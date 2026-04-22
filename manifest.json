@@ -1,0 +1,22 @@
+{
+  "name": "DATACAMP Inventari",
+  "short_name": "DataCamp",
+  "description": "Eina de recollida de dades en camp",
+  "start_url": "datacamp.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#c60c30",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

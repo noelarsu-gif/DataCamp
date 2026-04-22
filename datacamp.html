@@ -1,0 +1,616 @@
+  <!DOCTYPE html>
+  <html lang="ca">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>DATACAMP - Inventari V4.5</title>
+      
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c60c30">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+      
+      <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+      <style>
+          :root { --primary: #c60c30; --dark: #333; --light: #f4f4f4; --border: #ccc; }
+          body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #e0e0e0; display: flex; justify-content: center; color: var(--dark); }
+          .container { width: 100%; max-width: 500px; background: white; min-height: 100vh; border-top: 6px solid var(--primary); box-shadow: 0 0 20px rgba(0,0,0,0.2); position: relative; }
+          
+          header { padding: 20px; border-bottom: 2px solid var(--primary); text-align: center; background: #fff; position: sticky; top: 0; z-index: 10; }
+          .screen { display: none; padding: 20px; padding-bottom: 60px; }
+          .active { display: block; animation: fadeIn 0.3s; }
+          @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+          .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; transition: 0.2s; box-sizing: border-box; }
+          .btn-main { background: var(--primary); color: white; }
+          .btn-main:active { background: #a00a26; transform: scale(0.98); }
+          .btn-sec { background: white; border: 2px solid var(--primary); color: var(--primary); }
+          .btn-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; padding: 12px; font-size: 0.9rem; }
+        .btn-hist { padding: 8px; font-size: 0.75rem; width: auto; margin: 0; flex: 1; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; color: #666; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; outline: none; box-sizing: border-box; }
+        .pk-row { display: flex; align-items: center; gap: 10px; }
+        
+        #drop-zone { border: 2px dashed #bbb; padding: 25px; text-align: center; color: #777; cursor: pointer; background: #fafafa; border-radius: 8px; margin-bottom: 10px; }
+        .photo-buttons { display: flex; gap: 10px; }
+        .btn-photo { flex: 1; background: #f0f0f0; border: 1px solid #ccc; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
+        .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        .photo-item { position: relative; height: 100px; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+  .btn-del-photo { 
+    position: absolute; 
+    top: 0px; 
+    right: 0px; 
+    background: var(--primary); 
+    color: white; 
+    border-radius: 0 0 0 12px; /* Forma de cantonada */
+    width: 35px; 
+    height: 35px; 
+    border: none; 
+    cursor: pointer; 
+    z-index: 100; /* Sempre per sobre */
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.card { background: white; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .drag-handle { cursor: grab; color: #ccc; font-size: 1.5rem; }
+        
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; box-sizing:border-box; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+                <div style="font-weight: 900; color: var(--primary); font-size: 1.4rem;">DATACAMP</div>
+                <div style="font-size: 0.75rem; color: #777;">Eina de recollida de dades en camp</div>
+            </div>
+            <button onclick="toggleHelp()" style="background: none; border: 2px solid var(--primary); color: var(--primary); border-radius: 50%; width: 35px; height: 35px; font-weight: bold; cursor: pointer;">?</button>
+        </div>
+    </header>
+
+    <div id="home" class="screen active">
+        <button class="btn btn-main" onclick="openProjectModal()">➕ NOU PROJECTE</button>
+        <button class="btn btn-sec" onclick="historial()">📂 HISTORIAL</button>
+        <button class="btn btn-sec" style="background: #fff8e1; border-color: #ffc107; color: #856404;" onclick="ir('downloads')">📥 DESCÀRREGUES I COMPARTIR</button>
+        
+        <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+            <button class="btn btn-sec" style="border-color:#ccc; color:#666" onclick="exportarBackup()">📤 Exportar Backup Global</button>
+            <button class="btn btn-sec" style="border-color:#ccc; color:#666" onclick="document.getElementById('importFile').click()">📥 Importar Backup</button>
+            <input type="file" id="importFile" hidden onchange="importarBackup(this)">
+        </div>
+    </div>
+
+<div id="helpScreen" class="screen">
+    <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Guia i Consells</h3>
+    
+    <div style="font-size: 0.9rem; line-height: 1.6; color: #444;">
+        
+        <div style="background: #fff8e1; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; margin-bottom: 15px;">
+            <b style="color: #856404;">📏 Inventaris Grans</b><br>
+            Per a projectes extensos, és millor <b>crear un projecte diferent per a cada carretera</b> o tram. Això fa que l'app sigui més ràpida i els informes més fàcils de gestionar.
+        </div>
+
+        <div style="background: #fdf2f2; padding: 15px; border-radius: 8px; border-left: 5px solid #f87171; margin-bottom: 15px;">
+            <b style="color: #991b1b;">⚠️ Borrat de Dades</b><br>
+            Les dades es guarden al navegador del teu mòbil. Si esborres l'historial o les dades de lloc de Chrome/Safari, <b>perdràs tots els inventaris</b> si no has fet backup.
+        </div>
+
+        <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 5px solid #4ade80; margin-bottom: 15px;">
+            <b style="color: #166534;">💾 Seguretat i Compartició</b><br>
+            * <b>Backups:</b> Descarrega un "Backup Global" regularment per evitar pèrdues.
+            * <b>Sincronització:</b> Per passar la feina a un altre mòbil o PC, exporta el fitxer <b>Backup</b> i importa'l al nou dispositiu.
+        </div>
+        
+<div style="background: #e0f2fe; padding: 15px; border-radius: 8px; border-left: 5px solid #0ea5e9; margin-bottom: 15px;">
+            <b style="color: #0369a1;">📊 Què exportar?</b><br>
+            * <b>PDF Fitxa:</b> Ideal per a informes detallats. Mostra totes les fotos a mida gran.
+            * <b>PDF Taula:</b> Ideal per a resums ràpids. Només mostra la primera foto per estalviar espai.
+            * <b>Excel:</b> Perfecte per treballar les dades numèriques en oficina.
+        </div>
+        
+<div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 5px solid #0ea5e9; margin-bottom: 15px;">
+            <b style="color: #0369a1;">📸 Fotos de Qualitat</b><br>
+            * **Format:** És millor fer les fotos en <b>format horitzontal</b> (apaïsat). Així s'adapten millor al PDF i es veuen més grans.
+            * **Borrat:** Pots esborrar fotos clicant la "X" vermella a la cantonada de cada imatge.
+        </div>
+
+        <p>💡 <i>Consell: Utilitza l'opció <b>Clonar</b> per mantenir configuracions de formularis personalitzats sense haver de reconfigurar-los.</i></p>
+    </div>
+    
+
+    
+    <button class="btn btn-sec" style="margin-top: 10px;" onclick="ir('home')">TORNAR AL MENÚ</button>
+</div>
+
+
+   <div id="downloads" class="screen">
+        <h3>📥 Gestió de Fitxers</h3>
+        <div id="listaDescargas" style="margin-top: 20px;"></div>
+        <button class="btn btn-sec" style="margin-top: 20px;" onclick="ir('home')">TORNAR</button>
+    </div>
+
+    <div id="config" class="screen">
+        <h3>🛠️ Disseny del Formulari</h3>
+        <div id="fieldList" style="margin: 20px 0; border: 1px inset #f0f0f0; padding: 10px; border-radius: 8px; min-height: 40px;"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn btn-sec" onclick="addField('text')">+ Text</button>
+            <button class="btn btn-sec" onclick="addField('carretera', 'Carretera')">+ Carretera</button>
+            <button class="btn btn-sec" onclick="addField('pk', 'PK')">+ Bloc PK</button>
+            <button class="btn btn-sec" onclick="addField('marge', 'Marge')">+ Marge</button>
+            <button class="btn btn-sec" onclick="addField('obs', 'Observacions')">+ Observacions</button>
+        </div>
+        <button class="btn btn-main" style="margin-top:30px" onclick="finalitzarConfig()">CREAR/ACTUALITZAR FORMULARI 🚀</button>
+        <button class="btn btn-sec" onclick="ir('home')">TORNAR</button>
+    </div>
+
+    <div id="form" class="screen">
+        <div class="form-group"><label>Nom del Projecte</label><input type="text" id="titulo" placeholder="Ex: Millora C-55"></div>
+        <div id="dynamicFields"></div>
+    <div class="form-group">
+    <label>Imatges</label>
+    <div id="drop-zone" style="min-height: 120px; height: auto; padding: 15px; cursor: default;">
+        <div id="preview" class="photo-grid"></div>
+    </div>
+    
+    <div class="photo-buttons">
+        <button class="btn-photo" onclick="document.getElementById('fCam').click()">📸 CÀMERA</button>
+        <button class="btn-photo" onclick="document.getElementById('fGal').click()">🖼️ GALERIA</button>
+    </div>
+    <input type="file" id="fCam" accept="image/*" capture="environment" onchange="handleFotos(this)" style="display:none">
+    <input type="file" id="fGal" multiple accept="image/*" onchange="handleFotos(this)" style="display:none">
+</div>
+
+
+        <button class="btn btn-main" onclick="saveReg()">💾 GUARDAR REGISTRE</button>
+        
+        <button class="btn btn-sec" style="margin-top:20px; background: #f9f9f9;" onclick="ir('puntsLlistat')">
+            📍 PUNTS RECOLLITS (<span id="regCountBtn">0</span>)
+        </button>
+
+        <button class="btn btn-sec" style="margin-top:20px; border:none" onclick="ir('home')">⬅️ Menú Principal</button>
+    </div>
+
+    <div id="puntsLlistat" class="screen">
+        <h3 style="color: var(--primary);">Gestió de Punts</h3>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Arrossega ☰ per reordenar els punts recollits.</p>
+        <div id="regList"></div>
+        <button class="btn btn-main" style="margin-top:25px;" onclick="ir('form')">TORNAR AL FORMULARI</button>
+    </div>
+
+    <div id="list" class="screen">
+        <h3>Arxiu de Projectes</h3>
+        <div id="listaInventarios"></div>
+        <button class="btn btn-sec" onclick="ir('home')">TORNAR</button>
+    </div>
+
+    <div id="projectModal" class="modal" onclick="closeModal()">
+        <div style="background:white; padding:25px; border-radius:12px; width:100%; max-width:350px;" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0">Quin inventari farem?</h3>
+            <button class="btn btn-sec" onclick="crearProyecto('basic')">Estàndard (Carretera/PK)</button>
+            <button class="btn btn-sec" onclick="irConfigurador()">🛠️ Personalitzat (A mida)</button>
+            <button class="btn btn-main" style="margin-top:10px; background:#444" onclick="closeModal()">Cancel·lar</button>
+        </div>
+    </div>
+    
+    <div id="exportModal" class="modal" onclick="closeExportModal()">
+    <div style="background:white; padding:25px; border-radius:12px; width:80%; max-width:300px; text-align:center;" onclick="event.stopPropagation()">
+        <h3 id="exportTitle" style="margin-top:0; color:var(--primary);">Exportar fitxer</h3>
+        <p id="exportName" style="font-size:0.8rem; color:#666; margin-bottom:20px;"></p>
+        
+        <button class="btn btn-main" id="btnShare" style="background:#25D366; border:none;">📲 COMPARTIR</button>
+        <button class="btn btn-sec" id="btnDownload">💾 DESCARREGAR</button>
+        <button class="btn btn-sec" style="margin-top:10px; border:none; color:#999;" onclick="closeExportModal()">Cancel·lar</button>
+    </div>
+</div>
+</div>
+
+<script>
+
+let currentBlob = null;
+let currentFileName = "";
+let db, curId = "", regs = [], fields = [], tmpFotos = [], editIdx = -1;
+
+const req = indexedDB.open("GencatDinaV4", 1);
+req.onupgradeneeded = e => { 
+    e.target.result.createObjectStore("projects", { keyPath: "id" }); 
+};
+req.onsuccess = e => { db = e.target.result; };
+
+window.onload = () => {
+    const dz = document.getElementById('drop-zone');
+    if(dz){
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
+            dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
+        });
+        dz.addEventListener('drop', e => { handleFotos({ files: e.dataTransfer.files }); });
+    }
+
+    // Sortable per la previsualització de fotos
+    const previewEl = document.getElementById('preview');
+    if (previewEl) {
+        Sortable.create(previewEl, { 
+            animation: 150,
+            filter: '.btn-del-photo',
+            preventOnFilter: false 
+        });
+    }
+    
+    // Sortable per la llista de punts
+    const regListEl = document.getElementById('regList');
+    if (regListEl) {
+        Sortable.create(regListEl, { 
+            animation: 150, 
+            handle: '.drag-handle',
+            onEnd: function() {
+                let nousRegs = [];
+                document.querySelectorAll('#regList .card').forEach(el => {
+                    nousRegs.push(regs[parseInt(el.getAttribute('data-idx'))]);
+                });
+                regs = nousRegs;
+                actualizarDB(document.getElementById('titulo').value);
+                renderRegs();
+            }
+        });
+    }
+};
+
+function ir(id) { 
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    const target = document.getElementById(id);
+    if(target) target.classList.add("active");
+    if(id === 'downloads') carregarLlistaDescargues();
+    window.scrollTo(0,0);
+}
+
+function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('projectModal').style.display = 'none'; }
+function irConfigurador() { closeModal(); fields = []; renderConfig(); ir('config'); }
+
+function addField(type, label = "") {
+    let fl = label || prompt("Nom del camp:");
+    if(fl) { fields.push({type, label: fl}); renderConfig(); }
+}
+
+function renderConfig() {
+    const l = document.getElementById('fieldList');
+    l.innerHTML = fields.length === 0 ? "<p style='color:#999;text-align:center'>Formulari buit</p>" : 
+        fields.map((f, i) => `<div class="card" style="padding:10px; margin-bottom:5px"><span><b>${f.type.toUpperCase()}:</b> ${f.label}</span><button class="btn-danger btn-mini" style="margin-left:auto; padding:5px 10px" onclick="fields.splice(${i},1);renderConfig()">❌</button></div>`).join('');
+}
+
+function finalitzarConfig() {
+    if(fields.length === 0) return alert("Afegeix algun camp primer.");
+    const t = document.getElementById('titulo').value || "Sense títol";
+    actualizarDB(t);
+    renderForm(); 
+    renderRegs();
+    ir('form');
+}
+
+function crearProyecto(tipo) {
+    closeModal(); curId = "p_" + Date.now(); regs = []; document.getElementById('titulo').value = "";
+    if(tipo === 'basic') fields = [{type:'carretera', label:'Carretera'}, {type:'pk', label:'PK'}, {type:'marge', label:'Marge'}, {type:'obs', label:'Observacions'}];
+    renderForm(); renderRegs(); ir('form');
+}
+
+function renderForm() {
+    document.getElementById('dynamicFields').innerHTML = fields.map((f, i) => {
+        if(f.type === 'text' || f.type === 'carretera') return `<div class="form-group"><label>${f.label}</label><input type="text" class="dyn-input" data-idx="${i}"></div>`;
+        if(f.type === 'pk') return `<div class="form-group"><label>${f.label}</label><div class="pk-row"><input type="number" class="pk-km" data-idx="${i}" placeholder="Km"> <b>+</b> <input type="number" class="pk-m" data-idx="${i}" placeholder="m" onblur="if(this.value!='')this.value=this.value.padStart(3,'0')"></div></div>`;
+        if(f.type === 'marge') return `<div class="form-group"><label>${f.label}</label><select class="dyn-marge" data-idx="${i}"><option>MD</option><option>ME</option><option>Eix</option></select></div>`;
+        if(f.type === 'obs') return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-obs" data-idx="${i}" rows="2"></textarea></div>`;
+    }).join('');
+}
+
+function saveReg() {
+    const t = document.getElementById('titulo').value;
+    if(!t) return alert("Posa nom al projecte.");
+    let data = { values: [], fotos: [...tmpFotos] };
+    fields.forEach((f, i) => {
+        let val = "";
+        if(f.type === 'text' || f.type === 'carretera') val = document.querySelector(`.dyn-input[data-idx="${i}"]`).value;
+        if(f.type === 'pk') val = (document.querySelectorAll(`.pk-km[data-idx="${i}"]`)[0].value || "0") + "+" + (document.querySelectorAll(`.pk-m[data-idx="${i}"]`)[0].value || "000");
+        if(f.type === 'marge') val = document.querySelector(`.dyn-marge[data-idx="${i}"]`).value;
+        if(f.type === 'obs') val = document.querySelector(`.dyn-obs[data-idx="${i}"]`).value;
+        data.values.push({ label: f.label, val });
+    });
+    if(editIdx > -1) regs[editIdx] = data; else regs.push(data);
+    actualizarDB(t); clearInputs(); renderRegs();
+}
+
+function clearInputs() {
+    fields.forEach((f, i) => { if(f.type !== 'carretera') document.querySelectorAll(`[data-idx="${i}"]`).forEach(el => el.value = ""); });
+    tmpFotos = []; renderPreview(); editIdx = -1;
+}
+
+function renderRegs() {
+    const count = regs.length;
+    document.getElementById('regCountBtn').innerText = count;
+    const list = document.getElementById('regList');
+    if(list) {
+        list.innerHTML = regs.map((r, i) => `
+            <div class="card" data-idx="${i}">
+                <div class="drag-handle">☰</div>
+                <div style="flex-grow:1; font-size:0.85rem"><b>${r.values[0]?.val || ''}</b> ${r.values[1]?.val || ''}</div>
+                <button class="btn-sec btn-hist" onclick="loadE(${i})">Edit</button>
+                <button class="btn-danger btn-hist" onclick="eliminarPunt(${i})">🗑️</button>
+            </div>`).join('');
+    }
+}
+
+function eliminarPunt(i) {
+    if(confirm('Borrar punt?')) {
+        regs.splice(i, 1);
+        actualizarDB(document.getElementById('titulo').value);
+        renderRegs();
+    }
+}
+
+function loadE(i) {
+    editIdx = i; const r = regs[i];
+    fields.forEach((f, fIdx) => {
+        const item = r.values[fIdx]; if(!item) return;
+        if(f.type === 'text' || f.type === 'carretera') document.querySelector(`.dyn-input[data-idx="${fIdx}"]`).value = item.val;
+        if(f.type === 'pk') { 
+            const p = item.val.split('+'); 
+            document.querySelectorAll(`.pk-km[data-idx="${fIdx}"]`)[0].value = p[0]; 
+            document.querySelectorAll(`.pk-m[data-idx="${fIdx}"]`)[0].value = p[1]; 
+        }
+        if(f.type === 'marge') document.querySelector(`.dyn-marge[data-idx="${fIdx}"]`).value = item.val;
+        if(f.type === 'obs') document.querySelector(`.dyn-obs[data-idx="${fIdx}"]`).value = item.val;
+    });
+    tmpFotos = [...r.fotos]; 
+    renderPreview(); 
+    ir('form');
+}
+
+async function handleFotos(input) {
+    for (let f of Array.from(input.files)) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                const cvs = document.createElement("canvas");
+                const max = 1000; let w = img.width, h = img.height;
+                if (w > max) { h *= max / w; w = max; }
+                cvs.width = w; cvs.height = h;
+                cvs.getContext("2d").drawImage(img, 0, 0, w, h);
+                tmpFotos.push(cvs.toDataURL("image/jpeg", 0.7));
+                renderPreview();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(f);
+    }
+}
+
+function renderPreview() {
+    const preview = document.getElementById('preview');
+    if(preview) {
+        preview.innerHTML = tmpFotos.map((f, i) => `
+            <div class="photo-item" style="height: 110px;">
+                <img src="${f}">
+                <button class="btn-del-photo" onclick="eliminarFoto(event, ${i})">✕</button>
+            </div>`).join('');
+    }
+}
+
+function eliminarFoto(event, index) {
+    event.stopPropagation();
+    tmpFotos.splice(index, 1);
+    renderPreview();
+}
+
+function actualizarDB(t) {
+    if(!db) return;
+    db.transaction("projects", "readwrite").objectStore("projects").put({ id: curId, titulo: t, fields, registros: regs, fecha: new Date().toLocaleDateString() });
+}
+
+function historial() {
+    const l = document.getElementById("listaInventarios"); 
+    l.innerHTML = "";
+    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
+        const result = e.target.result;
+        if(result.length === 0) {
+            l.innerHTML = "<p style='text-align:center; padding:20px; color:#999'>No hi ha projectes guardats.</p>";
+        }
+        result.forEach(p => {
+            const div = document.createElement("div"); div.className = "card";
+            div.innerHTML = `<div style="flex-grow:1"><b>${p.titulo}</b><br><small>${p.fecha} · ${p.registros.length} pts</small></div>
+                <div style="display:flex; flex-direction:column; gap:4px">
+                    <button class="btn-main btn-hist" onclick="openP('${p.id}')">OBRIR</button>
+                    <button class="btn-sec btn-hist" onclick="clonarP('${p.id}')">CLONAR</button>
+                    <button class="btn-danger btn-hist" onclick="borrarP('${p.id}')">🗑️</button>
+                </div>`;
+            l.appendChild(div);
+        });
+        ir("list");
+    };
+}
+
+function borrarP(id) { if(confirm("Eliminar tot el projecte?")) db.transaction("projects", "readwrite").objectStore("projects").delete(id).onsuccess = () => historial(); }
+
+function openP(id) {
+    db.transaction("projects").objectStore("projects").get(id).onsuccess = e => {
+        const p = e.target.result; curId = p.id; fields = p.fields; regs = p.registros;
+        document.getElementById('titulo').value = p.titulo; renderForm(); renderRegs(); ir('form');
+    };
+}
+
+function clonarP(id) {
+    db.transaction("projects").objectStore("projects").get(id).onsuccess = e => {
+        const p = e.target.result;
+        fields = JSON.parse(JSON.stringify(p.fields)); 
+        regs = JSON.parse(JSON.stringify(p.registros)); 
+        curId = "p_" + Date.now();
+        const nouTitol = p.titulo + " (Copia)";
+        document.getElementById('titulo').value = nouTitol;
+        actualizarDB(nouTitol); 
+        renderForm();
+        renderRegs();
+        ir('form');
+    };
+}
+
+function carregarLlistaDescargues() {
+    const l = document.getElementById("listaDescargas");
+    l.innerHTML = "";
+    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
+        const projectes = e.target.result;
+        if(projectes.length === 0) {
+            l.innerHTML = "<p style='text-align:center; color:#999;'>No hi ha projectes guardats.</p>";
+            return;
+        }
+        projectes.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "card";
+            div.style = "flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px;";
+            div.innerHTML = `
+                <div style="font-weight: bold; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 5px; color: var(--primary);">${p.titulo}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                    <button class="btn-main btn-hist" onclick="exportarICompartir('${p.id}', 'Fitxa')">📄 PDF Fitxa</button>
+                    <button class="btn-main btn-hist" onclick="exportarICompartir('${p.id}', 'Taula')">📊 PDF Taula</button>
+                    <button class="btn-sec btn-hist" onclick="exportarICompartir('${p.id}', 'excel')">Excel</button>
+                    <button class="btn-sec btn-hist" style="border-color:#666; color:#666" onclick="exportarICompartir('${p.id}', 'backup')">Backup</button>
+                </div>
+            `;
+            l.appendChild(div);
+        });
+    };
+}
+
+async function exportarICompartir(id, tipus) {
+    db.transaction("projects").objectStore("projects").get(id).onsuccess = async e => {
+        const p = e.target.result;
+        if (tipus === 'Fitxa' || tipus === 'Taula') {
+            currentBlob = await generarBlobPDF(p, tipus);
+            currentFileName = `Inventari_${p.titulo.replace(/\s+/g, '_')}.pdf`;
+        } else if (tipus === 'excel') {
+            currentBlob = generarBlobExcel(p);
+            currentFileName = `Dades_${p.titulo.replace(/\s+/g, '_')}.xlsx`;
+        } else if (tipus === 'backup') {
+            currentBlob = new Blob([JSON.stringify([p])], {type: "application/json"});
+            currentFileName = `Backup_${p.titulo.replace(/\s+/g, '_')}.json`;
+        }
+
+        document.getElementById('exportTitle').innerText = tipus.toUpperCase();
+        document.getElementById('exportName').innerText = currentFileName;
+        
+        document.getElementById('btnShare').onclick = () => {
+            const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+            if (navigator.share) {
+                navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+            } else {
+                alert("El teu navegador no permet compartir directament.");
+            }
+            closeExportModal();
+        };
+
+        document.getElementById('btnDownload').onclick = () => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(currentBlob);
+            a.download = currentFileName;
+            a.click();
+            closeExportModal();
+        };
+        document.getElementById('exportModal').style.display = 'flex';
+    };
+}
+
+async function generarBlobPDF(p, tipus) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const localRegs = p.registros;
+    const localFields = p.fields;
+
+    if (tipus === 'Fitxa') {
+        localRegs.forEach((r, i) => {
+            if (i > 0) doc.addPage();
+            doc.setFillColor(198, 12, 48); doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255); doc.setFontSize(14); doc.text("INFORME TÈCNIC", 15, 10);
+            doc.setTextColor(0); doc.setFontSize(12); doc.text(`Projecte: ${p.titulo}`, 15, 22);
+            doc.autoTable({
+                startY: 28,
+                head: [['Paràmetre', 'Valor']],
+                body: r.values.map(v => [v.label, v.val]),
+                theme: 'striped',
+                headStyles: { fillColor: [100, 100, 100] }
+            });
+            let y = doc.lastAutoTable.finalY + 10;
+            const imgW = 180, imgH = 105;
+            r.fotos.forEach(f => {
+                if (y + imgH > 285) { doc.addPage(); y = 20; }
+                doc.addImage(f, 'JPEG', 15, y, imgW, imgH);
+                y += imgH + 8;
+            });
+        });
+    } else {
+        doc.text("RESUM: " + p.titulo, 15, 15);
+        const headers = localFields.map(f => f.label); headers.push("Imatges");
+        doc.autoTable({
+            startY: 22,
+            head: [headers],
+            body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
+            styles: { valign: 'middle', fontSize: 8 },
+            bodyStyles: { minCellHeight: 25 },
+            didDrawCell: (data) => {
+                if (data.column.index === localFields.length && data.cell.section === 'body') {
+                    const r = localRegs[data.row.index];
+                    if (r.fotos.length > 0) doc.addImage(r.fotos[0], 'JPEG', data.cell.x + 2, data.cell.y + 2, 12, 12);
+                }
+            }
+        });
+    }
+    return doc.output('blob');
+}
+
+function generarBlobExcel(p) {
+    const ws = XLSX.utils.json_to_sheet(p.registros.map(r => { let o = {}; r.values.forEach(v => o[v.label] = v.val); return o; }));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Dades");
+    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+function exportarBackup() {
+    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
+        const blob = new Blob([JSON.stringify(e.target.result)], {type: "application/json"});
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "backup_global.json"; a.click();
+    };
+}
+
+function importarBackup(input) {
+    const fr = new FileReader();
+    fr.onload = e => {
+        const tx = db.transaction("projects", "readwrite");
+        JSON.parse(e.target.result).forEach(item => tx.objectStore("projects").put(item));
+        tx.oncomplete = () => historial();
+    };
+    fr.readAsText(input.files[0]);
+}
+
+function toggleHelp() { 
+    const helpScreen = document.getElementById('helpScreen');
+    if (helpScreen.classList.contains('active')) ir('home'); else ir('helpScreen');
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').style.display = 'none';
+    currentBlob = null;
+    currentFileName = "";
+}
+
+
+</script>
+</body>
+</html>
