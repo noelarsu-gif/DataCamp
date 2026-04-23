@@ -588,6 +588,61 @@ async function generarBlobPDF(p, tipus) {
             head: [headers],
             body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
             theme: 'striped',
+           async function generarBlobPDF(p, tipus) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const localRegs = p.registros;
+    const localFields = p.fields;
+
+    if (tipus === 'Fitxa') {
+        localRegs.forEach((r, i) => {
+            if (i > 0) doc.addPage();
+            doc.setFillColor(58, 52, 50); doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255); doc.setFontSize(14); doc.text("INFORME TÈCNIC", 15, 10);
+            doc.setTextColor(0); doc.setFontSize(12); doc.text(`Projecte: ${p.titulo}`, 15, 22);
+            doc.autoTable({
+                startY: 28,
+                head: [['Paràmetre', 'Valor']],
+                body: r.values.map(v => [v.label, v.val]),
+                theme: 'striped',
+                headStyles: { fillColor: [60, 60, 60] }
+            });
+            let y = doc.lastAutoTable.finalY + 10;
+                        // Codi corregit per a les línies 551-555
+            r.fotos.forEach(f => {
+                const props = doc.getImageProperties(f);
+                const ampleMax = 180;
+                const altMax = 90; // Limitem l'alçada perquè en cabdin dues
+                
+                // Calculem la proporció per no deformar
+                const rati = Math.min(ampleMax / props.width, altMax / props.height);
+                const wFinal = props.width * rati;
+                const hFinal = props.height * rati;
+                
+                // Centrem la foto horitzontalment
+                const xCentrat = 15 + (ampleMax - wFinal) / 2;
+
+                if (y + hFinal > 280) { 
+                    doc.addPage(); 
+                    y = 20; 
+                }
+                
+                doc.addImage(f, 'JPEG', xCentrat, y, wFinal, hFinal);
+                y += hFinal + 8;
+            });
+
+        });
+    } else {
+        doc.setFontSize(14);
+        doc.text("PROJECTE: " + p.titulo, 15, 15);
+        const headers = localFields.map(f => f.label); 
+        headers.push("Imatges");
+
+        doc.autoTable({
+            startY: 22,
+            head: [headers],
+            body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
+            theme: 'striped',
             headStyles: { fillColor: [100, 100, 100] },
             styles: { valign: 'middle', fontSize: 8, overflow: 'linebreak' },
             // Fem les files més altes (35mm) per veure bé la foto
@@ -626,6 +681,7 @@ async function generarBlobPDF(p, tipus) {
                 }
             }
         });
+    }
     }
 
 
