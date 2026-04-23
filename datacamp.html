@@ -495,7 +495,12 @@ async function exportarICompartir(id, tipus) {
         const p = e.target.result;
         if (tipus === 'Fitxa' || tipus === 'Taula') {
             currentBlob = await generarBlobPDF(p, tipus);
-            currentFileName = `Inventari_${p.titulo.replace(/\s+/g, '_')}.pdf`;
+if (tipus === 'Fitxa') {
+    currentFileName = `Fitxa_${p.titulo.replace(/\s+/g, '_')}.pdf`;
+} else {
+    currentFileName = `Taula_${p.titulo.replace(/\s+/g, '_')}.pdf`;
+}
+
         } else if (tipus === 'excel') {
             currentBlob = generarBlobExcel(p);
             currentFileName = `Dades_${p.titulo.replace(/\s+/g, '_')}.xlsx`;
@@ -537,7 +542,7 @@ async function generarBlobPDF(p, tipus) {
     if (tipus === 'Fitxa') {
         localRegs.forEach((r, i) => {
             if (i > 0) doc.addPage();
-            doc.setFillColor(198, 12, 48); doc.rect(0, 0, 210, 15, 'F');
+            doc.setFillColor(58, 52, 50); doc.rect(0, 0, 210, 15, 'F');
             doc.setTextColor(255); doc.setFontSize(14); doc.text("INFORME TÈCNIC", 15, 10);
             doc.setTextColor(0); doc.setFontSize(12); doc.text(`Projecte: ${p.titulo}`, 15, 22);
             doc.autoTable({
@@ -545,33 +550,85 @@ async function generarBlobPDF(p, tipus) {
                 head: [['Paràmetre', 'Valor']],
                 body: r.values.map(v => [v.label, v.val]),
                 theme: 'striped',
-                headStyles: { fillColor: [100, 100, 100] }
+                headStyles: { fillColor: [60, 60, 60] }
             });
             let y = doc.lastAutoTable.finalY + 10;
-            const imgW = 180, imgH = 105;
+                        // Codi corregit per a les línies 551-555
             r.fotos.forEach(f => {
-                if (y + imgH > 285) { doc.addPage(); y = 20; }
-                doc.addImage(f, 'JPEG', 15, y, imgW, imgH);
-                y += imgH + 8;
+                const props = doc.getImageProperties(f);
+                const ampleMax = 180;
+                const altMax = 90; // Limitem l'alçada perquè en cabdin dues
+                
+                // Calculem la proporció per no deformar
+                const rati = Math.min(ampleMax / props.width, altMax / props.height);
+                const wFinal = props.width * rati;
+                const hFinal = props.height * rati;
+                
+                // Centrem la foto horitzontalment
+                const xCentrat = 15 + (ampleMax - wFinal) / 2;
+
+                if (y + hFinal > 280) { 
+                    doc.addPage(); 
+                    y = 20; 
+                }
+                
+                doc.addImage(f, 'JPEG', xCentrat, y, wFinal, hFinal);
+                y += hFinal + 8;
             });
+
         });
     } else {
-        doc.text("RESUM: " + p.titulo, 15, 15);
-        const headers = localFields.map(f => f.label); headers.push("Imatges");
+        doc.setFontSize(14);
+        doc.text("PROJECTE: " + p.titulo, 15, 15);
+        const headers = localFields.map(f => f.label); 
+        headers.push("Imatges");
+
         doc.autoTable({
             startY: 22,
             head: [headers],
             body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
-            styles: { valign: 'middle', fontSize: 8 },
-            bodyStyles: { minCellHeight: 25 },
+            theme: 'striped',
+            headStyles: { fillColor: [100, 100, 100] },
+            styles: { valign: 'middle', fontSize: 8, overflow: 'linebreak' },
+            // Fem les files més altes (35mm) per veure bé la foto
+            bodyStyles: { minCellHeight: 35 },
+            columnStyles: {
+                // Forcem que l'última columna (la foto) mesuri 35mm d'ample
+                [localFields.length]: { cellWidth: 35 }
+            },
             didDrawCell: (data) => {
+                // Si és la columna de la imatge i no és la capçalera
                 if (data.column.index === localFields.length && data.cell.section === 'body') {
                     const r = localRegs[data.row.index];
-                    if (r.fotos.length > 0) doc.addImage(r.fotos[0], 'JPEG', data.cell.x + 2, data.cell.y + 2, 12, 12);
+                    if (r.fotos && r.fotos.length > 0) {
+                        const f = r.fotos[0];
+                        try {
+                            const props = doc.getImageProperties(f);
+                            
+                            // Mida útil de la cel·la deixant un marge de 2mm
+                            const cW = data.cell.width - 4;
+                            const cH = data.cell.height - 4;
+
+                            // Calculem rati per mantenir proporció original (SENSE DEFORMAR)
+                            const rati = Math.min(cW / props.width, cH / props.height);
+                            const wFinal = props.width * rati;
+                            const hFinal = props.height * rati;
+
+                            // Centrem la foto dins la cel·la
+                            const xCentrat = data.cell.x + (data.cell.width - wFinal) / 2;
+                            const yCentrat = data.cell.y + (data.cell.height - hFinal) / 2;
+
+                            doc.addImage(f, 'JPEG', xCentrat, yCentrat, wFinal, hFinal);
+                        } catch (e) {
+                            console.error("Error en miniatura:", e);
+                        }
+                    }
                 }
             }
         });
     }
+
+
     return doc.output('blob');
 }
 
