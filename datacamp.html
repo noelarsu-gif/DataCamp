@@ -88,7 +88,7 @@
         <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
             <button class="btn btn-sec" style="border-color:#ccc; color:#666" onclick="exportarBackup()">📤 Exportar Backup Global</button>
             <button class="btn btn-sec" style="border-color:#ccc; color:#666" onclick="document.getElementById('importFile').click()">📥 Importar Backup</button>
-            <input type="file" id="importFile" hidden onchange="importarBackup(this)">
+            <input type="file" id="importFile" accept="application/json" hidden onchange="importarBackup(this)">
         </div>
     </div>
 
