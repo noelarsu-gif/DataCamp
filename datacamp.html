@@ -14,7 +14,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>  
       <style>
           :root { --primary: #c60c30; --dark: #333; --light: #f4f4f4; --border: #ccc; }
           body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #e0e0e0; display: flex; justify-content: center; color: var(--dark); }
@@ -30,8 +30,130 @@
           .btn-main:active { background: #a00a26; transform: scale(0.98); }
           .btn-sec { background: white; border: 2px solid var(--primary); color: var(--primary); }
           .btn-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; padding: 12px; font-size: 0.9rem; }
-        .btn-hist { padding: 8px; font-size: 0.75rem; width: auto; margin: 0; flex: 1; }
+          .btn-hist { padding: 8px; font-size: 0.75rem; width: auto; margin: 0; flex: 1; }
+          .btn-menu-item {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--dark);
+    display: block;
+}
+
+.btn-back {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px; /* Cantons més rodons */
+    width: 50px;
+    height: 45px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(198, 12, 48, 0.3);
+    transition: 0.2s;
+}
+
+/* Visor de fotos a pantalla completa */
+.full-img-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction:column; justify-content:center; align-items:center; z-index:2000; }
+.full-img-modal img { max-width: 95%; max-height: 80%; object-fit: contain; border: 2px solid white; }
+
+/* Targetes de descàrrega compactes */
+.download-card { 
+    background: white; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px;
+}
+.download-header { display: flex; justify-content: space-between; align-items: center; }
+.download-actions { display: flex; gap: 8px; align-items: center; }
+.extra-options { display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
+
+/* Icona de lupa */
+.zoom-icon {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(37, 99, 235, 0.9); /* Azul para diferenciar del rojo de borrar */
+    color: white;
+    border-radius: 0 12px 0 0;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 101;
+    cursor: pointer;
+}
+
+.photo-item img {
+    cursor: default; /* Ya no parece cliqueable toda la foto */
+}
+
+
+.btn-back:active {
+    transform: scale(0.9);
+    background: #a00a26;
+}
+
+.screen-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-menu-item:active {
+    background: #f0f0f0;
+}
         
+/* Barra de cerca i filtres */
+.search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.search-input {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+.sort-select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
+    background: white;
+}
+
+/* Botons de navegació flotants (Scroll) */
+.scroll-btns {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+}
+.btn-scroll {
+    background: var(--primary);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-weight: bold;
+}
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; color: #666; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; outline: none; box-sizing: border-box; }
@@ -62,9 +184,68 @@
     font-weight: bold;
 }
 .card { background: white; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .drag-handle { cursor: grab; color: #ccc; font-size: 1.5rem; }
+        .drag-handle {
+    cursor: grab;
+    color: #999;
+    font-size: 1.5rem;
+    padding: 0 10px;
+    user-select: none;
+}
         
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; box-sizing:border-box; }
+
+/* Contenidor del switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px; /* Ample del switch */
+  height: 24px; /* Altura del switch */
+}
+
+/* Amagar el checkbox original */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* El lliscador (slider) */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Color quan està apagat */
+  transition: .4s;
+  border-radius: 24px;
+}
+
+/* El cercle blanc que es mou */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Color quan està activat (Blau tipus iOS/Android) */
+input:checked + .slider {
+  background-color: #2563eb;
+}
+
+/* Moviment del cercle cap a la dreta */
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
     </style>
 </head>
 <body>
@@ -76,12 +257,27 @@
                 <div style="font-weight: 900; color: var(--primary); font-size: 1.4rem;">DATACAMP</div>
                 <div style="font-size: 0.75rem; color: #777;">Eina de recollida de dades en camp</div>
             </div>
-            <button onclick="toggleHelp()" style="background: none; border: 2px solid var(--primary); color: var(--primary); border-radius: 50%; width: 35px; height: 35px; font-weight: bold; cursor: pointer;">?</button>
+            <div style="position: relative;">
+    <button onclick="toggleMenu()" style="background: none; border: 2px solid var(--primary); color: var(--primary); border-radius: 8px; width: 40px; height: 35px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; padding: 0;">
+        <div style="width: 20px; height: 2px; background: var(--primary);"></div>
+        <div style="width: 20px; height: 2px; background: var(--primary);"></div>
+        <div style="width: 20px; height: 2px; background: var(--primary);"></div>
+    </button>
+    
+    <div id="dropdownMenu" style="display: none; position: absolute; top: 45px; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 180px; z-index: 1000;">
+        <div style="padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; color: #999; font-weight: bold;">MENÚ</div>
+        <button class="btn-menu-item" onclick="navTo('home')">🏠 Inici</button>
+        <button class="btn-menu-item" style="color: #2563eb; font-weight: bold;" onclick="toggleMenu(); modeFotoDirecta();">📸 Foto Directa</button>
+        <button class="btn-menu-item" onclick="navTo('list')">📂 Historial</button>
+        <button class="btn-menu-item" onclick="navTo('downloads')">📥 Descàrregues</button>
+        <button class="btn-menu-item" onclick="navTo('helpScreen')">❓ Ajuda</button>
+    </div>   
         </div>
     </header>
 
     <div id="home" class="screen active">
         <button class="btn btn-main" onclick="openProjectModal()">➕ NOU PROJECTE</button>
+        <button class="btn btn-main" style="background: #2563eb;" onclick="modeFotoDirecta()">📸 FOTO DIRECTA (Mode Ràpid)</button>
         <button class="btn btn-sec" onclick="historial()">📂 HISTORIAL</button>
         <button class="btn btn-sec" style="background: #fff8e1; border-color: #ffc107; color: #856404;" onclick="ir('downloads')">📥 DESCÀRREGUES I COMPARTIR</button>
         
@@ -102,7 +298,32 @@
             Per a projectes extensos, és millor <b>crear un projecte diferent per a cada carretera</b> o tram. Això fa que l'app sigui més ràpida i els informes més fàcils de gestionar.
         </div>
 
-        <div style="background: #fdf2f2; padding: 15px; border-radius: 8px; border-left: 5px solid #f87171; margin-bottom: 15px;">
+        <div style="background: #e0f2fe; padding: 15px; border-radius: 12px; border: 1px solid #7dd3fc; margin-bottom: 15px;">
+            <b style="color: #0369a1; display: flex; align-items: center; gap: 8px;">🚀 Truc d'expert: Estalvia temps</b>
+            <p style="margin: 8px 0 0 0;">
+                Si fas servir el botó <b>"Descarregar Foto"</b> des del visor (la lupa), l'arxiu es guardarà automàticament amb el nom: <br>
+                <code style="background:#fff; padding:2px 4px; border-radius:4px; font-size:0.8rem; display:block; margin-top:5px; border:1px solid #bae6fd;">Projecte_Carretera_PK_Marge.jpg</code>
+                Així no caldrà que renombris les fotos una a una al PC!
+            </p>
+        </div>
+
+<div style="background: #f0fdf4; padding: 15px; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 15px;">
+    <b style="color: #166534; display: flex; align-items: center; gap: 8px;">⚡ Vols anar encara més ràpid? Prova la "Foto Directa"</b>
+    <p style="margin: 8px 0 0 0; font-size: 0.9rem;">
+        Dissenyada per a inspeccions d'alta eficiència, aquesta funció permet optimitzar totalment el flux de treball de camp a oficina:
+    </p>
+    <ul style="margin: 10px 0; padding-left: 20px; font-size: 0.85rem; color: #444; line-height: 1.4;">
+        <li style="margin-bottom: 5px;"><b>Traçabilitat Immediata:</b> El sistema genera automàticament la nomenclatura del fitxer (Carretera_PK_Marge) al moment de la captura.</li>
+        <li style="margin-bottom: 5px;"><b>Georeferenciació Visual:</b> Possibilitat d'incrustar un peu de foto tècnic amb les dades de l'inventari directament a la imatge.</li>
+        <li style="margin-bottom: 5px;"><b>Compartició Professional:</b> Pots enviar la foto a l'instant per correu electrònic, WhatsApp o núvol.</li>
+    </ul>
+    
+    <div style="background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #4ade80; margin-top: 10px; font-size: 0.8rem; color: #166534;">
+        <b>💡 Consell de gestió:</b> Per conservar la nomenclatura automàtica del fitxer, <b>recomanem compartir per Correu Electrònic</b>. WhatsApp i altres apps de missatgeria solen renombrar les imatges, fent que es perdi la identificació del PK i la carretera al fitxer original.
+    </div>
+</div>
+
+       <div style="background: #fdf2f2; padding: 15px; border-radius: 8px; border-left: 5px solid #f87171; margin-bottom: 15px;">
             <b style="color: #991b1b;">⚠️ Borrat de Dades</b><br>
             Les dades es guarden al navegador del teu mòbil. Si esborres l'historial o les dades de lloc de Chrome/Safari, <b>perdràs tots els inventaris</b> si no has fet backup.
         </div>
@@ -136,10 +357,15 @@
 
 
    <div id="downloads" class="screen">
-        <h3>📥 Gestió de Fitxers</h3>
-        <div id="listaDescargas" style="margin-top: 20px;"></div>
-        <button class="btn btn-sec" style="margin-top: 20px;" onclick="ir('home')">TORNAR</button>
+    <div class="screen-header">
+        <button class="btn-back" onclick="ir('home')">←</button>
+        <h3 style="margin:0">📥 Gestió de Fitxers</h3>
     </div>
+    
+    <div id="listaDescargas" style="margin-top: 10px;"></div>
+    
+    <button class="btn btn-sec" style="margin-top: 25px;" onclick="ir('home')">TORNAR A L'INICI</button>
+</div>
 
     <div id="config" class="screen">
         <h3>🛠️ Disseny del Formulari</h3>
@@ -158,6 +384,16 @@
     <div id="form" class="screen">
         <div class="form-group"><label>Nom del Projecte</label><input type="text" id="titulo" placeholder="Ex: Millora C-55"></div>
         <div id="dynamicFields"></div>
+<div style="display: flex; align-items: center; justify-content: space-between; background: #f0f7ff; padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #c7d2fe;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.2rem;">📝</span>
+        <span style="font-weight: bold; color: #1e40af; font-size: 0.85rem;">Mostrar dades peu foto</span>
+    </div>
+    <label class="switch">
+        <input type="checkbox" id="checkWatermark" checked>
+        <span class="slider round"></span>
+    </label>
+</div>
     <div class="form-group">
     <label>Imatges</label>
     <div id="drop-zone" style="min-height: 120px; height: auto; padding: 15px; cursor: default;">
@@ -174,26 +410,49 @@
 
 
         <button class="btn btn-main" onclick="saveReg()">💾 GUARDAR REGISTRE</button>
+        <button id="btnCancelarEdicio" class="btn btn-sec" style="display:none; background:#fff1f2; color:#be123c; border-color:#fecaca;" onclick="cancelarEdicio()">❌ CANCEL·LAR EDICIÓ</button>
         
-        <button class="btn btn-sec" style="margin-top:20px; background: #f9f9f9;" onclick="ir('puntsLlistat')">
-            📍 PUNTS RECOLLITS (<span id="regCountBtn">0</span>)
+        <button class="btn btn-sec" style="margin-top:20px; background: #f9f9f9;" onclick="renderRegs(); ir('puntsLlistat')">
+           (<span id="regCountBtn">0</span>)
         </button>
 
         <button class="btn btn-sec" style="margin-top:20px; border:none" onclick="ir('home')">⬅️ Menú Principal</button>
     </div>
 
     <div id="puntsLlistat" class="screen">
-        <h3 style="color: var(--primary);">Gestió de Punts</h3>
-        <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Arrossega ☰ per reordenar els punts recollits.</p>
-        <div id="regList"></div>
-        <button class="btn btn-main" style="margin-top:25px;" onclick="ir('form')">TORNAR AL FORMULARI</button>
+    <div class="screen-header">
+        <button class="btn-back" onclick="ir('form')">←</button>
+        <h3 style="margin:0">📍 Punts Recollits</h3>
     </div>
+    
+    <!-- Hem eliminat la search-bar d'aquí -->
+
+    <div id="regList"></div>
+    
+    <div class="scroll-btns">
+        <button class="btn-scroll" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+        <button class="btn-scroll" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">↓</button>
+    </div>
+    <button class="btn-main" style="margin-top:25px;" onclick="ir('form')">TORNAR AL FORMULARI</button>
+</div>
 
     <div id="list" class="screen">
-        <h3>Arxiu de Projectes</h3>
-        <div id="listaInventarios"></div>
-        <button class="btn btn-sec" onclick="ir('home')">TORNAR</button>
+    <div class="screen-header">
+        <button class="btn-back" onclick="ir('home')">←</button>
+        <h3 style="margin:0">📂 Historial</h3>
     </div>
+
+    <div class="search-bar">
+        <input type="text" id="searchHistorial" class="search-input" placeholder="Cerca projecte..." oninput="historial()">
+        <select id="sortHistorial" class="sort-select" onchange="historial()">
+            <option value="new">Recents</option>
+            <option value="old">Antics</option>
+        </select>
+    </div>
+    
+    <div id="listaInventarios"></div>
+    <button class="btn-sec" style="margin-top:20px" onclick="ir('home')">TORNAR</button>
+</div>
 
     <div id="projectModal" class="modal" onclick="closeModal()">
         <div style="background:white; padding:25px; border-radius:12px; width:100%; max-width:350px;" onclick="event.stopPropagation()">
@@ -266,12 +525,40 @@ window.onload = () => {
     }
 };
 
-function ir(id) { 
+let isFotoDirecta = false;
+
+function modeFotoDirecta() {
+    isFotoDirecta = true;
+    tmpFotos = []; // 🔥 IMPORTANT: netejar fotos antigues
+
+    const inputCam = document.getElementById('fCam');
+    if (inputCam) {
+        inputCam.click(); // 👉 obre càmera directa
+    }
+}
+
+function ir(id) {
+    // Reset de modes especials al tornar a inici
+    if (id === 'home') {
+        isFotoDirecta = false;
+        const btnSave = document.querySelector('.btn-main[onclick="saveReg()"]');
+        if (btnSave) {
+            btnSave.innerText = "💾 GUARDAR REGISTRE";
+            btnSave.style.background = "var(--primary)";
+        }
+        const btnPunts = document.querySelector('button[onclick="ir(\'puntsLlistat\')"]');
+        if (btnPunts) btnPunts.style.display = 'block';
+    }
+
+    // Navegació de pantalles
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     const target = document.getElementById(id);
-    if(target) target.classList.add("active");
-    if(id === 'downloads') carregarLlistaDescargues();
-    window.scrollTo(0,0);
+    if (target) {
+        target.classList.add("active");
+    }
+
+    if (id === 'downloads') carregarLlistaDescargues();
+    window.scrollTo(0, 0);
 }
 
 function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
@@ -313,56 +600,243 @@ function renderForm() {
     }).join('');
 }
 
-function saveReg() {
-    const t = document.getElementById('titulo').value;
-    if(!t) return alert("Posa nom al projecte.");
-    let data = { values: [], fotos: [...tmpFotos] };
-    fields.forEach((f, i) => {
-        let val = "";
-        if(f.type === 'text' || f.type === 'carretera') val = document.querySelector(`.dyn-input[data-idx="${i}"]`).value;
-        if(f.type === 'pk') val = (document.querySelectorAll(`.pk-km[data-idx="${i}"]`)[0].value || "0") + "+" + (document.querySelectorAll(`.pk-m[data-idx="${i}"]`)[0].value || "000");
-        if(f.type === 'marge') val = document.querySelector(`.dyn-marge[data-idx="${i}"]`).value;
-        if(f.type === 'obs') val = document.querySelector(`.dyn-obs[data-idx="${i}"]`).value;
-        data.values.push({ label: f.label, val });
-    });
-    if(editIdx > -1) regs[editIdx] = data; else regs.push(data);
-    actualizarDB(t); clearInputs(); renderRegs();
+
+function descarregarFitxerUnic() {
+    if (!currentBlob || !currentFileName) return;
+    
+    const url = URL.createObjectURL(currentBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = currentFileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Opcional: Netejar fotos després de baixar
+    tmpFotos = [];
+    renderPreview();
+    closeExportModal();
 }
 
-function clearInputs() {
-    fields.forEach((f, i) => { if(f.type !== 'carretera') document.querySelectorAll(`[data-idx="${i}"]`).forEach(el => el.value = ""); });
-    tmpFotos = []; renderPreview(); editIdx = -1;
+async function saveReg() {
+    const t = document.getElementById('titulo').value;
+    if (!t) return alert("Posa nom al projecte.");
+    if (isFotoDirecta && tmpFotos.length === 0) return alert("Fes una foto primer.");
+
+    // Recollida de dades dels camps
+        let data = { values: [], fotos: [] };
+
+// 1. Recollir valors
+fields.forEach((f, i) => {
+    let val = "";
+    const el = document.querySelector(`[data-idx="${i}"]`);
+
+    if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs') {
+        val = el ? el.value : "";
+    } else if (f.type === 'pk') {
+        const kms = document.querySelector(`.pk-km[data-idx="${i}"]`)?.value || "0";
+        const ms = document.querySelector(`.pk-m[data-idx="${i}"]`)?.value || "000";
+        val = kms + "+" + ms;
+    }
+
+    data.values.push({ label: f.label, val });
+});
+
+// 2. Processar fotos (🔥 AQUÍ està la clau)
+const showWatermark = document.getElementById('checkWatermark').checked;
+
+for (let f of tmpFotos) {
+    if (showWatermark) {
+        const carr = data.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "";
+        const pk = data.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "";
+        const marge = data.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
+
+        const txt = `${carr} • PK ${pk} • ${marge} • ${new Date().toLocaleDateString('ca-ES')}`;
+        const img = await aplicarMarcaAigua(f, txt);
+
+        data.fotos.push(img);
+    } else {
+        data.fotos.push(f);
+    }
+}
+        fields.forEach((f, i) => {
+        let val = "";
+        const el = document.querySelector(`[data-idx="${i}"]`);
+        if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs') {
+            val = el ? el.value : "";
+        } else if (f.type === 'pk') {
+            const kms = document.querySelector(`.pk-km[data-idx="${i}"]`)?.value || "0";
+            const ms = document.querySelector(`.pk-m[data-idx="${i}"]`)?.value || "000";
+            val = kms + "+" + ms;
+        }
+        
+    });
+
+    if (isFotoDirecta) {
+        // --- LÒGICA FOTO DIRECTA (DESCARREGA) ---
+        const btnSave = document.querySelector('.btn-main[onclick="saveReg()"]');
+        btnSave.innerText = "⏳ GENERANT...";
+        btnSave.disabled = true;
+
+        const carr = data.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "";
+        const pk = data.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "";
+        const marge = data.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
+        const watermarkText = `${carr} PK ${pk} | ${marge} | ${new Date().toLocaleString()}`;
+
+        try {
+            if (tmpFotos.length === 1) {
+                const showWatermark = document.getElementById('checkWatermark').checked;
+                const finalImgData = showWatermark ? await aplicarMarcaAigua(tmpFotos[0], watermarkText) : tmpFotos[0];
+                currentFileName = `${t}_${carr}_PK${pk}_${marge}`.replace(/[^a-z0-9]/gi, '_') + ".jpg";
+                const res = await fetch(finalImgData);
+                currentBlob = await res.blob();
+            } else {
+                const zip = new JSZip();
+                for (let idx = 0; idx < tmpFotos.length; idx++) {
+                    const finalImgData = await aplicarMarcaAigua(tmpFotos[idx], watermarkText);
+                    zip.file(`${t}_PK${pk}_${idx+1}.jpg`.replace(/[^a-z0-9]/gi, '_'), finalImgData.split(',')[1], {base64: true});
+                }
+                currentBlob = await zip.generateAsync({type: "blob"});
+                currentFileName = `Fotos_${t}.zip`.replace(/[^a-z0-9]/gi, '_');
+            }
+
+            // Configurar el botó de descàrrega del modal
+            const btnDownload = document.getElementById('btnDownload');
+            btnDownload.onclick = () => {
+                const url = URL.createObjectURL(currentBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = currentFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            document.getElementById('exportName').innerText = currentFileName;
+            document.getElementById('exportModal').style.display = 'flex';
+
+        } catch (error) {
+            alert("Error processant la foto.");
+        } finally {
+            btnSave.innerText = "💾 GENERAR I DESCARREGAR FOTO";
+            btnSave.disabled = false;
+        }
+
+    } else {
+        // --- LÒGICA GUARDAR REGISTRE (HISTORIAL) ---
+        if (editIdx > -1) {
+            regs[editIdx] = data;
+        } else {
+            regs.push(data);
+        }
+        
+        // 1. Guardem a la base de dades
+        actualizarDB(t);
+        
+        // 2. Netejar formulari i l'array temporal de fotos
+        tmpFotos = []; 
+        clearInputs(); 
+        
+        // 3. Forçar refresc de la llista i el comptador
+        renderRegs(); 
+        
+        alert("Punt guardat correctament");
+        editIdx = -1;
+    }
+}
+
+function aplicarMarcaAigua(base64, text) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // Dibuixem la foto original
+            ctx.drawImage(img, 0, 0);
+            
+            // Configurem l'estil de la barra inferior
+            const hBarra = canvas.height * 0.05; // 5% de l'alçada
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.fillRect(0, canvas.height - hBarra, canvas.width, hBarra);
+            
+            // Configurem el text
+            ctx.fillStyle = "white";
+            ctx.font = `${Math.round(hBarra * 0.6)}px Arial`;
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, 20, canvas.height - (hBarra / 2));
+            
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+        };
+        img.src = base64;
+    });
 }
 
 function renderRegs() {
     const count = regs.length;
-    document.getElementById('regCountBtn').innerText = count;
+    const btn = document.getElementById('regCountBtn');
+    
+    // Actualitzem el text del botó
+    if (btn) {
+        btn.innerText = `📋 PUNTS RECOLLITS: ${count}`;
+    }
+
     const list = document.getElementById('regList');
-    if(list) {
-        list.innerHTML = regs.map((r, i) => `
+    if (list) {
+        if (regs.length === 0) {
+            list.innerHTML = `<p style="text-align:center; padding:20px; color:#666;">No hi ha punts registrats.</p>`;
+            return;
+        }
+
+        list.innerHTML = regs.map((r, i) => {
+            const carreteraVal = r.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "";
+            const pkVal = r.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "";
+            const margeVal = r.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
+            
+            return `
             <div class="card" data-idx="${i}">
                 <div class="drag-handle">☰</div>
-                <div style="flex-grow:1; font-size:0.85rem"><b>${r.values[0]?.val || ''}</b> ${r.values[1]?.val || ''}</div>
-                <button class="btn-sec btn-hist" onclick="loadE(${i})">Edit</button>
-                <button class="btn-danger btn-hist" onclick="eliminarPunt(${i})">🗑️</button>
-            </div>`).join('');
+                <div style="flex-grow:1; font-size:0.85rem; line-height: 1.2;">
+                    <div style="font-weight:bold; color:var(--primary);">${carreteraVal}</div>
+                    <div style="color:#555;">PK: ${pkVal} | ${margeVal}</div>
+                </div>
+                <div style="display:flex; gap:5px">
+                    <button class="btn-sec btn-hist" style="padding: 5px 10px;" onclick="loadE(${i})">✏️</button>
+                    <button class="btn-danger btn-hist" style="padding: 5px 10px;" onclick="eliminarPunt(${i})">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
     }
 }
 
 function eliminarPunt(i) {
     if(confirm('Borrar punt?')) {
-        regs.splice(i, 1);
-        actualizarDB(document.getElementById('titulo').value);
-        renderRegs();
+        regs.splice(i, 1); // Elimina de l'array local
+        
+        const titolProjecte = document.getElementById('titulo').value;
+        if (titolProjecte) {
+            actualizarDB(titolProjecte); // Guarda el canvi a IndexedDB
+        }
+        
+        renderRegs(); // Refresca la interfície i el comptador
     }
 }
 
 function loadE(i) {
     editIdx = i; const r = regs[i];
+    document.getElementById('btnCancelarEdicio').style.display = 'block';
     fields.forEach((f, fIdx) => {
-        const item = r.values[fIdx]; if(!item) return;
-        if(f.type === 'text' || f.type === 'carretera') document.querySelector(`.dyn-input[data-idx="${fIdx}"]`).value = item.val;
-        if(f.type === 'pk') { 
+      const item = r.values.find(v => v.label.toLowerCase() === f.label.toLowerCase()) || r.values[fIdx]; 
+        if(!item) return;
+        if(f.type === 'text' || f.type === 'carretera') {
+           const el = document.querySelector(`.dyn-input[data-idx="${fIdx}"]`);
+            if(el) el.value = item.val; 
+} 
+            if(f.type === 'pk') { 
             const p = item.val.split('+'); 
             document.querySelectorAll(`.pk-km[data-idx="${fIdx}"]`)[0].value = p[0]; 
             document.querySelectorAll(`.pk-m[data-idx="${fIdx}"]`)[0].value = p[1]; 
@@ -378,31 +852,103 @@ function loadE(i) {
 async function handleFotos(input) {
     for (let f of Array.from(input.files)) {
         const reader = new FileReader();
+
         reader.onload = e => {
             const img = new Image();
+
             img.onload = () => {
                 const cvs = document.createElement("canvas");
-                const max = 1000; let w = img.width, h = img.height;
-                if (w > max) { h *= max / w; w = max; }
-                cvs.width = w; cvs.height = h;
+                const max = 1000;
+
+                let w = img.width;
+                let h = img.height;
+
+                if (w > max) {
+                    h *= max / w;
+                    w = max;
+                }
+
+                cvs.width = w;
+                cvs.height = h;
                 cvs.getContext("2d").drawImage(img, 0, 0, w, h);
-                tmpFotos.push(cvs.toDataURL("image/jpeg", 0.7));
-                renderPreview();
+
+                const base64 = cvs.toDataURL("image/jpeg", 0.7);
+
+                // 🔥 CLAU TOTAL
+                if (isFotoDirecta) {
+                    tmpFotos = []; // neteja total
+                    obrirEditorFotoDirecta(base64); // 👉 nou flux
+                } else {
+                    tmpFotos.push(base64);
+                    renderPreview();
+                }
             };
+
             img.src = e.target.result;
         };
+
         reader.readAsDataURL(f);
     }
 }
 
 function renderPreview() {
     const preview = document.getElementById('preview');
-    if(preview) {
-        preview.innerHTML = tmpFotos.map((f, i) => `
-            <div class="photo-item" style="height: 110px;">
-                <img src="${f}">
-                <button class="btn-del-photo" onclick="eliminarFoto(event, ${i})">✕</button>
-            </div>`).join('');
+    if(!preview) return;
+    preview.innerHTML = tmpFotos.map((f, i) => `
+        <div class="photo-item" style="height: 110px; position: relative;">
+            <img src="${f}">
+            <!-- Botón de Lupa para ampliar -->
+            <div class="zoom-icon" onclick="obrirVisor(${i})">🔍</div>            
+            <!-- Botón de eliminar -->
+            <button class="btn-del-photo" onclick="eliminarFoto(event, ${i})">✕</button>
+        </div>`).join('');
+}
+
+function obrirVisor(index) {
+    const fotoData = tmpFotos[index];
+    const visor = document.createElement('div');
+    visor.className = 'full-img-modal';
+    visor.style.display = 'flex';
+    
+    // Generar nom del fitxer de forma segura (evitant errors si els elements no existeixen)
+    const titol = document.getElementById('titulo')?.value || "Projecte";
+    const carr = document.querySelector('.dyn-input[data-idx="0"]')?.value || "S-C";
+    const pk = document.querySelector('.pk-km')?.value || "0";
+    const marge = document.querySelector('.dyn-marge')?.value || "Eix";
+    
+    // Netegem el nom de caràcters estranys
+    const nomFitxer = `${titol}_${carr}_PK${pk}_${marge}.jpg`.replace(/[^a-z0-9]/gi, '_');
+
+    visor.innerHTML = `
+        <img src="${fotoData}" style="max-width: 90%; max-height: 70%;">
+        <div style="margin-top:20px; display:flex; gap:10px; width: 90%; justify-content: center;">
+            <button class="btn btn-main" id="btnBaixarAra" style="flex:1">💾 DESCARREGAR</button>
+            <button class="btn btn-sec" onclick="this.parentElement.parentElement.remove()" style="flex:1">TANCAR</button>
+        </div>
+    `;
+    document.body.appendChild(visor);
+
+    // Assignem l'esdeveniment de descàrrega directament al botó creat
+    document.getElementById('btnBaixarAra').onclick = () => {
+        descarregarFoto(fotoData, nomFitxer);
+    };
+}
+
+function descarregarFoto(data, nom) {
+    try {
+        const link = document.createElement('a');
+        link.href = data;
+        link.download = nom;
+        document.body.appendChild(link); // Necessari per alguns navegadors mòbils
+        link.click();
+        
+        // Donem un marge de temps abans d'eliminar el link
+        setTimeout(() => {
+            document.body.removeChild(link);
+        }, 100);
+    } catch (err) {
+        console.error("Error descarregant la foto:", err);
+        alert("Falla la descàrrega directa. Prova de mantenir polsada la foto i 'Guardar imatge'.");
     }
 }
 
@@ -418,24 +964,54 @@ function actualizarDB(t) {
 }
 
 function historial() {
-    const l = document.getElementById("listaInventarios"); 
-    l.innerHTML = "";
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        const result = e.target.result;
-        if(result.length === 0) {
-            l.innerHTML = "<p style='text-align:center; padding:20px; color:#999'>No hi ha projectes guardats.</p>";
+    // 1. Canviem de pantalla primer de tot
+    ir('list'); 
+
+    const l = document.getElementById("listaInventarios");
+    if (!l) return; 
+
+    // Fem la lectura dels filtres de forma segura (si no existeixen, fem servir buit o "new")
+    const searchEl = document.getElementById('searchHistorial');
+    const sortEl = document.getElementById('sortHistorial');
+    
+    const searchText = searchEl ? searchEl.value.toLowerCase() : "";
+    const sortOrder = sortEl ? sortEl.value : "new";
+
+    const transaction = db.transaction("projects", "readonly");
+    const store = transaction.objectStore("projects");
+
+    store.getAll().onsuccess = (e) => {
+        let result = e.target.result;
+
+        // Filtrar per text si n'hi ha
+        if (searchText) {
+            result = result.filter(p => p.titulo.toLowerCase().includes(searchText));
         }
+
+        // Ordenar per data
+        result.sort((a, b) => {
+            const dateA = new Date(a.fecha.split('/').reverse().join('-'));
+            const dateB = new Date(b.fecha.split('/').reverse().join('-'));
+            return sortOrder === 'new' ? dateB - dateA : dateA - dateB;
+        });
+
+        l.innerHTML = result.length === 0 ? "<p style='text-align:center; color:#999; margin-top:20px;'>No s'han trobat projectes.</p>" : "";
+
         result.forEach(p => {
-            const div = document.createElement("div"); div.className = "card";
-            div.innerHTML = `<div style="flex-grow:1"><b>${p.titulo}</b><br><small>${p.fecha} · ${p.registros.length} pts</small></div>
-                <div style="display:flex; flex-direction:column; gap:4px">
+            const div = document.createElement("div");
+            div.className = "card";
+            div.innerHTML = `
+                <div style="flex-grow:1">
+                    <b style="color:var(--dark)">${p.titulo}</b><br>
+                    <small style="color:#666">${p.fecha} · ${p.registros.length} pts</small>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px">
                     <button class="btn-main btn-hist" onclick="openP('${p.id}')">OBRIR</button>
                     <button class="btn-sec btn-hist" onclick="clonarP('${p.id}')">CLONAR</button>
-                    <button class="btn-danger btn-hist" onclick="borrarP('${p.id}')">🗑️</button>
+                    <button class="btn-danger btn-hist" style="padding:5px" onclick="borrarP('${p.id}')">🗑️</button>
                 </div>`;
             l.appendChild(div);
         });
-        ir("list");
     };
 }
 
@@ -468,25 +1044,57 @@ function carregarLlistaDescargues() {
     l.innerHTML = "";
     db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
         const projectes = e.target.result;
-        if(projectes.length === 0) {
-            l.innerHTML = "<p style='text-align:center; color:#999;'>No hi ha projectes guardats.</p>";
-            return;
-        }
         projectes.forEach(p => {
             const div = document.createElement("div");
-            div.className = "card";
-            div.style = "flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px;";
+            div.className = "download-card";
             div.innerHTML = `
-                <div style="font-weight: bold; border-bottom: 1px solid #eee; width: 100%; padding-bottom: 5px; color: var(--primary);">${p.titulo}</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
-                    <button class="btn-main btn-hist" onclick="exportarICompartir('${p.id}', 'Fitxa')">📄 PDF Fitxa</button>
-                    <button class="btn-main btn-hist" onclick="exportarICompartir('${p.id}', 'Taula')">📊 PDF Taula</button>
+                <div class="download-header">
+                    <div>
+                        <b style="color:var(--dark); font-size:1rem;">${p.titulo}</b><br>
+                        <small style="color:#888;">${p.registros.length} punts recollits</small>
+                    </div>
+                    <button class="btn-main" style="width:auto; padding:8px 15px;" onclick="exportarICompartir('${p.id}', 'Fitxa')">PDF FITXA</button>
+                </div>
+                <div style="text-align:right;">
+                    <button class="btn-sec" style="font-size:0.7rem; padding:4px 8px; width:auto; border-color:#eee; color:#666;" 
+                            onclick="toggleOptions('${p.id}')">Altres formats ▾</button>
+                </div>
+                <div id="opts-${p.id}" class="extra-options">
+                    <button class="btn-sec btn-hist" onclick="exportarICompartir('${p.id}', 'Taula')">PDF Taula</button>
                     <button class="btn-sec btn-hist" onclick="exportarICompartir('${p.id}', 'excel')">Excel</button>
-                    <button class="btn-sec btn-hist" style="border-color:#666; color:#666" onclick="exportarICompartir('${p.id}', 'backup')">Backup</button>
+                    <button class="btn-sec btn-hist" onclick="descarregarTotesFotos('${p.id}')">ZIP Fotos</button>
+                    <button class="btn-sec btn-hist" onclick="exportarICompartir('${p.id}', 'backup')">Backup</button>
                 </div>
             `;
             l.appendChild(div);
         });
+    };
+}
+
+function toggleOptions(id) {
+    const el = document.getElementById(`opts-${id}`);
+    el.style.display = (el.style.display === 'grid') ? 'none' : 'grid';
+}
+
+async function descarregarTotesFotos(id) {
+    const zip = new JSZip();
+    db.transaction("projects").objectStore("projects").get(id).onsuccess = async e => {
+        const p = e.target.result;
+        p.registros.forEach((reg, i) => {
+            const carr = reg.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "C";
+            const pk = reg.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "0";
+            const marge = reg.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "M";
+            
+            reg.fotos.forEach((foto, fi) => {
+                const imgData = foto.split(',')[1];
+                zip.file(`${p.titulo}_${carr}_PK${pk}_${marge}_${fi}.jpg`.replace(/\s+/g, '_'), imgData, {base64: true});
+            });
+        });
+        const content = await zip.generateAsync({type:"blob"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `Fotos_${p.titulo}.zip`;
+        link.click();
     };
 }
 
@@ -666,6 +1274,208 @@ function closeExportModal() {
     currentFileName = "";
 }
 
+function cancelarEdicio() {
+    if(confirm("Vols descartar els canvis de l'edició?")) {
+        clearInputs(); // Això neteja els camps i posa editIdx a -1
+        document.getElementById('btnCancelarEdicio').style.display = 'none';
+        alert("Edició cancel·lada. Ara pots crear un nou registre.");
+    }
+}
+
+function toggleMenu() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function navTo(screenId) {
+    document.getElementById('dropdownMenu').style.display = 'none'; // Tanca el menú en clicar
+    if (screenId === 'list') historial(); // Si anem a l'historial, cal carregar les dades
+    ir(screenId);
+}
+
+// Tancar el menú si es clica fora d'ell
+window.onclick = function(event) {
+    if (!event.target.closest('#dropdownMenu') && !event.target.closest('button[onclick="toggleMenu()"]')) {
+        document.getElementById('dropdownMenu').style.display = 'none';
+    }
+}
+
+function filtrarPunts() {
+    const searchInput = document.getElementById('searchPunts');
+    const sortSelect = document.getElementById('sortPunts');
+    const list = document.getElementById('regList');
+    if (!list) return;
+
+    const text = searchInput ? searchInput.value.toLowerCase() : "";
+    const sort = sortSelect ? sortSelect.value : "new";
+    
+    let puntsFiltrats = regs.map((r, i) => ({...r, originalIdx: i}));
+
+    if (text) {
+        puntsFiltrats = puntsFiltrats.filter(r => 
+            r.values.some(v => v.val.toLowerCase().includes(text))
+        );
+    }
+
+    if (sort === 'old') puntsFiltrats.reverse(); 
+
+    list.innerHTML = puntsFiltrats.map(r => `
+        <div class="card">
+            <div style="flex-grow:1; font-size:0.85rem"><b>${r.values[0]?.val || ''}</b> ${r.values[1]?.val || ''}</div>
+            <div style="display:flex; gap:5px">
+                <button class="btn-sec btn-hist" onclick="loadE(${r.originalIdx})">Edit</button>
+                <button class="btn-danger btn-hist" onclick="eliminarPunt(${r.originalIdx})">🗑️</button>
+            </div>
+        </div>`).join('');
+}
+
+function clearInputs() {
+    // Netejar inputs de text, PERÒ mantenir el valor si és el camp "Carretera"
+    document.querySelectorAll('.dyn-input').forEach((el, idx) => {
+        // Busquem si l'etiqueta d'aquest camp (field) inclou la paraula "carretera"
+        const isCarretera = fields[idx] && fields[idx].label.toLowerCase().includes('carretera');
+        
+        if (!isCarretera) {
+            el.value = '';
+        }
+        // Si és carretera, no fem res i el valor es manté per al següent punt
+    });
+    
+    // Netejar PK (Això sí que s'ha de netejar sempre)
+    document.querySelectorAll('.pk-km').forEach(el => el.value = '');
+    document.querySelectorAll('.pk-m').forEach(el => el.value = '');
+    
+    // Reset de la resta de camps
+    document.querySelectorAll('.dyn-marge').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('.dyn-obs').forEach(el => el.value = '');
+    
+    // Fotos i edició
+    tmpFotos = [];
+    renderPreview();
+    editIdx = -1;
+    const btnCancel = document.getElementById('btnCancelarEdicio');
+    if (btnCancel) btnCancel.style.display = 'none';
+}
+
+function obrirEditorFotoDirecta(imgData) {
+    const oldScreen = document.getElementById('screen-foto-directa');
+    if (oldScreen) oldScreen.remove();
+
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+
+    const screen = document.createElement("div");
+    screen.id = "screen-foto-directa"; 
+    screen.className = "screen active";
+
+    const defaultCarr = document.querySelector('.dyn-input[data-idx="0"]')?.value || "";
+
+    screen.innerHTML = `
+        <div class="screen-header">
+            <button class="btn-back" onclick="this.parentElement.parentElement.remove(); ir('home')">←</button>
+            <h3>📸 Foto Ràpida</h3>
+        </div>
+
+        <div style="position: relative; width: 100%; margin-bottom: 15px;">
+            <img src="${imgData}" style="width:100%; border-radius:10px; border: 2px solid #ddd; display: block;">
+            <button onclick="this.parentElement.parentElement.remove(); modeFotoDirecta();" 
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(198, 12, 48, 0.9); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+                ✕
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label>Carretera</label>
+            <input type="text" id="fd_carretera" value="${defaultCarr}">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 2;">
+                <label>PK</label>
+                <input type="text" id="fd_pk" placeholder="0+000">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Marge</label>
+                <select id="fd_marge">
+                    <option>MD</option>
+                    <option>ME</option>
+                    <option>Eix</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom:15px; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #eee;">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size: 0.9rem;">
+                <input type="checkbox" id="fd_watermark" checked style="width: 18px; height: 18px;"> 
+                <span>Afegir dades a la imatge</span>
+            </label>
+        </div>
+
+        <button class="btn btn-main" onclick="guardarFotoDirecta('${imgData}')">
+            💾 GENERAR I BAIXAR
+        </button>
+    `;
+
+    document.querySelector('.container').appendChild(screen);
+}
+
+async function guardarFotoDirecta(imgData) {
+    const carr = document.getElementById('fd_carretera').value || "S_C";
+    const pk = document.getElementById('fd_pk').value || "0";
+    const marge = document.getElementById('fd_marge').value;
+    const wm = document.getElementById('fd_watermark').checked;
+
+    const ara = new Date();
+    const fechaFormat = ara.getDate().toString().padStart(2, '0') + "_" + 
+                        (ara.getMonth() + 1).toString().padStart(2, '0') + "_" + 
+                        ara.getFullYear();
+    const horaFormat = ara.getHours().toString().padStart(2, '0') + "_" + 
+                       ara.getMinutes().toString().padStart(2, '0');
+
+    let finalImg = imgData;
+
+    if (wm) {
+        const text = `${carr} • PK ${pk} • ${marge} • ${ara.toLocaleDateString('ca-ES')} ${ara.getHours()}:${ara.getMinutes().toString().padStart(2, '0')}`;
+        finalImg = await aplicarMarcaAigua(imgData, text);
+    }
+
+    const nomBase = `${carr}_PK${pk}_${marge}_${fechaFormat}_${horaFormat}`.replace(/[^a-z0-9]/gi, '_');
+    currentFileName = nomBase + ".jpg";
+
+    const res = await fetch(finalImg);
+    currentBlob = await res.blob();
+
+    document.getElementById('exportTitle').innerText = "FOTO GENERADA";
+    document.getElementById('exportName').innerText = currentFileName;
+
+    document.getElementById('btnDownload').onclick = () => {
+        const url = URL.createObjectURL(currentBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        document.getElementById('screen-foto-directa')?.remove();
+        closeExportModal();
+        ir('home');
+    };
+
+    document.getElementById('btnShare').onclick = async () => {
+        const file = new File([currentBlob], currentFileName, { type: "image/jpeg" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: currentFileName });
+        } else {
+            alert("Compartir no disponible");
+        }
+        document.getElementById('screen-foto-directa')?.remove();
+        closeExportModal();
+        ir('home');
+    };
+
+    document.getElementById('exportModal').style.display = 'flex';
+}
 
 </script>
 </body>
