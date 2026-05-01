@@ -76,25 +76,27 @@
 /* Icona de lupa */
 .zoom-icon {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    background: rgba(37, 99, 235, 0.9); /* Azul para diferenciar del rojo de borrar */
+    bottom: 0px; 
+    left: 0px; 
+    background: rgba(37, 99, 235, 0.9); /* Blau per diferenciar */
     color: white;
-    border-radius: 0 12px 0 0;
-    width: 35px;
-    height: 35px;
+    border-radius: 0 12px 0 0; /* Forma inversa a la creu */
+    width: 40px;  /* Mida més gran per a dits */
+    height: 40px; 
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    z-index: 101;
+    font-size: 1.2rem;
+    z-index: 110;
     cursor: pointer;
+    border: none;
+    touch-action: none; /* Evita que el navegador confongui el toc amb scroll */
 }
 
-.photo-item img {
-    cursor: default; /* Ya no parece cliqueable toda la foto */
+/* Protecció extra: evitar que la foto reaccioni al tacte sota el botó */
+.photo-item {
+    touch-action: auto;
 }
-
 
 .btn-back:active {
     transform: scale(0.9);
@@ -267,7 +269,7 @@ input:checked + .slider:before {
     <div id="dropdownMenu" style="display: none; position: absolute; top: 45px; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 180px; z-index: 1000;">
         <div style="padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; color: #999; font-weight: bold;">MENÚ</div>
         <button class="btn-menu-item" onclick="navTo('home')">🏠 Inici</button>
-        <button class="btn-menu-item" style="color: #2563eb; font-weight: bold;" onclick="toggleMenu(); modeFotoDirecta();">📸 Foto Directa</button>
+        <button class="btn-menu-item" style="color: #2563eb; font-weight: bold;" onclick="toggleMenu(); modeFotoDirecta();">📸 Foto</button>
         <button class="btn-menu-item" onclick="navTo('list')">📂 Historial</button>
         <button class="btn-menu-item" onclick="navTo('downloads')">📥 Descàrregues</button>
         <button class="btn-menu-item" onclick="navTo('helpScreen')">❓ Ajuda</button>
@@ -277,7 +279,7 @@ input:checked + .slider:before {
 
     <div id="home" class="screen active">
         <button class="btn btn-main" onclick="openProjectModal()">➕ NOU PROJECTE</button>
-        <button class="btn btn-main" style="background: #2563eb;" onclick="modeFotoDirecta()">📸 FOTO DIRECTA (Mode Ràpid)</button>
+        <button class="btn btn-main" style="background: #2563eb;" onclick="modeFotoDirecta()">📸 FOTO AMB NOMENCLATURA</button>
         <button class="btn btn-sec" onclick="historial()">📂 HISTORIAL</button>
         <button class="btn btn-sec" style="background: #fff8e1; border-color: #ffc107; color: #856404;" onclick="ir('downloads')">📥 DESCÀRREGUES I COMPARTIR</button>
         
@@ -308,7 +310,7 @@ input:checked + .slider:before {
         </div>
 
 <div style="background: #f0fdf4; padding: 15px; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 15px;">
-    <b style="color: #166534; display: flex; align-items: center; gap: 8px;">⚡ Vols anar encara més ràpid? Prova la "Foto Directa"</b>
+    <b style="color: #166534; display: flex; align-items: center; gap: 8px;">⚡ Vols anar encara més ràpid? Prova la "Foto amb nomenclatura"</b>
     <p style="margin: 8px 0 0 0; font-size: 0.9rem;">
         Dissenyada per a inspeccions d'alta eficiència, aquesta funció permet optimitzar totalment el flux de treball de camp a oficina:
     </p>
@@ -473,6 +475,10 @@ input:checked + .slider:before {
         <button class="btn btn-sec" style="margin-top:10px; border:none; color:#999;" onclick="closeExportModal()">Cancel·lar</button>
     </div>
 </div>
+<footer style="text-align: center; padding: 20px 0; font-size: 0.75rem; color: #888; border-top: 1px solid #eee; margin-top: 20px;">
+    <b>DATACAMP Tool</b> | Desenvolupat per <i>N.Arroyo 2026</i>
+</footer>
+
 </div>
 
 <script>
@@ -498,13 +504,12 @@ window.onload = () => {
 
     // Sortable per la previsualització de fotos
     const previewEl = document.getElementById('preview');
-    if (previewEl) {
-        Sortable.create(previewEl, { 
-            animation: 150,
-            filter: '.btn-del-photo',
-            preventOnFilter: false 
-        });
-    }
+    if (previewEl) 
+     Sortable.create(previewEl, { 
+    animation: 150,
+    filter: '.btn-del-photo, .zoom-icon', // Afegim .zoom-icon al filtre
+    preventOnFilter: true // Canvia a true per bloquejar l'arrossegament si es toca el botó
+});
     
     // Sortable per la llista de punts
     const regListEl = document.getElementById('regList');
@@ -858,7 +863,7 @@ async function handleFotos(input) {
 
             img.onload = () => {
                 const cvs = document.createElement("canvas");
-                const max = 1000;
+                const max = 800;
 
                 let w = img.width;
                 let h = img.height;
@@ -897,9 +902,9 @@ function renderPreview() {
     preview.innerHTML = tmpFotos.map((f, i) => `
         <div class="photo-item" style="height: 110px; position: relative;">
             <img src="${f}">
-            <!-- Botón de Lupa para ampliar -->
-            <div class="zoom-icon" onclick="obrirVisor(${i})">🔍</div>            
-            <!-- Botón de eliminar -->
+            <!-- Botó Lupa robust -->
+            <div class="zoom-icon" onclick="obrirVisor(${i}); event.stopPropagation();" role="button">🔍</div>            
+            <!-- Botó Borrar robust -->
             <button class="btn-del-photo" onclick="eliminarFoto(event, ${i})">✕</button>
         </div>`).join('');
 }
@@ -1078,8 +1083,16 @@ function toggleOptions(id) {
 
 async function descarregarTotesFotos(id) {
     const zip = new JSZip();
+    
+    // Canviem el text del botó per indicar que s'està treballant
+    const btnText = document.getElementById(`opts-${id}`)?.previousElementSibling?.querySelector('button') || {innerText: ""};
+    const originalText = btnText.innerText;
+    btnText.innerText = "⏳ Generant ZIP...";
+
     db.transaction("projects").objectStore("projects").get(id).onsuccess = async e => {
         const p = e.target.result;
+        
+        // Bucle per afegir fotos al ZIP
         p.registros.forEach((reg, i) => {
             const carr = reg.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "C";
             const pk = reg.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "0";
@@ -1087,14 +1100,45 @@ async function descarregarTotesFotos(id) {
             
             reg.fotos.forEach((foto, fi) => {
                 const imgData = foto.split(',')[1];
-                zip.file(`${p.titulo}_${carr}_PK${pk}_${marge}_${fi}.jpg`.replace(/\s+/g, '_'), imgData, {base64: true});
+                // Nomenclatura neta per als fitxers dins del ZIP
+                const nomFoto = `${carr}_PK${pk}_${marge}_${i}_${fi}.jpg`.replace(/[^a-z0-9.]/gi, '_');
+                zip.file(nomFoto, imgData, {base64: true});
             });
         });
-        const content = await zip.generateAsync({type:"blob"});
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = `Fotos_${p.titulo}.zip`;
-        link.click();
+
+        // Generem el Blob del ZIP
+        currentBlob = await zip.generateAsync({type: "blob"});
+        currentFileName = `Fotos_${p.titulo.replace(/\s+/g, '_')}.zip`;
+
+        // Configurem el títol i el nom al modal d'exportació
+        document.getElementById('exportTitle').innerText = "PAQUET DE FOTOS (ZIP)";
+        document.getElementById('exportName').innerText = currentFileName;
+
+        // Configurem el botó de Compartir (WhatsApp, Email, etc.)
+        document.getElementById('btnShare').onclick = () => {
+            const file = new File([currentBlob], currentFileName, { type: "application/zip" });
+            if (navigator.share) {
+                navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+            } else {
+                alert("Compartir no disponible en aquest navegador.");
+            }
+            closeExportModal();
+        };
+
+        // Configurem el botó de Descàrrega directa
+        document.getElementById('btnDownload').onclick = () => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(currentBlob);
+            a.download = currentFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            closeExportModal();
+        };
+
+        // Mostrem el modal i restablim el text del botó del menú
+        document.getElementById('exportModal').style.display = 'flex';
+        btnText.innerText = originalText;
     };
 }
 
@@ -1185,7 +1229,8 @@ if (tipus === 'Fitxa') {
             });
 
         });
-    } else {
+
+} else {
         doc.setFontSize(14);
         doc.text("PROJECTE: " + p.titulo, 15, 15);
         const headers = localFields.map(f => f.label); 
@@ -1198,43 +1243,41 @@ if (tipus === 'Fitxa') {
             theme: 'striped',
             headStyles: { fillColor: [100, 100, 100] },
             styles: { valign: 'middle', fontSize: 8, overflow: 'linebreak' },
-            // Fem les files més altes (35mm) per veure bé la foto
-            bodyStyles: { minCellHeight: 35 },
-            columnStyles: {
-                // Forcem que l'última columna (la foto) mesuri 35mm d'ample
-                [localFields.length]: { cellWidth: 35 }
-            },
+            bodyStyles: { minCellHeight: 35 }, // Espai suficient per a la miniatura
+            margin: { bottom: 20 }, // Marge inferior per evitar talls
             didDrawCell: (data) => {
-                // Si és la columna de la imatge i no és la capçalera
+                // Comprovem si som a la columna de la imatge i a una fila de dades
                 if (data.column.index === localFields.length && data.cell.section === 'body') {
                     const r = localRegs[data.row.index];
                     if (r.fotos && r.fotos.length > 0) {
                         const f = r.fotos[0];
                         try {
-                            const props = doc.getImageProperties(f);
-                            
-                            // Mida útil de la cel·la deixant un marge de 2mm
-                            const cW = data.cell.width - 4;
-                            const cH = data.cell.height - 4;
+                            if (typeof f === 'string' && f.startsWith('data:image')) {
+                                const props = doc.getImageProperties(f);
+                                
+                                // Calculem dimensions mantenint la proporció
+                                const padding = 2;
+                                const cW = data.cell.width - (padding * 2);
+                                const cH = data.cell.height - (padding * 2);
+                                
+                                const rati = Math.min(cW / props.width, cH / props.height);
+                                const wFinal = props.width * rati;
+                                const hFinal = props.height * rati;
+                                
+                                // Centrem la imatge dins de la cel·la
+                                const xCentrat = data.cell.x + (data.cell.width - wFinal) / 2;
+                                const yCentrat = data.cell.y + (data.cell.height - hFinal) / 2;
 
-                            // Calculem rati per mantenir proporció original (SENSE DEFORMAR)
-                            const rati = Math.min(cW / props.width, cH / props.height);
-                            const wFinal = props.width * rati;
-                            const hFinal = props.height * rati;
-
-                            // Centrem la foto dins la cel·la
-                            const xCentrat = data.cell.x + (data.cell.width - wFinal) / 2;
-                            const yCentrat = data.cell.y + (data.cell.height - hFinal) / 2;
-
-                            doc.addImage(f, 'JPEG', xCentrat, yCentrat, wFinal, hFinal);
+                                doc.addImage(f, 'JPEG', xCentrat, yCentrat, wFinal, hFinal, undefined, 'FAST');
+                            }
                         } catch (e) {
-                            console.error("Error en miniatura:", e);
+                            console.error("Error imatge fila " + data.row.index, e);
                         }
                     }
                 }
             }
         });
-    }        
+    }       
 
  return doc.output('blob');
 }
