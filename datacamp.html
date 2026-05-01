@@ -387,14 +387,22 @@ input:checked + .slider:before {
         <div class="form-group"><label>Nom del Projecte</label><input type="text" id="titulo" placeholder="Ex: Millora C-55"></div>
         <div id="dynamicFields"></div>
 <div style="display: flex; align-items: center; justify-content: space-between; background: #f0f7ff; padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #c7d2fe;">
-    <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 1.2rem;">📝</span>
-        <span style="font-weight: bold; color: #1e40af; font-size: 0.85rem;">Mostrar dades peu foto</span>
-    </div>
-    <label class="switch">
-        <input type="checkbox" id="checkWatermark" checked>
+    
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <span style="font-size: 1.2rem; margin-top: 2px;">📝</span>
+        <div style="display: flex; flex-direction: column;">
+            <span style="font-weight: bold; color: #1e40af; font-size: 0.85rem;">Mostrar dades peu foto</span>
+            <span style="font-size: 0.65rem; color: #d93025; margin-top: 2px; font-weight: normal; line-height: 1.1; max-width: 180px;">
+                ⚠️ No reversible: un cop posades, no es poden treure.
+            </span>
+        </div>
+</div>
+
+        <label class="switch">
+        <input type="checkbox" id="checkWatermark">
         <span class="slider round"></span>
     </label>
+
 </div>
     <div class="form-group">
     <label>Imatges</label>
