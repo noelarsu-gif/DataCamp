@@ -738,10 +738,40 @@ function finalitzarConfig() {
 }
 
 function crearProyecto(tipo) {
-    closeModal(); curId = "p_" + Date.now(); regs = []; document.getElementById('titulo').value = "";
-    if(tipo === 'basic') fields = [{type:'carretera', label:'Carretera'}, {type:'pk', label:'PK'}, {type:'marge', label:'Marge'}, {type:'obs', label:'Observacions'}];
-    renderForm(); renderRegs(); ir('form');
+    closeModal();
+    curId = "p_" + Date.now();
+    regs = [];
+    editIdx = -1; // <--- IMPORTANT: Resetejar l'índex d'edició
+    tmpFotos = []; // <--- Netegar les fotos pendents
+    
+    document.getElementById('titulo').value = "";
+    
+    // Ocultar el botó de cancel·lar edició si estava visible
+    const btnCancel = document.getElementById('btnCancelarEdicio');
+    if (btnCancel) btnCancel.style.display = 'none';
+    
+    // Restaurar el text del botó de guardat
+    const btnSave = document.querySelector('.btn-main[onclick="saveReg()"]');
+    if (btnSave) {
+        btnSave.innerText = "💾 GUARDAR REGISTRE";
+        btnSave.style.background = "var(--primary)";
+    }
+
+    if(tipo === 'basic') {
+        fields = [
+            {type:'carretera', label:'Carretera'}, 
+            {type:'pk', label:'PK'}, 
+            {type:'marge', label:'Marge'}, 
+            {type:'obs', label:'Observacions'}
+        ];
+    }
+    
+    renderForm();    // Dibuixa el formulari buit
+    renderPreview(); // Netaja la graella de fotos
+    renderRegs();    // Actualitza el comptador de registres a 0
+    ir('form');
 }
+
 
 function renderForm() {
     document.getElementById('dynamicFields').innerHTML = fields.map((f, i) => {
