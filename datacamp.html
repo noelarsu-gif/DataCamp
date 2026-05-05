@@ -701,7 +701,28 @@ function ir(id) {
 
 function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
 function closeModal() { document.getElementById('projectModal').style.display = 'none'; }
-function irConfigurador() { closeModal(); fields = []; renderConfig(); ir('config'); }
+function irConfigurador() {
+    closeModal();
+    
+    // Neteja de dades
+    curId = "p_" + Date.now();
+    regs = [];
+    fields = [];
+    tmpFotos = []; // Buidem l'array de fotos
+    editIdx = -1;  // Sortim del mode edició
+    
+    // Neteja de la interfície
+    document.getElementById('titulo').value = "";
+    
+    // FORÇAR LA NETEJA VISUAL
+    renderPreview(); // Això esborrarà les fotos de la pantalla
+    
+    const btnCancel = document.getElementById('btnCancelarEdicio');
+    if (btnCancel) btnCancel.style.display = 'none';
+
+    renderConfig();
+    ir('config');
+}
 
 function addField(type, label = "") {
     let fl = label || prompt("Nom del camp:");
@@ -741,21 +762,15 @@ function crearProyecto(tipo) {
     closeModal();
     curId = "p_" + Date.now();
     regs = [];
-    editIdx = -1; // <--- IMPORTANT: Resetejar l'índex d'edició
-    tmpFotos = []; // <--- Netegar les fotos pendents
+    tmpFotos = []; // Afegit per seguretat
+    editIdx = -1;  // Afegit per seguretat
     
     document.getElementById('titulo').value = "";
     
-    // Ocultar el botó de cancel·lar edició si estava visible
+    // Neteja visual de fotos i botó
+    renderPreview(); 
     const btnCancel = document.getElementById('btnCancelarEdicio');
     if (btnCancel) btnCancel.style.display = 'none';
-    
-    // Restaurar el text del botó de guardat
-    const btnSave = document.querySelector('.btn-main[onclick="saveReg()"]');
-    if (btnSave) {
-        btnSave.innerText = "💾 GUARDAR REGISTRE";
-        btnSave.style.background = "var(--primary)";
-    }
 
     if(tipo === 'basic') {
         fields = [
@@ -766,11 +781,11 @@ function crearProyecto(tipo) {
         ];
     }
     
-    renderForm();    // Dibuixa el formulari buit
-    renderPreview(); // Netaja la graella de fotos
-    renderRegs();    // Actualitza el comptador de registres a 0
+    renderForm();
+    renderRegs();
     ir('form');
 }
+
 
 
 function renderForm() {
