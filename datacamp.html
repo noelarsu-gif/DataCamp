@@ -18,9 +18,9 @@
       <style>
           :root { --primary: #c60c30; --dark: #333; --light: #f4f4f4; --border: #ccc; }
           body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #e0e0e0; display: flex; justify-content: center; color: var(--dark); }
-          .container { width: 100%; max-width: 500px; background: white; min-height: 100vh; border-top: 6px solid var(--primary); box-shadow: 0 0 20px rgba(0,0,0,0.2); position: relative; }
+          .container { width: 100%; max-width: 500px; background: white; min-height: 100vh; border-top: 6px solid var(--primary); box-shadow: 0 0 20px rgba(0,0,0,0.2); position: relative; z-index: 0; }
           
-          header { padding: 20px; border-bottom: 2px solid var(--primary); text-align: center; background: #fff; position: sticky; top: 0; z-index: 10; }
+          header { padding: 20px; border-bottom: 2px solid var(--primary); text-align: center; background: #fff; position: sticky; top: 0; z-index: 1000; }
           .screen { display: none; padding: 20px; padding-bottom: 60px; }
           .active { display: block; animation: fadeIn 0.3s; }
           @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -87,7 +87,7 @@
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    z-index: 110;
+    z-index: 2;
     cursor: pointer;
     border: none;
     touch-action: none; /* Evita que el navegador confongui el toc amb scroll */
@@ -165,7 +165,7 @@
         .photo-buttons { display: flex; gap: 10px; }
         .btn-photo { flex: 1; background: #f0f0f0; border: 1px solid #ccc; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
         .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
-        .photo-item { position: relative; height: 100px; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+        .photo-item { position: relative; height: 100px; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; position: relative; }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; }
   .btn-del-photo { 
     position: absolute; 
@@ -248,6 +248,73 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+/* TARJETA */
+.reg-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-bottom: 10px;
+}
+
+/* MINIATURA */
+.thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #eee;
+}
+
+/* INFO */
+.reg-info {
+    flex: 1;
+}
+
+.reg-title {
+    font-weight: bold;
+    color: #c00;
+    font-size: 16px;
+}
+
+.reg-sub {
+    font-size: 13px;
+    color: #666;
+}
+
+.reg-desc {
+    font-size: 12px;
+    color: #888;
+}
+
+/* DRAG */
+.drag-handle {
+    font-size: 18px;
+    color: #999;
+    cursor: grab;
+}
+
+/* BOTONES */
+.actions {
+    display: flex;
+    gap: 6px;
+}
+
+.actions button {
+    border: none;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.actions button:hover {
+    background: #eee;
+}
+
     </style>
 </head>
 <body>
@@ -266,15 +333,17 @@ input:checked + .slider:before {
         <div style="width: 20px; height: 2px; background: var(--primary);"></div>
     </button>
     
-    <div id="dropdownMenu" style="display: none; position: absolute; top: 45px; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 180px; z-index: 1000;">
+    <div id="dropdownMenu" style="display: none; position: absolute; top: 45px; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 180px; z-index: 2000;">
         <div style="padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; color: #999; font-weight: bold;">MENÚ</div>
         <button class="btn-menu-item" onclick="navTo('home')">🏠 Inici</button>
         <button class="btn-menu-item" style="color: #2563eb; font-weight: bold;" onclick="toggleMenu(); modeFotoDirecta();">📸 Foto</button>
         <button class="btn-menu-item" onclick="navTo('list')">📂 Historial</button>
         <button class="btn-menu-item" onclick="navTo('downloads')">📥 Descàrregues</button>
+        <button class="btn-menu-item" onclick="navTo('pantallaAjustos')">⚙️ Configuració</button>
         <button class="btn-menu-item" onclick="navTo('helpScreen')">❓ Ajuda</button>
     </div>   
         </div>
+        
     </header>
 
     <div id="home" class="screen active">
@@ -289,6 +358,35 @@ input:checked + .slider:before {
             <input type="file" id="importFile" accept="application/json" hidden onchange="importarBackup(this)">
         </div>
     </div>
+
+<div id="pantallaAjustos" class="screen">
+    <div class="screen-header">
+        <button class="btn-back" onclick="ir('home')">←</button>
+        <h3 style="margin:0">⚙️ Configuració</h3>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
+            Configura els elements corporatius que apareixeran als teus informes PDF. Es recomana imatges sense fons o fons blanc.
+        </p>
+
+        <!-- SECCIÓ DEL LOGO (El Pas 3 que t'he passat abans) -->
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold; color: var(--primary);">🏢 LOGO CORPORATIU</label>
+            
+            <div id="logoPreviewContainer" style="background: white; border: 1px dashed #ccc; border-radius: 8px; text-align: center; padding: 15px; margin-bottom: 15px;">
+                <img id="logoActual" src="" style="max-width: 100%; max-height: 80px; display: none;">
+                <div id="noLogoMsg" style="color: #999; font-size: 0.8rem;">No s'ha carregat cap logo encara</div>
+            </div>
+
+            <button class="btn-sec" onclick="document.getElementById('inputLogo').click()" style="width: 100%; margin-bottom: 10px;">📂 SELECCIONAR IMATGE</button>
+            <button class="btn-danger" onclick="eliminarLogo()" style="width: 100%; background: #fff1f1;">🗑️ ELIMINAR LOGO</button>
+            
+            <!-- Input ocult que dispara la càrrega de fitxers -->
+            <input type="file" id="inputLogo" accept="image/*" hidden onchange="handleLogo(this)">
+        </div>
+    </div>
+</div>
 
 <div id="helpScreen" class="screen">
     <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Guia i Consells</h3>
@@ -484,6 +582,25 @@ input:checked + .slider:before {
     </div>
 </div>
 
+<div id="fotoChooserModal" class="modal" onclick="tancarFotoChooser()">
+    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:320px; text-align:center;" onclick="event.stopPropagation()">
+        
+        <h3 style="margin-top:0; color:var(--primary);">📸 Afegir imatge</h3>
+        
+        <button class="btn btn-main" style="font-size:1.1rem; padding:18px;" onclick="triarCamara()">
+            📸 CÀMERA
+        </button>
+        
+        <button class="btn btn-sec" style="font-size:1.1rem; padding:18px;" onclick="triarGaleria()">
+            🖼️ GALERIA
+        </button>
+
+        <button class="btn btn-sec" style="margin-top:10px; border:none; color:#999;" onclick="tancarFotoChooser()">
+            Cancel·lar
+        </button>
+    </div>
+</div>
+
 
 </div> 
 
@@ -492,12 +609,15 @@ input:checked + .slider:before {
 let currentBlob = null;
 let currentFileName = "";
 let db, curId = "", regs = [], fields = [], tmpFotos = [], editIdx = -1;
+let logoCorporativo = localStorage.getItem('logo_corp') || null;
+
 
 const req = indexedDB.open("GencatDinaV4", 1);
 req.onupgradeneeded = e => { 
     e.target.result.createObjectStore("projects", { keyPath: "id" }); 
 };
 req.onsuccess = e => { db = e.target.result; };
+mostrarLogoActual();
 
 window.onload = () => {
     const dz = document.getElementById('drop-zone');
@@ -520,32 +640,39 @@ window.onload = () => {
     // Sortable per la llista de punts
     const regListEl = document.getElementById('regList');
     if (regListEl) {
-        Sortable.create(regListEl, { 
-            animation: 150, 
-            handle: '.drag-handle',
-            onEnd: function() {
-                let nousRegs = [];
-                document.querySelectorAll('#regList .card').forEach(el => {
-                    nousRegs.push(regs[parseInt(el.getAttribute('data-idx'))]);
-                });
+    Sortable.create(regListEl, { 
+        animation: 150, 
+        handle: '.drag-handle',
+        onEnd: function() {
+            let nousRegs = [];
+
+            document.querySelectorAll('#regList .reg-item').forEach(el => {
+                const idx = parseInt(el.getAttribute('data-idx'));
+                if (!isNaN(idx) && regs[idx]) {
+                    nousRegs.push(regs[idx]);
+                }
+            });
+
+            // 🔒 Seguridad: evitar sobrescribir si algo falla
+            if (nousRegs.length === regs.length) {
                 regs = nousRegs;
                 actualizarDB(document.getElementById('titulo').value);
                 renderRegs();
+            } else {
+                console.warn("Error reordenando, no se aplican cambios");
             }
-        });
-    }
+        }
+    });
+}
 };
 
 let isFotoDirecta = false;
 
 function modeFotoDirecta() {
     isFotoDirecta = true;
-    tmpFotos = []; // 🔥 IMPORTANT: netejar fotos antigues
+    tmpFotos = [];
 
-    const inputCam = document.getElementById('fCam');
-    if (inputCam) {
-        inputCam.click(); // 👉 obre càmera directa
-    }
+    document.getElementById('fotoChooserModal').style.display = 'flex';
 }
 
 function ir(id) {
@@ -579,6 +706,20 @@ function irConfigurador() { closeModal(); fields = []; renderConfig(); ir('confi
 function addField(type, label = "") {
     let fl = label || prompt("Nom del camp:");
     if(fl) { fields.push({type, label: fl}); renderConfig(); }
+}
+
+function tancarFotoChooser() {
+    document.getElementById('fotoChooserModal').style.display = 'none';
+}
+
+function triarCamara() {
+    tancarFotoChooser();
+    document.getElementById('fCam').click();
+}
+
+function triarGaleria() {
+    tancarFotoChooser();
+    document.getElementById('fGal').click();
 }
 
 function renderConfig() {
@@ -791,37 +932,63 @@ function renderRegs() {
     const count = regs.length;
     const btn = document.getElementById('regCountBtn');
     
-    // Actualitzem el text del botó
+    // Botó contador
     if (btn) {
         btn.innerText = `📋 PUNTS RECOLLITS: ${count}`;
     }
 
     const list = document.getElementById('regList');
-    if (list) {
-        if (regs.length === 0) {
-            list.innerHTML = `<p style="text-align:center; padding:20px; color:#666;">No hi ha punts registrats.</p>`;
-            return;
-        }
 
-        list.innerHTML = regs.map((r, i) => {
-            const carreteraVal = r.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "";
-            const pkVal = r.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "";
-            const margeVal = r.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
-            
-            return `
-            <div class="card" data-idx="${i}">
-                <div class="drag-handle">☰</div>
-                <div style="flex-grow:1; font-size:0.85rem; line-height: 1.2;">
-                    <div style="font-weight:bold; color:var(--primary);">${carreteraVal}</div>
-                    <div style="color:#555;">PK: ${pkVal} | ${margeVal}</div>
-                </div>
-                <div style="display:flex; gap:5px">
-                    <button class="btn-sec btn-hist" style="padding: 5px 10px;" onclick="loadE(${i})">✏️</button>
-                    <button class="btn-danger btn-hist" style="padding: 5px 10px;" onclick="eliminarPunt(${i})">🗑️</button>
-                </div>
-            </div>`;
-        }).join('');
+    if (!list) return;
+
+    if (regs.length === 0) {
+        list.innerHTML = `<p style="text-align:center; padding:20px; color:#666;">
+            No hi ha punts registrats.
+        </p>`;
+        return;
     }
+
+    list.innerHTML = regs.map((r, i) => {
+
+        // 🔍 Buscar valors
+        const carreteraVal = r.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "";
+        const pkVal = r.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "";
+        const margeVal = r.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
+
+        // 🖼 FOTO (primera si existe)
+        const img = (r.fotos && r.fotos.length > 0) ? r.fotos[0] : "";
+
+        // 📸 contador fotos
+        const numFotos = r.fotos?.length || 0;
+
+        return `
+        <div class="reg-item" data-idx="${i}">
+
+            <div class="drag-handle">≡</div>
+
+            ${img 
+                ? `<img src="${img}" class="thumb">`
+                : `<div class="thumb"></div>`
+            }
+
+            <div class="reg-info">
+                <div class="reg-title">${carreteraVal}</div>
+                <div class="reg-sub">
+                    PK: ${pkVal} | ${margeVal}
+                    ${numFotos ? ` · 📷 ${numFotos}` : ''}
+                </div>
+                
+            </div>
+
+            <div class="actions">
+                <button onclick="loadE(${i})">✏️</button>
+                <button onclick="eliminarPunt(${i})">🗑️</button>
+            </div>
+
+        </div>
+        `;
+
+    }).join('');
 }
 
 function eliminarPunt(i) {
@@ -888,7 +1055,8 @@ async function handleFotos(input) {
                 // 🔥 CLAU TOTAL
                 if (isFotoDirecta) {
                     tmpFotos = []; // neteja total
-                    obrirEditorFotoDirecta(base64); // 👉 nou flux
+                    obrirEditorFotoDirecta(base64);
+                    isFotoDirecta = false; 
                 } else {
                     tmpFotos.push(base64);
                     renderPreview();
@@ -1031,7 +1199,7 @@ function borrarP(id) { if(confirm("Eliminar tot el projecte?")) db.transaction("
 function openP(id) {
     db.transaction("projects").objectStore("projects").get(id).onsuccess = e => {
         const p = e.target.result; curId = p.id; fields = p.fields; regs = p.registros;
-        document.getElementById('titulo').value = p.titulo; renderForm(); renderRegs(); ir('form');
+        document.getElementById('titulo').value = p.titulo; renderForm(); renderRegs(); ir('puntsLlistat');
     };
 }
 
@@ -1191,102 +1359,160 @@ if (tipus === 'Fitxa') {
     };
 }
 
-        async function generarBlobPDF(p, tipus) {
+
+async function generarBlobPDF(p, tipus) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    
+    // Funció interna per dibuixar la capçalera (MANTINGUDA TOTALMENT IGUAL)
+    const drawHeader = (pageDoc, title) => {
+        pageDoc.setDrawColor(200, 200, 200);
+        pageDoc.setLineWidth(0.5);
+        pageDoc.line(10, 22, 200, 22);
+
+        if (typeof logoCorporativo !== 'undefined' && logoCorporativo) {
+            try {
+                const imgProps = pageDoc.getImageProperties(logoCorporativo);
+                const hMax = 12;
+                const wMax = 50;
+                const rati = Math.min(wMax / imgProps.width, hMax / imgProps.height);
+                const wFinal = imgProps.width * rati;
+                const hFinal = imgProps.height * rati;
+                pageDoc.addImage(logoCorporativo, 'PNG', 15, 18 - hFinal, wFinal, hFinal);
+            } catch (err) { 
+                console.error("Error logo:", err);
+            }
+        }
+
+        pageDoc.setTextColor(40, 40, 40);
+        pageDoc.setFont("helvetica", "bold");
+        pageDoc.setFontSize(10);
+        
+        const textTitol = title.toUpperCase();
+        const xPosTitol = 195 - pageDoc.getTextWidth(textTitol);
+        pageDoc.text(textTitol, xPosTitol, 12);
+
+        const dataAvui = new Date().toLocaleDateString('ca-ES', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+        
+        pageDoc.setFont("helvetica", "normal");
+        pageDoc.setFontSize(8);
+        pageDoc.setTextColor(100, 100, 100);
+        
+        const textData = `Data d'emissió: ${dataAvui}`;
+        const xPosData = 195 - pageDoc.getTextWidth(textData);
+        pageDoc.text(textData, xPosData, 17);
+    };
+
     const localRegs = p.registros;
-    const localFields = p.fields;
 
     if (tipus === 'Fitxa') {
         localRegs.forEach((r, i) => {
             if (i > 0) doc.addPage();
-            doc.setFillColor(58, 52, 50); doc.rect(0, 0, 210, 15, 'F');
-            doc.setTextColor(255); doc.setFontSize(14); doc.text("INFORME TÈCNIC", 15, 10);
-            doc.setTextColor(0); doc.setFontSize(12); doc.text(`Projecte: ${p.titulo}`, 15, 22);
-            doc.autoTable({
-                startY: 28,
-                head: [['Paràmetre', 'Valor']],
-                body: r.values.map(v => [v.label, v.val]),
-                theme: 'striped',
-                headStyles: { fillColor: [60, 60, 60] }
+            drawHeader(doc, `Informe: ${p.titulo}`);
+
+            // Estil per al número de registre (més subtil com a la teva foto)
+            doc.setFontSize(8);
+            doc.setTextColor(180, 180, 180);
+            doc.setFont("helvetica", "normal");
+            doc.text(`REGISTRE #${i + 1}`, 15, 35);
+
+            // DADES ALINEADES (Com a la imatge 1)
+            let currentY = 45;
+            const xCol1 = 15;  // Posició etiqueta
+            const xCol2 = 60;  // Posició valor (tabulació)
+
+            r.values.forEach(v => {
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                
+                // Etiqueta en negreta
+                doc.setFont("helvetica", "bold");
+                doc.text(`${v.label}:`, xCol1, currentY);
+                
+                // Valor en normal a la segona columna
+                doc.setFont("helvetica", "normal");
+                const valor = String(v.val || "-");
+                
+                // Si el text és molt llarg, fem que salti de línia sense xafar la columna 1
+                const textSplit = doc.splitTextToSize(valor, 130); 
+                doc.text(textSplit, xCol2, currentY);
+                
+                // Espai entre files (ajustat per donar aire)
+                currentY += Math.max(textSplit.length * 7, 8); 
             });
-            let y = doc.lastAutoTable.finalY + 10;
-                        // Codi corregit per a les línies 551-555
+
+            let yFotos = currentY + 15; // Més espai abans de la foto
+            
+            // FOTOS
             r.fotos.forEach(f => {
-                const props = doc.getImageProperties(f);
-                const ampleMax = 180;
-                const altMax = 90; // Limitem l'alçada perquè en cabdin dues
-                
-                // Calculem la proporció per no deformar
-                const rati = Math.min(ampleMax / props.width, altMax / props.height);
-                const wFinal = props.width * rati;
-                const hFinal = props.height * rati;
-                
-                // Centrem la foto horitzontalment
-                const xCentrat = 15 + (ampleMax - wFinal) / 2;
+                try {
+                    const props = doc.getImageProperties(f);
+                    const ampleMax = 180;
+                    const altMax = 90;
+                    const rati = Math.min(ampleMax / props.width, altMax / props.height);
+                    const wFinal = props.width * rati;
+                    const hFinal = props.height * rati;
+                    const xCentrat = 15 + (ampleMax - wFinal) / 2;
 
-                if (y + hFinal > 280) { 
-                    doc.addPage(); 
-                    y = 20; 
-                }
-                
-                doc.addImage(f, 'JPEG', xCentrat, y, wFinal, hFinal);
-                y += hFinal + 8;
+                    if (yFotos + hFinal > 280) { 
+                        doc.addPage(); 
+                        drawHeader(doc, `Informe: ${p.titulo}`);
+                        yFotos = 35; 
+                    }
+                    
+                    doc.addImage(f, 'JPEG', xCentrat, yFotos, wFinal, hFinal);
+                    yFotos += hFinal + 10;
+                } catch(e) { console.error("Error imatge registre:", e); }
             });
-
         });
+    } else {
+    // PDF TIPUS TAULA
+    const headers = p.fields.map(f => f.label); 
+    headers.push("Imatges");
 
-} else {
-        doc.setFontSize(14);
-        doc.text("PROJECTE: " + p.titulo, 15, 15);
-        const headers = localFields.map(f => f.label); 
-        headers.push("Imatges");
+    doc.autoTable({
+        startY: 25,
+        head: [headers],
+        body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
+        theme: 'striped',
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { valign: 'middle', fontSize: 8 },
+        bodyStyles: { minCellHeight: 35 },
+        didDrawPage: () => {
+            drawHeader(doc, p.titulo);
+        },
+        didDrawCell: (data) => {
+            if (data.column.index === p.fields.length && data.cell.section === 'body') {
+                const r = localRegs[data.row.index];
+                if (r.fotos && r.fotos.length > 0) {
+                    const f = r.fotos[0];
+                    try {
+                        const props = doc.getImageProperties(f);
+                        const padding = 2;
+                        const cW = data.cell.width - (padding * 2);
+                        const cH = data.cell.height - (padding * 2);
+                        const rati = Math.min(cW / props.width, cH / props.height);
 
-        doc.autoTable({
-            startY: 22,
-            head: [headers],
-            body: localRegs.map(r => [...r.values.map(v => v.val), ""]),
-            theme: 'striped',
-            headStyles: { fillColor: [100, 100, 100] },
-            styles: { valign: 'middle', fontSize: 8, overflow: 'linebreak' },
-            bodyStyles: { minCellHeight: 35 }, // Espai suficient per a la miniatura
-            margin: { bottom: 20 }, // Marge inferior per evitar talls
-            didDrawCell: (data) => {
-                // Comprovem si som a la columna de la imatge i a una fila de dades
-                if (data.column.index === localFields.length && data.cell.section === 'body') {
-                    const r = localRegs[data.row.index];
-                    if (r.fotos && r.fotos.length > 0) {
-                        const f = r.fotos[0];
-                        try {
-                            if (typeof f === 'string' && f.startsWith('data:image')) {
-                                const props = doc.getImageProperties(f);
-                                
-                                // Calculem dimensions mantenint la proporció
-                                const padding = 2;
-                                const cW = data.cell.width - (padding * 2);
-                                const cH = data.cell.height - (padding * 2);
-                                
-                                const rati = Math.min(cW / props.width, cH / props.height);
-                                const wFinal = props.width * rati;
-                                const hFinal = props.height * rati;
-                                
-                                // Centrem la imatge dins de la cel·la
-                                const xCentrat = data.cell.x + (data.cell.width - wFinal) / 2;
-                                const yCentrat = data.cell.y + (data.cell.height - hFinal) / 2;
-
-                                doc.addImage(f, 'JPEG', xCentrat, yCentrat, wFinal, hFinal, undefined, 'FAST');
-                            }
-                        } catch (e) {
-                            console.error("Error imatge fila " + data.row.index, e);
-                        }
+                        doc.addImage(
+                            f,
+                            'JPEG',
+                            data.cell.x + (data.cell.width - props.width * rati) / 2,
+                            data.cell.y + (data.cell.height - props.height * rati) / 2,
+                            props.width * rati,
+                            props.height * rati
+                        );
+                    } catch (e) {
+                        console.error("Error imatge taula:", e);
                     }
                 }
             }
-        });
-    }       
-
- return doc.output('blob');
+        }
+    });
 }
+return doc.output('blob');
+}       
 
 function generarBlobExcel(p) {
     const ws = XLSX.utils.json_to_sheet(p.registros.map(r => { let o = {}; r.values.forEach(v => o[v.label] = v.val); return o; }));
@@ -1465,6 +1691,52 @@ function obrirEditorFotoDirecta(imgData) {
     `;
 
     document.querySelector('.container').appendChild(screen);
+}
+
+function handleLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400; // Mida optimitzada
+                const scale = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                logoCorporativo = canvas.toDataURL('image/png');
+                localStorage.setItem('logo_corp', logoCorporativo);
+                mostrarLogoActual();
+                alert("Logo guardat correctament");
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function mostrarLogoActual() {
+    const img = document.getElementById('logoActual');
+    const msg = document.getElementById('noLogoMsg');
+    if (logoCorporativo && img) {
+        img.src = logoCorporativo;
+        img.style.display = 'inline-block';
+        msg.style.display = 'none';
+    } else if (msg) {
+        img.style.display = 'none';
+        msg.style.display = 'block';
+    }
+}
+
+function eliminarLogo() {
+    if (confirm("Vols eliminar el logo corporatiu?")) {
+        localStorage.removeItem('logo_corp');
+        logoCorporativo = null;
+        mostrarLogoActual();
+    }
 }
 
 async function guardarFotoDirecta(imgData) {
