@@ -787,15 +787,17 @@ function crearProyecto(tipo) {
 }
 
 
-
 function renderForm() {
     document.getElementById('dynamicFields').innerHTML = fields.map((f, i) => {
-        if(f.type === 'text' || f.type === 'carretera') return `<div class="form-group"><label>${f.label}</label><input type="text" class="dyn-input" data-idx="${i}"></div>`;
+        if(f.type === 'carretera') return `<div class="form-group"><label>${f.label}</label><input type="text" class="dyn-input" data-idx="${i}"></div>`;
         if(f.type === 'pk') return `<div class="form-group"><label>${f.label}</label><div class="pk-row"><input type="number" class="pk-km" data-idx="${i}" placeholder="Km"> <b>+</b> <input type="number" class="pk-m" data-idx="${i}" placeholder="m" onblur="if(this.value!='')this.value=this.value.padStart(3,'0')"></div></div>`;
         if(f.type === 'marge') return `<div class="form-group"><label>${f.label}</label><select class="dyn-marge" data-idx="${i}"><option>MD</option><option>ME</option><option>Eix</option></select></div>`;
-        if(f.type === 'obs') return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-obs" data-idx="${i}" rows="2"></textarea></div>`;
+        
+        // MODIFICACIÓN: He añadido la clase "dyn-input" aquí también
+        if(f.type === 'text' || f.type === 'obs') return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-input dyn-obs" data-idx="${i}" rows="2" style="font-family:inherit"></textarea></div>`;
     }).join('');
 }
+
 
 
 function descarregarFitxerUnic() {
