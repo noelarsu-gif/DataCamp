@@ -1443,6 +1443,9 @@ pageDoc.text(títolMultilínia, 195, 10, { align: 'right' });
 const alcadaTitol = títolMultilínia.length * 4.5; 
 const yData = 10 + alcadaTitol + 2;
 
+const dataAvui = new Date().toLocaleDateString('ca-ES', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
         
       
         pageDoc.setFont("helvetica", "normal");
