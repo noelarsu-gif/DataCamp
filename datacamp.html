@@ -1433,21 +1433,33 @@ async function generarBlobPDF(p, tipus) {
         pageDoc.setFont("helvetica", "bold");
         pageDoc.setFontSize(10);
         
-        const textTitol = title.toUpperCase();
-        const xPosTitol = 195 - pageDoc.getTextWidth(textTitol);
-        pageDoc.text(textTitol, xPosTitol, 12);
+        
 
         const dataAvui = new Date().toLocaleDateString('ca-ES', {
             year: 'numeric', month: 'long', day: 'numeric'
         });
-        
+
+        const ampleMaximTitol = 100; // Limitem el títol a la meitat dreta
+const títolMultilínia = pageDoc.splitTextToSize(p.titulo.toUpperCase(), ampleMaximTitol);
+
+// Dibuixem el títol ajustat a la dreta (alineació dreta real)
+pageDoc.text(títolMultilínia, 195, 10, { align: 'right' });
+
+// Calculem la posició de la data dinàmicament segons les línies del títol
+const alcadaTitol = títolMultilínia.length * 4.5; 
+const yData = 10 + alcadaTitol + 2;
+
+        const dataAvui = new Date().toLocaleDateString('ca-ES', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+      
         pageDoc.setFont("helvetica", "normal");
         pageDoc.setFontSize(8);
         pageDoc.setTextColor(100, 100, 100);
         
         const textData = `Data d'emissió: ${dataAvui}`;
         const xPosData = 195 - pageDoc.getTextWidth(textData);
-        pageDoc.text(textData, xPosData, 17);
+        pageDoc.text(textData, xPosData, 20);
     };
 
     const localRegs = p.registros;
