@@ -1433,13 +1433,7 @@ async function generarBlobPDF(p, tipus) {
         pageDoc.setFont("helvetica", "bold");
         pageDoc.setFontSize(10);
         
-        
-
-        const dataAvui = new Date().toLocaleDateString('ca-ES', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
-
-        const ampleMaximTitol = 100; // Limitem el títol a la meitat dreta
+ const ampleMaximTitol = 100; // Limitem el títol a la meitat dreta
 const títolMultilínia = pageDoc.splitTextToSize(p.titulo.toUpperCase(), ampleMaximTitol);
 
 // Dibuixem el títol ajustat a la dreta (alineació dreta real)
@@ -1449,9 +1443,7 @@ pageDoc.text(títolMultilínia, 195, 10, { align: 'right' });
 const alcadaTitol = títolMultilínia.length * 4.5; 
 const yData = 10 + alcadaTitol + 2;
 
-        const dataAvui = new Date().toLocaleDateString('ca-ES', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
+        
       
         pageDoc.setFont("helvetica", "normal");
         pageDoc.setFontSize(8);
