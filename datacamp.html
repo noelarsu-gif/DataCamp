@@ -1364,20 +1364,28 @@ input:checked + .slider:before { transform: translateX(20px); }
     backdrop-filter: blur(4px);
     display: none;
     justify-content: center;
-    align-items: center;
+    align-items: center;          /* always centered — desktop & mobile */
     z-index: 1000;
     padding: 20px;
     box-sizing: border-box;
+    overflow-y: auto;             /* allow scroll if modal taller than viewport */
 }
 .modal-box {
     background: var(--surface);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 28px 24px;
     width: 100%;
     max-width: 380px;
     box-shadow: var(--shadow-lg);
     animation: modalIn 0.25s cubic-bezier(.34,1.56,.64,1);
+    /* Button spacing: every .btn inside a modal-box gets breathing room */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;                    /* space between buttons */
 }
+.modal-box .modal-title,
+.modal-box .modal-sub { /* pull title/sub out of the flex-gap flow */ }
+
 @keyframes modalIn {
     from { opacity: 0; transform: scale(0.9) translateY(10px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
@@ -1387,22 +1395,29 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 1.4rem;
     font-weight: 900;
     color: var(--dark);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     text-transform: uppercase;
 }
 .modal-sub {
     font-size: 0.85rem;
     color: var(--text-muted);
-    margin-bottom: 22px;
+    margin-bottom: 8px;           /* gap between sub and first button comes from flex gap */
 }
 
 /* Export modal */
 .export-modal-box {
     background: var(--surface);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 28px 24px;
     width: 90%;
     max-width: 320px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.25s cubic-bezier(.34,1.56,.64,1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
     text-align: center;
     box-shadow: var(--shadow-lg);
     animation: modalIn 0.25s cubic-bezier(.34,1.56,.64,1);
@@ -1808,19 +1823,26 @@ input:checked + .slider:before { transform: translateX(20px); }
     .screen-header h3 { font-size: 0.88rem; }
     .btn-back { width: 42px; height: 42px; font-size: 1.1rem; }
 
-    /* === MODAL === */
-    .modal { padding: 0; align-items: flex-end; }
+    /* === MODAL — always centered, never bottom-sheet === */
+    .modal {
+        padding: 16px;      /* tighter side padding on small screens */
+        align-items: center; /* explicitly override in case of specificity conflicts */
+    }
     .modal-box {
-        max-width: 100%; width: 100%;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        padding: 20px 15px; max-height: 90vh; overflow-y: auto;
+        max-width: 92vw;    /* use most of the screen width on mobile */
+        width: 100%;
+        border-radius: var(--radius-lg);   /* all corners rounded, not just top */
+        padding: 22px 18px;
+        max-height: 88vh;
+        overflow-y: auto;
     }
     .export-modal-box {
-        width: 100%; max-width: 100%;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        padding: 20px 15px;
+        width: 92vw;
+        max-width: 340px;
+        border-radius: var(--radius-lg);
+        padding: 22px 18px;
     }
-    .modal-title { font-size: 1.1rem; }
+    .modal-title { font-size: 1.15rem; }
 
     /* === MISC === */
     .scroll-btns { bottom: 16px; right: 12px; }
@@ -1972,6 +1994,223 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* Obra spans look like a bar (border-radius 0) */
 .cal-event-dot.cat-obra { border-radius: 2px; font-weight: 700; }
+
+/* ============================================================
+   DOWNLOADS — table + search + responsive cards
+   ============================================================ */
+
+/* Top bar: search + count */
+.dl-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.dl-search-wrap {
+    flex: 1 1 0%;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.dl-search-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+.dl-search {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.95rem;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    box-sizing: border-box;
+    height: 46px;
+}
+.dl-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); outline: none; }
+.dl-count {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Legend */
+.dl-legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.dl-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.dl-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.dl-icon.pdf { background: #fff1f2; }
+.dl-icon.xls { background: #f0fdf4; }
+.dl-icon.zip { background: #fef9c3; }
+.dl-icon.bak { background: var(--accent-blue-lt); }
+
+/* ── Desktop table ── */
+.dl-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    table-layout: fixed;
+}
+.dl-table thead tr {
+    background: var(--dark);
+}
+.dl-table th {
+    padding: 11px 14px;
+    text-align: left;
+    font-family: var(--font-cond);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+}
+.dl-table td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+    color: var(--text);
+}
+.dl-table tbody tr:last-child td { border-bottom: none; }
+.dl-table tbody tr:hover { background: var(--surface-2); }
+
+/* Column widths */
+.dl-col-name  { width: 30%; }
+.dl-col-carr  { width: 15%; }
+.dl-col-date  { width: 12%; }
+.dl-col-type  { width: 11%; }
+.dl-col-act   { width: 32%; }   /* wider: accommodates up to 5 buttons */
+
+.dl-cell-name {
+    font-weight: 700;
+    color: var(--dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dl-cell-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Action buttons row inside table */
+.dl-actions {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;          /* wrap to second row if buttons don't fit */
+    align-items: center;
+}
+.dl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 9px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    min-height: 34px;
+}
+.dl-btn-pdf { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+.dl-btn-pdf:hover { background: #ffe4e6; }
+.dl-btn-xls { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.dl-btn-xls:hover { background: #dcfce7; }
+.dl-btn-zip { background: #fef9c3; color: #92400e; border-color: #fde68a; }
+.dl-btn-zip:hover { background: #fef08a; }
+.dl-btn-bak { background: var(--accent-blue-lt); color: var(--accent-blue); border-color: var(--cat-inventari-bd); }
+.dl-btn-bak:hover { background: #dbeafe; }
+
+/* ── Mobile cards (hidden on desktop, shown on mobile) ── */
+.dl-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+}
+.dl-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.dl-card-title {
+    font-weight: 700;
+    color: var(--dark);
+    font-size: 0.95rem;
+    word-break: break-word;
+}
+.dl-card-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+.dl-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+.dl-card-actions .dl-btn {
+    min-height: 42px;
+    font-size: 0.78rem;
+    justify-content: center;
+}
+
+/* Responsive switch */
+.dl-table-wrap { display: block; }  /* shown on desktop */
+.dl-cards-wrap { display: none; }   /* shown on mobile */
+
+@media (max-width: 768px) {
+    .dl-table-wrap { display: none; }
+    .dl-cards-wrap { display: block; }
+    .dl-legend { gap: 8px; padding: 6px 10px; }
+    .dl-legend-item { font-size: 0.7rem; }
+    .dl-topbar { gap: 8px; }
+    .dl-count { width: 100%; text-align: right; }
+}
 
 /* ── Legend items ── */
 .cal-legend-dot.cat-captura   { background: var(--cat-captura);   }
@@ -2404,6 +2643,150 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* Closed obra: grey tint */
 .cal-cell.obra-closed-span { background: rgba(100,116,139,0.06); }
 
+/* ============================================================
+   RECENTS SECTION — Home screen
+   ============================================================ */
+.recents-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    margin-top: 4px;
+}
+.recents-view-all {
+    background: none;
+    border: none;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 0.15s;
+}
+.recents-view-all:hover { color: var(--primary); }
+
+/* Recent project card */
+.recent-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    text-decoration: none;
+}
+.recent-card:hover {
+    border-color: var(--border-dark);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+.recent-card:active { transform: translateY(0); }
+
+/* Left colour accent by category */
+.recent-card::before {
+    content: '';
+    display: block;
+    width: 3px;
+    border-radius: 3px;
+    align-self: stretch;
+    min-height: 36px;
+    flex-shrink: 0;
+}
+.recent-card.cat-inventari::before { background: var(--cat-inventari); }
+.recent-card.cat-obra::before      { background: var(--cat-obra); }
+.recent-card.cat-captura::before   { background: var(--cat-captura); }
+
+.recent-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.recent-icon.cat-inventari { background: var(--cat-inventari-lt); }
+.recent-icon.cat-obra      { background: var(--cat-obra-lt); }
+.recent-icon.cat-captura   { background: var(--cat-captura-lt); }
+
+.recent-info {
+    flex: 1;
+    min-width: 0;
+}
+.recent-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.recent-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+.recent-meta-sep { color: var(--border-dark); }
+
+.recent-continue {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 13px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+.recent-continue:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Empty state */
+.recents-empty {
+    text-align: center;
+    padding: 28px 20px;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    border: 1.5px dashed var(--border-dark);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+}
+.recents-empty-icon {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .recent-card    { padding: 11px 12px; gap: 10px; }
+    .recent-name    { font-size: 0.88rem; }
+    .recent-icon    { width: 32px; height: 32px; font-size: 1.1rem; }
+    .recent-continue{ padding: 6px 10px; font-size: 0.7rem; }
+}
+
 </style>
 </head>
 <body>
@@ -2438,6 +2821,11 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon">📥</span> Descàrregues</button>
         <button class="nav-item" onclick="mobileNavTo('pantallaAjustos')"><span class="nav-icon">⚙️</span> Configuració</button>
         <button class="nav-item" onclick="mobileNavTo('helpScreen')"><span class="nav-icon">❓</span> Ajuda</button>
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin:10px 0 6px;"></div>
+        <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.25);padding:0 12px 6px;">Còpies de Seguretat</div>
+        <button class="nav-item" onclick="closeMobileNav();exportarBackup()"><span class="nav-icon">📤</span> Exportar Backup</button>
+        <button class="nav-item" onclick="closeMobileNav();document.getElementById('importFileMob').click()"><span class="nav-icon">📥</span> Importar Backup</button>
+        <input type="file" id="importFileMob" accept="application/json" hidden onchange="importarBackup(this)">
     </div>
 </div>
 
@@ -2509,7 +2897,6 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div class="topbar-title" id="topbarTitle">Inici</div>
             <div class="topbar-actions">
                 <button class="btn btn-primary btn-sm" onclick="openProjectModal()">➕ Nou Projecte</button>
-                <button class="btn btn-ghost btn-sm" onclick="exportarBackup()">📤 Backup</button>
             </div>
         </div>
 
@@ -2530,7 +2917,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="action-card primary" onclick="openProjectModal()">
                         <div class="action-icon">➕</div>
                         <div class="action-label">Nou Projecte</div>
-                        <div class="action-desc">Crea un inventari nou estàndard o personalitzat</div>
+                        <div class="action-desc">Crea un inventari nou o seguiment d'obra</div>
                     </div>
                     <div class="action-card blue" onclick="modeFotoDirecta()">
                         <div class="action-icon">📸</div>
@@ -2549,11 +2936,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </div>
                 </div>
 
-                <div class="section-title">Còpies de seguretat</div>
-                <div class="util-row">
-                    <button class="btn btn-ghost btn-sm" onclick="exportarBackup()" style="width:auto; flex:1">📤 Exportar Backup Global</button>
-                    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile2').click()" style="width:auto; flex:1">📥 Importar Backup</button>
-                    <input type="file" id="importFile2" accept="application/json" hidden onchange="importarBackup(this)">
+                <!-- RECENT PROJECTS SECTION -->
+                <div class="recents-header">
+                    <span class="section-title" style="margin:0;">Treballs Recents</span>
+                    <button class="recents-view-all" onclick="historial()">Veure tots →</button>
+                </div>
+                <div id="recentsContainer">
+                    <!-- filled by renderRecents() on load and on ir('home') -->
+                    <div class="recents-empty">
+                        <div class="recents-empty-icon">📋</div>
+                        <div>Encara no hi ha treballs recents</div>
+                    </div>
                 </div>
             </div>
 
@@ -2777,10 +3170,32 @@ input:checked + .slider:before { transform: translateX(20px); }
                  ================================================ -->
             <div id="downloads" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>📥 Gestió de Fitxers</h3>
+                    <button class="btn-back" onclick="ir('home')">&#8592;</button>
+                    <h3>&#128229; Desc&#224;rregues</h3>
                 </div>
-                <div id="listaDescargas" style="margin-top:4px;"></div>
+
+                <!-- Search + stats row -->
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <span class="dl-search-icon">&#128269;</span>
+                        <input type="text" id="dlSearch" class="dl-search"
+                               placeholder="Cerca per obra o carretera..."
+                               oninput="carregarLlistaDescargues()">
+                    </div>
+                    <div class="dl-count" id="dlCount"></div>
+                </div>
+
+                <!-- Legend -->
+                <div class="dl-legend">
+                    <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe PDF</span>
+                    <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel / CSV</span>
+                    <span class="dl-legend-item"><span class="dl-icon zip">&#128452;&#65039;</span> ZIP Fotos</span>
+                    <span class="dl-legend-item"><span class="dl-icon bak">&#128190;</span> Backup</span>
+                </div>
+
+                <!-- Table (desktop) / Cards (mobile) -->
+                <div id="listaDescargas"></div>
+
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
             </div>
 
@@ -2930,9 +3345,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="modal-box" onclick="event.stopPropagation()" style="text-align:center;">
         <div class="modal-title" style="color:var(--primary);">📸 Afegir Imatge</div>
         <div class="modal-sub">Tria l'origen de la foto</div>
-        <button class="btn btn-primary" style="font-size:1.05rem; padding:18px;" onclick="triarCamara()">📸 CÀMERA</button>
-        <button class="btn btn-secondary" style="font-size:1.05rem; padding:18px;" onclick="triarGaleria()">🖼️ GALERIA</button>
-        <button class="btn btn-ghost" onclick="tancarFotoChooser()">Cancel·lar</button>
+        <!-- Two main buttons side by side -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button class="btn btn-primary" style="font-size:1rem; padding:16px 10px; margin:0;" onclick="triarCamara()">📸 CÀMERA</button>
+            <button class="btn btn-secondary" style="font-size:1rem; padding:16px 10px; margin:0;" onclick="triarGaleria()">🖼️ GALERIA</button>
+        </div>
+        <button class="btn btn-ghost" style="font-size:0.85rem; margin:0;" onclick="tancarFotoChooser()">Cancel·lar</button>
     </div>
 </div>
 
@@ -2972,6 +3390,8 @@ req.onsuccess = e => {
             };
         }
     };
+    /* Populate recents as soon as DB is ready */
+    setTimeout(renderRecents, 100);
 };
 
 /* Load logo from storage */
@@ -3043,6 +3463,8 @@ function ir(id) {
         if (btnSave) { btnSave.textContent = "💾 GUARDAR REGISTRE"; }
         const btnPunts = document.querySelector('.pts-count-btn');
         if (btnPunts) btnPunts.style.display = 'flex';
+        /* Refresh recents every time home is opened */
+        renderRecents();
     }
 
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -3064,6 +3486,86 @@ function ir(id) {
 
 function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
 function closeModal()       { document.getElementById('projectModal').style.display = 'none'; }
+
+/* ============================================================
+   RECENTS — 3 most recently modified projects on the Home screen
+   Excludes 'captura' (quick photos) — those are historial-only.
+   ============================================================ */
+function renderRecents() {
+    const container = document.getElementById('recentsContainer');
+    if (!container || !db) return;
+
+    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
+        let all = (e.target.result || [])
+            .filter(p => (p.tipusEntrada || 'inventari') !== 'captura')
+            .sort((a,b) => (b.timestamp||0) - (a.timestamp||0))
+            .slice(0, 3);
+
+        if (all.length === 0) {
+            container.innerHTML = `
+                <div class="recents-empty">
+                    <div class="recents-empty-icon">📋</div>
+                    <div>Ancora no hi ha treballs recents</div>
+                    <div style="font-size:0.76rem;margin-top:4px;color:var(--text-light);">Crea un projecte o inventari per veure'l aquí</div>
+                </div>`;
+            return;
+        }
+
+        const ICON_MAP = { obra: '🏗️', inventari: '📋', captura: '📸' };
+
+        container.innerHTML = all.map(p => {
+            const tipus  = p.tipusEntrada || 'inventari';
+            const cls    = getCatClass(tipus);
+            const icon   = ICON_MAP[tipus] || '📋';
+            const pts    = p.registros?.length || 0;
+            const nFotos = (p.registros||[]).reduce((s,r) => s+(r.fotos?.length||0), 0);
+            const carr   = (p.registros||[]).flatMap(r=>r.values||[])
+                               .find(v=>v.label.toLowerCase().includes('carretera'))?.val || '';
+
+            /* Relative time label */
+            const ts   = p.timestamp || 0;
+            const diff = ts ? Math.floor((Date.now() - ts) / 60000) : null; // minutes
+            let timeLabel = p.fecha || '';
+            if (diff !== null) {
+                if      (diff < 1)    timeLabel = 'Ara mateix';
+                else if (diff < 60)   timeLabel = `Fa ${diff} min`;
+                else if (diff < 1440) timeLabel = `Fa ${Math.floor(diff/60)}h`;
+                else if (diff < 2880) timeLabel = 'Ahir';
+                else                  timeLabel = p.fecha || '';
+            }
+
+            /* "Continuar" navigates to projectDetail for obres, form for inventaris */
+            const continueAction = tipus === 'obra'
+                ? `obrirDetallProjecte('${p.id}')`
+                : `openP('${p.id}')`;
+
+            const isObraClosedBadge = p.estat_obra_tancada
+                ? `<span style="font-size:0.65rem;background:var(--cat-obra-lt);color:var(--cat-obra);border:1px solid var(--cat-obra-bd);padding:1px 6px;border-radius:10px;font-weight:700;">FINALITZADA</span>`
+                : '';
+
+            return `
+            <div class="recent-card cat-${cls}" onclick="${continueAction}" role="button" tabindex="0">
+                <div class="recent-icon cat-${cls}">${icon}</div>
+                <div class="recent-info">
+                    <div class="recent-name" title="${p.titulo}">${
+                        p.titulo.length > 42 ? p.titulo.slice(0,40) + '\u2026' : p.titulo
+                    }</div>
+                    <div class="recent-meta">
+                        ${carr ? `<span>${carr}</span><span class="recent-meta-sep">·</span>` : ''}
+                        <span>${pts} punt${pts!==1?'s':''}</span>
+                        ${nFotos > 0 ? `<span class="recent-meta-sep">·</span><span>${nFotos} foto${nFotos!==1?'s':''}</span>` : ''}
+                        <span class="recent-meta-sep">·</span>
+                        <span>${timeLabel}</span>
+                        ${isObraClosedBadge}
+                    </div>
+                </div>
+                <button class="recent-continue" onclick="event.stopPropagation();${continueAction}">
+                    Continuar →
+                </button>
+            </div>`;
+        }).join('');
+    };
+}
 
 function navTo(screenId) {
     if (screenId === 'list') historial(); else ir(screenId);
@@ -3821,10 +4323,14 @@ function obrirDetallProjecte(id) {
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;">
             ${tipus!=='captura'?`<button class="btn btn-primary btn-sm" style="grid-column:1/-1;" onclick="openP('${id}')">&#128194; OBRIR PROJECTE</button>`:''}
-            ${isObra ? `<button class="btn btn-primary btn-sm" style="grid-column:1/-1;background:#1e293b;" onclick="generarInformeObraPDF('${id}')">&#128196; GENERAR INFORME PDF</button>` : ''}
             ${mapBtn}
             <button class="btn btn-ghost btn-sm" onclick="clonarP('${id}')">&#128260; CLONAR</button>
             <button class="btn btn-danger btn-sm" onclick="borrarP('${id}');ir('list')">&#128465; ELIMINAR</button>
+        </div>
+        <div style="margin-top:10px;">
+            <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--text-muted);font-size:0.8rem;" onclick="ir('downloads')">
+                &#128229; Anar a Desc&#224;rregues per exportar PDF / Excel / ZIP
+            </button>
         </div>`;
 
     ir('projectDetail');
@@ -4267,45 +4773,142 @@ function clonarP(id) {
 /* ============================================================
    DOWNLOADS
    ============================================================ */
+/* ============================================================
+   DOWNLOADS — table (desktop) + cards (mobile)
+   ============================================================ */
 function carregarLlistaDescargues() {
-    const l = document.getElementById("listaDescargas");
-    l.innerHTML = "";
-    if (!db) return;
+    const container = document.getElementById("listaDescargas");
+    if (!container || !db) return;
+
+    const q = (document.getElementById('dlSearch')?.value || '').toLowerCase().trim();
+
     db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        const projectes = e.target.result;
+        let projectes = e.target.result || [];
+
+        /* ── EXCLUDE quick photos: captura type never appears in downloads ── */
+        projectes = projectes.filter(p => (p.tipusEntrada || 'inventari') !== 'captura');
+
+        /* Filter by search query */
+        if (q) {
+            projectes = projectes.filter(p => {
+                const carr = (p.registros||[]).flatMap(r=>r.values||[])
+                    .find(v=>v.label.toLowerCase().includes('carretera'))?.val || '';
+                return p.titulo.toLowerCase().includes(q) || carr.toLowerCase().includes(q);
+            });
+        }
+
+        /* Sort newest first */
+        projectes.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+
+        /* Update count */
+        const countEl = document.getElementById('dlCount');
+        if (countEl) countEl.textContent = `${projectes.length} projecte${projectes.length!==1?'s':''}`;
+
         if (projectes.length === 0) {
-            l.innerHTML = "<div style='text-align:center;padding:40px;color:var(--text-muted);'><div style='font-size:2rem;margin-bottom:10px;'>📥</div><div>Cap projecte disponible</div></div>";
+            container.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
+                <div style='font-size:2.5rem;margin-bottom:12px;'>&#128229;</div>
+                <div style='font-weight:600;'>Cap projecte trobat</div>
+                <div style='font-size:0.82rem;margin-top:6px;'>${q ? 'Prova amb un altre terme de cerca' : 'Crea el primer projecte o inventari des de l\'inici'}</div>
+            </div>`;
             return;
         }
-        projectes.forEach(p => {
-            const div = document.createElement("div");
-            div.className = "download-card";
-            const pts = p.registros?.length || 0;
-            div.innerHTML = `
-                <div class="download-card-header">
-                    <div style="min-width:0;flex:1;">
-                        <div class="download-card-title">${p.titulo}</div>
-                        <div class="download-card-meta">${pts} punt${pts!==1?'s':''} &middot; ${p.fecha}</div>
-                    </div>
-                    <button class="btn btn-primary btn-fitxa" onclick="exportarICompartir('${p.id}','Fitxa')">&#128196; PDF FITXA</button>
-                </div>
-                <div class="download-card-secondary">
-                    <button class="btn btn-ghost" onclick="toggleOptions('${p.id}')">Altres formats &#9660;</button>
-                </div>
-                <div id="opts-${p.id}" class="extra-options">
-                    <button class="btn btn-ghost" onclick="exportarICompartir('${p.id}','Taula')">&#128202; PDF Taula</button>
-                    <button class="btn btn-ghost" onclick="exportarICompartir('${p.id}','excel')">&#128200; Excel</button>
-                    <button class="btn btn-ghost" onclick="descarregarTotesFotos('${p.id}')">ZIP Fotos</button>
-                    <button class="btn btn-ghost" onclick="exportarICompartir('${p.id}','backup')">&#128190; Backup</button>
-                </div>`;
-            l.appendChild(div);
-        });
+
+        /* ── Build HTML ── */
+        const tableRows = projectes.map(p => buildTableRow(p)).join('');
+        const cards     = projectes.map(p => buildCard(p)).join('');
+
+        container.innerHTML = `
+            <div class="dl-table-wrap">
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th class="dl-col-name">Obra / Projecte</th>
+                            <th class="dl-col-carr">Carretera</th>
+                            <th class="dl-col-date">&#218;ltima Mod.</th>
+                            <th class="dl-col-type">Tipus</th>
+                            <th class="dl-col-act">Accions</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+            <div class="dl-cards-wrap">${cards}</div>`;
     };
 }
 
+function _projMeta(p) {
+    const carr   = (p.registros||[]).flatMap(r=>r.values||[])
+        .find(v=>v.label.toLowerCase().includes('carretera'))?.val || '—';
+    const pts    = p.registros?.length || 0;
+    const nFotos = (p.registros||[]).reduce((s,r)=>s+(r.fotos?.length||0),0);
+    const tipus  = p.tipusEntrada || 'inventari';
+    const cls    = getCatClass(tipus);
+    const data   = p.fecha || '—';
+    return { carr, pts, nFotos, tipus, cls, data };
+}
+
+function _actionBtns(id, tipus) {
+    /*
+     * PDF buttons:
+     *  - Obra → full technical report (generarInformeObraPDF)
+     *  - Inventari → PDF Fitxa (detailed) + PDF Taula (summary table)
+     * Excel, ZIP and Backup available for all non-captura types.
+     */
+    const isObra = (tipus === 'obra');
+    const pdfBtns = isObra
+        ? `<button class="dl-btn dl-btn-pdf" title="Informe t&#232;cnic d'obra (PDF oficial)" onclick="exportarICompartir('${id}','Informe')">
+               &#128196; Informe
+           </button>`
+        : `<button class="dl-btn dl-btn-pdf" title="PDF detallat per registre amb fotos" onclick="exportarICompartir('${id}','Fitxa')">
+               &#128196; Fitxa
+           </button>
+           <button class="dl-btn dl-btn-pdf" style="background:#fdf2f8;color:#86198f;border-color:#e879f9;" title="PDF resum en taula" onclick="exportarICompartir('${id}','Taula')">
+               &#128202; Taula
+           </button>`;
+
+    return `
+        ${pdfBtns}
+        <button class="dl-btn dl-btn-xls" title="Exportar registres a Excel" onclick="exportarICompartir('${id}','excel')">&#128202; Excel</button>
+        <button class="dl-btn dl-btn-zip" title="ZIP amb totes les fotos" onclick="descarregarTotesFotos('${id}')">&#128452;&#65039; ZIP</button>
+        <button class="dl-btn dl-btn-bak" title="Backup JSON d'aquest projecte" onclick="exportarICompartir('${id}','backup')">&#128190; Bak</button>`;
+}
+
+function buildTableRow(p) {
+    const { carr, pts, nFotos, tipus, cls, data } = _projMeta(p);
+    const titolTr = p.titulo.length > 36 ? p.titulo.slice(0,34)+'\u2026' : p.titulo;
+    const carrTr  = carr.length > 16 ? carr.slice(0,14)+'\u2026' : carr;
+    return `<tr>
+        <td class="dl-col-name">
+            <div class="dl-cell-name" title="${p.titulo}">${titolTr}</div>
+            <div class="dl-cell-meta">${pts} punt${pts!==1?'s':''} &middot; ${nFotos} foto${nFotos!==1?'s':''}</div>
+        </td>
+        <td class="dl-col-carr">${carrTr}</td>
+        <td class="dl-col-date" style="font-size:0.8rem;">${data}</td>
+        <td class="dl-col-type"><span class="cat-badge ${cls}" style="font-size:0.62rem;">${getCatLabel(tipus)}</span></td>
+        <td class="dl-col-act"><div class="dl-actions">${_actionBtns(p.id, tipus)}</div></td>
+    </tr>`;
+}
+
+function buildCard(p) {
+    const { carr, pts, nFotos, tipus, cls, data } = _projMeta(p);
+    return `<div class="dl-card">
+        <div class="dl-card-header">
+            <div style="min-width:0;flex:1;">
+                <div class="dl-card-title">${p.titulo}</div>
+                <div class="dl-card-meta">
+                    ${carr !== '—' ? carr+' &middot; ' : ''}${pts} punt${pts!==1?'s':''} &middot; ${nFotos} foto${nFotos!==1?'s':''} &middot; ${data}
+                </div>
+            </div>
+            <span class="cat-badge ${cls}">${getCatLabel(tipus)}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;">${_actionBtns(p.id, tipus)}</div>
+    </div>`;
+}
+
+/* toggleOptions kept for backward compat (no longer used in new UI) */
 function toggleOptions(id) {
     const el = document.getElementById(`opts-${id}`);
-    el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
+    if (el) el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
 }
 
 async function descarregarTotesFotos(id) {
@@ -4313,21 +4916,36 @@ async function descarregarTotesFotos(id) {
     db.transaction("projects").objectStore("projects").get(id).onsuccess = async e => {
         const p = e.target.result;
         const zip = new JSZip();
-        p.registros.forEach((reg, i) => {
-            const carr  = reg.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "C";
-            const pk    = reg.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "0";
-            const marge = reg.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "M";
-            reg.fotos.forEach((foto, fi) => {
+        let nFotos = 0;
+
+        p.registros.forEach((reg, ri) => {
+            const carr  = reg.values?.find(v => v.label.toLowerCase().includes('carretera'))?.val || 'SC';
+            const pk    = reg.values?.find(v => v.label.toLowerCase().includes('pk'))?.val        || '0';
+            const marge = reg.values?.find(v => v.label.toLowerCase().includes('marge'))?.val     || 'M';
+            /* Descriptive filename: Carretera_PK125+400_Sentit_MD_Punt01_Foto01.jpg */
+            const base  = `${carr}_PK${pk}_${marge}_Punt${String(ri+1).padStart(2,'0')}`
+                            .replace(/[^a-z0-9_+]/gi,'_');
+            (reg.fotos || []).forEach((foto, fi) => {
                 const imgData = foto.split(',')[1];
-                const nomFoto = `${carr}_PK${pk}_${marge}_${i+1}_${fi+1}.jpg`.replace(/[^a-z0-9.]/gi,'_');
+                const nomFoto = `${base}_Foto${String(fi+1).padStart(2,'0')}.jpg`;
                 zip.file(nomFoto, imgData, { base64: true });
+                nFotos++;
             });
         });
-        currentBlob = await zip.generateAsync({ type: "blob" });
-        currentFileName = `Fotos_${p.titulo.replace(/\s+/g,'_')}.zip`;
 
-        document.getElementById('exportTitle').innerText = "PAQUET DE FOTOS (ZIP)";
-        document.getElementById('exportName').innerText = currentFileName;
+        if (nFotos === 0) {
+            hideSpinner();
+            alert('Aquest projecte no té fotos per descarregar.');
+            return;
+        }
+
+        currentBlob = await zip.generateAsync({ type: "blob" });
+        const slug = p.titulo.replace(/[^a-z0-9]/gi,'_').slice(0,40);
+        const date = new Date().toISOString().slice(0,10);
+        currentFileName = `Fotos_${slug}_${date}.zip`;
+
+        document.getElementById('exportTitle').innerText = `FOTOS ZIP (${nFotos} imatge${nFotos!==1?'s':''})`;
+        document.getElementById('exportName').innerText  = currentFileName;
 
         document.getElementById('btnShare').onclick = () => {
             const file = new File([currentBlob], currentFileName, { type: "application/zip" });
@@ -4348,23 +4966,32 @@ async function descarregarTotesFotos(id) {
 }
 
 async function exportarICompartir(id, tipus) {
-    showSpinner(`GENERANT ${tipus.toUpperCase()}...`);
+    const cleanType = tipus === 'Informe' ? 'INFORME PDF' : tipus.toUpperCase();
+    showSpinner(`GENERANT ${cleanType}...`);
     db.transaction("projects").objectStore("projects").get(id).onsuccess = async e => {
         const p = e.target.result;
         try {
-            if (tipus === 'Fitxa' || tipus === 'Taula') {
+            const slug = p.titulo.replace(/[^a-z0-9]/gi,'_').slice(0,40);
+            const date = new Date().toISOString().slice(0,10);
+
+            if (tipus === 'Informe') {
+                /* Technical obra report — routes to the full jsPDF generator */
+                hideSpinner();
+                await generarInformeObraPDF(id);
+                return;
+            } else if (tipus === 'Fitxa' || tipus === 'Taula') {
                 currentBlob = await generarBlobPDF(p, tipus);
-                currentFileName = `${tipus}_${p.titulo.replace(/\s+/g,'_')}.pdf`;
+                currentFileName = `${tipus}_${slug}_${date}.pdf`;
             } else if (tipus === 'excel') {
                 currentBlob = generarBlobExcel(p);
-                currentFileName = `Dades_${p.titulo.replace(/\s+/g,'_')}.xlsx`;
+                currentFileName = `Dades_${slug}_${date}.xlsx`;
             } else if (tipus === 'backup') {
                 currentBlob = new Blob([JSON.stringify([p])], { type: "application/json" });
-                currentFileName = `Backup_${p.titulo.replace(/\s+/g,'_')}.json`;
+                currentFileName = `Backup_${slug}_${date}.json`;
             }
 
-            document.getElementById('exportTitle').innerText = tipus.toUpperCase();
-            document.getElementById('exportName').innerText = currentFileName;
+            document.getElementById('exportTitle').innerText = cleanType;
+            document.getElementById('exportName').innerText  = currentFileName;
 
             document.getElementById('btnShare').onclick = () => {
                 const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
@@ -4405,22 +5032,16 @@ async function generarBlobPDF(p, tipus) {
     const GRAY = [110, 110, 110];
     const LGRAY = [220, 220, 220];
 
-   const drawHeader = (pageDoc, title) => {
-    // 1. Eliminamos el bloque rojo y dibujamos una línea gris fina 🔘
-    pageDoc.setDrawColor(200, 200, 200); // Gris claro discreto
-    pageDoc.setLineWidth(0.1);           // Grosor mínimo
-    pageDoc.line(12, 25, 198, 25);      // Línea horizontal debajo del logo
-
-    // 2. Logo (se mantiene igual, pero ahora sin el fondo rojo que lo pisaba)
-    if (typeof logoCorporativo !== 'undefined' && logoCorporativo) {
-        try {
-            const imgProps = pageDoc.getImageProperties(logoCorporativo);
-            const hMax = 14, wMax = 55;
-            const rati = Math.min(wMax / imgProps.width, hMax / imgProps.height);
-            // El logo se imprime en una zona limpia 📄
-            pageDoc.addImage(logoCorporativo, 'PNG', 12, 10, imgProps.width * rati, imgProps.height * rati);
-        } catch (err) { console.error("Logo error:", err); }
-    }
+    const drawHeader = (pageDoc, title) => {
+        // Logo
+        if (typeof logoCorporativo !== 'undefined' && logoCorporativo) {
+            try {
+                const imgProps = pageDoc.getImageProperties(logoCorporativo);
+                const hMax = 14, wMax = 55;
+                const rati = Math.min(wMax / imgProps.width, hMax / imgProps.height);
+                pageDoc.addImage(logoCorporativo, 'PNG', 12, 10, imgProps.width * rati, imgProps.height * rati);
+            } catch (err) { console.error("Logo error:", err); }
+        }
 
         // Title (right-aligned)
         pageDoc.setFont("helvetica", "bold");
@@ -4540,13 +5161,11 @@ async function generarBlobPDF(p, tipus) {
             body: localRegs.map(r => [...r.values.map(v => v.val || "—"), ""]),
             theme: 'grid',
             headStyles: {
-                fillColor: [255, 255, 255], // Fondo blanco para eliminar la franja roja ⚪
-                textColor: [50, 50, 50],    // Texto en gris oscuro para que sea legible 🖋️
+                fillColor: RED,
+                textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 8,
-                cellPadding: 4,
-                lineColor: [200, 200, 200], // Gris discreto para la línea divisoria 🔘
-                lineWidth: { bottom: 0.5 }   // Solo una línea fina en la parte inferior
+                cellPadding: 4
             },
             alternateRowStyles: { fillColor: [250, 250, 250] },
             styles: { valign: 'middle', fontSize: 8, cellPadding: 3, lineColor: LGRAY, lineWidth: 0.3 },
@@ -4859,35 +5478,23 @@ async function guardarFotoDirecta(imgData) {
     }
     // --- End save to Historial ---
 
-    document.getElementById('exportTitle').innerText = "FOTO GENERADA";
-    document.getElementById('exportName').innerText = currentFileName;
-
-    document.getElementById('btnDownload').onclick = () => {
-        const url = URL.createObjectURL(currentBlob);
-        const a = document.createElement('a');
-        a.href = url; a.download = currentFileName;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        document.getElementById('screen-foto-directa')?.remove();
-        closeExportModal();
-        ir('home');
-    };
-
-    document.getElementById('btnShare').onclick = async () => {
-        const file = new File([currentBlob], currentFileName, { type: "image/jpeg" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: currentFileName });
-        } else {
-            alert("Compartir no disponible");
-        }
-        document.getElementById('screen-foto-directa')?.remove();
-        closeExportModal();
-        ir('home');
-    };
-
+    /* ── AUTO-DOWNLOAD: trigger immediately via <a download>, no modal ── */
     hideSpinner();
-    showToast("📸 Foto guardada a l'historial");
-    document.getElementById('exportModal').style.display = 'flex';
+
+    const url = URL.createObjectURL(currentBlob);
+    const dlLink = document.createElement('a');
+    dlLink.href     = url;
+    dlLink.download = currentFileName;
+    document.body.appendChild(dlLink);
+    dlLink.click();
+    document.body.removeChild(dlLink);
+    /* Revoke after a short delay so mobile browsers have time to start the download */
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+    /* Close the editor screen and return home */
+    document.getElementById('screen-foto-directa')?.remove();
+    ir('home');
+    showToast(`📸 Foto descarregada: ${currentFileName}`);
 }
 
 /* ============================================================
@@ -4899,506 +5506,606 @@ function toggleHelp() {
 }
 
 /* ============================================================
-   OBRA REPORT PDF — professional A4 with strict page-break control
+   INFORME TÈCNIC DE SEGUIMENT D'OBRA
    ─────────────────────────────────────────────────────────────
-   Strategy: jsPDF is a canvas-based renderer; CSS page-break
-   rules do not apply. We implement three explicit mechanisms:
-
-   1. checkPageBreak(needed)  — soft guard for single elements
-   2. forceNewPage()          — hard page break for chapters
-   3. blockFits(needed)       — look-ahead to keep a complete
-                                block (row+images) together on
-                                one page, never orphaned
+   Estètica d'informe tècnic oficial — inspirat en documentació
+   de la Generalitat de Catalunya / PTOP.
+   Paleta: negre #000, gris molt tenu #f2f2f2, blanc pur.
+   Sense decoració de color.  Tipografia sans-serif exclusiva.
+   Mecanismes de paginació:
+     checkPageBreak(mm) — guarda suau
+     forceNewPage()     — salt de capítol
+     blockFits(mm)      — look-ahead row+fotos
    ============================================================ */
 async function generarInformeObraPDF(id) {
-    const p = allProjectsCache.find(x => x.id === id);
-    if (!p || p.tipusEntrada !== 'obra') return;
+    console.log('[PDF] generarInformeObraPDF called, id=', id);
 
-    showSpinner('GENERANT INFORME PDF...');
+    /* ── Resolve project: try cache first, then DB ──────────── */
+    let p = allProjectsCache.find(x => x.id === id);
+    if (!p && db) {
+        /* Cache miss — load directly from IndexedDB */
+        p = await new Promise(resolve => {
+            db.transaction('projects').objectStore('projects').get(id).onsuccess = e => resolve(e.target.result);
+        });
+    }
+    if (!p) { console.error('[PDF] project not found:', id); alert('Projecte no trobat.'); return; }
+    if (p.tipusEntrada !== 'obra') { console.warn('[PDF] not an obra:', p.tipusEntrada); alert('Només disponible per a projectes d\'Obra.'); return; }
+
+    console.log('[PDF] project loaded:', p.titulo, '— registros:', (p.registros||[]).length);
+    showSpinner('GENERANT INFORME TÈCNIC...');
 
     try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        if (!jsPDF) throw new Error('jsPDF not loaded');
+        const doc = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+        console.log('[PDF] jsPDF instance created');
 
-        /* ── Palette ───────────────────────────────────────────── */
-        const GREEN   = [22, 163, 74];
-        const GREEN_L = [240, 253, 244];
-        const DARK    = [17, 24, 39];
-        const GRAY    = [100, 116, 139];
-        const LGRAY   = [226, 232, 240];
-        const WHITE   = [255, 255, 255];
-        const RED_CL  = [198, 12, 48];
-        const ORANGE  = [234, 88, 12];
-        const BLUE    = [29, 78, 216];
-        const SLATE   = [71, 85, 105];
+        /* ── Palette ─────────────────────────────────────────── */
+        const BLACK=[0,0,0], D60=[60,60,60], D120=[120,120,120];
+        const D180=[180,180,180], THEAD=[242,242,242], WHITE=[255,255,255];
 
-        const avui   = new Date();
-        const PAGE_W = 210;
-        const PAGE_H = 297;
-        const MARGIN = 14;
-        const COL_W  = PAGE_W - MARGIN * 2;   // 182 mm
+        /* ── Page geometry ───────────────────────────────────── */
+        const PAGE_W=210, PAGE_H=297, ML=20, MR=20, MT=25, MB=22;
+        const CW  = PAGE_W - ML - MR;   /* 170 mm printable width */
+        const BOT = PAGE_H - MB;         /* 275 mm safe bottom     */
 
-        /* safe printable bottom edge (footer sits in last 15 mm) */
-        const BOTTOM_SAFE = PAGE_H - 18;
+        const avui = new Date();
+        const fmt  = d => d ? new Date(d).toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric'}) : '\u2014';
+        const fmtL = d => d ? new Date(d).toLocaleDateString('ca-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '\u2014';
 
-        const fmt = (d) => d
-            ? new Date(d).toLocaleDateString('ca-ES', { day:'2-digit', month:'2-digit', year:'numeric' })
-            : '—';
+        let Y = MT;          /* current vertical cursor — THE single source of truth */
+        let PG = 1;
 
-        let yPos = 0;
+        /* ── Image format detector ───────────────────────────── */
+        const imgFmt = uri => {
+            if (!uri) return null;
+            if (uri.startsWith('data:image/png'))  return 'PNG';
+            return 'JPEG'; /* canvas always outputs JPEG */
+        };
 
-        /* ── Page footer ──────────────────────────────────────── */
-        function drawPageFooter() {
-            const pageNum = doc.internal.getNumberOfPages();
-            doc.setDrawColor(...LGRAY);
-            doc.setLineWidth(0.3);
-            doc.line(MARGIN, PAGE_H - 13, PAGE_W - MARGIN, PAGE_H - 13);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(7);
-            doc.setTextColor(...GRAY);
-            doc.text("DATACAMP — Informe de Seguiment d'Obra", MARGIN, PAGE_H - 8);
-            doc.text(`Pàg. ${pageNum}`, PAGE_W - MARGIN, PAGE_H - 8, { align: 'right' });
-            doc.text(avui.toLocaleString('ca-ES'), PAGE_W / 2, PAGE_H - 8, { align: 'center' });
-        }
-
-        /* ── 1. SOFT guard — checks before drawing a single element */
-        function checkPageBreak(needed = 10) {
-            if (yPos + needed > BOTTOM_SAFE) {
-                doc.addPage();
-                drawPageFooter();
-                yPos = MARGIN + 2;
+        /* ── Safe image draw — never throws ─────────────────── */
+        function safeImg(uri, x, y, maxW, maxH) {
+            if (!uri) return;
+            try {
+                const fmt = imgFmt(uri);
+                const pr  = doc.getImageProperties(uri);
+                const r   = Math.min(maxW/pr.width, maxH/pr.height);
+                const iw  = pr.width*r, ih = pr.height*r;
+                doc.addImage(uri, fmt, x+(maxW-iw)/2, y+(maxH-ih)/2, iw, ih);
+            } catch(e) {
+                console.warn('[PDF] image error:', e.message);
+                doc.setFillColor(...THEAD);
+                doc.rect(x, y, maxW, maxH, 'F');
+                doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+                doc.text('Imatge no disponible', x+maxW/2, y+maxH/2, {align:'center'});
             }
         }
 
-        /* ── 2. HARD chapter break — always starts on a fresh page */
-        function forceNewPage() {
-            doc.addPage();
-            drawPageFooter();
-            yPos = MARGIN + 2;
+        /* ── Footer ──────────────────────────────────────────── */
+        function foot(n) {
+            doc.setDrawColor(...D180); doc.setLineWidth(0.25);
+            doc.line(ML, PAGE_H-14, PAGE_W-MR, PAGE_H-14);
+            doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...D120);
+            doc.text("DATACAMP \u2014 Sistema de Gesti\u00f3 d'Informes T\u00e8cnics", ML, PAGE_H-9);
+            doc.text(`P\u00e0g. ${n}`, PAGE_W-MR, PAGE_H-9, {align:'right'});
+            doc.text(`Generat: ${avui.toLocaleDateString('ca-ES')}`, PAGE_W/2, PAGE_H-9, {align:'center'});
         }
 
-        /* ── 3. LOOK-AHEAD — keeps a complete block (data + photos)
-                on one page.  If the block is taller than a full page
-                we let it flow naturally (can't avoid that).          */
-        function blockFits(totalNeeded) {
-            /* returns true if the block fits from current yPos */
-            return yPos + totalNeeded <= BOTTOM_SAFE;
+        /* ── Running header (page 2+) ────────────────────────── */
+        function runHead() {
+            doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...D60);
+            const st = p.titulo.length>60 ? p.titulo.slice(0,58)+'\u2026' : p.titulo;
+            doc.text("INFORME T\u00c8CNIC \u2014 "+st.toUpperCase(), ML, 15);
+            doc.setDrawColor(...D120); doc.setLineWidth(0.2);
+            doc.line(ML, 17, PAGE_W-MR, 17);
         }
 
-        /* ── Section header helper ────────────────────────────── */
-        function sectionHeader(title, color = GREEN, forceBreak = false) {
-            if (forceBreak) {
-                forceNewPage();
-            } else {
-                /* need at least header (10) + 2 rows (18) below it */
-                checkPageBreak(28);
-            }
-            doc.setFillColor(...color);
-            doc.rect(MARGIN, yPos, COL_W, 8, 'F');
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(9);
-            doc.setTextColor(...WHITE);
-            doc.text(title.toUpperCase(), MARGIN + 4, yPos + 5.5);
-            yPos += 10;
+        /* ── New page ────────────────────────────────────────── */
+        function newPage() {
+            foot(PG); doc.addPage(); PG++; runHead(); Y = MT;
+            console.log('[PDF] new page', PG, '— Y reset to', Y);
         }
 
-        /* ── Zebra info-row helper ────────────────────────────── */
-        function infoRow(label, value, isAlt = false) {
-            const vLines = doc.splitTextToSize(String(value || '—'), COL_W - 58);
-            const rowH   = Math.max(vLines.length * 8, 8);
-            checkPageBreak(rowH + 1);
-
-            if (isAlt) {
-                doc.setFillColor(248, 250, 252);
-                doc.rect(MARGIN, yPos, COL_W, rowH, 'F');
-            }
-            doc.setDrawColor(...LGRAY);
-            doc.setLineWidth(0.2);
-            doc.line(MARGIN, yPos + rowH, MARGIN + COL_W, yPos + rowH);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.setTextColor(...GRAY);
-            doc.text(label, MARGIN + 3, yPos + 5.5);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(...DARK);
-            doc.text(vLines, MARGIN + 56, yPos + 5.5);
-            yPos += rowH;
+        /* ── Soft guard: adds page if `need` mm doesn't fit ──── */
+        function guard(need) {
+            if (Y + need > BOT) newPage();
         }
 
-        /* ══════════════════════════════════════════════════════
+        /* ── Horizontal rule ─────────────────────────────────── */
+        const hLine = (y,lw=0.25,c=D180) => {
+            doc.setDrawColor(...c); doc.setLineWidth(lw);
+            doc.line(ML,y,PAGE_W-MR,y);
+        };
+
+        /* ── Section header ──────────────────────────────────── */
+        function secHead(num, title, forceBreak=false) {
+            if (forceBreak) newPage(); else guard(30);
+            hLine(Y,0.6,D60); Y+=1.5; hLine(Y,0.2,D60); Y+=5;
+            doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...BLACK);
+            doc.text(`${num}  ${title.toUpperCase()}`, ML, Y); Y+=8;
+        }
+
+        /* ── Sub-section ─────────────────────────────────────── */
+        function subSec(num, title) {
+            guard(14); Y+=2;
+            doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...D60);
+            doc.text(`${num}  ${title}`, ML, Y); Y+=6;
+        }
+
+        /* ── Info row ────────────────────────────────────────── */
+        function infoRow(label, val, alt=false) {
+            const vStr = String(val||'\u2014');
+            const vl   = doc.splitTextToSize(vStr, CW-56);
+            const rH   = Math.max(vl.length*5.5+4, 8);
+            guard(rH+1);
+            if (alt) { doc.setFillColor(...THEAD); doc.rect(ML,Y,CW,rH,'F'); }
+            doc.setDrawColor(...D180); doc.setLineWidth(0.2);
+            doc.rect(ML,Y,CW,rH,'D');
+            doc.line(ML+52,Y,ML+52,Y+rH);
+            doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(...D60);
+            doc.text(label, ML+2, Y+rH/2+1.2, {baseline:'middle'});
+            doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...BLACK);
+            if (vl.length===1) doc.text(vl[0], ML+54, Y+rH/2+1.2, {baseline:'middle'});
+            else               doc.text(vl,   ML+54, Y+3.5, {lineHeightFactor:1.3});
+            Y += rH;
+        }
+
+        /* ════════════════════════════════════════════════════
            PAGE 1 — COVER
-           ══════════════════════════════════════════════════════ */
-        doc.setFillColor(...GREEN);
-        doc.rect(0, 0, PAGE_W, 52, 'F');
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] drawing cover');
+        doc.setDrawColor(...BLACK); doc.setLineWidth(0.8);
+        doc.line(ML,14,PAGE_W-MR,14);
 
-        /* decorative diagonal stripe */
-        doc.setFillColor(255,255,255);
-        try { doc.setGState(doc.GState({ opacity: 0.06 })); } catch(e){}
-        doc.triangle(0, 52, 90, 0, 0, 0, 'F');
-        try { doc.setGState(doc.GState({ opacity: 1 })); } catch(e){}
-
-        /* logo / wordmark */
         if (logoCorporativo) {
             try {
-                const ip  = doc.getImageProperties(logoCorporativo);
-                const r   = Math.min(60 / ip.width, 16 / ip.height);
-                doc.addImage(logoCorporativo, 'PNG', MARGIN, 9, ip.width*r, ip.height*r);
-            } catch(e){}
+                const ip=doc.getImageProperties(logoCorporativo);
+                const r=Math.min(45/ip.width,14/ip.height);
+                doc.addImage(logoCorporativo,imgFmt(logoCorporativo)||'PNG',ML,16,ip.width*r,ip.height*r);
+            } catch(e){ console.warn('[PDF] logo err',e.message); }
         } else {
-            doc.setFont("helvetica","bold"); doc.setFontSize(18);
-            doc.setTextColor(...WHITE);
-            doc.text("DATACAMP", MARGIN, 22);
+            doc.setFillColor(...THEAD); doc.setDrawColor(...D180); doc.setLineWidth(0.3);
+            doc.rect(ML,16,40,14,'FD');
+            doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...D120);
+            doc.text('LOGOTIP',ML+20,23,{align:'center'});
+            doc.text('CORPORATIU',ML+20,27,{align:'center'});
         }
 
-        doc.setFont("helvetica","normal"); doc.setFontSize(8);
-        doc.setTextColor(...WHITE);
-        doc.text("INFORME DE SEGUIMENT D'OBRA", MARGIN, 32);
+        doc.setDrawColor(...BLACK); doc.setLineWidth(0.8);
+        doc.line(ML,34,PAGE_W-MR,34);
 
-        doc.setFont("helvetica","bold"); doc.setFontSize(15);
-        doc.setTextColor(...WHITE);
-        const titleLines = doc.splitTextToSize(p.titulo.toUpperCase(), COL_W - 10);
-        doc.text(titleLines, MARGIN, 42);
+        Y=60;
+        doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(...BLACK);
+        doc.text('INFORME T\u00c8CNIC',PAGE_W/2,Y,{align:'center'}); Y+=10;
+        doc.setFontSize(14);
+        doc.text("DE SEGUIMENT D'OBRA",PAGE_W/2,Y,{align:'center'}); Y+=7;
+        hLine(Y,0.4,D60); Y+=14;
 
-        yPos = 60;
+        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...D60);
+        const oL=doc.splitTextToSize(p.titulo,CW-10);
+        doc.text(oL,PAGE_W/2,Y,{align:'center'}); Y+=oL.length*7+14;
 
-        const isClosed    = !!p.estat_obra_tancada;
-        const statusText  = isClosed ? 'FINALITZADA' : 'EN CURS';
-        const statusColor = isClosed ? GREEN : ORANGE;
-        doc.setFillColor(...statusColor);
-        doc.roundedRect(MARGIN, yPos, 38, 8, 2, 2, 'F');
-        doc.setFont("helvetica","bold"); doc.setFontSize(7.5);
-        doc.setTextColor(...WHITE);
-        doc.text(statusText, MARGIN + 19, yPos + 5.2, { align:'center' });
-
-        yPos += 14;
-
-        /* ══════════════════════════════════════════════════════
-           SECTION 1 — DADES GENERALS
-           (no forced break — continues on page 1 after cover)
-           ══════════════════════════════════════════════════════ */
-        sectionHeader("1. Dades Generals de l'Obra", GREEN, false);
-
-        const carr = (p.registros||[]).flatMap(r=>r.values||[])
-            .find(v => v.label.toLowerCase().includes('carretera'))?.val || '—';
-
-        infoRow("ID Projecte",       p.id,                                  false);
-        infoRow("Nom de l'Obra",     p.titulo,                              true);
-        infoRow("Carretera / Via",   carr,                                  false);
-        infoRow("Coordenades GPS",   p.coordenades || 'No disponibles',     true);
-        infoRow("Progrés actual",    `${p.porcentaje_progreso || 0}%`,      false);
-        infoRow("Estat",             isClosed ? 'Finalitzada' : 'En curs', true);
-
-        yPos += 4;
-
-        /* ══════════════════════════════════════════════════════
-           SECTION 2 — CRONOLOGIA
-           Forced to start on new page so it's always complete
-           ══════════════════════════════════════════════════════ */
-        sectionHeader("2. Cronologia i Control de Terminis", GREEN, true);
-
-        const tsInici    = p.fecha_inicio      ? new Date(p.fecha_inicio)       : null;
-        const tsEstimada = p.fecha_fin_estimada ? new Date(p.fecha_fin_estimada) : null;
-        const diasTotal  = (tsInici && tsEstimada)
-            ? Math.ceil((tsEstimada - tsInici) / 86400000) : null;
-        const diasTransc = tsInici
-            ? Math.max(0, Math.ceil((avui - tsInici) / 86400000)) : null;
-        const diasRestants = tsEstimada && !isClosed
-            ? Math.ceil((tsEstimada - avui) / 86400000) : null;
-        const retard     = diasRestants !== null && diasRestants < 0;
-
-        infoRow("Data d'Inici",          fmt(p.fecha_inicio),           false);
-        infoRow("Fi Estimada",           fmt(p.fecha_fin_estimada),     true);
-        infoRow("Fi Real (tancament)",   fmt(p.fecha_cierre_real),      false);
-        infoRow("Dies totals previstos", diasTotal ? `${diasTotal} dies` : '—', true);
-        infoRow("Dies transcorreguts",   diasTransc ? `${diasTransc} dies` : '—', false);
-
-        if (!isClosed && diasRestants !== null) {
-            const restLabel = retard
-                ? `${Math.abs(diasRestants)} dies de RETARD`
-                : `${diasRestants} dies restants`;
-            infoRow("Situació actual", restLabel, true);
-        }
-
-        yPos += 4;
-
-        /* Progress bar — keep bar + labels together (22 mm) */
-        if (tsInici && tsEstimada) {
-            checkPageBreak(22);
-            const bX = MARGIN, bY = yPos, bW = COL_W, bH = 10;
-            doc.setFillColor(...LGRAY);
-            doc.roundedRect(bX, bY, bW, bH, 2, 2, 'F');
-            const pct      = Math.min(100, p.porcentaje_progreso || 0) / 100;
-            const barColor = retard ? RED_CL : GREEN;
-            doc.setFillColor(...barColor);
-            doc.roundedRect(bX, bY, Math.max(4, bW * pct), bH, 2, 2, 'F');
-            doc.setFont("helvetica","bold"); doc.setFontSize(7);
-            doc.setTextColor(...WHITE);
-            doc.text(`${p.porcentaje_progreso || 0}%`, bX + 4, bY + 6.5);
-            doc.setFont("helvetica","normal"); doc.setFontSize(7);
-            doc.setTextColor(...GRAY);
-            doc.text(fmt(p.fecha_inicio), bX, bY + bH + 5);
-            doc.text(fmt(p.fecha_fin_estimada), bX + bW, bY + bH + 5, { align:'right' });
-            yPos += bH + 12;
-        }
-
-        /* ══════════════════════════════════════════════════════
-           SECTION 3 — RESUM ESTADÍSTIC
-           (continues on same page as Cronologia)
-           ══════════════════════════════════════════════════════ */
-        sectionHeader("3. Resum Estadístic", GREEN, false);
-
-        const totalReg   = (p.registros || []).length;
-        const totalFotos = (p.registros || []).reduce((s,r) => s+(r.fotos?.length||0), 0);
-        const regAmbFoto = (p.registros || []).filter(r => r.fotos?.length > 0).length;
-
-        /* Stat boxes need 26 mm — keep together */
-        checkPageBreak(26);
-        const sW = (COL_W - 8) / 3;
-        [{val:totalReg,label:'Punts registrats'},{val:totalFotos,label:'Fotos capturades'},{val:regAmbFoto,label:'Punts amb foto'}]
-            .forEach((s, i) => {
-                const bx = MARGIN + i * (sW + 4);
-                doc.setFillColor(...GREEN_L); doc.setDrawColor(...GREEN); doc.setLineWidth(0.4);
-                doc.roundedRect(bx, yPos, sW, 22, 2, 2, 'FD');
-                doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(...GREEN);
-                doc.text(String(s.val), bx + sW/2, yPos+13, {align:'center'});
-                doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GRAY);
-                doc.text(s.label, bx + sW/2, yPos+19, {align:'center'});
+        const isClosed=!!p.estat_obra_tancada;
+        const carr=(p.registros||[]).flatMap(r=>r.values||[])
+            .find(v=>v.label.toLowerCase().includes('carretera'))?.val||'\u2014';
+        const BROW=9,BX=ML+10,BW=CW-20,NR=4;
+        doc.setDrawColor(...D60); doc.setLineWidth(0.4); doc.rect(BX,Y,BW,BROW*(NR+1),'D');
+        doc.setFillColor(...THEAD); doc.rect(BX,Y,BW,BROW,'F');
+        doc.setDrawColor(...D60); doc.line(BX,Y+BROW,BX+BW,Y+BROW);
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...D60);
+        doc.text("IDENTIFICACI\u00d3 DEL PROJECTE",BX+BW/2,Y+BROW/2+1.2,{align:'center'});
+        [["Nom del projecte",p.titulo],["Carretera / Via",carr],["Data d'emiss\u00f3",fmtL(avui)],["Estat",isClosed?'FINALITZADA':'EN CURS']]
+            .forEach(([lb,vl],ri)=>{
+                const ry=Y+BROW*(ri+1);
+                if(ri<NR-1){doc.setDrawColor(...D180);doc.setLineWidth(0.15);doc.line(BX,ry+BROW,BX+BW,ry+BROW);}
+                const sx=BX+52; doc.setDrawColor(...D180); doc.line(sx,ry,sx,ry+BROW);
+                doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...D60);
+                doc.text(lb,BX+2,ry+BROW/2+1.2,{baseline:'middle'});
+                doc.setFont('helvetica','normal'); doc.setTextColor(...BLACK);
+                const mv=BW-(sx-BX)-3;
+                doc.text((doc.splitTextToSize(String(vl||'\u2014'),mv)[0]||'\u2014'),sx+2,ry+BROW/2+1.2,{baseline:'middle'});
             });
-        yPos += 30;
+        Y+=BROW*(NR+1)+18;
+        doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...D120);
+        doc.text("Document generat mitjan\u00e7ant el sistema DATACAMP. No distribuir sense autoritzaci\u00f3.",PAGE_W/2,Y,{align:'center',maxWidth:CW});
+        foot(1);
 
-        /* ══════════════════════════════════════════════════════
-           SECTION 4 — HITOS / REGISTRES
-           FORCED new page: this is a chapter-level section and
-           the table header must never appear alone at the bottom.
-           ══════════════════════════════════════════════════════ */
-        sectionHeader("4. Hitos i Registres de l'Obra", DARK, true);
+        /* ════════════════════════════════════════════════════
+           SECTION 1 — GENERAL DATA
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 1');
+        newPage();
+        secHead('1.',"Dades Generals de l'Obra");
+        subSec('1.1.','Identificaci\u00f3');
+        infoRow("Nom de l'obra",p.titulo,false);
+        infoRow('Carretera / Via',carr,true);
+        infoRow("Estat de l'obra",isClosed?'Finalitzada':'En curs',false);
+        infoRow('Progr\u00e9s actual',`${p.porcentaje_progreso||0} %`,true);
+        Y+=4;
+        subSec('1.2.','Localitzaci\u00f3');
+        infoRow('Coordenades GPS',p.coordenades||'No disponibles',false);
+        if(p.coordenades){
+            const c2=p.coordenades.split(',').map(s=>parseFloat(s.trim()));
+            if(c2.length>=2&&!isNaN(c2[0]))
+                infoRow('Refer\u00e8ncia cartogr\u00e0fica',`maps.google.com/?q=${c2[0]},${c2[1]}`,true);
+        }
+        Y+=6;
 
-        const colWidths = [8, 34, 28, 22, 18, COL_W - 8 - 34 - 28 - 22 - 18];
-        const colLabels = ['#','Carretera','PK','Marge','Fotos','Observacions'];
-        const ROW_H     = 9;   // height of each data row
+        /* ════════════════════════════════════════════════════
+           SECTION 2 — TIMELINE
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 2');
+        secHead('2.','Cronologia i Control de Terminis',true);
+        const tsI=p.fecha_inicio?new Date(p.fecha_inicio):null;
+        const tsE=p.fecha_fin_estimada?new Date(p.fecha_fin_estimada):null;
+        const dTotal=(tsI&&tsE)?Math.ceil((tsE-tsI)/86400000):null;
+        const dTrans=tsI?Math.max(0,Math.ceil((avui-tsI)/86400000)):null;
+        const dRest=tsE&&!isClosed?Math.ceil((tsE-avui)/86400000):null;
+        const retard=dRest!==null&&dRest<0;
+        subSec('2.1.','Fites Temporals');
+        infoRow("Data d'inici dels treballs",fmt(p.fecha_inicio),false);
+        infoRow('Data fi estimada',fmt(p.fecha_fin_estimada),true);
+        infoRow('Data de tancament real',fmt(p.fecha_cierre_real),false);
+        Y+=4;
+        subSec('2.2.','Indicadors de Termini');
+        infoRow('Dies totals previstos',dTotal?`${dTotal} dies`:'\u2014',false);
+        infoRow('Dies transcorreguts',dTrans?`${dTrans} dies`:'\u2014',true);
+        if(!isClosed&&dRest!==null)
+            infoRow('Situaci\u00f3 actual',retard?`${Math.abs(dRest)} dies de RETARD`:`${dRest} dies restants`,false);
+        Y+=6;
 
-        if (totalReg === 0) {
-            checkPageBreak(12);
-            doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(...GRAY);
-            doc.text('Cap registre disponible per a aquesta obra.', MARGIN+4, yPos+6);
-            yPos += 14;
-        } else {
-            const sortedRegs = [...(p.registros||[])].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
-
-            /*
-             * PAGE-BREAK STRATEGY FOR THE TABLE
-             * ─────────────────────────────────
-             * We draw one registro at a time as a "pdf-block" unit:
-             *   block = table row (ROW_H) + all its photos (PHOTO_H each)
-             *
-             * Before drawing each block we measure its total height.
-             * If it doesn't fit from the current yPos:
-             *   → force new page AND redraw the sticky table header
-             *
-             * This guarantees a row is NEVER separated from its photos.
-             */
-            const PHOTO_H_INLINE = 56;  // height reserved per photo in "linked" mode
-
-            function drawTableHeader() {
-                checkPageBreak(9);
-                doc.setFillColor(...DARK);
-                doc.rect(MARGIN, yPos, COL_W, 8, 'F');
-                doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...WHITE);
-                let cx = MARGIN + 2;
-                colLabels.forEach((lbl, ci) => { doc.text(lbl, cx, yPos+5.5); cx += colWidths[ci]; });
-                yPos += 8;
-            }
-
-            drawTableHeader();
-
-            sortedRegs.forEach((r, ri) => {
-                const nFoto   = r.fotos?.length || 0;
-                /* total block height = data row + photos (stacked inline below row) */
-                const blockH  = ROW_H + nFoto * (PHOTO_H_INLINE + 4);
-
-                /* === block-fit check: avoid-all equivalent === */
-                if (!blockFits(blockH)) {
-                    forceNewPage();
-                    drawTableHeader();   /* repeat header on new page — no orphan header */
-                }
-
-                /* ── Draw data row ── */
-                const rCarr = r.values?.find(v=>v.label.toLowerCase().includes('carretera'))?.val||'—';
-                const rPK   = r.values?.find(v=>v.label.toLowerCase().includes('pk'))?.val      ||'—';
-                const rMarg = r.values?.find(v=>v.label.toLowerCase().includes('marge'))?.val   ||'—';
-                const rObs  = r.values?.find(v=>v.label.toLowerCase().includes('obs'))?.val     ||'';
-
-                if (ri % 2 === 0) {
-                    doc.setFillColor(248,250,252);
-                    doc.rect(MARGIN, yPos, COL_W, ROW_H, 'F');
-                }
-                /* left accent stripe — category colour */
-                doc.setFillColor(...GREEN);
-                doc.rect(MARGIN, yPos, 2, ROW_H, 'F');
-
-                doc.setDrawColor(...LGRAY); doc.setLineWidth(0.2);
-                doc.line(MARGIN, yPos+ROW_H, MARGIN+COL_W, yPos+ROW_H);
-                doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DARK);
-                const cells = [
-                    String(ri+1),
-                    rCarr.length>15 ? rCarr.slice(0,14)+'\u2026' : rCarr,
-                    rPK, rMarg, String(nFoto),
-                    (doc.splitTextToSize(rObs, colWidths[5]-2)[0] || '')
-                ];
-                let cx = MARGIN + 2;
-                cells.forEach((cell,ci)=>{ doc.text(String(cell), cx, yPos+6); cx+=colWidths[ci]; });
-                yPos += ROW_H;
-
-                /* ── Draw linked photos directly below the row ── */
-                if (nFoto > 0) {
-                    r.fotos.forEach((f, fi) => {
-                        /* Each photo is bound to its data row (already guaranteed by block check above).
-                           In the rare case the block is taller than a full page, individual photos
-                           may still page-break — that's unavoidable without scaling. */
-                        const PHOTO_W_INLINE = COL_W;
-                        const photoBlockH    = PHOTO_H_INLINE + 12;
-
-                        /* soft guard only (block-level guard already ran) */
-                        checkPageBreak(photoBlockH);
-
-                        /* label strip */
-                        doc.setFillColor(241,245,249); doc.setDrawColor(...LGRAY); doc.setLineWidth(0.3);
-                        doc.rect(MARGIN, yPos, COL_W, 8, 'F');
-                        doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...DARK);
-                        doc.text(`Punt #${ri+1} — Foto ${fi+1}/${nFoto}`, MARGIN+3, yPos+5.5);
-                        doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GRAY);
-                        const caption = `${rCarr}${rPK!=='—'?' PK '+rPK:''}${rMarg!=='—'?' ('+rMarg+')':''}`;
-                        doc.text(caption, MARGIN+COL_W-3, yPos+5.5, { align:'right' });
-                        yPos += 8;
-
-                        /* photo frame */
-                        doc.setDrawColor(...LGRAY); doc.setLineWidth(0.5);
-                        doc.roundedRect(MARGIN, yPos, PHOTO_W_INLINE, PHOTO_H_INLINE, 1.5, 1.5, 'D');
-                        try {
-                            const props = doc.getImageProperties(f);
-                            const rati  = Math.min((PHOTO_W_INLINE-3)/props.width, (PHOTO_H_INLINE-3)/props.height);
-                            const iw = props.width*rati, ih = props.height*rati;
-                            doc.addImage(f,'JPEG',
-                                MARGIN+(PHOTO_W_INLINE-iw)/2,
-                                yPos  +(PHOTO_H_INLINE-ih)/2,
-                                iw, ih);
-                        } catch(e) {
-                            doc.setFillColor(241,245,249);
-                            doc.rect(MARGIN+1, yPos+1, PHOTO_W_INLINE-2, PHOTO_H_INLINE-2, 'F');
-                            doc.setFont("helvetica","italic"); doc.setFontSize(8); doc.setTextColor(...GRAY);
-                            doc.text('Error en carregar la imatge',
-                                MARGIN+PHOTO_W_INLINE/2, yPos+PHOTO_H_INLINE/2, {align:'center'});
-                        }
-                        yPos += PHOTO_H_INLINE + 4;
-                    });
-                    /* subtle divider between registros */
-                    doc.setDrawColor(...GREEN); doc.setLineWidth(0.6);
-                    doc.line(MARGIN, yPos, MARGIN+COL_W, yPos);
-                    yPos += 5;
-                }
-            });
-            yPos += 4;
+        if(tsI&&tsE){
+            guard(22);
+            const bX=ML,bY=Y,bW=CW,bH=8;
+            doc.setFillColor(...THEAD); doc.setDrawColor(...D120); doc.setLineWidth(0.25);
+            doc.rect(bX,bY,bW,bH,'FD');
+            const pct=Math.min(1,(p.porcentaje_progreso||0)/100);
+            if(pct>0){doc.setFillColor(...D60);doc.rect(bX,bY,Math.max(3,bW*pct),bH,'F');}
+            doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...WHITE);
+            if(pct>0.08)doc.text(`${p.porcentaje_progreso||0}%`,bX+3,bY+5.2);
+            doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...D120);
+            doc.text(fmt(p.fecha_inicio),bX,bY+bH+4.5);
+            doc.text(fmt(p.fecha_fin_estimada),bX+bW,bY+bH+4.5,{align:'right'});
+            Y+=bH+10;
         }
 
-        /* ══════════════════════════════════════════════════════
-           SECTION 5 — LOCALITZACIÓ GPS
-           FORCED new page if GPS is present (standalone section).
-           ══════════════════════════════════════════════════════ */
-        if (p.coordenades) {
-            sectionHeader("5. Localització GPS", BLUE, true);
-
-            /* GPS box: 28 mm — keep together */
-            checkPageBreak(28);
-            doc.setFillColor(239,246,255); doc.setDrawColor(191,219,254); doc.setLineWidth(0.4);
-            doc.roundedRect(MARGIN, yPos, COL_W, 24, 2, 2, 'FD');
-            doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...BLUE);
-            doc.text('Coordenades de referència:', MARGIN+4, yPos+8);
-            doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(...DARK);
-            doc.text(p.coordenades, MARGIN+4, yPos+16);
-            const parts = p.coordenades.split(',').map(s=>parseFloat(s.trim()));
-            if (parts.length>=2 && !isNaN(parts[0])) {
-                doc.setFontSize(8); doc.setTextColor(...GRAY);
-                doc.text(`maps.google.com/?q=${parts[0]},${parts[1]}`, MARGIN+4, yPos+22);
-            }
-            yPos += 32;
-
-            /* QR-style visual note */
-            doc.setFillColor(...LGRAY);
-            doc.roundedRect(MARGIN, yPos, COL_W, 10, 2, 2, 'F');
-            doc.setFont("helvetica","italic"); doc.setFontSize(7.5); doc.setTextColor(...GRAY);
-            doc.text('Escanejar o copiar les coordenades per localitzar el punt al mapa.', MARGIN+4, yPos+6.5);
-            yPos += 16;
-        }
-
-        /* ══════════════════════════════════════════════════════
-           SECTION 6 — VALIDACIÓ I SIGNATURA
-           Always on its own page (legal document convention).
-           ══════════════════════════════════════════════════════ */
-        sectionHeader("6. Validació i Signatura", SLATE, true);
-
-        yPos += 4;
-        doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...DARK);
-        doc.text('Aquest informe ha estat generat automàticament pel sistema DATACAMP.', MARGIN, yPos);
-        yPos += 6;
-        doc.text(`Data i hora de generació: ${avui.toLocaleString('ca-ES')}`, MARGIN, yPos);
-        yPos += 12;
-
-        /* Signature boxes — keep pair together (34 mm) */
-        checkPageBreak(34);
-        const sigW = (COL_W - 8) / 2;
-        [["Tècnic responsable"],["Supervisor / Cap d'obra"]].forEach(([title],i) => {
-            const bx = MARGIN + i*(sigW+8);
-            doc.setDrawColor(...LGRAY); doc.setLineWidth(0.4);
-            doc.roundedRect(bx, yPos, sigW, 30, 1.5, 1.5, 'D');
-            doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...GRAY);
-            doc.text(title.toUpperCase(), bx+3, yPos+5);
-            doc.setDrawColor(...LGRAY);
-            doc.line(bx+4, yPos+24, bx+sigW-4, yPos+24);
-            doc.setFont("helvetica","normal"); doc.setFontSize(7);
-            doc.text('Signatura i segell', bx+sigW/2, yPos+28, {align:'center'});
+        /* ════════════════════════════════════════════════════
+           SECTION 3 — STATS
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 3');
+        secHead('3.','Resum Estad\u00edstic del Seguiment');
+        const totalReg=(p.registros||[]).length;
+        const totalFotos=(p.registros||[]).reduce((s,r)=>s+(r.fotos?.length||0),0);
+        const regAmbFoto=(p.registros||[]).filter(r=>r.fotos?.length>0).length;
+        guard(50);
+        doc.setFillColor(...THEAD); doc.setDrawColor(...D120); doc.setLineWidth(0.25);
+        doc.rect(ML,Y,CW,8,'FD');
+        doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(...D60);
+        doc.text('Concepte',ML+2,Y+5.2);
+        doc.text('Valor',ML+CW-2,Y+5.2,{align:'right'});
+        Y+=8;
+        [['Nombre total de punts registrats',String(totalReg)],
+         ['Fotografies capturades',String(totalFotos)],
+         ['Punts amb documentaci\u00f3 fotogr\u00e0fica',String(regAmbFoto)],
+         ['Punts sense fotografia',String(totalReg-regAmbFoto)]]
+        .forEach(([lb,vl])=>{
+            doc.setDrawColor(...D180); doc.setLineWidth(0.15);
+            doc.rect(ML,Y,CW,8,'D');
+            doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...BLACK);
+            doc.text(lb,ML+2,Y+5.2);
+            doc.setFont('helvetica','bold'); doc.text(vl,ML+CW-2,Y+5.2,{align:'right'});
+            Y+=8;
         });
-        yPos += 36;
+        Y+=6;
 
-        /* ── Footer pass on all pages ──────────────────────────── */
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-            doc.setPage(i);
-            drawPageFooter();
+        /* ════════════════════════════════════════════════════
+           SECTION 4 — OPEN-BLOCK RECORDS
+           Architecture: measure → page-check → draw.
+           Y is the single source of truth for vertical position.
+           checkSpace() is the only page-break gate — it never
+           fires mid-element; it fires only at element boundaries.
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 4 — records:', totalReg);
+        secHead('4.',"Registre Cronol\u00f2gic d'Actuacions", true);
+
+        /* ── Layout constants (all mm) ─────────────────────── */
+        const LBL_W   = 30;   /* label column width                  */
+        const LBL_FS  = 7.5;  /* labels font-size                    */
+        const VAL_FS  = 8.5;  /* values + obs font-size              */
+        const LH      = 5.4;  /* height of one text line             */
+        const PP      = 1.8;  /* vertical pad between pairs          */
+        const BP      = 5;    /* block padding obs top/bottom        */
+        const IMG_GAP = 7;    /* gap after obs, before first photo   */
+        const CAP     = 6;    /* photo caption height                */
+        const SEP     = 9;    /* gap between records                 */
+        const SMRG    = 12;   /* safety margin above BOT             */
+        const PH_STD  = 65;   /* standard photo height               */
+        const PH_SOLO = Math.min(110, BOT - MT - CAP - 18); /* solo-page photo */
+
+        const sortedRegs = [...(p.registros||[])].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+
+        /* ── checkSpace ──────────────────────────────────────
+           ONLY page-break gate. Call before drawing each element.
+           Caps `needed` so a single oversized block never causes
+           an infinite newPage() loop.                        */
+        function checkSpace(needed) {
+            const n = Math.min(Number(needed)||10, BOT - MT - SMRG - 2);
+            if (Y + n > BOT - SMRG) {
+                newPage();  /* newPage resets Y=MT and draws runHead */
+            }
         }
 
-        /* ── Export ──────────────────────────────────────────── */
-        const cleanTitle  = p.titulo.replace(/[^a-z0-9]/gi,'_').slice(0,40);
-        const dateTag     = avui.toISOString().slice(0,10);
-        currentFileName   = `Informe_Obra_${cleanTitle}_${dateTag}.pdf`;
-        currentBlob       = doc.output('blob');
+        /* ── measureBlock ────────────────────────────────────
+           Returns estimated total height of one record (mm).
+           Must be called BEFORE drawing for pre-flight check. */
+        function measureBlock(r) {
+            const nFoto = r.fotos?.length || 0;
+            const rObs  = r.values?.find(v => v.label.toLowerCase().includes('obs'))?.val || '';
+            doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS);
+            const obsLines = rObs ? doc.splitTextToSize(rObs, CW) : [];
 
-        document.getElementById('exportTitle').innerText = "INFORME D'OBRA GENERAT";
-        document.getElementById('exportName').innerText  = currentFileName;
+            const hdrH    = LH + 1 + 3;                         /* header + underline  */
+            const pairsH  = 4 * (LH + PP);                      /* 4 label-value pairs */
+            const obsH    = obsLines.length > 0
+                ? (BP + LH + 1 + obsLines.length * LH + BP)     /* label + text + pad  */
+                : 0;
+            const photosH = nFoto > 0
+                ? (IMG_GAP + nFoto * (PH_STD + CAP + 3))
+                : 0;
 
-        document.getElementById('btnShare').onclick = () => {
-            const file = new File([currentBlob], currentFileName, {type:'application/pdf'});
-            if (navigator.share) navigator.share({files:[file], title:currentFileName}).catch(console.error);
+            return Math.min(hdrH + pairsH + obsH + photosH + SEP, BOT - MT - SMRG);
+        }
+
+        /* ── buildCaption ────────────────────────────────────  */
+        function buildCaption(fi, nFoto, ri, rCarr, rPK, rData) {
+            const parts = [`Fig. ${fi+1}/${nFoto}`, `Registre #${ri+1}`];
+            if (rCarr && rCarr !== '\u2014') parts.push(rCarr);
+            if (rPK   && rPK   !== '\u2014') parts.push(`PK ${rPK}`);
+            if (rData) parts.push(rData);
+            return parts.join(' \u2014 ');
+        }
+
+        /* ── drawRecord ──────────────────────────────────────
+           Renders header + pairs + obs + photos in strict order.
+           Y is updated after EVERY element — never fixed coords. */
+        function drawRecord(r, ri) {
+            console.log(`[PDF] drawRecord ${ri+1} Y=${Y.toFixed(1)}`);
+
+            const rCarr = r.values?.find(v => v.label.toLowerCase().includes('carretera'))?.val || '\u2014';
+            const rPK   = r.values?.find(v => v.label.toLowerCase().includes('pk'))?.val        || '\u2014';
+            const rMarg = r.values?.find(v => v.label.toLowerCase().includes('marge'))?.val     || '\u2014';
+            const rObs  = r.values?.find(v => v.label.toLowerCase().includes('obs'))?.val       || '';
+            const rData = r.timestamp
+                ? new Date(r.timestamp).toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric'})
+                : p.fecha;
+            const nFoto = r.fotos?.length || 0;
+
+            /* Pre-wrap obs */
+            doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS);
+            const obsL = rObs ? doc.splitTextToSize(rObs, CW) : [];
+
+            /* ── 1. HEADER: "#N  ···  Date" ───────────────── */
+            checkSpace(LH + 6);
+
+            doc.setFont('helvetica','bold'); doc.setFontSize(LBL_FS); doc.setTextColor(...D60);
+            doc.text(`REGISTRE #${ri+1}`, ML, Y);
+            doc.setFont('helvetica','normal'); doc.setFontSize(LBL_FS); doc.setTextColor(...D120);
+            doc.text(rData, ML+CW, Y, {align:'right'});
+            Y += LH + 1;
+
+            doc.setDrawColor(...D120); doc.setLineWidth(0.4);
+            doc.line(ML, Y, ML+CW, Y);
+            Y += 3;
+
+            /* ── 2. LABEL-VALUE PAIRS (no borders) ─────────── */
+            [['CARRETERA', rCarr], ['PK', rPK], ['SENTIT', rMarg], ['FOTOS', String(nFoto)]]
+                .forEach(([lbl, val]) => {
+                    checkSpace(LH + PP + 1);
+                    doc.setFont('helvetica','bold'); doc.setFontSize(LBL_FS); doc.setTextColor(...D60);
+                    doc.text(lbl, ML, Y);
+                    doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS); doc.setTextColor(...BLACK);
+                    doc.text(String(val), ML+LBL_W, Y);
+                    Y += LH + PP;
+                });
+
+            /* ── 3. OBSERVATIONS — full-width, line-by-line ─── */
+            if (obsL.length > 0) {
+                Y += BP;
+                checkSpace(LH + 2);
+                doc.setFont('helvetica','bold'); doc.setFontSize(LBL_FS); doc.setTextColor(...D60);
+                doc.text('OBSERVACIONS', ML, Y);
+                Y += LH + 1;
+
+                doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS); doc.setTextColor(...BLACK);
+                obsL.forEach(line => {
+                    /* Per-line page check — content flows across pages naturally */
+                    if (Y + LH > BOT - SMRG) {
+                        newPage();
+                        /* Continuation label so context isn't lost */
+                        doc.setFont('helvetica','bold'); doc.setFontSize(LBL_FS); doc.setTextColor(...D60);
+                        doc.text('OBSERVACIONS (cont.)', ML, Y);
+                        Y += LH + 1;
+                        doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS); doc.setTextColor(...BLACK);
+                    }
+                    doc.text(line, ML, Y);
+                    Y += LH;
+                });
+                Y += BP;
+            }
+
+            /* ── 4. PHOTOS — strictly after all text ────────── */
+            if (nFoto > 0) {
+                Y += IMG_GAP;
+
+                (r.fotos||[]).forEach((f, fi) => {
+                    const needed = PH_STD + CAP + 4;
+
+                    if (Y + needed > BOT - SMRG) {
+                        /* Photo doesn't fit — solo page, vertically centred */
+                        newPage();
+                        const avail = BOT - MT - SMRG - CAP - 4;
+                        const fH    = Math.min(PH_SOLO, avail);
+                        const fY    = MT + Math.max(0, (avail - fH) / 2);
+
+                        doc.setDrawColor(...D180); doc.setLineWidth(0.3);
+                        doc.rect(ML, fY, CW, fH, 'D');
+                        safeImg(f, ML, fY, CW, fH);
+
+                        doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+                        doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
+                                 PAGE_W/2, fY+fH+4.5, {align:'center'});
+                        Y = fY + fH + CAP + 4;
+                    } else {
+                        /* Photo fits — draw at exact current Y */
+                        doc.setDrawColor(...D180); doc.setLineWidth(0.3);
+                        doc.rect(ML, Y, CW, PH_STD, 'D');
+                        safeImg(f, ML, Y, CW, PH_STD);
+                        Y += PH_STD;
+
+                        doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+                        doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
+                                 PAGE_W/2, Y+4, {align:'center'});
+                        Y += CAP + 2;
+                        if (fi < nFoto-1) Y += 3; /* gap between consecutive photos */
+                    }
+                });
+            }
+
+            /* ── 5. RECORD SEPARATOR — after the last photo ─── */
+            Y += Math.floor(SEP / 2);
+            if (Y + 1 <= BOT - SMRG) {
+                doc.setDrawColor(...D180); doc.setLineWidth(0.5);
+                doc.line(ML, Y, ML+CW, Y);
+            }
+            Y += Math.ceil(SEP / 2);
+        }
+
+        /* ── Main rendering loop ─────────────────────────────
+           measure → maybe page-break → draw.                */
+        if (totalReg === 0) {
+            checkSpace(16);
+            doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(...D120);
+            doc.text("No s'han registrat actuacions per a aquesta obra.", ML, Y+6);
+            Y += 16;
+        } else {
+            sortedRegs.forEach((r, ri) => {
+                const blockH = measureBlock(r);
+                console.log(`[PDF] pre-draw record ${ri+1}: blockH=${blockH.toFixed(1)} Y=${Y.toFixed(1)} space=${(BOT-SMRG-Y).toFixed(1)}`);
+
+                /* Page break if block doesn't fit AND we're past the top margin
+                   (avoids creating an empty page at the start of the section). */
+                if (ri > 0 && Y + blockH > BOT - SMRG && Y > MT + 8) {
+                    newPage();
+                }
+
+                drawRecord(r, ri);
+            });
+        }
+        Y += 6;
+
+
+
+        /* ════════════════════════════════════════════════════
+           SECTION 5 — GPS
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 5 GPS');
+        if(p.coordenades){
+            secHead('5.','Dades de Localitzaci\u00f3 GPS',true);
+            guard(34);
+            doc.setDrawColor(...D120); doc.setLineWidth(0.3);
+            doc.rect(ML,Y,CW,24,'D');
+            doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...BLACK);
+            doc.text('Coordenades de refer\u00e8ncia GPS:',ML+3,Y+7);
+            doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(...BLACK);
+            doc.text(p.coordenades,ML+3,Y+15);
+            const cp=p.coordenades.split(',').map(s=>parseFloat(s.trim()));
+            if(cp.length>=2&&!isNaN(cp[0])){doc.setFontSize(8);doc.setTextColor(...D120);doc.text(`maps.google.com/?q=${cp[0]},${cp[1]}`,ML+3,Y+22);}
+            Y+=28;
+            guard(12);
+            doc.setFillColor(...THEAD); doc.roundedRect(ML,Y,CW,10,1,1,'F');
+            doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...D120);
+            doc.text('Escanejar o copiar les coordenades per localitzar el punt al mapa.',ML+4,Y+6.5);
+            Y+=14;
+        }
+
+        /* ════════════════════════════════════════════════════
+           SECTION 6 — SIGNATURES (always fresh page)
+           ════════════════════════════════════════════════════ */
+        console.log('[PDF] section 6 signatures');
+        newPage();
+        secHead('6.','Validaci\u00f3 i Signatura');
+        Y+=4;
+        doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...BLACK);
+        doc.text("L'informe ha estat elaborat a partir de les dades registrades al sistema DATACAMP i \u00e9s responsabilitat dels t\u00e8cnics signants la seva veracitat i exactitud.",ML,Y,{maxWidth:CW});
+        Y+=14;
+        infoRow("Data de l'informe",fmtL(avui),false);
+        Y+=14;
+
+        guard(58);
+        const sigW=(CW-16)/2, sigH=54;
+        [['Cap de Treballs (Contractista)',['Nom i cognoms:','Empresa contractista:','Data:']],
+         ["Vigil\u00e0ncia (Administraci\u00f3)",['Nom i cognoms:','Organisme:','Data:']]]
+        .forEach(([title,lines],i)=>{
+            const bx=ML+i*(sigW+16);
+            doc.setDrawColor(...D120); doc.setLineWidth(0.3); doc.rect(bx,Y,sigW,sigH,'D');
+            doc.setFillColor(...THEAD); doc.rect(bx,Y,sigW,9,'F');
+            doc.setDrawColor(...D120); doc.line(bx,Y+9,bx+sigW,Y+9);
+            doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...D60);
+            doc.text(title.toUpperCase(),bx+sigW/2,Y+6,{align:'center'});
+            let ly=Y+14;
+            lines.forEach(l=>{
+                doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...D120);
+                doc.text(l,bx+3,ly);
+                doc.setDrawColor(...D180); doc.line(bx+3,ly+5,bx+sigW-3,ly+5);
+                ly+=10;
+            });
+            doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...D120);
+            doc.text('Signatura i segell oficial:',bx+3,Y+sigH-12);
+            doc.setDrawColor(...D120); doc.rect(bx+3,Y+sigH-9,sigW-6,7,'D');
+        });
+        Y+=sigH+16;
+        hLine(Y,0.25,D180); Y+=5;
+        doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+        doc.text("Aquest document t\u00e9 validesa com a informe intern. Per a efectes legals, cal l'aval del responsable de l'Administraci\u00f3.",ML,Y,{maxWidth:CW});
+
+        /* ── Stamp footer on ALL pages ── */
+        console.log('[PDF] stamping footers on', doc.internal.getNumberOfPages(), 'pages');
+        for(let pg=1;pg<=doc.internal.getNumberOfPages();pg++){doc.setPage(pg);foot(pg);}
+
+        /* ── Export ── */
+        const slug=p.titulo.replace(/[^a-z0-9]/gi,'_').slice(0,40);
+        const dTag=avui.toISOString().slice(0,10);
+        currentFileName=`InformeTecnic_${slug}_${dTag}.pdf`;
+        currentBlob=doc.output('blob');
+        console.log('[PDF] done, blob size:', currentBlob.size);
+
+        document.getElementById('exportTitle').innerText="INFORME T\u00c8CNIC GENERAT";
+        document.getElementById('exportName').innerText=currentFileName;
+        document.getElementById('btnShare').onclick=()=>{
+            const file=new File([currentBlob],currentFileName,{type:'application/pdf'});
+            if(navigator.share)navigator.share({files:[file],title:currentFileName}).catch(console.error);
             else alert('Compartir no disponible en aquest navegador.');
             closeExportModal();
         };
-        document.getElementById('btnDownload').onclick = () => {
-            const a = document.createElement('a');
-            a.href     = URL.createObjectURL(currentBlob);
-            a.download = currentFileName;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        document.getElementById('btnDownload').onclick=()=>{
+            const a=document.createElement('a');
+            a.href=URL.createObjectURL(currentBlob);
+            a.download=currentFileName;
+            document.body.appendChild(a);a.click();document.body.removeChild(a);
             closeExportModal();
         };
-
         hideSpinner();
-        document.getElementById('exportModal').style.display = 'flex';
+        document.getElementById('exportModal').style.display='flex';
 
     } catch(err) {
         hideSpinner();
-        console.error('Error generant informe:', err);
-        alert('Error generant el PDF: ' + err.message);
+        console.error('[PDF] FATAL error:', err);
+        alert("Error generant l'informe PDF:\n" + err.message + "\n\nConsulta la consola per a m\u00e9s detalls.");
     }
 }
+
+
+
 
 /* ============================================================
    MAP MODULE — Leaflet + MarkerCluster
