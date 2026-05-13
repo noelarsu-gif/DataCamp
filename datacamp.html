@@ -188,6 +188,20 @@ html, body {
     border-top: 1px solid rgba(255,255,255,0.07);
 }
 
+/* Authorship credit — sidebar & drawer */
+.sidebar-credit {
+    font-family: 'Barlow', var(--font);
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.22);
+    text-align: center;
+    letter-spacing: 0.3px;
+    padding: 10px 12px 4px;
+    user-select: none;
+    pointer-events: none;
+    line-height: 1.6;
+}
+
 /* MAIN CONTENT */
 .main-content {
     flex: 1;
@@ -2826,6 +2840,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="nav-item" onclick="closeMobileNav();exportarBackup()"><span class="nav-icon">📤</span> Exportar Backup</button>
         <button class="nav-item" onclick="closeMobileNav();document.getElementById('importFileMob').click()"><span class="nav-icon">📥</span> Importar Backup</button>
         <input type="file" id="importFileMob" accept="application/json" hidden onchange="importarBackup(this)">
+        <div class="sidebar-credit" style="margin-top:8px;">Creat per N.Arroyo</div>
     </div>
 </div>
 
@@ -2878,6 +2893,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <button class="nav-item" onclick="exportarBackup()"><span class="nav-icon">📤</span> Exportar Backup</button>
             <button class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">📥</span> Importar Backup</button>
             <input type="file" id="importFile" accept="application/json" hidden onchange="importarBackup(this)">
+            <div class="sidebar-credit">Creat per N.Arroyo</div>
         </div>
     </nav>
 
@@ -3026,15 +3042,18 @@ input:checked + .slider:before { transform: translateX(20px); }
                  ================================================ -->
             <div id="puntsLlistat" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('form')">←</button>
-                    <h3>📍 Punts Recollits</h3>
+                    <button class="btn-back" onclick="goBackFromPunts()">&#8592;</button>
+                    <h3>&#128205; Punts Recollits</h3>
                 </div>
                 <div id="regList"></div>
                 <div class="scroll-btns">
-                    <button class="btn-scroll" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-                    <button class="btn-scroll" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">↓</button>
+                    <button class="btn-scroll" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+                    <button class="btn-scroll" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
                 </div>
-                <button class="btn btn-primary" style="margin-top:20px;" onclick="ir('form')">TORNAR AL FORMULARI</button>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;">
+                    <button class="btn btn-ghost" onclick="goBackFromPunts()">&#8592; Tornar al detall</button>
+                    <button class="btn btn-primary" onclick="ir('form')">&#9998; Editar formulari</button>
+                </div>
             </div>
 
             <!-- ================================================
@@ -3127,7 +3146,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <!-- PROJECT DETAIL SCREEN -->
             <div id="projectDetail" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('list')">&#8592;</button>
+                    <button class="btn-back" onclick="goBackFromDetail()">&#8592;</button>
                     <h3 id="detailScreenTitle">Detall</h3>
                 </div>
                 <div id="detailContent"></div>
@@ -3488,6 +3507,40 @@ function openProjectModal() { document.getElementById('projectModal').style.disp
 function closeModal()       { document.getElementById('projectModal').style.display = 'none'; }
 
 /* ============================================================
+   NAVIGATION STACK
+   Tracks where the user came from so back buttons are contextual.
+   navFrom values:
+     'home'          → came from home screen (recents)
+     'list'          → came from historial (list screen)
+     'projectDetail' → came from detail (punts opened via "Obrir")
+   ============================================================ */
+let navFrom = 'list';      // default: historial
+let detailScrollY = 0;     // remember scroll position in historial
+
+/** Back from projectDetail → go to wherever we came from */
+function goBackFromDetail() {
+    if (navFrom === 'home') {
+        ir('home');
+    } else {
+        // Restore historial with scroll position preserved
+        historial();
+        // Restore scroll after a short delay so the list has rendered
+        setTimeout(() => window.scrollTo({ top: detailScrollY, behavior: 'instant' }), 80);
+    }
+}
+
+/** Back from puntsLlistat → always go to projectDetail (never directly to form) */
+function goBackFromPunts() {
+    // curId is still set — re-render the detail without DB re-fetch
+    if (allProjectsCache.find(p => p.id === curId)) {
+        obrirDetallProjecte(curId, navFrom);
+    } else {
+        // Fallback: detail screen is already rendered, just show it
+        ir('projectDetail');
+    }
+}
+
+/* ============================================================
    RECENTS — 3 most recently modified projects on the Home screen
    Excludes 'captura' (quick photos) — those are historial-only.
    ============================================================ */
@@ -3534,10 +3587,10 @@ function renderRecents() {
                 else                  timeLabel = p.fecha || '';
             }
 
-            /* "Continuar" navigates to projectDetail for obres, form for inventaris */
-            const continueAction = tipus === 'obra'
-                ? `obrirDetallProjecte('${p.id}')`
-                : `openP('${p.id}')`;
+            /* All types → projectDetail first.
+               From detail the user can then open punts via the "Obrir Projecte" button.
+               This keeps the navigation stack linear: home → detail → punts → form  */
+            const continueAction = `obrirDetallProjecte('${p.id}','home')`;
 
             const isObraClosedBadge = p.estat_obra_tancada
                 ? `<span style="font-size:0.65rem;background:var(--cat-obra-lt);color:var(--cat-obra);border:1px solid var(--cat-obra-bd);padding:1px 6px;border-radius:10px;font-weight:700;">FINALITZADA</span>`
@@ -4172,7 +4225,7 @@ function renderHistLlista() {
                 ${progrHTML}
             </div>
             <div class="project-card-actions">
-                <button class="btn btn-primary btn-sm pca-open" onclick="obrirDetallProjecte('${p.id}')">&#128269; DETALL</button>
+                <button class="btn btn-primary btn-sm pca-open" onclick="obrirDetallProjecte('${p.id}','list')">&#128269; DETALL</button>
                 ${!isCap ? `<button class="btn btn-ghost btn-sm pca-clone" onclick="clonarP('${p.id}')">&#128260; CLONAR</button>` : ''}
                 <button class="btn btn-danger btn-sm btn-icon pca-delete" onclick="borrarP('${p.id}')" title="Eliminar">&#128465;</button>
             </div>`;
@@ -4183,9 +4236,27 @@ function renderHistLlista() {
 /* ============================================================
    PROJECT DETAIL / TIMELINE  — with obra management
    ============================================================ */
-function obrirDetallProjecte(id) {
+function obrirDetallProjecte(id, origin) {
     const p = allProjectsCache.find(x => x.id === id);
-    if (!p) return;
+    if (!p) {
+        /* Cache miss: load from DB then re-call */
+        if (db) {
+            db.transaction("projects").objectStore("projects").get(id).onsuccess = e => {
+                if (e.target.result) {
+                    allProjectsCache.push(e.target.result);
+                    obrirDetallProjecte(id, origin);
+                }
+            };
+        }
+        return;
+    }
+
+    /* Store navigation origin so back buttons know where to go */
+    if (origin !== undefined) {
+        navFrom = origin;
+    }
+    /* Remember scroll position in case we need to go back to historial */
+    detailScrollY = window.scrollY;
     const tipus    = p.tipusEntrada || 'inventari';
     const cls      = getCatClass(tipus);
     const avui     = new Date();
@@ -4322,10 +4393,10 @@ function obrirDetallProjecte(id) {
         <div class="timeline">${tlHTML||'<p style="color:var(--text-muted);font-size:0.85rem;">Cap activitat registrada</p>'}</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;">
-            ${tipus!=='captura'?`<button class="btn btn-primary btn-sm" style="grid-column:1/-1;" onclick="openP('${id}')">&#128194; OBRIR PROJECTE</button>`:''}
+            ${tipus!=='captura'?`<button class="btn btn-primary btn-sm" style="grid-column:1/-1;" onclick="openPFromDetail('${id}')">&#128194; OBRIR PROJECTE</button>`:''}
             ${mapBtn}
             <button class="btn btn-ghost btn-sm" onclick="clonarP('${id}')">&#128260; CLONAR</button>
-            <button class="btn btn-danger btn-sm" onclick="borrarP('${id}');ir('list')">&#128465; ELIMINAR</button>
+            <button class="btn btn-danger btn-sm" onclick="borrarP('${id}');goBackFromDetail()">&#128465; ELIMINAR</button>
         </div>
         <div style="margin-top:10px;">
             <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--text-muted);font-size:0.8rem;" onclick="ir('downloads')">
@@ -4421,7 +4492,7 @@ function renderGantt() {
                     <div style="position:relative;height:28px;background:var(--bg-alt);border-radius:4px;overflow:hidden;">
                         <div style="position:absolute;left:${left}%;width:${w}%;height:100%;background:${barColor};opacity:0.25;border-radius:4px;"></div>
                         <div style="position:absolute;left:${left}%;width:${Math.min(parseFloat(w), parseFloat(w)*prog/100)}%;height:100%;background:${barColor};border-radius:4px;cursor:pointer;"
-                             onclick="obrirDetallProjecte('${p.id}')" title="${p.titulo} — ${prog}%"></div>
+                             onclick="obrirDetallProjecte('${p.id}','list')" title="${p.titulo} — ${prog}%"></div>
                         <div style="position:absolute;left:${left}%;top:50%;transform:translateY(-50%);font-size:0.65rem;font-weight:700;color:white;padding:0 4px;pointer-events:none;">${prog}%</div>
                     </div>
                     <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">${p.fecha_inicio} &rarr; ${p.fecha_fin_estimada}${diff < 0 ? ' <span style="color:var(--primary);font-weight:700;">VENÇUDA</span>' : ''}</div>
@@ -4649,8 +4720,8 @@ function renderCalDayPanel(dateKey, projects) {
                     ${coord}
                 </div>
                 <div class="cal-day-entry-actions">
-                    <button class="btn btn-primary btn-sm" style="width:auto;" onclick="obrirDetallProjecte('${p.id}')">Detall &#8594;</button>
-                    ${!isCap ? `<button class="btn btn-ghost btn-sm" style="width:auto;" onclick="openP('${p.id}')">Obrir</button>` : ''}
+                    <button class="btn btn-primary btn-sm" style="width:auto;" onclick="obrirDetallProjecte('${p.id}','list')">Detall &#8594;</button>
+                    ${!isCap ? `<button class="btn btn-ghost btn-sm" style="width:auto;" onclick="openPFromDetail('${p.id}')">Obrir</button>` : ''}
                 </div>
             </div>
         </div>`;
@@ -4745,6 +4816,13 @@ function borrarP(id) {
             showToast("Projecte eliminat");
         };
     }
+}
+
+/** Open punts list coming FROM the detail screen.
+ *  Sets navFrom so the back button in puntsLlistat returns to detail. */
+function openPFromDetail(id) {
+    navFrom = 'projectDetail';
+    openP(id);
 }
 
 function openP(id) {
@@ -5819,8 +5897,7 @@ async function generarInformeObraPDF(id) {
         const CAP     = 6;    /* photo caption height                */
         const SEP     = 9;    /* gap between records                 */
         const SMRG    = 12;   /* safety margin above BOT             */
-        const PH_STD  = 65;   /* standard photo height               */
-        const PH_SOLO = Math.min(110, BOT - MT - CAP - 18); /* solo-page photo */
+        /* PH_STD / PH_SOLO removed — photo renderer uses its own PH=75 */
 
         const sortedRegs = [...(p.registros||[])].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
 
@@ -5837,20 +5914,25 @@ async function generarInformeObraPDF(id) {
 
         /* ── measureBlock ────────────────────────────────────
            Returns estimated total height of one record (mm).
-           Must be called BEFORE drawing for pre-flight check. */
+           Must be called BEFORE drawing for pre-flight check.
+           Photo estimate: pairs of 2 (PH=75) to match renderer. */
         function measureBlock(r) {
+            const PH_EST  = 75;   /* must match PH inside drawRecord photos */
+            const CAP_EST = 4.5 + CAP;
             const nFoto = r.fotos?.length || 0;
             const rObs  = r.values?.find(v => v.label.toLowerCase().includes('obs'))?.val || '';
             doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS);
             const obsLines = rObs ? doc.splitTextToSize(rObs, CW) : [];
 
-            const hdrH    = LH + 1 + 3;                         /* header + underline  */
-            const pairsH  = 4 * (LH + PP);                      /* 4 label-value pairs */
+            const hdrH    = LH + 1 + 3;
+            const pairsH  = 4 * (LH + PP);
             const obsH    = obsLines.length > 0
-                ? (BP + LH + 1 + obsLines.length * LH + BP)     /* label + text + pad  */
+                ? (BP + LH + 1 + obsLines.length * LH + BP)
                 : 0;
-            const photosH = nFoto > 0
-                ? (IMG_GAP + nFoto * (PH_STD + CAP + 3))
+            /* Pair-aware photo height: ceil(nFoto/2) rows of 2, with gap between rows */
+            const photoRows  = Math.ceil(nFoto / 2);
+            const photosH    = nFoto > 0
+                ? (IMG_GAP + photoRows * (PH_EST + CAP_EST) + (photoRows - 1) * 6)
                 : 0;
 
             return Math.min(hdrH + pairsH + obsH + photosH + SEP, BOT - MT - SMRG);
@@ -5933,42 +6015,72 @@ async function generarInformeObraPDF(id) {
                 Y += BP;
             }
 
-            /* ── 4. PHOTOS — strictly after all text ────────── */
+
+            /* ── 4. PHOTOS — pair-aware flow renderer ────────────
+               Rules:
+               • Photos are placed sequentially, 1 per slot.
+               • Two photos can share a page when both fit.
+               • Only trigger newPage() when the NEXT photo
+                 (not a pair) doesn't fit from current Y.
+               • No solo vertically-centred pages — photos always
+                 flow naturally, maximising page usage.
+               • PH = fixed photo height; caption is always
+                 drawn at Y+PH+CAP_PAD, tightly coupled.         */
             if (nFoto > 0) {
+                const PH        = 75;     /* fixed photo height (mm)    */
+                const CAP_PAD   = 4.5;    /* gap between frame & caption*/
+                const PHOTO_GAP = 6;      /* gap between two photos     */
+
                 Y += IMG_GAP;
 
-                (r.fotos||[]).forEach((f, fi) => {
-                    const needed = PH_STD + CAP + 4;
+                const fotos = r.fotos || [];
+                let fi = 0;
 
-                    if (Y + needed > BOT - SMRG) {
-                        /* Photo doesn't fit — solo page, vertically centred */
+                while (fi < fotos.length) {
+                    const SLOT_H = PH + CAP_PAD + CAP;   /* one photo slot total */
+
+                    /* ── Does the NEXT photo fit on the current page? ── */
+                    if (Y + PH + CAP > BOT - SMRG) {
+                        /* No space even for one photo — start fresh page */
                         newPage();
-                        const avail = BOT - MT - SMRG - CAP - 4;
-                        const fH    = Math.min(PH_SOLO, avail);
-                        const fY    = MT + Math.max(0, (avail - fH) / 2);
-
-                        doc.setDrawColor(...D180); doc.setLineWidth(0.3);
-                        doc.rect(ML, fY, CW, fH, 'D');
-                        safeImg(f, ML, fY, CW, fH);
-
-                        doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
-                        doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
-                                 PAGE_W/2, fY+fH+4.5, {align:'center'});
-                        Y = fY + fH + CAP + 4;
-                    } else {
-                        /* Photo fits — draw at exact current Y */
-                        doc.setDrawColor(...D180); doc.setLineWidth(0.3);
-                        doc.rect(ML, Y, CW, PH_STD, 'D');
-                        safeImg(f, ML, Y, CW, PH_STD);
-                        Y += PH_STD;
-
-                        doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
-                        doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
-                                 PAGE_W/2, Y+4, {align:'center'});
-                        Y += CAP + 2;
-                        if (fi < nFoto-1) Y += 3; /* gap between consecutive photos */
                     }
-                });
+
+                    /* ── Draw photo at current Y ── */
+                    const f1 = fotos[fi];
+                    doc.setDrawColor(...D180); doc.setLineWidth(0.3);
+                    doc.rect(ML, Y, CW, PH, 'D');
+                    safeImg(f1, ML, Y, CW, PH);
+                    Y += PH;
+
+                    /* Caption below frame */
+                    doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+                    doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
+                             PAGE_W/2, Y + CAP_PAD, {align:'center'});
+                    Y += CAP_PAD + CAP;
+                    fi++;
+
+                    /* ── Attempt to place a SECOND photo on the same page ── */
+                    if (fi < fotos.length) {
+                        if (Y + PHOTO_GAP + PH + CAP <= BOT - SMRG) {
+                            /* Second photo fits — place it immediately below */
+                            Y += PHOTO_GAP;
+
+                            const f2 = fotos[fi];
+                            doc.setDrawColor(...D180); doc.setLineWidth(0.3);
+                            doc.rect(ML, Y, CW, PH, 'D');
+                            safeImg(f2, ML, Y, CW, PH);
+                            Y += PH;
+
+                            doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...D120);
+                            doc.text(buildCaption(fi, nFoto, ri, rCarr, rPK, rData),
+                                     PAGE_W/2, Y + CAP_PAD, {align:'center'});
+                            Y += CAP_PAD + CAP;
+                            fi++;
+                        }
+                        /* If second photo doesn't fit, the while loop will
+                           call newPage() at the top of the next iteration. */
+                    }
+                }
             }
 
             /* ── 5. RECORD SEPARATOR — after the last photo ─── */
@@ -6218,7 +6330,7 @@ function renderMapMarkers() {
                 ${p.fecha}${hora ? ' · ' + hora : ''} · ${pts} punt${pts!==1?'s':''}<br>
                 <small style="color:var(--text-light);">&#127758; ${lat.toFixed(5)}, ${lng.toFixed(5)}</small>
             </div>
-            <button class="map-popup-btn" onclick="obrirDetallProjecte('${p.id}');leafletMap?.closePopup();">
+            <button class="map-popup-btn" onclick="obrirDetallProjecte('${p.id}','list');leafletMap?.closePopup();">
                 &#128269; Veure detall
             </button>
         </div>`;
