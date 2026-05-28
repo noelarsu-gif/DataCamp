@@ -587,6 +587,96 @@ input:focus, select:focus, textarea:focus {
     flex-shrink: 0;
 }
 
+/* ── AUTO-PK GEOLOCALITZACIÓ ─────────────────────────────── */
+.btn-autopk {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-cond);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(29,78,216,0.30);
+    margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+}
+.btn-autopk:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    box-shadow: 0 6px 18px rgba(29,78,216,0.42);
+    transform: translateY(-1px);
+}
+.btn-autopk:active { transform: scale(0.98); }
+.btn-autopk:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+.btn-autopk .autopk-pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pkPulse 1.2s infinite;
+    flex-shrink: 0;
+}
+@keyframes pkPulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.6); opacity: 0.5; }
+}
+
+.autopk-status {
+    background: var(--accent-blue-lt);
+    border: 1.5px solid #bfdbfe;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.45;
+}
+.autopk-status.visible { display: flex; }
+.autopk-status.error   { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+.autopk-status.warning { background: #fffbeb; border-color: #fde68a; color: #d97706; }
+.autopk-status.success { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+.autopk-status-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+/* Sincronització PKs — settings card */
+.syncro-pk-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    line-height: 1.5;
+}
+.syncro-pk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+}
+.syncro-pk-badge.ok    { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.syncro-pk-badge.pend  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.syncro-pk-badge.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
 /* Project name field */
 .project-name-input {
     font-size: 1.1rem;
@@ -675,6 +765,92 @@ input:checked + .slider:before { transform: translateX(20px); }
     transition: var(--transition);
 }
 .btn-del-photo:hover { background: var(--primary-dark); }
+
+/* ── FOTO RÀPIDA — fila PK amb botó Auto-PK integrat ────── */
+.fd-pk-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 18px;
+}
+.fd-pk-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.fd-pk-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.3px;
+}
+.fd-pk-input-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--surface);
+}
+.fd-pk-input-wrap input {
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 1;
+    min-width: 0;
+    padding: 10px 10px;
+    font-size: 1rem;
+    background: transparent;
+    outline: none;
+}
+.btn-autopk-foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    background: var(--cat-captura);
+    color: #fff;
+    border: none;
+    border-left: 1.5px solid rgba(0,0,0,0.10);
+    cursor: pointer;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    transition: var(--transition);
+    -webkit-tap-highlight-color: transparent;
+}
+.btn-autopk-foto:hover   { background: #c2410c; }
+.btn-autopk-foto:active  { transform: scale(0.93); }
+.btn-autopk-foto:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+.fd-marge-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.fd-marge-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.3px;
+}
+.fd-marge-group select {
+    height: 44px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+    font-size: 0.95rem;
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+}
 
 .zoom-icon {
     position: absolute; bottom: 0; left: 0;
@@ -1569,6 +1745,27 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 0.9rem;
 }
 .field-tag b { color: var(--primary); }
+/* Botó d'eliminar camp — quadrat contenut, no s'estira */
+.field-tag .btn.btn-danger.btn-sm {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    border-radius: 6px !important;
+    background: #fee2e2 !important;
+    color: #ef4444 !important;
+    border: 1px solid #fecaca !important;
+    font-size: 0.85rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+    font-weight: 700 !important;
+}
 .field-type-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2998,6 +3195,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <input type="text" id="titulo" class="project-name-input" placeholder="Ex: Millora C-55 Tram Nord">
                 </div>
 
+                <!-- AUTO-PK GEOLOCALITZACIÓ ─────────────────────── -->
+                <div id="autopkStatus" class="autopk-status">
+                    <span class="autopk-status-icon" id="autopkStatusIcon">📡</span>
+                    <span id="autopkStatusText">Cercant posició GPS...</span>
+                </div>
+                <button class="btn-autopk" id="btnAutoPK" onclick="executarAutoPK()" title="Detecta la carretera i PK automàticament per GPS">
+                    <span class="autopk-pulse" id="autopkPulse" style="display:none;"></span>
+                    🔍 ON ESTIC ARA? (Auto-PK)
+                </button>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <div id="dynamicFields"></div>
 
                 <div class="watermark-row">
@@ -3240,6 +3448,27 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <button class="btn btn-danger" onclick="eliminarLogo()">🗑️ ELIMINAR LOGO</button>
                     <input type="file" id="inputLogo" accept="image/*" hidden onchange="handleLogo(this)">
                 </div>
+
+                <!-- SINCRO PKS ARCGIS ──────────────────────────── -->
+                <div class="settings-section">
+                    <div class="settings-section-title">📡 Dades PKs ArcGIS (Offline)</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                        Descarrega els Punts Kilométrics oficials de la xarxa de carreteres de Catalunya per poder usar la detecció automàtica de posició (<b>ON ESTIC ARA?</b>) sense connexió a Internet.
+                    </p>
+                    <div id="syncroStatus" style="margin-bottom:14px;">
+                        <span id="syncroStatusBadge" class="syncro-pk-badge pend">⏳ Sense dades</span>
+                    </div>
+                    <div class="syncro-pk-info" id="syncroInfoText">
+                        Prem el botó per descarregar les dades. Pot trigar uns 20-40 segons.
+                    </div>
+                    <button class="btn btn-secondary" id="btnSyncroPKs" onclick="sincronitzarPKsArcGIS()" style="margin-top:14px;">
+                        🔄 SINCRO PKS ARCGIS
+                    </button>
+                    <button class="btn btn-danger" onclick="esborrarCachePKs()" style="margin-top:8px;">
+                        🗑️ ESBORRAR CACHE PKS
+                    </button>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
 
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
@@ -5443,6 +5672,15 @@ function obrirEditorFotoDirecta(imgData) {
             <input type="text" id="fd_carretera" value="${defaultCarr}" placeholder="Ex: C-55">
         </div>
 
+        <div id="fdAutopkStatus" class="autopk-status" style="margin-bottom:14px;">
+            <span class="autopk-status-icon" id="fdAutopkStatusIcon">📡</span>
+            <span id="fdAutopkStatusText">Cercant posició GPS...</span>
+        </div>
+        <button class="btn-autopk" id="btn-autopk-foto" style="margin-bottom:18px;" title="Detecta la carretera i PK automàticament per GPS">
+            <span class="autopk-pulse" id="fdAutopkPulse" style="display:none;"></span>
+            🔍 ON ESTIC ARA? (Auto-PK)
+        </button>
+
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:18px;">
             <div class="form-group" style="margin:0">
                 <label>PK</label>
@@ -5477,8 +5715,123 @@ function obrirEditorFotoDirecta(imgData) {
     `;
 
     document.querySelector('.page-content').appendChild(screen);
-}
 
+    // ── Connectar el botó Auto-PK de Foto Ràpida ──────────────────
+    const btnAutoPKFoto = document.getElementById('btn-autopk-foto');
+
+    function fdAutopkMostrarEstat(tipus, icon, text) {
+        const el  = document.getElementById('fdAutopkStatus');
+        const ico = document.getElementById('fdAutopkStatusIcon');
+        const txt = document.getElementById('fdAutopkStatusText');
+        if (!el) return;
+        el.className = 'autopk-status visible ' + tipus;
+        if (ico) ico.textContent = icon;
+        if (txt) txt.textContent = text;
+    }
+    function fdAutopkSetLoading(actiu) {
+        const btn   = document.getElementById('btn-autopk-foto');
+        const pulse = document.getElementById('fdAutopkPulse');
+        if (!btn) return;
+        btn.disabled = actiu;
+        if (pulse) pulse.style.display = actiu ? 'inline-block' : 'none';
+        btn.innerHTML = actiu
+            ? `<span class="autopk-pulse" id="fdAutopkPulse"></span> ⏳ DETECTANT POSICIÓ...`
+            : `<span class="autopk-pulse" id="fdAutopkPulse" style="display:none;"></span> 🔍 ON ESTIC ARA? (Auto-PK)`;
+    }
+
+    if (btnAutoPKFoto) {
+        btnAutoPKFoto.addEventListener('click', async function() {
+            if (!navigator.geolocation) {
+                fdAutopkMostrarEstat('error', '🚫', 'El navegador no admet geolocalització. Introdueix les dades manualment.');
+                return;
+            }
+            fdAutopkSetLoading(true);
+            fdAutopkMostrarEstat('', '📡', 'Adquirint senyal GPS...');
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+                    fdAutopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carretera més propera...`);
+                    try {
+                        let punts = [];
+                        const bufferGraus = 0.04;
+                        const cacheLocal = cercarEnCache(lat, lon, bufferGraus);
+                        if (cacheLocal.length > 0) {
+                            punts = cacheLocal;
+                            fdAutopkMostrarEstat('', '💾', `Cache local: ${punts.length} PKs trobats. Calculant...`);
+                        } else {
+                            fdAutopkMostrarEstat('', '🌐', 'Consultant ArcGIS (Generalitat de Catalunya)...');
+                            punts = await consultarArcGIS(lat, lon, bufferGraus);
+                        }
+                        if (punts.length === 0) {
+                            fdAutopkMostrarEstat('', '🔎', 'Ampliant zona de cerca...');
+                            punts = await consultarArcGIS(lat, lon, 0.10);
+                        }
+                        const resultat = calcularPKdePunts(lat, lon, punts);
+                        if (!resultat) {
+                            fdAutopkMostrarEstat('warning', '🏙️', 'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa.');
+                            showToast('🏙️ Zona Urbana o Fora d\'àrea — verificar posició');
+                        } else if (resultat.dist > AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
+                            fdAutopkMostrarEstat('warning', '⚠️', `Carretera més propera: ${resultat.carretera} (${Math.round(resultat.dist)}m). Fora de la zona de carretera (>${AUTOPK_CONFIG.LLINDAR_CARRETERA_M}m).`);
+                            showToast(`⚠️ Fora de l'àrea de la carretera (${Math.round(resultat.dist)}m)`);
+                        } else {
+                            const msStr = String(resultat.m).padStart(3, '0');
+                            const pkFormatat = `${resultat.km}+${msStr}`;
+                            const fdPk   = document.getElementById('fd_pk');
+                            const fdCarr = document.getElementById('fd_carretera');
+                            if (fdPk)   fdPk.value   = pkFormatat;
+                            if (fdCarr) fdCarr.value = resultat.carretera;
+                            fdAutopkMostrarEstat('success', '✅',
+                                `${resultat.carretera}  •  PK ${pkFormatat}  •  ±${Math.round(resultat.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
+                            showToast(`📍 ${resultat.carretera} — PK ${pkFormatat}`);
+                        }
+                    } catch (err) {
+                        const cacheLocal = cercarEnCache(lat, lon, 0.10);
+                        if (cacheLocal.length > 0) {
+                            const resultat = calcularPKdePunts(lat, lon, cacheLocal);
+                            if (resultat && resultat.dist <= AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
+                                const msStr = String(resultat.m).padStart(3, '0');
+                                const pkFormatat = `${resultat.km}+${msStr}`;
+                                const fdPk   = document.getElementById('fd_pk');
+                                const fdCarr = document.getElementById('fd_carretera');
+                                if (fdPk)   fdPk.value   = pkFormatat;
+                                if (fdCarr) fdCarr.value = resultat.carretera;
+                                fdAutopkMostrarEstat('warning', '📴',
+                                    `Mode offline (cache). ${resultat.carretera} PK ${pkFormatat} ±${Math.round(resultat.dist)}m`);
+                                showToast(`📴 Offline — ${resultat.carretera} PK ${pkFormatat}`);
+                            } else {
+                                fdAutopkMostrarEstat('warning', '📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
+                            }
+                        } else {
+                            fdAutopkMostrarEstat('error', '🔴', `Error de connexió ArcGIS: ${err.message}. Ves a Configuració → Sincro PKs per descarregar dades offline.`);
+                            showToast('🔴 Error ArcGIS. Sincronitza les dades offline des de Configuració.');
+                        }
+                    }
+                    fdAutopkSetLoading(false);
+                },
+                (err) => {
+                    fdAutopkSetLoading(false);
+                    let msg = '';
+                    switch (err.code) {
+                        case err.PERMISSION_DENIED:
+                            msg = 'Permís GPS denegat. Activa\'l a la configuració del navegador / dispositiu.';
+                            showToast('💻 GPS denegat: Introdueix les dades manualment'); break;
+                        case err.POSITION_UNAVAILABLE:
+                            msg = 'Posició no disponible. Comprova que el GPS del dispositiu està activat.';
+                            showToast('📡 GPS no disponible: Introdueix les dades manualment'); break;
+                        case err.TIMEOUT:
+                            msg = 'El GPS ha trigat massa. Intenta-ho en un lloc amb millor cobertura.';
+                            showToast('⏱️ Temps d\'espera GPS exhaurit'); break;
+                        default:
+                            msg = `Error GPS (${err.code}). Introdueix les dades manualment.`;
+                            showToast('🚫 Error GPS: Introdueix les dades manualment');
+                    }
+                    fdAutopkMostrarEstat('error', '🚫', msg);
+                },
+                { enableHighAccuracy: true, timeout: AUTOPK_CONFIG.GPS_TIMEOUT, maximumAge: AUTOPK_CONFIG.GPS_MAX_AGE }
+            );
+        });
+    }
+}
 async function guardarFotoDirecta(imgData) {
     const carr  = document.getElementById('fd_carretera').value || "SC";
     const pk    = document.getElementById('fd_pk').value || "0";
@@ -6451,6 +6804,527 @@ function actualizarDBWithGeo(t) {
     }
 }
 
+/* ============================================================
+   AUTO-PK — MÒDUL DE GEOLOCALITZACIÓ INTEL·LIGENT
+   Detecció automàtica de carretera i Punt Kilométric (PK)
+   mitjançant l'API REST d'ArcGIS de la Generalitat de Catalunya
+   ============================================================ */
+
+/* ── Constants ──────────────────────────────────────────────── */
+const AUTOPK_CONFIG = {
+    // ArcGIS FeatureService: Puntos Kilométricos España (Esri España / item d8854f26...)
+    // Camps: nombre = nom carretera, numero = valor PK, geometry = coordenades ETRS89
+    ARCGIS_URL: 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query',
+    // Radi màxim de cerca en metres per considerar que l'usuari és a la carretera
+    LLINDAR_CARRETERA_M: 200,
+    // Quants PKs agafem per petita zona (màx del servei = 1000)
+    MAX_FEATURES_PER_QUERY: 200,
+    // Clau localStorage per dades en cache
+    LS_KEY: 'autopk_dades_v1',
+    LS_META_KEY: 'autopk_meta_v1',
+    // GPS timeout i edat màxima acceptable (ms)
+    GPS_TIMEOUT: 15000,
+    GPS_MAX_AGE: 10000,
+};
+
+/* ── Estat intern del mòdul ─────────────────────────────────── */
+let _autopkRunning = false;
+
+/* ============================================================
+   HAVERSINE — distància en metres entre dos punts (lat/lng)
+   ============================================================ */
+function haversineM(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // metres
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) ** 2
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+    return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+/* ============================================================
+   INTERPOLACIÓ LINEAL — calcula PK exacte entre dos nodes
+   Retorna { km: number, m: number, carretera: string, dist: number }
+   ============================================================ */
+function interpolarPK(userLat, userLon, pkA, pkB) {
+    // pkA / pkB = { lat, lon, pk (decimal, eg. 25.3 = PK 25+300), carretera }
+    const dA  = haversineM(userLat, userLon, pkA.lat, pkA.lon);
+    const dB  = haversineM(userLat, userLon, pkB.lat, pkB.lon);
+    const dAB = haversineM(pkA.lat, pkA.lon, pkB.lat, pkB.lon);
+    if (dAB < 1) return null; // nodes idèntics
+
+    // Projecció del punt usuari sobre el segment A-B (0..1)
+    const t = Math.max(0, Math.min(1, (dAB * dAB + dA * dA - dB * dB) / (2 * dAB * dAB)));
+    const pkDecimal = pkA.pk + t * (pkB.pk - pkA.pk);
+
+    // Distància perpendicular (metres) fins al segment de carretera
+    const distPerp = Math.sqrt(Math.max(0, dA * dA - (t * dAB) * (t * dAB)));
+
+    const km = Math.floor(pkDecimal);
+    const m  = Math.round((pkDecimal - km) * 1000);
+
+    return { km, m, carretera: pkA.carretera, dist: distPerp };
+}
+
+/* ============================================================
+   MOSTRAR ESTAT Auto-PK al widget de l'app
+   ============================================================ */
+function autopkMostrarEstat(tipus, icon, text) {
+    const el   = document.getElementById('autopkStatus');
+    const ico  = document.getElementById('autopkStatusIcon');
+    const txt  = document.getElementById('autopkStatusText');
+    if (!el) return;
+    el.className = 'autopk-status visible ' + tipus;
+    ico.textContent = icon;
+    txt.textContent = text;
+}
+function autopkAmagarEstat() {
+    const el = document.getElementById('autopkStatus');
+    if (el) el.className = 'autopk-status';
+}
+
+/* ============================================================
+   OMPLIR CAMPS DEL FORMULARI DINÀMIC
+   Escriu carretera i PK als inputs corresponents
+   ============================================================ */
+function autopkOmplirCamps(carretera, km, m) {
+    // Carretera: primer camp de tipus 'carretera'
+    const iCarr = fields.findIndex(f => f.type === 'carretera');
+    if (iCarr > -1) {
+        const el = document.querySelector(`.dyn-input[data-idx="${iCarr}"]`);
+        if (el) el.value = carretera;
+    }
+    // PK: primer camp de tipus 'pk'
+    const iPK = fields.findIndex(f => f.type === 'pk');
+    if (iPK > -1) {
+        const elKm = document.querySelector(`.pk-km[data-idx="${iPK}"]`);
+        const elM  = document.querySelector(`.pk-m[data-idx="${iPK}"]`);
+        if (elKm) elKm.value = km;
+        if (elM)  elM.value  = String(m).padStart(3, '0');
+    }
+}
+function autopkOmplirForaArea() {
+    const iCarr = fields.findIndex(f => f.type === 'carretera');
+    if (iCarr > -1) {
+        const el = document.querySelector(`.dyn-input[data-idx="${iCarr}"]`);
+        if (el) el.value = 'FORA D\'ÀREA';
+    }
+    const iPK = fields.findIndex(f => f.type === 'pk');
+    if (iPK > -1) {
+        const elKm = document.querySelector(`.pk-km[data-idx="${iPK}"]`);
+        const elM  = document.querySelector(`.pk-m[data-idx="${iPK}"]`);
+        if (elKm) elKm.value = '';
+        if (elM)  elM.value  = '';
+    }
+}
+
+/* ============================================================
+   DESACTIVAR / ACTIVAR EL BOTÓ
+   ============================================================ */
+function autopkSetLoading(actiu) {
+    const btn   = document.getElementById('btnAutoPK');
+    const pulse = document.getElementById('autopkPulse');
+    _autopkRunning = actiu;
+    if (!btn) return;
+    btn.disabled = actiu;
+    if (pulse) pulse.style.display = actiu ? 'inline-block' : 'none';
+    btn.innerHTML = actiu
+        ? `<span class="autopk-pulse" id="autopkPulse"></span> ⏳ DETECTANT POSICIÓ...`
+        : `<span class="autopk-pulse" id="autopkPulse" style="display:none;"></span> 🔍 ON ESTIC ARA? (Auto-PK)`;
+}
+
+/* ============================================================
+   CONSULTA A ARCGIS REST API
+   Cerca els N PKs més propers a lat/lon dins un buffer en graus
+   ============================================================ */
+async function consultarArcGIS(lat, lon, bufferGraus = 0.05) {
+    const xmin = lon - bufferGraus, ymin = lat - bufferGraus;
+    const xmax = lon + bufferGraus, ymax = lat + bufferGraus;
+    // El servei usa ETRS89 (EPSG:4258) però accepta bbox en WGS84 (4326) com a inSR
+    // outSR=4326 per rebre coordenades en lat/lon estàndard
+    const params = new URLSearchParams({
+        where: '1=1',
+        geometry: `${xmin},${ymin},${xmax},${ymax}`,
+        geometryType: 'esriGeometryEnvelope',
+        inSR: '4326',
+        spatialRel: 'esriSpatialRelIntersects',
+        outFields: 'nombre,numero',   // nombre = carretera, numero = valor PK
+        returnGeometry: true,
+        outSR: '4326',
+        f: 'json',
+        resultRecordCount: AUTOPK_CONFIG.MAX_FEATURES_PER_QUERY,
+    });
+    const url = `${AUTOPK_CONFIG.ARCGIS_URL}?${params}`;
+    const resp = await fetch(url, { signal: AbortSignal.timeout(12000) });
+    if (!resp.ok) throw new Error(`ArcGIS HTTP ${resp.status}`);
+    const json = await resp.json();
+    if (json.error) throw new Error(`ArcGIS: ${json.error.message || json.error.code}`);
+    return (json.features || []).map(f => ({
+        carretera: f.attributes.nombre || '?',        // camp real = nombre
+        pk: parseFloat(f.attributes.numero) || 0,     // camp real = numero (valor decimal del PK)
+        lat: f.geometry.y,
+        lon: f.geometry.x,
+    })).filter(p => !isNaN(p.pk) && p.lat && p.lon);  // filtrar entrades invàlides
+}
+
+/* ============================================================
+   CARREGAR PKs DES DE CACHE LOCAL (localStorage)
+   ============================================================ */
+function autopkCarregarCache() {
+    try {
+        const raw = localStorage.getItem(AUTOPK_CONFIG.LS_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+function autopkDadesCache() {
+    const meta = autopkMeta();
+    return meta ? meta : null;
+}
+function autopkMeta() {
+    try {
+        const raw = localStorage.getItem(AUTOPK_CONFIG.LS_META_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+
+/* ============================================================
+   CERCA LOCAL (sense internet) — filtra cache per bounding box
+   ============================================================ */
+function cercarEnCache(lat, lon, bufferGraus = 0.05) {
+    const cache = autopkCarregarCache();
+    if (!cache || !Array.isArray(cache)) return [];
+    return cache.filter(p =>
+        p.lat >= lat - bufferGraus && p.lat <= lat + bufferGraus &&
+        p.lon >= lon - bufferGraus && p.lon <= lon + bufferGraus
+    );
+}
+
+/* ============================================================
+   ALGORISME PRINCIPAL DE CÀLCUL
+   Donada llista de punts, trobar el PK interpolat
+   ============================================================ */
+function calcularPKdePunts(userLat, userLon, punts) {
+    if (!punts || punts.length === 0) return null;
+
+    // Agrupar per carretera
+    const perCarretera = {};
+    punts.forEach(p => {
+        if (!perCarretera[p.carretera]) perCarretera[p.carretera] = [];
+        perCarretera[p.carretera].push(p);
+    });
+
+    let millor = null;
+
+    Object.entries(perCarretera).forEach(([carr, pks]) => {
+        // Ordenar per PK
+        pks.sort((a, b) => a.pk - b.pk);
+
+        // Provar tots els parells consecutius
+        for (let i = 0; i < pks.length - 1; i++) {
+            const res = interpolarPK(userLat, userLon, pks[i], pks[i+1]);
+            if (res && (!millor || res.dist < millor.dist)) {
+                millor = res;
+            }
+        }
+
+        // Si només hi ha un punt, usem distància directa
+        if (pks.length === 1) {
+            const d = haversineM(userLat, userLon, pks[0].lat, pks[0].lon);
+            if (!millor || d < millor.dist) {
+                millor = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk % 1) * 1000), carretera: carr, dist: d };
+            }
+        }
+    });
+
+    return millor;
+}
+
+/* ============================================================
+   DETECCIÓ PC / GPS NO DISPONIBLE
+   ============================================================ */
+function detectarModePC() {
+    // Heurística: si l'user-agent és Windows/Mac/Linux sense mobile
+    const ua = navigator.userAgent.toLowerCase();
+    const esMobile = /android|iphone|ipad|ipod|mobile|tablet/i.test(ua);
+    return !esMobile;
+}
+
+/* ============================================================
+   FUNCIÓ PRINCIPAL — executarAutoPK()
+   Crida des del botó 🔍 del formulari
+   ============================================================ */
+async function executarAutoPK() {
+    if (_autopkRunning) return;
+
+    // Comprovar que hi ha camps PK / Carretera al formulari actual
+    const teCamps = fields.some(f => f.type === 'carretera' || f.type === 'pk');
+    if (!teCamps) {
+        showToast('⚠️ El formulari no té camps Carretera/PK');
+        return;
+    }
+
+    // Comprovar si el navegador suporta geolocalització
+    if (!navigator.geolocation) {
+        autopkMostrarEstat('error', '🚫', 'El navegador no admet geolocalització. Introdueix les dades manualment.');
+        showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
+        return;
+    }
+
+    autopkSetLoading(true);
+    autopkMostrarEstat('', '📡', 'Adquirint senyal GPS...');
+
+    navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+            const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+
+            autopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carretera més propera...`);
+
+            // Avisar si la precisió és molt dolenta (mode PC / xarxa mòbil)
+            if (accuracy > 200 && detectarModePC()) {
+                autopkSetLoading(false);
+                autopkMostrarEstat('warning', '💻',
+                    `Precisió GPS molt baixa (±${Math.round(accuracy)}m). Probablement estàs en un PC. Introdueix les dades manualment.`);
+                showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
+                return;
+            }
+
+            try {
+                let punts = [];
+                const bufferGraus = 0.04; // ~4km
+
+                // 1. Intentar primer amb cache local
+                const cacheLocal = cercarEnCache(lat, lon, bufferGraus);
+                if (cacheLocal.length > 0) {
+                    punts = cacheLocal;
+                    autopkMostrarEstat('', '💾', `Cache local: ${punts.length} PKs trobats. Calculant...`);
+                } else {
+                    // 2. Consultar ArcGIS en temps real
+                    autopkMostrarEstat('', '🌐', 'Consultant ArcGIS (Generalitat de Catalunya)...');
+                    punts = await consultarArcGIS(lat, lon, bufferGraus);
+                }
+
+                if (punts.length === 0) {
+                    // Buffer més gran (intent extra)
+                    autopkMostrarEstat('', '🔎', 'Ampliant zona de cerca...');
+                    punts = await consultarArcGIS(lat, lon, 0.10);
+                }
+
+                const resultat = calcularPKdePunts(lat, lon, punts);
+
+                if (!resultat) {
+                    autopkOmplirForaArea();
+                    autopkMostrarEstat('warning', '🏙️',
+                        'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa de carreteres.');
+                    showToast('🏙️ Zona Urbana o Fora d\'àrea — verificar posició');
+                } else if (resultat.dist > AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
+                    // Massa lluny de la carretera
+                    autopkOmplirForaArea();
+                    autopkMostrarEstat('warning', '⚠️',
+                        `Carretera més propera: ${resultat.carretera} (${Math.round(resultat.dist)}m). Fora de la zona de carretera (>${AUTOPK_CONFIG.LLINDAR_CARRETERA_M}m).`);
+                    showToast(`⚠️ Fora de l'àrea de la carretera (${Math.round(resultat.dist)}m)`);
+                } else {
+                    // ✅ Èxit! Omplir camps del formulari
+                    const msStr = String(resultat.m).padStart(3, '0');
+                    autopkOmplirCamps(resultat.carretera, resultat.km, resultat.m);
+                    autopkMostrarEstat('success', '✅',
+                        `${resultat.carretera}  •  PK ${resultat.km}+${msStr}  •  ±${Math.round(resultat.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
+                    showToast(`📍 ${resultat.carretera} — PK ${resultat.km}+${msStr}`);
+                }
+
+            } catch (err) {
+                console.error('[AutoPK] Error ArcGIS:', err);
+                // Intentar amb cache si la xarxa ha fallat
+                const cacheLocal = cercarEnCache(lat, lon, 0.10);
+                if (cacheLocal.length > 0) {
+                    const resultat = calcularPKdePunts(lat, lon, cacheLocal);
+                    if (resultat && resultat.dist <= AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
+                        const msStr = String(resultat.m).padStart(3, '0');
+                        autopkOmplirCamps(resultat.carretera, resultat.km, resultat.m);
+                        autopkMostrarEstat('warning', '📴',
+                            `Mode offline (cache). ${resultat.carretera} PK ${resultat.km}+${msStr} ±${Math.round(resultat.dist)}m`);
+                        showToast(`📴 Offline — ${resultat.carretera} PK ${resultat.km}+${msStr}`);
+                    } else {
+                        autopkOmplirForaArea();
+                        autopkMostrarEstat('warning', '📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
+                        showToast('📴 Sin connexió i sense cache per a aquesta zona');
+                    }
+                } else {
+                    autopkMostrarEstat('error', '🔴',
+                        `Error de connexió ArcGIS: ${err.message}. Ves a Configuració → Sincro PKs per descarregar dades offline.`);
+                    showToast('🔴 Error ArcGIS. Sincronitza les dades offline des de Configuració.');
+                }
+            }
+
+            autopkSetLoading(false);
+        },
+        (err) => {
+            autopkSetLoading(false);
+            let msg = '';
+            switch (err.code) {
+                case err.PERMISSION_DENIED:
+                    msg = 'Permís GPS denegat. Activa\'l a la configuració del navegador / dispositiu.';
+                    showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
+                    break;
+                case err.POSITION_UNAVAILABLE:
+                    msg = 'Posició no disponible. Comprova que el GPS del dispositiu està activat.';
+                    showToast('📡 GPS no disponible: Introdueix les dades manualment');
+                    break;
+                case err.TIMEOUT:
+                    msg = 'El GPS ha trigat massa. Intenta-ho en un lloc amb millor cobertura.';
+                    showToast('⏱️ Temps d\'espera GPS exhaurit');
+                    break;
+                default:
+                    msg = `Error GPS (${err.code}). Introdueix les dades manualment.`;
+                    showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
+            }
+            autopkMostrarEstat('error', '🚫', msg);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: AUTOPK_CONFIG.GPS_TIMEOUT,
+            maximumAge: AUTOPK_CONFIG.GPS_MAX_AGE,
+        }
+    );
+}
+
+/* ============================================================
+   SINCRONITZACIÓ PKs ARCGIS — Panell de Configuració
+   Descarrega tots els PKs de Catalunya i els guarda localment
+   ============================================================ */
+async function sincronitzarPKsArcGIS() {
+    const btn = document.getElementById('btnSyncroPKs');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ DESCARREGANT...'; }
+    actualizarUIMetaSyncro('pend', '⏳ Descarregant dades d\'ArcGIS...', null);
+    showSpinner('Descarregant PKs de Catalunya...');
+
+    // ArcGIS paginació: max 2000 per petició (sense token, 1000 típicament)
+    const RECORD_COUNT = 1000;
+    let offset = 0;
+    let totalPunts = [];
+    let seguit = true;
+    let errors = 0;
+
+    try {
+        while (seguit) {
+            const params = new URLSearchParams({
+                where: '1=1',
+                outFields: 'nombre,numero',   // camps reals del servei
+                returnGeometry: true,
+                outSR: '4326',
+                f: 'json',
+                resultRecordCount: RECORD_COUNT,
+                resultOffset: offset,
+            });
+            const url = `${AUTOPK_CONFIG.ARCGIS_URL}?${params}`;
+            const resp = await fetch(url, { signal: AbortSignal.timeout(30000) });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const json = await resp.json();
+            if (json.error) throw new Error(json.error.message || `Error ${json.error.code}`);
+
+            const features = json.features || [];
+            features.forEach(f => {
+                // nombre = nom de la carretera, numero = valor del PK (decimal)
+                if (f.geometry && f.attributes.nombre && f.attributes.numero != null) {
+                    const pkVal = parseFloat(f.attributes.numero);
+                    if (!isNaN(pkVal)) {
+                        totalPunts.push({
+                            carretera: f.attributes.nombre,
+                            pk: pkVal,
+                            lat: f.geometry.y,
+                            lon: f.geometry.x,
+                        });
+                    }
+                }
+            });
+
+            // ArcGIS indica si hi ha més pàgines
+            if (features.length < RECORD_COUNT || json.exceededTransferLimit === false) {
+                seguit = false;
+            } else {
+                offset += RECORD_COUNT;
+                actualizarUIMetaSyncro('pend',
+                    `Descarregant... ${totalPunts.length} PKs rebuts fins ara`, null);
+            }
+
+            // Màxim 20 pàgines (20k PKs) per seguretat
+            if (offset > 20000) { seguit = false; }
+        }
+
+        if (totalPunts.length === 0) throw new Error('Cap dada rebuda. Comprova la connexió.');
+
+        // Desar a localStorage
+        localStorage.setItem(AUTOPK_CONFIG.LS_KEY, JSON.stringify(totalPunts));
+        const meta = {
+            data: new Date().toLocaleString('ca-ES'),
+            total: totalPunts.length,
+        };
+        localStorage.setItem(AUTOPK_CONFIG.LS_META_KEY, JSON.stringify(meta));
+
+        actualizarUIMetaSyncro('ok',
+            `✅ ${totalPunts.length} PKs descarregats correctament`, meta);
+        showToast(`✅ ${totalPunts.length} PKs sincronitzats correctament`);
+
+    } catch (err) {
+        console.error('[AutoPK] Sincro error:', err);
+        actualizarUIMetaSyncro('error', `❌ Error: ${err.message}`, null);
+        showToast(`❌ Error de sincronització: ${err.message}`);
+    } finally {
+        hideSpinner();
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 SINCRO PKS ARCGIS'; }
+    }
+}
+
+function actualizarUIMetaSyncro(estat, text, meta) {
+    const badge = document.getElementById('syncroStatusBadge');
+    const info  = document.getElementById('syncroInfoText');
+    if (!badge) return;
+    badge.className = `syncro-pk-badge ${estat}`;
+    if (estat === 'ok') badge.textContent = `✅ ${meta ? meta.total + ' PKs' : 'Dades OK'}`;
+    else if (estat === 'error') badge.textContent = '❌ Error';
+    else badge.textContent = '⏳ En progrés';
+    if (info) info.textContent = text + (meta ? `  •  Última sync: ${meta.data}` : '');
+}
+
+/* Esborrar cache PKs */
+function esborrarCachePKs() {
+    if (!confirm('Segur que vols esborrar les dades de PKs descarregades?')) return;
+    localStorage.removeItem(AUTOPK_CONFIG.LS_KEY);
+    localStorage.removeItem(AUTOPK_CONFIG.LS_META_KEY);
+    actualizarUIMetaSyncro('pend', 'Cache esborrada. Pots tornar a sincronitzar.', null);
+    showToast('🗑️ Cache PKs esborrada');
+}
+
+/* Actualitzar UI del panell de Configuració en iniciar l'app */
+function autopkActualizarUIinici() {
+    const meta = autopkMeta();
+    const badge = document.getElementById('syncroStatusBadge');
+    const info  = document.getElementById('syncroInfoText');
+    if (!badge) return;
+    if (meta && meta.total) {
+        badge.className = 'syncro-pk-badge ok';
+        badge.textContent = `✅ ${meta.total} PKs`;
+        if (info) info.textContent = `Dades descarregades. Última sync: ${meta.data}`;
+    } else {
+        badge.className = 'syncro-pk-badge pend';
+        badge.textContent = '⏳ Sense dades';
+        if (info) info.textContent = 'Prem el botó per descarregar les dades. Pot trigar uns 20-40 segons.';
+    }
+}
+
+/* Hook d'inicialització — cridem quan la pàgina carrega */
+(function autopkInit() {
+    // Esperem que el DOM estigui llest i l'app inicialitzada
+    const ready = () => {
+        autopkAmagarEstat();
+        autopkActualizarUIinici();
+    };
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(ready, 300);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 300));
+    }
+})();
+
 </script>
-</body>
 </html>
