@@ -1,0 +1,64 @@
+/* ============================================================
+   fonts/barlow.css — Barlow font local (sense Google Fonts CDN)
+   Posa els fitxers .woff2 a la mateixa carpeta /fonts/
+   
+   Descarrega els .woff2 des de:
+   https://gwfh.mranftl.com/fonts/barlow?subsets=latin
+   (selecciona weights: 300, 400, 500, 600, 700, 900 + italic 400)
+   ============================================================ */
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./Barlow-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./Barlow-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./Barlow-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./Barlow-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./Barlow-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./Barlow-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./Barlow-Black.woff2') format('woff2');
+}
