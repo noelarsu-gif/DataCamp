@@ -1,0 +1,32 @@
+/* ============================================================
+   fonts/barlow-condensed.css — Barlow Condensed font local
+   Posa els fitxers .woff2 a la mateixa carpeta /fonts/
+   
+   Descarrega els .woff2 des de:
+   https://gwfh.mranftl.com/fonts/barlow-condensed?subsets=latin
+   (selecciona weights: 600, 700, 900)
+   ============================================================ */
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./BarlowCondensed-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./BarlowCondensed-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./BarlowCondensed-Black.woff2') format('woff2');
+}
