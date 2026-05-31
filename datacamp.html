@@ -7,20 +7,21 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#c60c30">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Leaflet — loaded async so it never blocks app startup -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin="" defer></script>
+    <!-- ── Fonts locals (sense CDN) ──────────────────────────── -->
+    <link rel="stylesheet" href="./fonts/barlow.css">
+    <link rel="stylesheet" href="./fonts/barlow-condensed.css">
+    <!-- ── Leaflet CSS local ──────────────────────────────────── -->
+    <link rel="stylesheet" href="./lib/leaflet/leaflet.css">
+    <link rel="stylesheet" href="./lib/leaflet/MarkerCluster.css">
+    <link rel="stylesheet" href="./lib/leaflet/MarkerCluster.Default.css">
+    <!-- ── JS libs locals — defer evita bloqueig del render ───── -->
+    <script src="./lib/sortable/Sortable.min.js" defer></script>
+    <script src="./lib/jspdf/jspdf.umd.min.js" defer></script>
+    <script src="./lib/jspdf/jspdf.plugin.autotable.min.js" defer></script>
+    <script src="./lib/xlsx/xlsx.full.min.js" defer></script>
+    <script src="./lib/jszip/jszip.min.js" defer></script>
+    <script src="./lib/leaflet/leaflet.js" defer></script>
+    <script src="./lib/leaflet/leaflet.markercluster.js" defer></script>
 <style>
 /* ============================================================
    DATACAMP ULTIMATE — CSS VARIABLES & RESET
@@ -6603,32 +6604,54 @@ function makeMarkerIcon(color) {
     });
 }
 
-/** Initialise the Leaflet map once (lazy — only when first opened) */
+/** Inicialitza el mapa Leaflet de forma segura (offline-safe).
+ *  — Si Leaflet no ha carregat (libs locals no trobades): banner elegant.
+ *  — Si no hi ha internet: mapa amb fons gris + avís, GPS segueix actiu.
+ *  — Si tot OK: mapa complet amb tiles OSM.
+ */
 function initLeafletMap() {
-    if (leafletMap) return;         // already initialised
+    if (leafletMap) return;   // ja inicialitzat
 
     const container = document.getElementById('mapContainer');
-    if (!container || typeof L === 'undefined') {
-        // Leaflet not yet loaded — retry after 500 ms
-        setTimeout(initLeafletMap, 500);
+    if (!container) return;
+
+    /* ── Leaflet no disponible (script no carregat) ──────────── */
+    if (typeof L === 'undefined') {
+        container.classList.remove('loading');
+        container.innerHTML = _buildOfflineMapBanner();
+        /* Reintenta cada 2 s (dona temps al SW per cachear les libs) */
+        setTimeout(initLeafletMap, 2000);
         return;
     }
 
     container.classList.remove('loading');
 
+    /* ── Crea el mapa ─────────────────────────────────────────── */
     leafletMap = L.map('mapContainer', {
-        center: [41.4, 1.6],       // Catalunya approximate centre
+        center: [41.4, 1.6],
         zoom: 8,
         zoomControl: true,
         attributionControl: true
     });
 
-    // OpenStreetMap tiles — no API key needed
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    /* ── Tiles OSM amb gestió d'error offline ─────────────────── */
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19
-    }).addTo(leafletMap);
+        maxZoom: 19,
+        errorTileUrl: _transparentTile()
+    });
 
+    let _tileErrorShown = false;
+    tileLayer.on('tileerror', () => {
+        if (!_tileErrorShown) { _tileErrorShown = true; _showOfflineMapNotice(); }
+    });
+
+    tileLayer.addTo(leafletMap);
+
+    /* Si ja estem offline en el moment d'obrir el mapa */
+    if (!navigator.onLine) _showOfflineMapNotice();
+
+    /* ── Cluster de marcadors ─────────────────────────────────── */
     markerCluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 50,
@@ -6643,8 +6666,74 @@ function initLeafletMap() {
         }
     });
     leafletMap.addLayer(markerCluster);
-
     renderMapMarkers();
+
+    /* ── Reactiva tiles quan torna la connexió ────────────────── */
+    window.addEventListener('online', () => {
+        _hideOfflineMapNotice();
+        if (leafletMap) {
+            leafletMap.eachLayer(layer => {
+                if (layer instanceof L.TileLayer) layer.redraw();
+            });
+        }
+    });
+    window.addEventListener('offline', _showOfflineMapNotice);
+}
+
+/* ── Banner gran quan Leaflet no ha pogut carregar ──────────────── */
+function _buildOfflineMapBanner() {
+    return `<div style="
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        height:100%;min-height:220px;
+        background:linear-gradient(135deg,#1e293b 0%,#111827 100%);
+        border-radius:12px;padding:32px 20px;text-align:center;color:white;">
+        <div style="font-size:2.8rem;margin-bottom:12px;">🗺️</div>
+        <div style="font-size:1rem;font-weight:700;margin-bottom:6px;color:#f0fdf4;">
+            Mapa en Mode Offline
+        </div>
+        <div style="font-size:0.82rem;color:#94a3b8;line-height:1.6;margin-bottom:16px;max-width:260px;">
+            El mapa visual no es pot carregar sense internet.<br>
+            <strong style="color:#fbbf24;">El GPS continua actiu</strong> — pots capturar
+            coordenades i usar l'Auto-PK normalment.
+        </div>
+        <div style="
+            background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);
+            border-radius:8px;padding:8px 16px;font-size:0.78rem;color:#6ee7b7;font-weight:600;">
+            📍 GPS actiu · Coordenades disponibles
+        </div>
+        <div style="margin-top:12px;font-size:0.72rem;color:#475569;">
+            Els marcadors es mostraran quan es recuperi la connexió
+        </div>
+    </div>`;
+}
+
+/* ── Avís subtil (control Leaflet) quan els tiles OSM no carreguen ─ */
+let _offlineMapNotice = null;
+function _showOfflineMapNotice() {
+    if (_offlineMapNotice || !leafletMap) return;
+    const notice = L.control({ position: 'topright' });
+    notice.onAdd = () => {
+        const div = L.DomUtil.create('div');
+        div.innerHTML = `<div style="
+            background:rgba(30,41,59,0.92);color:white;border-radius:10px;
+            padding:8px 14px;font-size:0.75rem;font-weight:600;
+            display:flex;align-items:center;gap:6px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.4);backdrop-filter:blur(4px);">
+            <span>📴</span>
+            <span>Tiles offline — <strong style="color:#6ee7b7;">GPS actiu</strong></span>
+        </div>`;
+        return div;
+    };
+    notice.addTo(leafletMap);
+    _offlineMapNotice = notice;
+}
+function _hideOfflineMapNotice() {
+    if (_offlineMapNotice) { _offlineMapNotice.remove(); _offlineMapNotice = null; }
+}
+
+/* ── PNG 1×1 transparent com a tile fallback ─────────────────────── */
+function _transparentTile() {
+    return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAABjE+ibYAAAAASUVORK5CYII=';
 }
 
 /** Render/re-render all markers based on active category filters */
@@ -7325,6 +7414,59 @@ function autopkActualizarUIinici() {
         document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 300));
     }
 })();
+
+/* ============================================================
+   SERVICE WORKER — Registre i indicador offline
+   Ruta ajustada per a GitHub Pages: /DataCamp/
+   ============================================================ */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/DataCamp/sw.js', { scope: '/DataCamp/' })
+            .then(reg => {
+                console.log('[App] SW registrat. Scope:', reg.scope);
+                /* Avisa quan hi ha una nova versió de l'app disponible */
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            showToast('🔄 Nova versió disponible — refresca per actualitzar');
+                        }
+                    });
+                });
+            })
+            .catch(err => console.warn('[App] SW no registrat:', err));
+    });
+}
+
+/* ── Badge "📴 MODE OFFLINE" a la barra superior ─────────────── */
+function _updateOnlineBadge() {
+    let badge = document.getElementById('_offlineBadge');
+    if (!navigator.onLine) {
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.id = '_offlineBadge';
+            badge.style.cssText = [
+                'position:fixed;top:0;left:50%;transform:translateX(-50%)',
+                'background:#92400e;color:white;font-size:0.72rem;font-weight:700',
+                'padding:3px 16px;border-radius:0 0 8px 8px;z-index:9999',
+                'letter-spacing:0.04em;pointer-events:none'
+            ].join(';');
+            badge.textContent = '📴 MODE OFFLINE';
+            document.body.appendChild(badge);
+        }
+        badge.style.display = 'block';
+    } else {
+        if (badge) badge.style.display = 'none';
+    }
+}
+window.addEventListener('online',  _updateOnlineBadge);
+window.addEventListener('offline', _updateOnlineBadge);
+/* Comprova l'estat inicial una vegada el DOM és llest */
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(_updateOnlineBadge, 200);
+} else {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(_updateOnlineBadge, 200));
+}
 
 </script>
 </html>
