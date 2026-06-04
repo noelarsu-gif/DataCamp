@@ -1783,20 +1783,23 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex;
     flex-direction: column;
     gap: 8px;
-    z-index: 99;
+    z-index: 9999;
 }
 .btn-scroll {
     background: var(--dark);
     color: white;
-    width: 38px; height: 38px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     border: none;
     box-shadow: var(--shadow-md);
     cursor: pointer;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     transition: var(--transition);
-    opacity: 0.8;
+    opacity: 0.82;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn-scroll:hover { opacity: 1; }
 
@@ -2740,6 +2743,174 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 /* ============================================================
+   ANNEX RICH-TEXT EDITOR
+   ============================================================ */
+.annex-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px;
+    background: var(--surface);
+    border: 1.5px solid var(--cat-annex-bd);
+    border-bottom: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    padding: 5px 6px;
+}
+.atb-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 7px;
+    font-family: var(--font);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dark);
+    cursor: pointer;
+    line-height: 1.3;
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+}
+.atb-btn:hover {
+    background: var(--cat-annex-lt);
+    border-color: var(--cat-annex-bd);
+    color: var(--cat-annex);
+}
+.atb-btn-primary {
+    background: var(--cat-annex-lt);
+    border-color: var(--cat-annex-bd);
+    color: var(--cat-annex);
+    font-weight: 700;
+}
+.atb-btn-danger {
+    color: var(--danger, #dc2626);
+}
+.atb-btn-danger:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+.atb-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 3px;
+    flex-shrink: 0;
+}
+.annex-editor {
+    min-height: 180px;
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1.5px solid var(--cat-annex-bd);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: 10px 12px;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--dark);
+    background: #fff;
+    outline: none;
+    box-sizing: border-box;
+}
+.annex-editor:focus {
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    border-color: var(--cat-annex);
+}
+.annex-editor:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    pointer-events: none;
+    font-style: italic;
+}
+/* Tables inside the editor */
+.annex-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+    font-size: 0.85rem;
+}
+.annex-editor td, .annex-editor th {
+    border: 1.5px solid #a78bfa;
+    padding: 5px 8px;
+    min-width: 40px;
+    vertical-align: top;
+}
+.annex-editor tr:first-child td {
+    background: #f5f3ff;
+    font-weight: 600;
+}
+
+/* ============================================================
+   ANNEX / RESUM — element especial dins la llista de registres
+   ============================================================ */
+:root {
+    --cat-annex:      #7c3aed;
+    --cat-annex-lt:   #f5f3ff;
+    --cat-annex-bd:   #ddd6fe;
+}
+
+.reg-item.is-annex {
+    border-color: var(--cat-annex-bd);
+    background: var(--cat-annex-lt);
+}
+.reg-item.is-annex .reg-title { color: var(--cat-annex); }
+.reg-item.is-annex .thumb-placeholder {
+    background: var(--cat-annex-lt);
+    border-color: var(--cat-annex-bd);
+    color: var(--cat-annex);
+}
+
+/* Inline annex form (shown below the button) */
+.annex-form-inline {
+    background: var(--cat-annex-lt);
+    border: 1.5px solid var(--cat-annex-bd);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    animation: fadeSlide 0.22s ease;
+}
+.annex-form-inline label {
+    color: var(--cat-annex);
+}
+.annex-form-inline input:focus,
+.annex-form-inline textarea:focus {
+    border-color: var(--cat-annex);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+.btn-annex {
+    background: var(--cat-annex-lt);
+    color: var(--cat-annex);
+    border: 1.5px solid var(--cat-annex-bd);
+}
+.btn-annex:hover {
+    background: var(--cat-annex-bd);
+}
+
+/* Badge for annex type in lists */
+.annex-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--cat-annex-lt);
+    color: var(--cat-annex);
+    border: 1px solid var(--cat-annex-bd);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Custom field group — subtle dashed left border */
+.custom-field-group {
+    border-left: 3px dashed var(--border);
+    padding-left: 10px;
+    background: transparent;
+}
+.custom-field-group label { color: var(--text-muted); }
+
+/* ============================================================
    OBRA MANAGEMENT — closure controls
    ============================================================ */
 .obra-closed-banner {
@@ -3209,6 +3380,43 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <div id="dynamicFields"></div>
 
+                <!-- CAMP PERSONALITZAT INLINE ─────────────────────── -->
+                <div id="campPersonalitzatForm" style="display:none;
+                     background:var(--surface-2,#f8f8f8);
+                     border:1.5px dashed var(--border);
+                     border-radius:var(--radius);
+                     padding:14px 14px 10px;
+                     margin-bottom:12px;
+                     animation:fadeSlide 0.2s ease;">
+                    <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);
+                                text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
+                        ➕ Nou camp personalitzat
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Nom del camp</label>
+                        <input type="text" id="campNomInput"
+                               placeholder="Ex: Amplada de calçada, Tipus de ferm…"
+                               style="font-family:var(--font);"
+                               onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarCampPersonalitzat();}">
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primary btn-sm"
+                                style="flex:1;margin:0;"
+                                onclick="confirmarCampPersonalitzat()">✔ Afegir camp</button>
+                        <button class="btn btn-ghost btn-sm"
+                                style="flex:1;margin:0;"
+                                onclick="tancarFormCampPersonalitzat()">✕ Cancel·lar</button>
+                    </div>
+                </div>
+                <button id="btnAfegirCampPersonalitzat"
+                        class="btn btn-ghost btn-sm"
+                        style="width:100%;margin:0 0 12px;border-style:dashed;
+                               color:var(--text-muted);font-size:0.82rem;"
+                        onclick="obrirFormCampPersonalitzat()">
+                    ➕ Afegir camp personalitzat
+                </button>
+                <!-- ─────────────────────────────────────────────────── -->
+
                 <div class="watermark-row">
                     <div class="watermark-row-info">
                         <span class="watermark-row-icon">📝</span>
@@ -3236,32 +3444,95 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <input type="file" id="fGal" multiple accept="image/*" onchange="handleFotos(this)" style="display:none">
                 </div>
 
-                <button class="btn btn-primary" onclick="saveReg()">💾 GUARDAR REGISTRE</button>
-                <button id="btnCancelarEdicio" class="btn btn-danger" style="display:none;" onclick="cancelarEdicio()">❌ CANCEL·LAR EDICIÓ</button>
+                <button class="btn btn-primary" style="width:100%;margin:0 0 10px;" onclick="saveReg()">💾 GUARDAR REGISTRE</button>
+                <button id="btnCancelarEdicio" class="btn btn-danger" style="display:none;width:100%;margin:0 0 10px;" onclick="cancelarEdicio()">❌ CANCEL·LAR EDICIÓ</button>
 
                 <button class="pts-count-btn" onclick="renderRegs(); ir('puntsLlistat')">
                     <span>📋 PUNTS RECOLLITS:</span>
                     <span id="regCountBtn" style="color:var(--primary); font-size:1.3rem;">0</span>
                 </button>
-                <button class="btn btn-ghost" onclick="ir('home')">⬅️ Menú Principal</button>
+                <button class="btn btn-ghost" style="width:100%;margin:0;" onclick="ir('home')">⬅️ Menú Principal</button>
             </div>
 
-            <!-- ================================================
-                 PUNTS LLISTAT
-                 ================================================ -->
             <div id="puntsLlistat" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="goBackFromPunts()">&#8592;</button>
                     <h3>&#128205; Punts Recollits</h3>
                 </div>
+
+                <!-- ANNEX INLINE FORM (hidden by default) -->
+                <div id="annexFormInline" class="annex-form-inline" style="display:none;">
+                    <div class="form-group">
+                        <label>📄 Títol de l'Annex</label>
+                        <input type="text" id="annexTitol" placeholder="Ex: Annex 1 — Resum de l'estat del paviment">
+                    </div>
+                    <div class="form-group">
+                        <label>Contingut de l'Annex</label>
+
+                        <!-- RICH TEXT TOOLBAR -->
+                        <div class="annex-toolbar" id="annexToolbar">
+                            <!-- Inline formats -->
+                            <button type="button" class="atb-btn" title="Negreta (Ctrl+B)"
+                                    onmousedown="event.preventDefault();document.execCommand('bold')"><b>B</b></button>
+                            <button type="button" class="atb-btn" title="Cursiva (Ctrl+I)"
+                                    onmousedown="event.preventDefault();document.execCommand('italic')"><i>I</i></button>
+                            <button type="button" class="atb-btn" title="Subratllat"
+                                    onmousedown="event.preventDefault();document.execCommand('underline')"><u>U</u></button>
+                            <div class="atb-sep"></div>
+                            <!-- Text align -->
+                            <button type="button" class="atb-btn" title="Alinear esquerra"
+                                    onmousedown="event.preventDefault();document.execCommand('justifyLeft')">⬅</button>
+                            <button type="button" class="atb-btn" title="Centrar"
+                                    onmousedown="event.preventDefault();document.execCommand('justifyCenter')">☰</button>
+                            <div class="atb-sep"></div>
+                            <!-- Lists -->
+                            <button type="button" class="atb-btn" title="Llista de punts"
+                                    onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• —</button>
+                            <div class="atb-sep"></div>
+                            <!-- Table ops -->
+                            <button type="button" class="atb-btn atb-btn-primary" title="Inserir taula"
+                                    onclick="annexInsertTable()">⊞ Taula</button>
+                            <button type="button" class="atb-btn" title="Afegir fila a la taula activa"
+                                    onclick="annexAddRow()">+ Fila</button>
+                            <button type="button" class="atb-btn atb-btn-danger" title="Treure última fila"
+                                    onclick="annexRemoveRow()">− Fila</button>
+                            <button type="button" class="atb-btn" title="Afegir columna a la taula activa"
+                                    onclick="annexAddCol()">+ Col</button>
+                            <button type="button" class="atb-btn atb-btn-danger" title="Treure última columna"
+                                    onclick="annexRemoveCol()">− Col</button>
+                            <button type="button" class="atb-btn atb-btn-danger" title="Eliminar taula activa"
+                                    onclick="annexDelTable()">✕ Taula</button>
+                            <div class="atb-sep"></div>
+                            <!-- Clear -->
+                            <button type="button" class="atb-btn" title="Eliminar format"
+                                    onmousedown="event.preventDefault();document.execCommand('removeFormat')">T̶</button>
+                        </div>
+
+                        <!-- CONTENTEDITABLE EDITOR -->
+                        <div id="annexEditor"
+                             class="annex-editor"
+                             contenteditable="true"
+                             spellcheck="true"
+                             data-placeholder="Escriu aquí el contingut de l'annex. Pots afegir text enriquit i taules…"
+                        ></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <button class="btn btn-annex btn-sm" style="width:100%;margin:0;" onclick="guardarAnnex()">💾 Guardar Annex</button>
+                        <button class="btn btn-ghost btn-sm" style="width:100%;margin:0;" onclick="tancarFormAnnex()">✕ Cancel·lar</button>
+                    </div>
+                </div>
+
                 <div id="regList"></div>
                 <div class="scroll-btns">
                     <button class="btn-scroll" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
                     <button class="btn-scroll" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;">
-                    <button class="btn btn-ghost" onclick="goBackFromPunts()">&#8592; Tornar al detall</button>
-                    <button class="btn btn-primary" onclick="ir('form')">&#9998; Editar formulari</button>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
+                    <button class="btn btn-primary" style="width:100%;margin:0;" onclick="ir('form')">&#9998; Editar formulari</button>
+                    <button class="btn btn-ghost" style="width:100%;margin:0;" onclick="goBackFromPunts()">&#8592; Tornar al detall</button>
+                </div>
+                <div style="margin-top:10px;">
+                    <button class="btn btn-annex btn-sm" style="width:100%;margin:0;" onclick="obrirFormAnnex()">➕ Afegir Annex / Resum</button>
                 </div>
             </div>
 
@@ -3357,6 +3628,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div class="screen-header">
                     <button class="btn-back" onclick="goBackFromDetail()">&#8592;</button>
                     <h3 id="detailScreenTitle">Detall</h3>
+                    <div id="detailHeaderActions" style="display:flex;gap:6px;margin-left:auto;flex-shrink:0;"></div>
                 </div>
                 <div id="detailContent"></div>
             </div>
@@ -3677,7 +3949,7 @@ window.onload = () => {
                 let nousRegs = [];
                 document.querySelectorAll('#regList .reg-item').forEach(el => {
                     const idx = parseInt(el.getAttribute('data-idx'));
-                    if (!isNaN(idx) && regs[idx]) nousRegs.push(regs[idx]);
+                    if (!isNaN(idx) && regs[idx] !== undefined) nousRegs.push(regs[idx]);
                 });
                 if (nousRegs.length === regs.length) {
                     regs = nousRegs;
@@ -3749,6 +4021,8 @@ let detailScrollY = 0;     // remember scroll position in historial
 
 /** Back from projectDetail → go to wherever we came from */
 function goBackFromDetail() {
+    const headerActions = document.getElementById('detailHeaderActions');
+    if (headerActions) headerActions.innerHTML = '';
     if (navFrom === 'home') {
         ir('home');
     } else {
@@ -3967,6 +4241,23 @@ function renderForm() {
         if (f.type === 'pk')        return `<div class="form-group"><label>${f.label}</label><div class="pk-row"><input type="number" class="pk-km" data-idx="${i}" placeholder="Km"> <b>+</b> <input type="number" class="pk-m" data-idx="${i}" placeholder="m" onblur="if(this.value!='')this.value=this.value.padStart(3,'0')"></div></div>`;
         if (f.type === 'marge')     return `<div class="form-group"><label>${f.label}</label><select class="dyn-marge" data-idx="${i}"><option>MD</option><option>ME</option><option>Eix</option></select></div>`;
         if (f.type === 'text' || f.type === 'obs') return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-input dyn-obs" data-idx="${i}" rows="2" style="font-family:var(--font)"></textarea></div>`;
+        if (f.type === 'custom')    return `
+            <div class="form-group custom-field-group" data-idx="${i}">
+                <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="display:flex;align-items:center;gap:5px;">
+                        <span style="font-size:0.8rem;opacity:0.6;">✏️</span>
+                        ${f.label}
+                    </span>
+                    <button type="button"
+                            style="flex-shrink:0;padding:2px 7px;font-size:0.68rem;line-height:1.4;
+                                   background:transparent;border:1px solid var(--border-dark);
+                                   border-radius:4px;color:var(--text-muted);cursor:pointer;
+                                   font-family:var(--font);white-space:nowrap;"
+                            onclick="eliminarCampPersonalitzat(${i})">✕ treure</button>
+                </label>
+                <input type="text" class="dyn-input dyn-custom" data-idx="${i}"
+                       placeholder="${f.label}…" style="font-family:var(--font);">
+            </div>`;
     }).join('');
 }
 
@@ -3983,7 +4274,7 @@ async function saveReg() {
     fields.forEach((f, i) => {
         let val = "";
         const el = document.querySelector(`[data-idx="${i}"]`);
-        if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs') {
+        if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs' || f.type === 'custom') {
             val = el ? el.value : "";
         } else if (f.type === 'pk') {
             const kms = document.querySelector(`.pk-km[data-idx="${i}"]`)?.value || "0";
@@ -4108,6 +4399,30 @@ function renderRegs() {
     }
 
     list.innerHTML = regs.map((r, i) => {
+        // ── ANNEX / RESUM ─────────────────────────────────────────
+        if (r.isAnnex) {
+            const rawText = r.annexText
+                ? (new DOMParser().parseFromString(r.annexText,'text/html').body.textContent || '')
+                : '';
+            const previewText = rawText.length > 80 ? rawText.slice(0, 78) + '…' : (rawText || '(Sense contingut)');
+            const hasTable = r.annexText && r.annexText.includes('<table');
+            return `
+        <div class="reg-item is-annex" data-idx="${i}">
+            <div class="drag-handle">≡</div>
+            <div class="thumb-placeholder" style="font-size:1.6rem;">${hasTable ? '📊' : '📄'}</div>
+            <div class="reg-info">
+                <div class="reg-title">${r.annexTitol || 'Annex sense títol'}</div>
+                <div class="reg-sub" style="white-space:normal;line-height:1.35;">${previewText}</div>
+                <div class="annex-badge">${hasTable ? '📊 Annex amb taula' : '📄 Annex / Resum'}</div>
+            </div>
+            <div class="actions">
+                <button onclick="editarAnnex(${i})" title="Editar annex">✏️</button>
+                <button onclick="eliminarPunt(${i})" title="Eliminar">🗑️</button>
+            </div>
+        </div>`;
+        }
+
+        // ── REGISTRE NORMAL ───────────────────────────────────────
         const carreteraVal = r.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "—";
         const pkVal        = r.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "—";
         const margeVal     = r.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
@@ -4143,6 +4458,263 @@ function eliminarPunt(i) {
     }
 }
 
+/* ============================================================
+   ANNEX / RESUM — gestió d'elements d'anotació lliure
+   ============================================================ */
+
+/** Obre el formulari inline d'annex i fa scroll fins a ell */
+function obrirFormAnnex() {
+    const form = document.getElementById('annexFormInline');
+    if (!form) return;
+    delete form.dataset.editIdx;
+    form.style.display = 'block';
+    document.getElementById('annexTitol').value = '';
+    const ed = document.getElementById('annexEditor');
+    if (ed) ed.innerHTML = '';
+    setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    document.getElementById('annexTitol').focus();
+}
+
+/** Tanca el formulari inline sense desar */
+function tancarFormAnnex() {
+    const form = document.getElementById('annexFormInline');
+    const ed   = document.getElementById('annexEditor');
+    if (!form) return;
+    form.style.display = 'none';
+    if (ed) ed.innerHTML = '';
+    delete form.dataset.editIdx;
+}
+
+/** Obre el formulari pre-omplert per editar un annex existent */
+function editarAnnex(i) {
+    const r = regs[i];
+    if (!r || !r.isAnnex) return;
+    const form = document.getElementById('annexFormInline');
+    if (!form) return;
+    form.dataset.editIdx = String(i);
+    document.getElementById('annexTitol').value = r.annexTitol || '';
+    const ed = document.getElementById('annexEditor');
+    if (ed) ed.innerHTML = r.annexText || '';
+    form.style.display = 'block';
+    setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    document.getElementById('annexTitol').focus();
+}
+
+/** Desa l'annex (nou o editat) al array regs[] i a IndexedDB */
+function guardarAnnex() {
+    const form  = document.getElementById('annexFormInline');
+    const editI = (form && form.dataset.editIdx !== undefined && form.dataset.editIdx !== '')
+                  ? parseInt(form.dataset.editIdx, 10) : -1;
+
+    const titol = document.getElementById('annexTitol').value.trim();
+    const ed    = document.getElementById('annexEditor');
+    const htmlContent = ed ? ed.innerHTML.trim() : '';
+
+    if (!titol) { alert("Cal posar un títol a l'annex."); return; }
+
+    const annexReg = {
+        isAnnex:    true,
+        annexTitol: titol,
+        annexText:  htmlContent,   // HTML ric (pot contenir <table>, <b>, etc.)
+        values:     [],
+        fotos:      [],
+        timestamp:  (editI > -1 && regs[editI]) ? (regs[editI].timestamp || Date.now()) : Date.now()
+    };
+
+    if (editI > -1) {
+        regs[editI] = annexReg;
+    } else {
+        regs.push(annexReg);
+    }
+
+    const titolProjecte = document.getElementById('titulo').value;
+    if (titolProjecte) actualizarDB(titolProjecte);
+    tancarFormAnnex();
+    renderRegs();
+    showToast(editI > -1 ? "📄 Annex actualitzat" : "📄 Annex afegit correctament");
+    if (editI === -1) {
+        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 150);
+    }
+}
+
+/* ── Table helpers for the annex rich editor ─────────────────── */
+
+/** Returns the <table> element that currently contains the caret, or null */
+function _annexActiveTable() {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    let node = sel.getRangeAt(0).commonAncestorContainer;
+    while (node && node !== document) {
+        if (node.nodeName === 'TABLE') return node;
+        node = node.parentNode;
+    }
+    return null;
+}
+
+/** Insert a table at the current caret position, asking user for dimensions */
+function annexInsertTable() {
+    const ed = document.getElementById('annexEditor');
+    if (!ed) return;
+
+    // Ask dimensions with a small inline dialog
+    const rowsStr = prompt('Nombre de files:', '3');
+    if (rowsStr === null) return;
+    const colsStr = prompt('Nombre de columnes:', '3');
+    if (colsStr === null) return;
+
+    const rows = Math.max(1, Math.min(20, parseInt(rowsStr) || 3));
+    const cols = Math.max(1, Math.min(10, parseInt(colsStr) || 3));
+
+    ed.focus();
+    let html = '<table border="1" style="border-collapse:collapse;width:100%;margin:8px 0;">';
+    for (let r = 0; r < rows; r++) {
+        html += '<tr>';
+        for (let c = 0; c < cols; c++) {
+            const tag = r === 0 ? 'th' : 'td';
+            html += `<${tag} style="border:1.5px solid #a78bfa;padding:5px 8px;min-width:40px;background:${r===0?'#f5f3ff':'#fff'}">${r===0?'Cap '+(c+1):''}</${tag}>`;
+        }
+        html += '</tr>';
+    }
+    html += '</table><p><br></p>';
+    document.execCommand('insertHTML', false, html);
+}
+
+/** Add a row to the table that currently contains the caret */
+function annexAddRow() {
+    const tbl = _annexActiveTable();
+    if (!tbl) { showToast("⚠️ Fes clic dins d'una taula primer"); return; }
+    const nCols = tbl.rows[0]?.cells.length || 1;
+    const tr    = tbl.insertRow();
+    for (let c = 0; c < nCols; c++) {
+        const td = tr.insertCell();
+        td.style.cssText = 'border:1.5px solid #a78bfa;padding:5px 8px;min-width:40px;';
+        td.innerHTML     = '';
+    }
+    showToast("✅ Fila afegida");
+}
+
+/** Remove the last row of the active table */
+function annexRemoveRow() {
+    const tbl = _annexActiveTable();
+    if (!tbl) { showToast("⚠️ Fes clic dins d'una taula primer"); return; }
+    if (tbl.rows.length <= 1) { showToast("⚠️ La taula ha de tenir almenys 1 fila"); return; }
+    tbl.deleteRow(tbl.rows.length - 1);
+    showToast("🗑️ Última fila eliminada");
+}
+
+/** Add a column to the table that currently contains the caret */
+function annexAddCol() {
+    const tbl = _annexActiveTable();
+    if (!tbl) { showToast("⚠️ Fes clic dins d'una taula primer"); return; }
+    Array.from(tbl.rows).forEach((tr, ri) => {
+        const cell = ri === 0 ? document.createElement('th') : document.createElement('td');
+        cell.style.cssText = `border:1.5px solid #a78bfa;padding:5px 8px;min-width:40px;background:${ri===0?'#f5f3ff':'#fff'}`;
+        cell.innerHTML     = '';
+        tr.appendChild(cell);
+    });
+    showToast("✅ Columna afegida");
+}
+
+/** Remove the last column of the active table */
+function annexRemoveCol() {
+    const tbl = _annexActiveTable();
+    if (!tbl) { showToast("⚠️ Fes clic dins d'una taula primer"); return; }
+    const nCols = tbl.rows[0]?.cells.length || 0;
+    if (nCols <= 1) { showToast("⚠️ La taula ha de tenir almenys 1 columna"); return; }
+    Array.from(tbl.rows).forEach(tr => {
+        if (tr.cells.length > 0) tr.deleteCell(tr.cells.length - 1);
+    });
+    showToast("🗑️ Última columna eliminada");
+}
+
+/** Remove the table that currently contains the caret */
+function annexDelTable() {
+    const tbl = _annexActiveTable();
+    if (!tbl) { showToast("⚠️ Fes clic dins d'una taula primer"); return; }
+    if (!confirm("Eliminar aquesta taula?")) return;
+    tbl.remove();
+    showToast("🗑️ Taula eliminada");
+}
+
+/* ============================================================
+   CAMPS PERSONALITZATS — afegir camps extra al formulari actiu
+   ============================================================ */
+
+/** Mostra el formulari inline per afegir un camp custom */
+function obrirFormCampPersonalitzat() {
+    const form = document.getElementById('campPersonalitzatForm');
+    const btn  = document.getElementById('btnAfegirCampPersonalitzat');
+    if (!form) return;
+    form.style.display = 'block';
+    if (btn) btn.style.display = 'none';
+    const inp = document.getElementById('campNomInput');
+    if (inp) { inp.value = ''; inp.focus(); }
+}
+
+/** Amaga el formulari sense desar */
+function tancarFormCampPersonalitzat() {
+    const form = document.getElementById('campPersonalitzatForm');
+    const btn  = document.getElementById('btnAfegirCampPersonalitzat');
+    if (form) form.style.display = 'none';
+    if (btn)  btn.style.display  = '';
+}
+
+/** Confirma i afegeix el camp custom a fields[], actualitza DB i re-renderitza */
+function confirmarCampPersonalitzat() {
+    const inp  = document.getElementById('campNomInput');
+    const nom  = inp ? inp.value.trim() : '';
+    if (!nom) { alert("Cal posar un nom al camp."); return; }
+
+    // Evitar duplicats de nom
+    if (fields.some(f => f.label.toLowerCase() === nom.toLowerCase())) {
+        alert(`Ja existeix un camp anomenat "${nom}".`); return;
+    }
+
+    fields.push({ type: 'custom', label: nom });
+
+    // Propagar el camp buit als registres existents que no el tinguin
+    regs.forEach(r => {
+        if (r.isAnnex) return;
+        const jaTe = r.values.some(v => v.label.toLowerCase() === nom.toLowerCase());
+        if (!jaTe) r.values.push({ label: nom, val: '' });
+    });
+
+    const titol = document.getElementById('titulo').value;
+    if (titol) actualizarDB(titol);
+
+    tancarFormCampPersonalitzat();
+    renderForm();
+    showToast(`✏️ Camp "${nom}" afegit al formulari`);
+
+    // Focus al nou camp
+    setTimeout(() => {
+        const idx  = fields.length - 1;
+        const nouEl = document.querySelector(`.dyn-input[data-idx="${idx}"]`);
+        if (nouEl) nouEl.focus();
+    }, 80);
+}
+
+/** Elimina un camp custom de fields[] i esborra el valor dels registres existents */
+function eliminarCampPersonalitzat(fIdx) {
+    const f = fields[fIdx];
+    if (!f) return;
+    if (!confirm(`Treure el camp "${f.label}" del formulari?\n\nEls valors ja guardats als registres existents es perdran.`)) return;
+
+    const nom = f.label;
+    fields.splice(fIdx, 1);
+
+    regs.forEach(r => {
+        if (r.isAnnex) return;
+        r.values = r.values.filter(v => v.label.toLowerCase() !== nom.toLowerCase());
+    });
+
+    const titol = document.getElementById('titulo').value;
+    if (titol) actualizarDB(titol);
+
+    renderForm();
+    showToast(`🗑️ Camp "${nom}" eliminat`);
+}
+
 function loadE(i) {
     editIdx = i;
     const r = regs[i];
@@ -4150,7 +4722,7 @@ function loadE(i) {
     fields.forEach((f, fIdx) => {
         const item = r.values.find(v => v.label.toLowerCase() === f.label.toLowerCase()) || r.values[fIdx];
         if (!item) return;
-        if (f.type === 'text' || f.type === 'carretera') {
+        if (f.type === 'text' || f.type === 'carretera' || f.type === 'custom') {
             const el = document.querySelector(`.dyn-input[data-idx="${fIdx}"]`);
             if (el) el.value = item.val;
         }
@@ -4499,6 +5071,16 @@ function obrirDetallProjecte(id, origin) {
     const entries = [];
     if (p.fecha_inicio) entries.push({ ts: new Date(p.fecha_inicio).getTime(), type:'start', label:"Inici d'obra", sub: p.fecha_inicio });
     (p.registros || []).forEach((r, i) => {
+        if (r.isAnnex) {
+            const _pt = r.annexText
+                ? (new DOMParser().parseFromString(r.annexText,'text/html').body.textContent||'').trim()
+                : '';
+            entries.push({ ts: r.timestamp || p.timestamp || Date.now(), type:'annex',
+                label:`📄 ${r.annexTitol || 'Annex sense títol'}`,
+                sub: _pt ? (_pt.length > 60 ? _pt.slice(0,58)+'…' : _pt) : '',
+                regTipus: tipus });
+            return;
+        }
         const carr = r.values?.find(v => v.label.toLowerCase().includes('carretera'))?.val || '';
         const pk   = r.values?.find(v => v.label.toLowerCase().includes('pk'))?.val || '';
         const nf   = r.fotos?.length || 0;
@@ -4593,7 +5175,7 @@ function obrirDetallProjecte(id, origin) {
 
     // ── Timeline HTML ───────────────────────────────────────────
     const tlHTML = entries.map(e => {
-        const dotCls = e.type==='start'?'start':e.type==='end'?'end':`cat-${getCatClass(e.regTipus||tipus)}`;
+        const dotCls = e.type==='start'?'start':e.type==='end'?'end':e.type==='annex'?'cat-inventari':`cat-${getCatClass(e.regTipus||tipus)}`;
         const dateStr = e.ts ? new Date(e.ts).toLocaleDateString('ca-ES') : '';
         return `<div class="timeline-item">
             <div class="timeline-dot ${dotCls}"></div>
@@ -4620,19 +5202,24 @@ function obrirDetallProjecte(id, origin) {
         ${obraBlock}
 
         <div class="section-title" style="margin:14px 0 12px;">&#9201; Línia de temps</div>
-        <div class="timeline">${tlHTML||'<p style="color:var(--text-muted);font-size:0.85rem;">Cap activitat registrada</p>'}</div>
+        <div class="timeline">${tlHTML||'<p style="color:var(--text-muted);font-size:0.85rem;">Cap activitat registrada</p>'}</div>`;
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;">
-            ${tipus!=='captura'?`<button class="btn btn-primary btn-sm" style="grid-column:1/-1;" onclick="openPFromDetail('${id}')">&#128194; OBRIR PROJECTE</button>`:''}
-            ${mapBtn}
-            <button class="btn btn-ghost btn-sm" onclick="clonarP('${id}')">&#128260; CLONAR</button>
-            <button class="btn btn-danger btn-sm" onclick="borrarP('${id}');goBackFromDetail()">&#128465; ELIMINAR</button>
-        </div>
-        <div style="margin-top:10px;">
-            <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--text-muted);font-size:0.8rem;" onclick="ir('downloads')">
-                &#128229; Anar a Desc&#224;rregues per exportar PDF / Excel / ZIP
-            </button>
-        </div>`;
+    // Header actions — always visible, never scroll needed
+    const headerActions = document.getElementById('detailHeaderActions');
+    if (headerActions) {
+        headerActions.innerHTML = `
+            ${tipus!=='captura'?`
+            <button class="btn btn-primary btn-sm"
+                    style="padding:7px 13px;font-size:0.8rem;gap:5px;"
+                    onclick="openPFromDetail('${id}')">
+                ✏️ Editar
+            </button>`:''}
+            <button class="btn btn-ghost btn-sm"
+                    style="padding:7px 10px;font-size:0.85rem;"
+                    onclick="ir('downloads')" title="Exportar PDF / Excel / ZIP">
+                📥
+            </button>`;
+    }
 
     ir('projectDetail');
 }
@@ -5145,14 +5732,16 @@ function carregarLlistaDescargues() {
 }
 
 function _projMeta(p) {
-    const carr   = (p.registros||[]).flatMap(r=>r.values||[])
+    const carr   = (p.registros||[]).flatMap(r=>r.isAnnex?[]:r.values||[])
         .find(v=>v.label.toLowerCase().includes('carretera'))?.val || '—';
-    const pts    = p.registros?.length || 0;
-    const nFotos = (p.registros||[]).reduce((s,r)=>s+(r.fotos?.length||0),0);
+    const regsNormals = (p.registros||[]).filter(r => !r.isAnnex);
+    const annexos     = (p.registros||[]).filter(r =>  r.isAnnex);
+    const pts    = regsNormals.length;
+    const nFotos = regsNormals.reduce((s,r)=>s+(r.fotos?.length||0),0);
     const tipus  = p.tipusEntrada || 'inventari';
     const cls    = getCatClass(tipus);
     const data   = p.fecha || '—';
-    return { carr, pts, nFotos, tipus, cls, data };
+    return { carr, pts, nFotos, tipus, cls, data, annexos };
 }
 
 function _actionBtns(id, tipus) {
@@ -5182,13 +5771,14 @@ function _actionBtns(id, tipus) {
 }
 
 function buildTableRow(p) {
-    const { carr, pts, nFotos, tipus, cls, data } = _projMeta(p);
+    const { carr, pts, nFotos, tipus, cls, data, annexos } = _projMeta(p);
     const titolTr = p.titulo.length > 36 ? p.titulo.slice(0,34)+'\u2026' : p.titulo;
     const carrTr  = carr.length > 16 ? carr.slice(0,14)+'\u2026' : carr;
+    const annexBit = annexos.length > 0 ? ` · ${annexos.length} annex${annexos.length>1?'os':''}` : '';
     return `<tr>
         <td class="dl-col-name">
             <div class="dl-cell-name" title="${p.titulo}">${titolTr}</div>
-            <div class="dl-cell-meta">${pts} punt${pts!==1?'s':''} &middot; ${nFotos} foto${nFotos!==1?'s':''}</div>
+            <div class="dl-cell-meta">${pts} punt${pts!==1?'s':''}${annexBit} &middot; ${nFotos} foto${nFotos!==1?'s':''}</div>
         </td>
         <td class="dl-col-carr">${carrTr}</td>
         <td class="dl-col-date" style="font-size:0.8rem;">${data}</td>
@@ -5198,13 +5788,14 @@ function buildTableRow(p) {
 }
 
 function buildCard(p) {
-    const { carr, pts, nFotos, tipus, cls, data } = _projMeta(p);
+    const { carr, pts, nFotos, tipus, cls, data, annexos } = _projMeta(p);
+    const annexBit = annexos.length > 0 ? ` · ${annexos.length} annex${annexos.length>1?'os':''}` : '';
     return `<div class="dl-card">
         <div class="dl-card-header">
             <div style="min-width:0;flex:1;">
                 <div class="dl-card-title">${p.titulo}</div>
                 <div class="dl-card-meta">
-                    ${carr !== '—' ? carr+' &middot; ' : ''}${pts} punt${pts!==1?'s':''} &middot; ${nFotos} foto${nFotos!==1?'s':''} &middot; ${data}
+                    ${carr !== '—' ? carr+' &middot; ' : ''}${pts} punt${pts!==1?'s':''}${annexBit} &middot; ${nFotos} foto${nFotos!==1?'s':''} &middot; ${data}
                 </div>
             </div>
             <span class="cat-badge ${cls}">${getCatLabel(tipus)}</span>
@@ -5378,6 +5969,164 @@ async function generarBlobPDF(p, tipus) {
             if (i > 0) doc.addPage();
             drawHeader(doc, p.titulo);
 
+            // ── ANNEX / RESUM ──────────────────────────────────────
+            if (r.isAnnex) {
+                // Badge
+                doc.setFillColor(245, 240, 255);
+                doc.roundedRect(12, 29, 186, 7, 1, 1, 'F');
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7);
+                doc.setTextColor(124, 58, 237);
+                doc.text(`ANNEX #${i + 1} / ${localRegs.length}`, 14, 34);
+
+                // Title
+                let yA = 42;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(30, 30, 30);
+                const titLines = doc.splitTextToSize(r.annexTitol || 'Annex', 182);
+                doc.text(titLines, 14, yA);
+                yA += titLines.length * 7 + 4;
+
+                // Divider
+                doc.setDrawColor(221, 214, 254);
+                doc.setLineWidth(0.5);
+                doc.line(14, yA, 194, yA);
+                yA += 8;
+
+                // ── Parse HTML content ──────────────────────────────
+                if (r.annexText) {
+                    const tmpDiv = document.createElement('div');
+                    tmpDiv.innerHTML = r.annexText;
+                    const childNodes = Array.from(tmpDiv.childNodes);
+
+                    function _renderTextNode(htmlEl, startY) {
+                        const text = (htmlEl.textContent || '').trim();
+                        if (!text) return startY;
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(9);
+                        doc.setTextColor(30, 30, 30);
+                        const lines = doc.splitTextToSize(text, 180);
+                        lines.forEach(line => {
+                            if (startY + 6 > 280) {
+                                doc.addPage(); drawHeader(doc, p.titulo); startY = 36;
+                            }
+                            doc.text(line, 14, startY);
+                            startY += 5.5;
+                        });
+                        return startY;
+                    }
+
+                    function _renderTable(tableEl, startY) {
+                        const rows   = Array.from(tableEl.querySelectorAll('tr'));
+                        if (!rows.length) return startY;
+                        const head = [], body = [];
+                        rows.forEach((tr, ri) => {
+                            const cells = Array.from(tr.querySelectorAll('td,th'))
+                                              .map(c => c.textContent.trim());
+                            if (ri === 0) head.push(cells);
+                            else          body.push(cells);
+                        });
+                        if (startY + 20 > 275) {
+                            doc.addPage(); drawHeader(doc, p.titulo); startY = 36;
+                        }
+                        doc.autoTable({
+                            startY:    startY,
+                            head:      head.length ? head : undefined,
+                            body:      body.length ? body : (head.length ? [] : [head[0]]),
+                            theme:     'grid',
+                            margin:    { left: 12, right: 12 },
+                            headStyles: {
+                                fillColor:  [124, 58, 237],
+                                textColor:  [255, 255, 255],
+                                fontStyle:  'bold',
+                                fontSize:   8
+                            },
+                            styles: {
+                                fontSize:    8,
+                                cellPadding: 3,
+                                lineColor:   [167, 139, 250],
+                                lineWidth:   0.4
+                            },
+                            alternateRowStyles: { fillColor: [250, 248, 255] },
+                            didDrawPage: () => { drawHeader(doc, p.titulo); }
+                        });
+                        return doc.lastAutoTable.finalY + 6;
+                    }
+
+                    for (const node of childNodes) {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            yA = _renderTextNode(node, yA);
+                        } else if (node.nodeName === 'TABLE') {
+                            yA = _renderTable(node, yA);
+                        } else if (node.nodeName === 'UL' || node.nodeName === 'OL') {
+                            const items = Array.from(node.querySelectorAll('li'));
+                            items.forEach((li, idx) => {
+                                const bullet = node.nodeName === 'OL' ? `${idx+1}.` : '•';
+                                const txt    = (li.textContent || '').trim();
+                                if (!txt) return;
+                                doc.setFont("helvetica", "normal");
+                                doc.setFontSize(9);
+                                doc.setTextColor(30, 30, 30);
+                                const lines = doc.splitTextToSize(txt, 172);
+                                lines.forEach((line, li2) => {
+                                    if (yA + 6 > 280) {
+                                        doc.addPage(); drawHeader(doc, p.titulo); yA = 36;
+                                    }
+                                    doc.text(li2 === 0 ? `${bullet} ${line}` : `   ${line}`, 16, yA);
+                                    yA += 5.5;
+                                });
+                            });
+                            yA += 2;
+                        } else {
+                            // Generic: any block element — extract plain text
+                            const tag   = node.nodeName;
+                            const isHdr = ['H1','H2','H3','H4'].includes(tag);
+                            if (isHdr) {
+                                const sizeMap = {H1:13, H2:11, H3:10, H4:9};
+                                doc.setFont("helvetica", "bold");
+                                doc.setFontSize(sizeMap[tag] || 10);
+                                doc.setTextColor(60, 20, 140);
+                                const htxt = (node.textContent || '').trim();
+                                if (htxt) {
+                                    const hl = doc.splitTextToSize(htxt, 180);
+                                    hl.forEach(l => {
+                                        if (yA + 7 > 280) { doc.addPage(); drawHeader(doc, p.titulo); yA = 36; }
+                                        doc.text(l, 14, yA); yA += (sizeMap[tag]||10) * 0.6;
+                                    });
+                                    yA += 3;
+                                }
+                            } else {
+                                const nested = node.querySelector('table');
+                                if (nested) {
+                                    // mixed: render pre-table text first
+                                    const preText = (node.textContent || '').replace(nested.textContent,'').trim();
+                                    if (preText) yA = _renderTextNode({ textContent: preText }, yA);
+                                    yA = _renderTable(nested, yA);
+                                } else {
+                                    yA = _renderTextNode(node, yA);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    doc.setFont("helvetica", "italic");
+                    doc.setFontSize(9);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text("(Sense contingut)", 14, yA);
+                }
+
+                // Footer
+                doc.setDrawColor(...LGRAY);
+                doc.setLineWidth(0.3);
+                doc.line(12, 285, 198, 285);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7);
+                doc.setTextColor(...GRAY);
+                doc.text("DATACAMP — Eina de Recollida de Dades en Camp", 105, 290, { align: 'center' });
+                return;
+            }
+
             // Record number badge
             doc.setFillColor(245, 245, 245);
             doc.roundedRect(12, 29, 40, 7, 1, 1, 'F');
@@ -5466,7 +6215,19 @@ async function generarBlobPDF(p, tipus) {
         doc.autoTable({
             startY: 30,
             head: [headers],
-            body: localRegs.map(r => [...r.values.map(v => v.val || "—"), ""]),
+            body: localRegs.map(r => {
+                if (r.isAnnex) {
+                    const plainBody = r.annexText
+                        ? (() => { const d=document.createElement('div'); d.innerHTML=r.annexText; return (d.textContent||'').trim().slice(0,120); })()
+                        : '';
+                    const row = Array(p.fields.length + 1).fill('');
+                    row[0] = `📄 ${r.annexTitol || 'Annex'}`;
+                    row[p.fields.length - 1] = plainBody;
+                    row[p.fields.length] = '—';
+                    return row;
+                }
+                return [...r.values.map(v => v.val || "—"), ""];
+            }),
             theme: 'grid',
             headStyles: {
                 fillColor: RED,
@@ -5490,7 +6251,7 @@ async function generarBlobPDF(p, tipus) {
             didDrawCell: (data) => {
                 if (data.column.index === p.fields.length && data.cell.section === 'body') {
                     const r = localRegs[data.row.index];
-                    if (r && r.fotos && r.fotos.length > 0) {
+                    if (r && !r.isAnnex && r.fotos && r.fotos.length > 0) {
                         try {
                             const f = r.fotos[0];
                             const props = doc.getImageProperties(f);
@@ -5515,9 +6276,35 @@ async function generarBlobPDF(p, tipus) {
 }
 
 function generarBlobExcel(p) {
+    /** Strip HTML tags and return plain text. Tables → [Taula d'Annex] */
+    function _stripHtml(html) {
+        if (!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        // Replace tables with a placeholder to preserve structure integrity
+        tmp.querySelectorAll('table').forEach(t => {
+            // Build a text summary: header row / data rows
+            const rows = Array.from(t.querySelectorAll('tr'));
+            const summary = rows.map(tr =>
+                Array.from(tr.querySelectorAll('td,th')).map(c => c.textContent.trim()).join(' | ')
+            ).join(' // ');
+            const placeholder = document.createTextNode(`[Taula: ${summary}]`);
+            t.replaceWith(placeholder);
+        });
+        return (tmp.textContent || tmp.innerText || '').trim().replace(/\s+/g, ' ');
+    }
+
     const ws = XLSX.utils.json_to_sheet(
         p.registros.map(r => {
-            let o = {};
+            if (r.isAnnex) {
+                return {
+                    'Tipus':        '📄 Annex / Resum',
+                    'Títol Annex':  r.annexTitol || '',
+                    'Observacions': _stripHtml(r.annexText),
+                    'Nº Fotos':     0
+                };
+            }
+            let o = { 'Tipus': '📍 Registre' };
             r.values.forEach(v => o[v.label] = v.val);
             o['Nº Fotos'] = r.fotos?.length || 0;
             return o;
@@ -6206,9 +6993,10 @@ async function generarInformeObraPDF(id) {
            ════════════════════════════════════════════════════ */
         console.log('[PDF] section 3');
         secHead('3.','Resum Estad\u00edstic del Seguiment');
-        const totalReg=(p.registros||[]).length;
+        const totalReg=(p.registros||[]).filter(r=>!r.isAnnex).length;
+        const totalAnnex=(p.registros||[]).filter(r=>r.isAnnex).length;
         const totalFotos=(p.registros||[]).reduce((s,r)=>s+(r.fotos?.length||0),0);
-        const regAmbFoto=(p.registros||[]).filter(r=>r.fotos?.length>0).length;
+        const regAmbFoto=(p.registros||[]).filter(r=>!r.isAnnex&&r.fotos?.length>0).length;
         guard(50);
         doc.setFillColor(...THEAD); doc.setDrawColor(...D120); doc.setLineWidth(0.25);
         doc.rect(ML,Y,CW,8,'FD');
@@ -6217,8 +7005,9 @@ async function generarInformeObraPDF(id) {
         doc.text('Valor',ML+CW-2,Y+5.2,{align:'right'});
         Y+=8;
         [['Nombre total de punts registrats',String(totalReg)],
+         ['Annexos / Resums afegits',String(totalAnnex)],
          ['Fotografies capturades',String(totalFotos)],
-         ['Punts amb documentaci\u00f3 fotogr\u00e0fica',String(regAmbFoto)],
+         ['Punts amb documentació fotogràfica',String(regAmbFoto)],
          ['Punts sense fotografia',String(totalReg-regAmbFoto)]]
         .forEach(([lb,vl])=>{
             doc.setDrawColor(...D180); doc.setLineWidth(0.15);
@@ -6271,6 +7060,14 @@ async function generarInformeObraPDF(id) {
            Must be called BEFORE drawing for pre-flight check.
            Photo estimate: pairs of 2 (PH=75) to match renderer. */
         function measureBlock(r) {
+            // Annex: fixed height estimate
+            if (r.isAnnex) {
+                if (!r.annexText) return 30;
+                doc.setFont('helvetica','normal'); doc.setFontSize(VAL_FS);
+                const bodyLines = doc.splitTextToSize(r.annexText, CW);
+                return Math.min(20 + bodyLines.length * LH + SEP, BOT - MT - SMRG);
+            }
+
             const PH_EST  = 75;   /* must match PH inside drawRecord photos */
             const CAP_EST = 4.5 + CAP;
             const nFoto = r.fotos?.length || 0;
@@ -6306,6 +7103,102 @@ async function generarInformeObraPDF(id) {
            Y is updated after EVERY element — never fixed coords. */
         function drawRecord(r, ri) {
             console.log(`[PDF] drawRecord ${ri+1} Y=${Y.toFixed(1)}`);
+
+            // ── ANNEX / RESUM ─────────────────────────────────────
+            if (r.isAnnex) {
+                checkSpace(20);
+                // Header band
+                doc.setFillColor(245, 240, 255);
+                doc.setDrawColor(200, 185, 240);
+                doc.setLineWidth(0.3);
+                const bH = 8;
+                doc.rect(ML, Y, CW, bH, 'FD');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(100, 50, 180);
+                doc.text(`📄 ANNEX #${ri + 1}  —  ${(r.annexTitol || 'Sense títol').toUpperCase()}`, ML + 3, Y + bH / 2 + 1.5, { baseline: 'middle' });
+                Y += bH + 4;
+
+                // Title
+                checkSpace(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(...D60);
+                const titLines = doc.splitTextToSize(r.annexTitol || '', CW);
+                doc.text(titLines, ML, Y);
+                Y += titLines.length * 6 + 3;
+
+                // Divider
+                doc.setDrawColor(200, 185, 240);
+                doc.setLineWidth(0.4);
+                doc.line(ML, Y, ML + CW, Y);
+                Y += 5;
+
+                // ── Parse HTML ──────────────────────────────────────
+                if (r.annexText) {
+                    const _div = document.createElement('div');
+                    _div.innerHTML = r.annexText;
+
+                    const _txt = (nd) => {
+                        const t = (nd.textContent || '').trim();
+                        if (!t) return;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(VAL_FS);
+                        doc.setTextColor(...BLACK);
+                        doc.splitTextToSize(t, CW).forEach(line => {
+                            if (Y + LH > BOT - SMRG) { newPage(); }
+                            doc.text(line, ML, Y); Y += LH;
+                        });
+                    };
+
+                    const _tbl = (tableEl) => {
+                        const rows = Array.from(tableEl.querySelectorAll('tr'));
+                        if (!rows.length) return;
+                        const head = [], body = [];
+                        rows.forEach((tr, ri2) => {
+                            const cells = Array.from(tr.querySelectorAll('td,th')).map(c => c.textContent.trim());
+                            if (ri2 === 0) head.push(cells);
+                            else           body.push(cells);
+                        });
+                        if (Y + 20 > BOT - SMRG) { newPage(); }
+                        doc.autoTable({
+                            startY: Y,
+                            head:   head.length ? head : undefined,
+                            body:   body,
+                            theme:  'grid',
+                            margin: { left: ML, right: 210 - ML - CW },
+                            headStyles: { fillColor:[124,58,237], textColor:[255,255,255], fontStyle:'bold', fontSize:8 },
+                            styles: { fontSize:8, cellPadding:3, lineColor:[167,139,250], lineWidth:0.4 },
+                            alternateRowStyles: { fillColor:[250,248,255] },
+                            didDrawPage: () => { newPage(); }
+                        });
+                        Y = doc.lastAutoTable.finalY + 5;
+                    };
+
+                    Array.from(_div.childNodes).forEach(node => {
+                        if (node.nodeType === Node.TEXT_NODE) { _txt(node); }
+                        else if (node.nodeName === 'TABLE')   { _tbl(node); }
+                        else {
+                            const tbl = node.querySelector('table');
+                            if (tbl) {
+                                const pre = (node.textContent||'').replace(tbl.textContent,'').trim();
+                                if (pre) _txt({textContent: pre});
+                                _tbl(tbl);
+                            } else { _txt(node); }
+                        }
+                    });
+                }
+
+                Y += Math.floor(SEP / 2);
+                if (Y + 1 <= BOT - SMRG) {
+                    doc.setDrawColor(...D180); doc.setLineWidth(0.5);
+                    doc.line(ML, Y, ML + CW, Y);
+                }
+                Y += Math.ceil(SEP / 2);
+                return;
+            }
+
+            // ── REGISTRE NORMAL ───────────────────────────────────
 
             const rCarr = r.values?.find(v => v.label.toLowerCase().includes('carretera'))?.val || '\u2014';
             const rPK   = r.values?.find(v => v.label.toLowerCase().includes('pk'))?.val        || '\u2014';
