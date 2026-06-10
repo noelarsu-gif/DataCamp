@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1B4F72">
+<title>Suite Digital Vial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   SUITE DIGITAL VIAL — Pilot v1.0
+   Línia corporativa: Azul marino institucional + naranja obra
+   Campo limpio, sin frivolidades, máxima legibilidad solar
+═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Paleta corporativa */
+  --navy:       #1B4F72;
+  --navy-dark:  #153d59;
+  --navy-light: #2471A3;
+  --navy-pale:  #EBF5FB;
+  --orange:     #E67E22;
+  --orange-dk:  #CA6F1E;
+  --orange-pale:#FEF5EC;
+
+  /* Neutros */
+  --bg:         #F5F4F1;
+  --surface:    #FFFFFF;
+  --border:     #DDDBD6;
+  --border-dk:  #C8C5BE;
+  --text-1:     #1A1A1A;
+  --text-2:     #4A4A4A;
+  --text-3:     #888880;
+  --text-inv:   #FFFFFF;
+
+  /* Semàntica */
+  --ok:         #1E8449;
+  --ok-bg:      #EAFAF1;
+  --warn:       #D4AC0D;
+  --warn-bg:    #FEFCE8;
+  --err:        #C0392B;
+  --err-bg:     #FDEDEC;
+
+  /* Layout */
+  --tabbar-h:   68px;
+  --header-h:   56px;
+  --radius:     10px;
+  --radius-sm:  6px;
+  --radius-lg:  14px;
+  --shadow:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.10);
+
+  /* Tipografía */
+  --font:       'Inter', system-ui, sans-serif;
+  --mono:       'JetBrains Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text-1); -webkit-tap-highlight-color: transparent; overflow: hidden; }
+
+/* ── HEADER ─────────────────────────────────────────── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--header-h);
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+.header-brand { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: var(--orange); display: flex; align-items: center; justify-content: center;
+  font-size: 17px; line-height: 1; flex-shrink: 0;
+}
+.header-name { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: .2px; }
+.header-sub { color: rgba(255,255,255,.55); font-size: 10px; font-weight: 500; letter-spacing: .8px; text-transform: uppercase; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.badge-offline {
+  display: none; /* se activa con JS */
+  background: rgba(230,126,34,.25); border: 1px solid rgba(230,126,34,.5);
+  color: #F0A500; font-size: 10px; font-weight: 700; letter-spacing: .6px;
+  padding: 3px 8px; border-radius: 20px; text-transform: uppercase;
+}
+.badge-offline.visible { display: block; }
+.header-menu-btn {
+  background: rgba(255,255,255,.12); border: none; border-radius: 7px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff; font-size: 18px;
+}
+
+/* ── CONTENT AREA ───────────────────────────────────── */
+.content-area {
+  position: fixed;
+  top: var(--header-h);
+  bottom: var(--tabbar-h);
+  left: 0; right: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen { display: none; padding: 16px; min-height: 100%; }
+.screen.active { display: block; }
+
+/* ── TAB BAR ────────────────────────────────────────── */
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  height: var(--tabbar-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2px 10px rgba(0,0,0,.07);
+}
+.tab-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; border: none; background: transparent; cursor: pointer;
+  color: var(--text-3); font-family: var(--font); transition: color .15s;
+  padding: 6px 4px; position: relative;
+}
+.tab-btn .tab-icon { font-size: 22px; line-height: 1; }
+.tab-btn .tab-label { font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
+.tab-btn.active { color: var(--navy); }
+.tab-btn.active::before {
+  content: ''; position: absolute; top: 0; left: 20%; right: 20%;
+  height: 2px; background: var(--navy); border-radius: 0 0 3px 3px;
+}
+.tab-btn.tab-new { color: var(--orange); }
+.tab-btn.tab-new.active { color: var(--orange-dk); }
+.tab-btn.tab-new.active::before { background: var(--orange); }
+
+/* ── CARDS ──────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow);
+  overflow: hidden; margin-bottom: 12px;
+}
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.card-header-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  background: var(--navy-pale);
+}
+.card-header-icon.orange { background: var(--orange-pale); }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-1); letter-spacing: .2px; }
+.card-subtitle { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.card-body { padding: 16px; }
+
+/* ── GPS STATUS BAR ─────────────────────────────────── */
+.gps-status-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg); margin-bottom: 12px;
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+  letter-spacing: .3px;
+}
+.gps-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  background: var(--text-3);
+}
+.gps-status-bar.searching .gps-dot { background: var(--warn); animation: pulse 1s infinite; }
+.gps-status-bar.locked .gps-dot { background: var(--ok); }
+.gps-status-bar.error .gps-dot { background: var(--err); }
+.gps-acc { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+@keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:.4 } }
+
+/* ── RESULTADO PK ───────────────────────────────────── */
+.pk-result-card {
+  border-radius: var(--radius-lg); border: 1.5px solid var(--border);
+  background: var(--surface); padding: 20px; margin-bottom: 12px;
+  text-align: center; box-shadow: var(--shadow-md);
+  transition: border-color .25s;
+}
+.pk-result-card.ok { border-color: var(--ok); background: var(--ok-bg); }
+.pk-result-card.warn { border-color: var(--warn); background: var(--warn-bg); }
+.pk-result-card.err { border-color: var(--err); background: var(--err-bg); }
+.pk-road {
+  font-size: 13px; font-weight: 700; color: var(--navy); letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.pk-number {
+  font-family: var(--mono); font-size: 42px; font-weight: 700;
+  color: var(--text-1); line-height: 1; letter-spacing: -1px; margin-bottom: 6px;
+}
+.pk-number .sep { color: var(--text-3); font-size: 32px; margin: 0 2px; }
+.pk-dist { font-size: 12px; color: var(--text-3); }
+.pk-sentit {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 10px; padding: 5px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  background: var(--bg); border: 1px solid var(--border); color: var(--text-2);
+}
+.pk-sentit.creciente { background: #EAF4EF; border-color: #A9DFBF; color: var(--ok); }
+.pk-sentit.decreciente { background: #FDEDEC; border-color: #F1948A; color: var(--err); }
+.pk-warn-title { font-size: 15px; font-weight: 700; color: var(--text-1); margin: 8px 0 4px; }
+.pk-warn-sub { font-size: 12px; color: var(--text-3); }
+.pk-placeholder {
+  color: var(--text-3); font-size: 13px; padding: 12px 0;
+}
+
+/* ── BOTÓN PRINCIPAL GPS ────────────────────────────── */
+.btn-main {
+  width: 100%; height: 64px; border-radius: var(--radius);
+  border: none; cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  font-size: 15px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  background: var(--navy); color: #fff;
+  box-shadow: 0 3px 8px rgba(27,79,114,.3);
+  transition: background .15s, transform .1s;
+  margin-bottom: 12px; -webkit-appearance: none;
+}
+.btn-main:active { transform: scale(.98); background: var(--navy-dark); }
+.btn-main.loading { background: #507EA0; pointer-events: none; }
+.btn-main .btn-icon { font-size: 22px; }
+
+/* ── BOTONES DE CAMPO (CAMPO = botones grandes con icono izquierdo) */
+.field-btn {
+  width: 100%; min-height: 60px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  text-align: left; transition: background .12s, border-color .12s;
+  margin-bottom: 8px;
+}
+.field-btn:active { background: var(--bg); }
+.field-btn .fb-icon {
+  width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.field-btn .fb-text {}
+.field-btn .fb-label { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.field-btn .fb-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.field-btn.orange { border-color: rgba(230,126,34,.35); }
+.field-btn.orange .fb-icon { background: var(--orange-pale); }
+.field-btn.navy .fb-icon { background: var(--navy-pale); }
+.field-btn.green .fb-icon { background: var(--ok-bg); }
+.field-btn.gray .fb-icon { background: var(--bg); }
+
+/* ── LAUNCHER GRID (estilo app de campo, como Ícaro) ── */
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.launcher-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; padding: 22px 12px 18px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); cursor: pointer;
+  text-align: center; transition: background .12s, border-color .12s, transform .1s;
+  box-shadow: var(--shadow); min-height: 120px; position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.launcher-btn:active { transform: scale(.96); background: var(--bg); }
+.launcher-btn .lb-icon-wrap {
+  width: 64px; height: 64px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; flex-shrink: 0;
+}
+.launcher-btn .lb-label {
+  font-size: 13px; font-weight: 700; color: var(--text-2);
+  letter-spacing: .2px; line-height: 1.2;
+}
+.launcher-btn.lb-incidencia .lb-icon-wrap { background: #FEF5EC; }
+.launcher-btn.lb-incidencia { border-color: rgba(230,126,34,.3); }
+.launcher-btn.lb-inventari  .lb-icon-wrap { background: var(--navy-pale); }
+.launcher-btn.lb-inventari  { border-color: rgba(27,79,114,.2); }
+.launcher-btn.lb-obra       .lb-icon-wrap { background: #FDF2F8; }
+.launcher-btn.lb-obra       { border-color: rgba(134,25,143,.2); }
+.launcher-btn.lb-foto       .lb-icon-wrap { background: var(--ok-bg); }
+.launcher-btn.lb-foto       { border-color: rgba(30,132,73,.2); }
+.launcher-btn.lb-wa         .lb-icon-wrap { background: #E8F8F5; }
+.launcher-btn.lb-wa         { border-color: rgba(39,174,96,.25); }
+.launcher-btn.lb-map        .lb-icon-wrap { background: #EBF5FB; }
+.launcher-btn.lb-map        { border-color: rgba(36,113,163,.2); }
+.lb-badge {
+  position: absolute; top: 8px; right: 10px;
+  background: var(--orange); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 10px;
+  padding: 1px 6px; min-width: 18px; text-align: center; display: none;
+}
+.lb-badge.visible { display: block; }
+/* Estado seleccionado en formulario */
+#typeSel .launcher-btn.selected {
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(27,79,114,.12);
+}
+#typeSel .launcher-btn.lb-incidencia.selected { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(230,126,34,.12); }
+#typeSel .launcher-btn.lb-inventari.selected  { border-color: var(--navy); }
+#typeSel .launcher-btn.lb-obra.selected       { border-color: #86198f; box-shadow: 0 0 0 3px rgba(134,25,143,.10); }
+#typeSel .launcher-btn.lb-foto.selected       { border-color: var(--ok); box-shadow: 0 0 0 3px rgba(30,132,73,.12); }
+
+/* ── INCIDENCIAS LIST ──────────────────────────────── */
+.inc-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.inc-item:last-child { border-bottom: none; }
+.inc-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.inc-road { font-size: 12px; font-weight: 700; color: var(--navy); letter-spacing: .8px; }
+.inc-pk { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text-1); }
+.inc-type { font-size: 11px; color: var(--text-3); }
+.inc-ts { margin-left: auto; font-size: 10px; color: var(--text-3); white-space: nowrap; }
+
+/* ── FORMULARIO NUEVO REGISTRO ─────────────────────── */
+.form-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-3); margin: 16px 0 8px; padding-left: 2px;
+}
+.form-field { margin-bottom: 12px; }
+.form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; }
+.form-field input, .form-field textarea, .form-field select {
+  width: 100%; padding: 11px 13px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-family: var(--font); font-size: 14px; color: var(--text-1);
+  outline: none; transition: border-color .15s;
+  -webkit-appearance: none;
+}
+.form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+  border-color: var(--navy-light);
+}
+.form-field input.mono { font-family: var(--mono); }
+.form-field textarea { min-height: 80px; resize: vertical; }
+.autopk-strip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 13px; border-radius: var(--radius-sm);
+  background: var(--navy-pale); border: 1.5px solid rgba(27,79,114,.2);
+  margin-bottom: 12px; font-size: 12px; color: var(--navy);
+}
+.autopk-strip .autopk-spinner { font-size: 14px; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.type-selector { display: flex; gap: 8px; margin-bottom: 4px; }
+.type-pill {
+  flex: 1; padding: 10px 6px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  text-align: center; cursor: pointer; font-size: 12px; font-weight: 600;
+  color: var(--text-2); transition: all .15s;
+}
+.type-pill.selected { border-color: var(--navy); background: var(--navy-pale); color: var(--navy); }
+.type-pill .tp-icon { display: block; font-size: 18px; margin-bottom: 3px; }
+
+.btn-save {
+  width: 100%; height: 60px; border-radius: var(--radius);
+  border: none; background: var(--orange); color: #fff;
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  letter-spacing: .5px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 10px; margin-top: 8px;
+  box-shadow: 0 3px 8px rgba(230,126,34,.3);
+  transition: background .12s, transform .1s;
+}
+.btn-save:active { background: var(--orange-dk); transform: scale(.99); }
+
+/* ── HISTORIAL ─────────────────────────────────────── */
+.hist-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--shadow);
+}
+.hist-color-bar { width: 4px; height: 44px; border-radius: 3px; flex-shrink: 0; }
+.hist-road { font-size: 11px; font-weight: 700; color: var(--navy); letter-spacing: .8px; }
+.hist-pk { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+.hist-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.hist-badge {
+  margin-left: auto; padding: 4px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: .3px; text-align: center; flex-shrink: 0;
+}
+.hist-badge.inventari { background: #EBF5FB; color: #1B4F72; }
+.hist-badge.obra { background: #FEF5EC; color: #CA6F1E; }
+.hist-badge.incidencia { background: #FDEDEC; color: #C0392B; }
+.hist-badge.captura { background: #EAF4EF; color: #1E8449; }
+
+.filter-strip {
+  display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto;
+  padding-bottom: 2px;
+}
+.filter-pill {
+  padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  border: 1.5px solid var(--border); background: var(--surface); cursor: pointer;
+  white-space: nowrap; color: var(--text-2); flex-shrink: 0;
+}
+.filter-pill.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* ── AJUSTES ───────────────────────────────────────── */
+.settings-section { margin-bottom: 20px; }
+.settings-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 10px; padding-left: 2px;
+}
+.settings-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 6px; overflow: hidden;
+}
+.settings-item {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-item:active { background: var(--bg); }
+.settings-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  background: var(--navy-pale);
+}
+.settings-icon.orange { background: var(--orange-pale); }
+.settings-icon.red { background: var(--err-bg); }
+.settings-icon.green { background: var(--ok-bg); }
+.settings-label { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.settings-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.settings-chevron { margin-left: auto; color: var(--text-3); font-size: 16px; }
+.settings-value { margin-left: auto; font-size: 12px; color: var(--text-3); font-family: var(--mono); }
+
+.settings-toggle {
+  width: 46px; height: 26px; border-radius: 13px; flex-shrink: 0;
+  background: var(--border); border: none; cursor: pointer;
+  position: relative; transition: background .2s; margin-left: auto;
+}
+.settings-toggle.on { background: var(--navy); }
+.settings-toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transition: transform .2s;
+}
+.settings-toggle.on::after { transform: translateX(20px); }
+
+.slider-container { padding: 0 16px 14px; }
+.slider-container label { font-size: 11px; color: var(--text-3); display: flex; justify-content: space-between; margin-bottom: 8px; }
+.slider-container label span { font-family: var(--mono); color: var(--navy); font-weight: 700; }
+input[type=range] {
+  width: 100%; height: 4px; border-radius: 2px; background: var(--border);
+  -webkit-appearance: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--navy); border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+
+/* ── MAPA placeholder ──────────────────────────────── */
+.map-placeholder {
+  width: 100%; height: 280px; border-radius: var(--radius-lg);
+  background: var(--bg); border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; color: var(--text-3); margin-bottom: 12px;
+}
+.map-placeholder .map-ph-icon { font-size: 40px; opacity: .4; }
+.map-placeholder .map-ph-label { font-size: 13px; font-weight: 600; }
+.map-placeholder .map-ph-sub { font-size: 11px; }
+
+/* ── STATS STRIP ───────────────────────────────────── */
+.stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-val { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--navy); }
+.stat-lbl { font-size: 10px; font-weight: 600; color: var(--text-3); margin-top: 3px; letter-spacing: .4px; text-transform: uppercase; }
+
+/* ── SECTION TITLE ─────────────────────────────────── */
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 10px; padding-left: 2px;
+}
+
+/* ── MODAL ─────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.45); display: none; align-items: flex-end;
+}
+.modal-backdrop.open { display: flex; }
+.modal-sheet {
+  width: 100%; background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  max-height: 85vh; overflow-y: auto;
+}
+.modal-handle {
+  width: 40px; height: 4px; border-radius: 2px; background: var(--border);
+  margin: 0 auto 20px;
+}
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+
+/* ── TOAST ─────────────────────────────────────────── */
+#toastContainer {
+  position: fixed; bottom: calc(var(--tabbar-h) + 12px); left: 12px; right: 12px;
+  z-index: 999; pointer-events: none;
+  display: flex; flex-direction: column; gap: 6px; align-items: stretch;
+}
+.toast {
+  background: var(--text-1); color: #fff;
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 13px; font-weight: 500; box-shadow: var(--shadow-md);
+  animation: slideUp .25s ease-out;
+}
+.toast.ok { background: var(--ok); }
+.toast.warn { background: #B7770D; }
+.toast.err { background: var(--err); }
+.toast.out { animation: fadeOut .3s ease-in forwards; }
+@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(8px); } }
+
+/* ── SPINNER ────────────────────────────────────────── */
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+
+/* ── DIVIDER ────────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ── EMPTY STATE ────────────────────────────────────── */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-3); }
+.empty-icon { font-size: 40px; opacity: .4; display: block; margin-bottom: 10px; }
+.empty-label { font-size: 13px; font-weight: 600; }
+.empty-sub { font-size: 12px; margin-top: 4px; }
+
+/* ── COPIAR BTN ─────────────────────────────────────── */
+.btn-row { display: flex; gap: 8px; margin-top: 10px; }
+.btn-sm {
+  flex: 1; height: 42px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-family: var(--font); font-size: 12px; font-weight: 700;
+  color: var(--text-2); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 6px;
+  transition: background .12s, border-color .12s;
+}
+.btn-sm:active { background: var(--bg); }
+.btn-sm.navy { background: var(--navy-pale); border-color: rgba(27,79,114,.3); color: var(--navy); }
+.btn-sm.orange { background: var(--orange-pale); border-color: rgba(230,126,34,.3); color: var(--orange-dk); }
+
+/* ── PROFILE SELECTOR ───────────────────────────────── */
+.profile-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+.profile-btn {
+  flex: 1; padding: 14px 8px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; text-align: center; transition: all .15s;
+}
+.profile-btn.active { border-color: var(--navy); background: var(--navy-pale); }
+.profile-btn .pb-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+.profile-btn .pb-label { font-size: 12px; font-weight: 700; color: var(--text-1); }
+.profile-btn .pb-sub { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+.profile-btn.active .pb-label { color: var(--navy); }
+
+/* ── INCIDENCIA MODAL TYPES ─────────────────────────── */
+.inc-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.inc-type-btn {
+  padding: 14px 8px; border-radius: var(--radius); border: 1.5px solid var(--border);
+  background: var(--surface); cursor: pointer; text-align: center; transition: all .15s;
+}
+.inc-type-btn.selected { border-color: var(--orange); background: var(--orange-pale); }
+.inc-type-btn .itb-icon { font-size: 22px; display: block; margin-bottom: 5px; }
+.inc-type-btn .itb-label { font-size: 11px; font-weight: 600; color: var(--text-2); }
+.inc-type-btn.selected .itb-label { color: var(--orange-dk); }
+
+/* ── VERSION BADGE ──────────────────────────────────── */
+.version-badge {
+  text-align: center; padding: 20px; color: var(--text-3); font-size: 11px;
+}
+
+/* ── UTILITIES ───────────────────────────────────────── */
+.hidden { display: none !important; }
+.text-navy { color: var(--navy); }
+.text-orange { color: var(--orange); }
+.fw-700 { font-weight: 700; }
+.mono { font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">🛣️</div>
+    <div>
+      <div class="header-name">Suite Digital Vial</div>
+      <div class="header-sub">Gestió de Carreteres</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge-offline" id="offlineBadge">SIN RED</span>
+    <button class="header-menu-btn" onclick="showToast('Menú en desarrollo','',2000)">≡</button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content-area">
+
+  <!-- ══ PESTAÑA 1: GPS / LOCALIZAR ══ -->
+  <div class="screen active" id="screenGPS">
+
+    <div class="gps-status-bar" id="gpsBar">
+      <div class="gps-dot" id="gpsDot"></div>
+      <span id="gpsLabel">GPS no inicializado</span>
+      <span class="gps-acc hidden" id="gpsAcc"></span>
+    </div>
+
+    <div class="pk-result-card" id="pkResultCard">
+      <div class="pk-placeholder">Pulsa «¿Dónde estoy?» para detectar la carretera y el PK</div>
+    </div>
+
+    <button class="btn-main" id="btnMain" onclick="executarGeolocal()">
+      <span class="btn-icon" id="btnIcon">📍</span>
+      <span id="btnLabel">¿DÓNDE ESTOY?</span>
+    </button>
+
+    <div class="section-title">ACCIONES RÁPIDAS</div>
+
+    <div class="launcher-grid">
+      <button class="launcher-btn lb-incidencia" onclick="abrirModalNouRegistre('incidencia')">
+        <div class="lb-icon-wrap">⚠️</div>
+        <div class="lb-label">Incidencia</div>
+      </button>
+      <button class="launcher-btn lb-inventari" onclick="abrirModalNouRegistre('inventari')">
+        <div class="lb-icon-wrap">📋</div>
+        <div class="lb-label">Inventario</div>
+      </button>
+      <button class="launcher-btn lb-obra" onclick="abrirModalNouRegistre('obra')">
+        <div class="lb-icon-wrap">🚧</div>
+        <div class="lb-label">Obra</div>
+      </button>
+      <button class="launcher-btn lb-foto" onclick="abrirModalNouRegistre('captura')">
+        <div class="lb-icon-wrap">📸</div>
+        <div class="lb-label">Foto Rápida</div>
+      </button>
+      <button class="launcher-btn lb-wa" onclick="compartirWA()">
+        <div class="lb-icon-wrap">📲</div>
+        <div class="lb-label">Compartir PK</div>
+      </button>
+      <button class="launcher-btn lb-map" onclick="canviarTab('screenMapa','tab-mapa')">
+        <div class="lb-icon-wrap">🗺️</div>
+        <div class="lb-label">Ver Mapa</div>
+      </button>
+    </div>
+
+    <div class="section-title" style="margin-top:4px;">ÚLTIMAS INCIDENCIAS</div>
+    <div class="card" id="incListContainer">
+      <div id="incList">
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <div class="empty-label">Sin registros todavía</div>
+          <div class="empty-sub">Las incidencias aparecerán aquí</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PESTAÑA 2: NUEVO REGISTRO ══ -->
+  <div class="screen" id="screenNou">
+
+    <div class="autopk-strip" id="autopkStrip">
+      <span id="autopkIcon">📡</span>
+      <span id="autopkMsg">Esperando datos GPS del módulo de localización...</span>
+    </div>
+
+    <div class="form-section-label">TIPO DE REGISTRO</div>
+    <div class="launcher-grid" id="typeSel" style="margin-bottom:16px;">
+      <div class="launcher-btn lb-inventari selected" data-t="inventari" onclick="selTipus(this,'inventari')" style="min-height:100px;">
+        <div class="lb-icon-wrap" style="width:54px;height:54px;font-size:28px;">📋</div>
+        <div class="lb-label">Inventario</div>
+      </div>
+      <div class="launcher-btn lb-incidencia" data-t="incidencia" onclick="selTipus(this,'incidencia')" style="min-height:100px;">
+        <div class="lb-icon-wrap" style="width:54px;height:54px;font-size:28px;">⚠️</div>
+        <div class="lb-label">Incidencia</div>
+      </div>
+      <div class="launcher-btn lb-obra" data-t="obra" onclick="selTipus(this,'obra')" style="min-height:100px;">
+        <div class="lb-icon-wrap" style="width:54px;height:54px;font-size:28px;">🚧</div>
+        <div class="lb-label">Obra</div>
+      </div>
+      <div class="launcher-btn lb-foto" data-t="captura" onclick="selTipus(this,'captura')" style="min-height:100px;">
+        <div class="lb-icon-wrap" style="width:54px;height:54px;font-size:28px;">📸</div>
+        <div class="lb-label">Foto Rápida</div>
+      </div>
+    </div>
+
+    <div class="form-section-label">LOCALIZACIÓN (AUTO)</div>
+
+    <div style="display:flex;gap:8px;">
+      <div class="form-field" style="flex:1.5;">
+        <label>Carretera</label>
+        <input type="text" id="fCarretera" class="mono" placeholder="C-14" style="text-transform:uppercase;">
+      </div>
+      <div class="form-field" style="flex:1;">
+        <label>PK km</label>
+        <input type="number" id="fKm" class="mono" placeholder="45">
+      </div>
+      <div class="form-field" style="flex:1;">
+        <label>Metros</label>
+        <input type="number" id="fM" class="mono" placeholder="200">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <div class="form-field" style="flex:1;">
+        <label>Sentido</label>
+        <select id="fSentit">
+          <option value="indeterminado">↔ Indeterminado</option>
+          <option value="creciente">↑ Creciente</option>
+          <option value="decreciente">↓ Decreciente</option>
+        </select>
+      </div>
+      <div class="form-field" style="flex:1;">
+        <label>Margen</label>
+        <select id="fMarge">
+          <option value="">— Sin margen —</option>
+          <option value="izquierdo">Izquierdo</option>
+          <option value="derecho">Derecho</option>
+          <option value="calzada">Calzada</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-label">DESCRIPCIÓN</div>
+    <div class="form-field">
+      <label>Descripción del elemento</label>
+      <input type="text" id="fDesc" placeholder="Señal R-101, bache, barrera New Jersey...">
+    </div>
+    <div class="form-field">
+      <label>Observaciones</label>
+      <textarea id="fObs" placeholder="Detalles adicionales, estado, urgencia..."></textarea>
+    </div>
+
+    <div class="form-section-label">FOTO</div>
+    <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoSeleccionada(this)">
+    <button class="field-btn gray" onclick="document.getElementById('fotoInput').click()">
+      <div class="fb-icon" style="background:var(--bg);">📷</div>
+      <div class="fb-text">
+        <div class="fb-label" id="fotoLabel">Añadir foto</div>
+        <div class="fb-sub">Cámara o galería</div>
+      </div>
+    </button>
+    <div id="fotoPreview" class="hidden" style="margin-bottom:12px;">
+      <img id="fotoImg" style="width:100%;border-radius:var(--radius);border:1px solid var(--border);">
+    </div>
+
+    <button class="btn-save" onclick="guardarRegistre()">
+      <span>💾</span> GUARDAR REGISTRO
+    </button>
+
+    <div style="height:8px;"></div>
+  </div>
+
+  <!-- ══ PESTAÑA 3: MAPA ══ -->
+  <div class="screen" id="screenMapa">
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-val" id="statTotal">0</div>
+        <div class="stat-lbl">Registros</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statKm">—</div>
+        <div class="stat-lbl">Carretera</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statSync" style="color:var(--warn);">0</div>
+        <div class="stat-lbl">Pendientes</div>
+      </div>
+    </div>
+
+    <div class="map-placeholder">
+      <span class="map-ph-icon">🗺️</span>
+      <div class="map-ph-label">Mapa de puntos inventariados</div>
+      <div class="map-ph-sub">Leaflet + clusters · Fase 2</div>
+    </div>
+
+    <div class="section-title">BUSCAR POR CARRETERA</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <div class="form-field" style="flex:1;margin:0;">
+        <input type="text" id="mapSearch" placeholder="C-14, N-240..." style="text-transform:uppercase;" class="mono">
+      </div>
+      <button class="btn-sm navy" style="width:50px;flex-shrink:0;" onclick="showToast('🗺 Búsqueda de carretera — Fase 2','',2500)">›</button>
+    </div>
+
+    <div class="section-title">HERRAMIENTAS</div>
+    <button class="field-btn navy" onclick="showToast('📏 Medición de distancias entre PKs — Fase 2','',2500)">
+      <div class="fb-icon">📏</div>
+      <div class="fb-text">
+        <div class="fb-label">Medir distancia entre PKs</div>
+        <div class="fb-sub">Herramienta de auscultación</div>
+      </div>
+    </button>
+    <button class="field-btn gray" onclick="showToast('📐 Medición de superficie — Fase 2','',2500)">
+      <div class="fb-icon">📐</div>
+      <div class="fb-text">
+        <div class="fb-label">Medir superficie de zona</div>
+        <div class="fb-sub">Cálculo de área de actuación</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- ══ PESTAÑA 4: HISTORIAL ══ -->
+  <div class="screen" id="screenHistorial">
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <input type="text" id="searchInc" placeholder="Buscar por carretera, PK, descripción..." style="flex:1;padding:10px 13px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:var(--font);font-size:13px;outline:none;" oninput="renderHistorial()">
+    </div>
+
+    <div class="filter-strip" id="filterStrip">
+      <div class="filter-pill active" data-f="all" onclick="setFilter(this,'all')">Todos</div>
+      <div class="filter-pill" data-f="inventari" onclick="setFilter(this,'inventari')">📋 Inventario</div>
+      <div class="filter-pill" data-f="incidencia" onclick="setFilter(this,'incidencia')">⚠️ Incidencias</div>
+      <div class="filter-pill" data-f="obra" onclick="setFilter(this,'obra')">🚧 Obras</div>
+      <div class="filter-pill" data-f="captura" onclick="setFilter(this,'captura')">📸 Fotos</div>
+    </div>
+
+    <div id="historialList">
+      <div class="empty-state">
+        <span class="empty-icon">📂</span>
+        <div class="empty-label">Sin registros</div>
+        <div class="empty-sub">Los registros guardados aparecerán aquí</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PESTAÑA 5: AJUSTES ══ -->
+  <div class="screen" id="screenAjustos">
+
+    <div class="settings-section">
+      <div class="settings-section-label">Perfil de usuario</div>
+      <div class="profile-selector">
+        <div class="profile-btn active" id="profileBrigada" onclick="setPerfil('brigada')">
+          <span class="pb-icon">👷</span>
+          <div class="pb-label">Brigada</div>
+          <div class="pb-sub">Campo · Botones grandes</div>
+        </div>
+        <div class="profile-btn" id="profileOficina" onclick="setPerfil('oficina')">
+          <span class="pb-icon">🖥️</span>
+          <div class="pb-label">Oficina</div>
+          <div class="pb-sub">Informes · Gestión</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Licencia y dispositivo</div>
+      <div class="settings-row">
+        <div class="settings-item">
+          <div class="settings-icon">🔑</div>
+          <div>
+            <div class="settings-label">Código de acceso</div>
+            <div class="settings-sub" id="licenseDisplay">No configurado</div>
+          </div>
+          <span class="settings-chevron">›</span>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon">📱</div>
+          <div>
+            <div class="settings-label">ID de dispositivo</div>
+            <div class="settings-sub mono" id="deviceIdDisplay">—</div>
+          </div>
+          <div class="settings-value" id="licenseStatus">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">GPS y detección PK</div>
+      <div class="settings-row">
+        <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:0;">
+          <div style="display:flex;align-items:center;width:100%;gap:12px;margin-bottom:8px;">
+            <div class="settings-icon">🎯</div>
+            <div>
+              <div class="settings-label">Umbral de carretera</div>
+              <div class="settings-sub">Distancia máxima al eje de calzada</div>
+            </div>
+          </div>
+          <div class="slider-container" style="padding:0;width:100%;">
+            <label>Umbral actual: <span id="llindarVal">150</span> m</label>
+            <input type="range" min="30" max="300" step="10" value="150" id="llindarSlider"
+              oninput="document.getElementById('llindarVal').textContent=this.value;llindar=+this.value;">
+          </div>
+        </div>
+        <div class="settings-item" style="cursor:default;">
+          <div class="settings-icon green">📡</div>
+          <div>
+            <div class="settings-label">Datos PK offline</div>
+            <div class="settings-sub" id="pkSyncStatus">Comprobando...</div>
+          </div>
+          <button class="btn-sm navy" style="margin-left:auto;width:70px;height:34px;font-size:11px;" onclick="syncPKs()">Sync</button>
+        </div>
+        <div class="settings-item" onclick="clearCache()">
+          <div class="settings-icon">🗑️</div>
+          <div>
+            <div class="settings-label">Borrar caché de PKs</div>
+            <div class="settings-sub">Libera espacio y fuerza nueva descarga</div>
+          </div>
+          <span class="settings-chevron">›</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Lista negra de carreteras</div>
+      <div class="settings-row">
+        <div class="settings-item" style="flex-direction:column;align-items:flex-start;">
+          <div class="settings-label" style="margin-bottom:6px;">Carreteras ignoradas</div>
+          <textarea id="blacklistTA" placeholder="Una carretera por línea. Ej: A-2&#10;N-II" style="width:100%;min-height:80px;padding:10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:var(--mono);font-size:13px;background:var(--bg);resize:vertical;" onchange="guardarListaNegra(this.value)"></textarea>
+          <div style="font-size:11px;color:var(--text-3);margin-top:6px;">Evita falsos positivos en viaductos o vías paralelas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Datos y exportación</div>
+      <div class="settings-row">
+        <div class="settings-item" onclick="exportarBackup()">
+          <div class="settings-icon orange">📤</div>
+          <div>
+            <div class="settings-label">Exportar backup JSON</div>
+            <div class="settings-sub">Todos los registros en un archivo</div>
+          </div>
+          <span class="settings-chevron">›</span>
+        </div>
+        <div class="settings-item" onclick="document.getElementById('importFile').click()">
+          <div class="settings-icon">📥</div>
+          <div>
+            <div class="settings-label">Importar backup</div>
+            <div class="settings-sub">Restaurar registros desde archivo</div>
+          </div>
+          <span class="settings-chevron">›</span>
+        </div>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarBackup(this)">
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Sistema</div>
+      <div class="settings-row">
+        <div class="settings-item" onclick="forzarActualizacion()">
+          <div class="settings-icon">🔄</div>
+          <div>
+            <div class="settings-label">Forzar actualización</div>
+            <div class="settings-sub">Borra caché del Service Worker</div>
+          </div>
+          <span class="settings-chevron">›</span>
+        </div>
+        <div class="settings-item" style="cursor:default;">
+          <div class="settings-icon">ℹ️</div>
+          <div>
+            <div class="settings-label">Versión</div>
+            <div class="settings-sub">Suite Digital Vial · Pilot v1.0</div>
+          </div>
+          <div class="settings-value">v1.0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="version-badge">Suite Digital Vial © 2026 · N.Arroyo<br>Pilot v1.0 · Motor PK-GEOLOC v2 integrado</div>
+  </div>
+
+</div><!-- /content-area -->
+
+<!-- TAB BAR -->
+<nav class="tab-bar">
+  <button class="tab-btn active" id="tab-gps" onclick="canviarTab('screenGPS','tab-gps')">
+    <span class="tab-icon">📡</span>
+    <span class="tab-label">GPS</span>
+  </button>
+  <button class="tab-btn tab-new" id="tab-nou" onclick="canviarTab('screenNou','tab-nou')">
+    <span class="tab-icon">➕</span>
+    <span class="tab-label">Nuevo</span>
+  </button>
+  <button class="tab-btn" id="tab-mapa" onclick="canviarTab('screenMapa','tab-mapa')">
+    <span class="tab-icon">🗺️</span>
+    <span class="tab-label">Mapa</span>
+  </button>
+  <button class="tab-btn" id="tab-hist" onclick="canviarTab('screenHistorial','tab-hist')">
+    <span class="tab-icon">📂</span>
+    <span class="tab-label">Historial</span>
+  </button>
+  <button class="tab-btn" id="tab-config" onclick="canviarTab('screenAjustos','tab-config')">
+    <span class="tab-icon">⚙️</span>
+    <span class="tab-label">Ajustes</span>
+  </button>
+</nav>
+
+<!-- MODAL: NUEVO REGISTRO RÁPIDO -->
+<div class="modal-backdrop" id="modalNou">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalNouTitle">Nueva Incidencia</div>
+
+    <div class="inc-type-grid" id="incTypeGrid">
+      <div class="inc-type-btn selected" data-inc="Deterioro calzada" onclick="selIncType(this)">
+        <span class="itb-icon">🕳️</span>
+        <div class="itb-label">Bache / deterioro</div>
+      </div>
+      <div class="inc-type-btn" data-inc="Señalización" onclick="selIncType(this)">
+        <span class="itb-icon">🚧</span>
+        <div class="itb-label">Señalización</div>
+      </div>
+      <div class="inc-type-btn" data-inc="Derrumbe / talud" onclick="selIncType(this)">
+        <span class="itb-icon">⛰️</span>
+        <div class="itb-label">Derrumbe</div>
+      </div>
+      <div class="inc-type-btn" data-inc="Agua / inundación" onclick="selIncType(this)">
+        <span class="itb-icon">💧</span>
+        <div class="itb-label">Agua</div>
+      </div>
+      <div class="inc-type-btn" data-inc="Accidente" onclick="selIncType(this)">
+        <span class="itb-icon">🚗</span>
+        <div class="itb-label">Accidente</div>
+      </div>
+      <div class="inc-type-btn" data-inc="Otro" onclick="selIncType(this)">
+        <span class="itb-icon">📝</span>
+        <div class="itb-label">Otro</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;">LOCALIZACIÓN DETECTADA</div>
+    <div class="autopk-strip" id="modalAutopkStrip">
+      <span id="modalAutopkIcon">📡</span>
+      <span id="modalAutopkMsg" style="font-size:12px;">Obteniendo posición GPS...</span>
+    </div>
+
+    <div class="form-field">
+      <label>Observaciones (opcional)</label>
+      <textarea id="modalObs" placeholder="Urgencia, estado, acceso..." style="min-height:60px;"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn-sm" style="flex:1;" onclick="cerrarModal('modalNou')">Cancelar</button>
+      <button class="btn-save" style="flex:2;margin:0;" onclick="guardarIncidenciaRapida()">
+        <span>💾</span> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     MOTOR PK — funciones preservadas íntegramente de PK-GEOLOC v2
+════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── CONFIG ──────────────────────────────────────────────────────── */
+const CFG = {
+  ARCGIS_URL: 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query',
+  IDB_NAME: 'SuiteVialV1',
+  IDB_VER: 1,
+  STORE_CACHE: 'pk_cache',
+  STORE_REG: 'registros',
+};
+
+/* ── ESTAT GLOBAL ─────────────────────────────────────────────────── */
+let llindar = 150;
+let llistaNegra = [];
+let pkCache = null;
+let ultimaPos = null;
+let ultimResultatObj = null;
+let sentit = 'indeterminado';
+let historialPos = [];
+let db = null;
+let currentFilter = 'all';
+let pendingModalTipus = 'incidencia';
+let pendingIncType = 'Deterioro calzada';
+let pendingModalRes = null;
+let pendingModalPos = null;
+
+/* ── IndexedDB ──────────────────────────────────────────────────── */
+async function initDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(CFG.IDB_NAME, CFG.IDB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(CFG.STORE_CACHE))
+        d.createObjectStore(CFG.STORE_CACHE, { keyPath: 'id' });
+      if (!d.objectStoreNames.contains(CFG.STORE_REG)) {
+        const s = d.createObjectStore(CFG.STORE_REG, { keyPath: 'id' });
+        s.createIndex('timestamp', 'timestamp', { unique: false });
+        s.createIndex('tipusEntrada', 'tipusEntrada', { unique: false });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbGet(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store);
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbPut(store, val) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(val);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbAdd(store, val) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).add(val);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbGetAll(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store);
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbDelete(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(key);
+    req.onsuccess = () => res();
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbClear(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).clear();
+    req.onsuccess = () => res();
+    req.onerror = () => rej(req.error);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOTOR PK — PRESERVAT ÍNTEGRAMENT DE PK-GEOLOC v2
+   Funcions: haversineM, interpolarPK, calcularPK, calcularSentit,
+   filtrarCache, filtrarSeed, consultarArcGIS
+════════════════════════════════════════════════════════════════════ */
+
+function haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function interpolarPK(uLat, uLon, p1, p2) {
+  const dx = p2.lon - p1.lon, dy = p2.lat - p1.lat;
+  const len2 = dx*dx + dy*dy;
+  if (len2 === 0) return null;
+  let t = ((uLon - p1.lon)*dx + (uLat - p1.lat)*dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  const projLat = p1.lat + t*dy, projLon = p1.lon + t*dx;
+  const dist = haversineM(uLat, uLon, projLat, projLon);
+  const pkDec = p1.pk + t*(p2.pk - p1.pk);
+  return { km: Math.floor(pkDec), m: Math.round((pkDec%1)*1000), carretera: p1.carretera, dist, pkDec, projLat, projLon };
+}
+
+function calcularPK(uLat, uLon, punts) {
+  if (!punts?.length) return null;
+  const grups = {};
+  punts.forEach(p => {
+    if (!p.carretera) return;
+    const nomNet = p.carretera.trim().toUpperCase();
+    if (llistaNegra.some(b => b.trim().toUpperCase() === nomNet)) return;
+    if (!grups[p.carretera]) grups[p.carretera] = [];
+    grups[p.carretera].push(p);
+  });
+  if (!Object.keys(grups).length) return null;
+  let millor = null;
+  for (const pks of Object.values(grups)) {
+    pks.sort((a,b) => a.pk - b.pk);
+    for (let i = 0; i < pks.length-1; i++) {
+      const r = interpolarPK(uLat, uLon, pks[i], pks[i+1]);
+      if (r && (!millor || r.dist < millor.dist)) millor = r;
+    }
+    if (pks.length === 1) {
+      const d = haversineM(uLat, uLon, pks[0].lat, pks[0].lon);
+      if (!millor || d < millor.dist)
+        millor = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk%1)*1000), carretera: pks[0].carretera, dist: d, pkDec: pks[0].pk };
+    }
+  }
+  return millor;
+}
+
+function calcularSentitAutomatic(nouPkDec) {
+  if (historialPos.length < 2) return;
+  const ant = historialPos[historialPos.length-2].pkDec;
+  const dif = nouPkDec - ant;
+  if (Math.abs(dif) < 0.001) return;
+  const nou = dif > 0 ? 'creciente' : 'decreciente';
+  if (nou !== sentit) { sentit = nou; }
+}
+
+function filtrarCache(lat, lon, bufGraus = 0.05) {
+  if (!Array.isArray(pkCache)) return [];
+  return pkCache.filter(p =>
+    p.lat >= lat-bufGraus && p.lat <= lat+bufGraus &&
+    p.lon >= lon-bufGraus && p.lon <= lon+bufGraus
+  );
+}
+
+function filtrarSeed(lat, lon, bufGraus = 0.08) {
+  if (typeof PK_SEED === 'undefined') return [];
+  const resultat = [];
+  const latMin=lat-bufGraus, latMax=lat+bufGraus, lonMin=lon-bufGraus, lonMax=lon+bufGraus;
+  for (const carretera in PK_SEED) {
+    const punts = PK_SEED[carretera];
+    for (let i=0; i<punts.length; i++) {
+      const [pk,pLat,pLon] = punts[i];
+      if (pLat>=latMin && pLat<=latMax && pLon>=lonMin && pLon<=lonMax)
+        resultat.push({ carretera, pk, lat:pLat, lon:pLon });
+    }
+  }
+  return resultat;
+}
+
+async function consultarArcGIS(lat, lon, bufGraus=0.06) {
+  const params = new URLSearchParams({
+    where:'1=1',
+    geometry:`${lon-bufGraus},${lat-bufGraus},${lon+bufGraus},${lat+bufGraus}`,
+    geometryType:'esriGeometryEnvelope', inSR:'4326', spatialRel:'esriSpatialRelIntersects',
+    outFields:'nombre,numero', returnGeometry:true, outSR:'4326', f:'json', resultRecordCount:200
+  });
+  const r = await fetch(`${CFG.ARCGIS_URL}?${params}`, { signal: AbortSignal.timeout(12000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  if (j.error) throw new Error(j.error.message);
+  return (j.features||[]).map(f => ({
+    carretera: f.attributes.nombre||'?',
+    pk: parseFloat(f.attributes.numero)||0,
+    lat: f.geometry.y, lon: f.geometry.x
+  })).filter(p => !isNaN(p.pk) && p.lat && p.lon);
+}
+
+/* ── GPS BAR UI ─────────────────────────────────────── */
+function setGPSBar(state, label, acc) {
+  const bar = document.getElementById('gpsBar');
+  bar.className = 'gps-status-bar ' + (state||'');
+  document.getElementById('gpsLabel').textContent = label;
+  const accEl = document.getElementById('gpsAcc');
+  if (acc != null) { accEl.textContent = `±${Math.round(acc)} m`; accEl.classList.remove('hidden'); }
+  else accEl.classList.add('hidden');
+}
+
+/* ── RESULT CARD UI ─────────────────────────────────── */
+function mostrarResultatOK(res) {
+  const mStr = String(res.m).padStart(3,'0');
+  ultimResultatObj = res;
+  const sentitCls = sentit === 'creciente' ? 'creciente' : sentit === 'decreciente' ? 'decreciente' : '';
+  const sentitIcon = sentit === 'creciente' ? '↑' : sentit === 'decreciente' ? '↓' : '↔';
+  const sentitTxt = sentit === 'creciente' ? 'Creciente' : sentit === 'decreciente' ? 'Decreciente' : 'Indeterminado';
+  document.getElementById('pkResultCard').className = 'pk-result-card ok';
+  document.getElementById('pkResultCard').innerHTML = `
+    <div class="pk-road">${res.carretera}</div>
+    <div class="pk-number">${res.km}<span class="sep">+</span>${mStr}</div>
+    <div class="pk-dist">±${Math.round(res.dist)} m del eje · GPS ±${Math.round(ultimaPos?.acc||0)} m</div>
+    <div class="pk-sentit ${sentitCls}">${sentitIcon} ${sentitTxt}</div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn-sm navy" onclick="copiarPK()">📋 Copiar</button>
+      <button class="btn-sm orange" onclick="compartirWA()">📲 WhatsApp</button>
+    </div>`;
+  // Sync form fields
+  document.getElementById('fCarretera').value = res.carretera;
+  document.getElementById('fKm').value = res.km;
+  document.getElementById('fM').value = mStr;
+  document.getElementById('fSentit').value = sentit;
+  // Sync modal
+  actualizarModalAutopk(res);
+}
+
+function mostrarResultatFora(carretera, dist) {
+  ultimResultatObj = null;
+  document.getElementById('pkResultCard').className = 'pk-result-card warn';
+  document.getElementById('pkResultCard').innerHTML = `
+    <div style="font-size:28px;margin-bottom:6px;">⚠️</div>
+    <div class="pk-warn-title">Fuera del área de carretera</div>
+    <div class="pk-warn-sub">${carretera ? `Más cercana: ${carretera} (${Math.round(dist)} m)` : 'Sin carretera detectada cerca'}</div>`;
+}
+
+function mostrarResultatError(msg) {
+  ultimResultatObj = null;
+  document.getElementById('pkResultCard').className = 'pk-result-card err';
+  document.getElementById('pkResultCard').innerHTML = `
+    <div style="font-size:28px;margin-bottom:6px;">🚫</div>
+    <div class="pk-warn-title">Error de detección</div>
+    <div class="pk-warn-sub">${msg}</div>`;
+}
+
+/* ── BOTÓN PRINCIPAL ─────────────────────────────────── */
+let gpsRunning = false;
+function setBtnLoading(loading) {
+  gpsRunning = loading;
+  const btn = document.getElementById('btnMain');
+  document.getElementById('btnIcon').textContent = loading ? '' : '📍';
+  document.getElementById('btnLabel').textContent = loading ? 'DETECTANDO...' : '¿DÓNDE ESTOY?';
+  btn.classList.toggle('loading', loading);
+  if (loading) {
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    spinner.id = 'btnSpinner';
+    document.getElementById('btnIcon').replaceWith(spinner);
+  } else {
+    const sp = document.getElementById('btnSpinner');
+    if (sp) { const ico = document.createElement('span'); ico.id='btnIcon'; ico.textContent='📍'; sp.replaceWith(ico); }
+  }
+}
+
+/* ── GEOLOCALIZACIÓN PRINCIPAL ───────────────────────── */
+async function executarGeolocal() {
+  if (gpsRunning) return;
+  if (!navigator.geolocation) {
+    mostrarResultatError('El navegador no admite geolocalización.');
+    showToast('Introduce los datos manualmente', 'warn'); return;
+  }
+  setBtnLoading(true);
+  setGPSBar('searching', 'Adquiriendo señal GPS...', null);
+  navigator.geolocation.getCurrentPosition(
+    pos => processarPosicio(pos),
+    err => gestionarErrorGPS(err),
+    { enableHighAccuracy: true, timeout: 35000, maximumAge: 5000 }
+  );
+}
+
+async function processarPosicio(pos) {
+  const { latitude:lat, longitude:lon, accuracy:acc } = pos.coords;
+  ultimaPos = { lat, lon, acc, timestamp: Date.now() };
+  setGPSBar('locked', 'Señal GPS adquirida', acc);
+  if (acc > 300) {
+    setBtnLoading(false);
+    mostrarResultatError(`Precisión GPS insuficiente (±${Math.round(acc)} m).`);
+    showToast('Introduce los datos manualmente', 'warn'); return;
+  }
+  setGPSBar('searching', 'Buscando PKs cercanos...', acc);
+  try {
+    let punts = filtrarCache(lat, lon, 0.05);
+    let font = 'cache';
+    if (punts.length < 2) { punts = filtrarSeed(lat, lon, 0.08); font = 'seed'; }
+    if (punts.length < 2) { punts = filtrarSeed(lat, lon, 0.15); }
+    if (punts.length < 2) {
+      setGPSBar('searching', 'Consultando ArcGIS...', acc);
+      punts = await consultarArcGIS(lat, lon, 0.06); font = 'arcgis';
+      if (punts.length < 2) punts = await consultarArcGIS(lat, lon, 0.12);
+    }
+    const res = calcularPK(lat, lon, punts);
+    if (!res) {
+      mostrarResultatFora(null, 0);
+      showToast('Zona urbana o fuera de la red de carreteras', 'warn');
+    } else if (res.dist > llindar) {
+      mostrarResultatFora(res.carretera, res.dist);
+      showToast(`Fuera del área (${Math.round(res.dist)} m)`, 'warn', 4000);
+    } else {
+      historialPos.push({ pkDec: res.pkDec, lat, lon, ts: Date.now() });
+      if (historialPos.length > 5) historialPos.shift();
+      calcularSentitAutomatic(res.pkDec);
+      mostrarResultatOK(res);
+      showToast(`${res.carretera} · PK ${res.km}+${String(res.m).padStart(3,'0')} · ${font === 'cache' ? 'Cache' : font === 'seed' ? 'Offline' : 'ArcGIS'}`, 'ok');
+      setGPSBar('locked', 'GPS activo', acc);
+    }
+  } catch(e) {
+    let puntsFallback = filtrarCache(lat, lon, 0.12);
+    if (!puntsFallback.length) { puntsFallback = filtrarSeed(lat, lon, 0.15); }
+    if (puntsFallback.length) {
+      const res = calcularPK(lat, lon, puntsFallback);
+      if (res && res.dist <= llindar) { mostrarResultatOK(res); showToast('Modo offline — seed local', 'warn'); }
+      else { mostrarResultatFora(res?.carretera, res?.dist); showToast('Offline: sin datos precisos para la zona', 'warn'); }
+    } else {
+      mostrarResultatError(`Error: ${e.message}`);
+      showToast(`Error ArcGIS: ${e.message}`, 'err');
+    }
+    setGPSBar('error', 'Error de conexión', acc);
+  }
+  setBtnLoading(false);
+}
+
+function gestionarErrorGPS(err) {
+  setBtnLoading(false);
+  if (ultimaPos && (filtrarSeed(ultimaPos.lat, ultimaPos.lon, 0.10).length >= 2 ||
+      filtrarCache(ultimaPos.lat, ultimaPos.lon, 0.10).length >= 2)) {
+    let punts = filtrarCache(ultimaPos.lat, ultimaPos.lon, 0.10);
+    if (!punts.length) punts = filtrarSeed(ultimaPos.lat, ultimaPos.lon, 0.10);
+    const res = calcularPK(ultimaPos.lat, ultimaPos.lon, punts);
+    if (res) { mostrarResultatOK(res); showToast('Usando última posición conocida', 'warn'); }
+  } else {
+    const msgs = { 1:'Permiso GPS denegado', 2:'Posición no disponible', 3:'Tiempo GPS agotado (35s)' };
+    mostrarResultatError(msgs[err.code] || 'Error GPS');
+    showToast(msgs[err.code] || 'Error GPS', 'err');
+    setGPSBar('error', msgs[err.code] || 'Error GPS', null);
+  }
+}
+
+/* ── CACHE PKs ───────────────────────────────────────── */
+async function carregarCache() {
+  try {
+    const row = await idbGet(CFG.STORE_CACHE, 'pks');
+    pkCache = row?.data || null;
+    actualitzarUICache();
+  } catch { pkCache = null; actualitzarUICache(); }
+}
+
+function actualitzarUICache() {
+  const el = document.getElementById('pkSyncStatus');
+  if (!el) return;
+  if (pkCache?.length) {
+    el.textContent = `${pkCache.length.toLocaleString()} PKs indexados · Offline OK`;
+  } else if (typeof PK_SEED !== 'undefined') {
+    el.textContent = 'Seed offline disponible (sin sincronizar)';
+  } else {
+    el.textContent = 'Sin datos locales · Requiere conexión';
+  }
+}
+
+async function syncPKs() {
+  showToast('Iniciando descarga de PKs...', 'ok', 4000);
+  let total = [], offset = 0, seguir = true;
+  const BATCH = 1000;
+  try {
+    while (seguir) {
+      const params = new URLSearchParams({ where:'1=1', outFields:'nombre,numero', returnGeometry:true, outSR:'4326', f:'json', resultRecordCount:BATCH, resultOffset:offset });
+      const r = await fetch(`${CFG.ARCGIS_URL}?${params}`, { signal: AbortSignal.timeout(30000) });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      const feats = j.features||[];
+      feats.forEach(f => {
+        const pkv = parseFloat(f.attributes.numero);
+        if (f.geometry && f.attributes.nombre && !isNaN(pkv))
+          total.push({ carretera:f.attributes.nombre, pk:pkv, lat:f.geometry.y, lon:f.geometry.x });
+      });
+      showToast(`Descargando... ${total.length.toLocaleString()} PKs`, '', 2000);
+      if (feats.length < BATCH) seguir = false;
+      else offset += BATCH;
+      if (offset > 20000) seguir = false;
+    }
+    if (!total.length) throw new Error('Sin datos recibidos');
+    await idbPut(CFG.STORE_CACHE, { id:'pks', data:total, data_sync:new Date().toISOString() });
+    pkCache = total;
+    actualitzarUICache();
+    showToast(`${total.length.toLocaleString()} PKs sincronizados`, 'ok', 4000);
+  } catch(e) {
+    showToast(`Error: ${e.message}`, 'err');
+  }
+}
+
+async function clearCache() {
+  if (!confirm('¿Borrar los datos locales de PKs?')) return;
+  await idbClear(CFG.STORE_CACHE);
+  pkCache = null;
+  actualitzarUICache();
+  showToast('Caché de PKs borrada', 'warn');
+}
+
+/* ── REGISTROS ──────────────────────────────────────── */
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+async function guardarRegistre() {
+  const carretera = document.getElementById('fCarretera').value.trim().toUpperCase();
+  const desc = document.getElementById('fDesc').value.trim();
+  if (!desc) { showToast('Introduce una descripción', 'warn'); return; }
+
+  const tipo = document.querySelector('#typeSel .launcher-btn.selected')?.dataset.t || 'inventari';
+  const ara = new Date();
+  const rec = {
+    id: genId(),
+    tipusEntrada: tipo,
+    timestamp: Date.now(),
+    fecha: ara.toLocaleDateString('es-ES'),
+    hora: ara.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+    gps: ultimaPos ? { lat:ultimaPos.lat, lon:ultimaPos.lon, accuracy:ultimaPos.acc } : null,
+    pk: {
+      carretera: carretera || (ultimResultatObj?.carretera || null),
+      km: parseInt(document.getElementById('fKm').value)||null,
+      m: parseInt(document.getElementById('fM').value)||null,
+      sentit: document.getElementById('fSentit').value,
+    },
+    desc,
+    marge: document.getElementById('fMarge').value,
+    obs: document.getElementById('fObs').value,
+    sync: { status:'local' }
+  };
+  try {
+    await idbAdd(CFG.STORE_REG, rec);
+    showToast(`Guardado: ${rec.pk.carretera||'—'} ${rec.pk.km != null ? 'PK '+rec.pk.km+'+'+String(rec.pk.m||0).padStart(3,'0') : ''}`, 'ok');
+    // Reset form
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fObs').value = '';
+    document.getElementById('fotoLabel').textContent = 'Añadir foto';
+    document.getElementById('fotoPreview').classList.add('hidden');
+    renderHistorial();
+    renderStats();
+    canviarTab('screenHistorial','tab-hist');
+  } catch(e) {
+    showToast('Error al guardar: '+e.message, 'err');
+  }
+}
+
+/* ── MODAL INCIDENCIA RÁPIDA ────────────────────────── */
+function abrirModalNouRegistre(tipus) {
+  pendingModalTipus = tipus;
+  const titles = { incidencia:'Nueva Incidencia', inventari:'Nuevo Inventario', captura:'Foto Rápida', obra:'Nueva Obra' };
+  document.getElementById('modalNouTitle').textContent = titles[tipus]||'Nuevo Registro';
+  document.getElementById('modalNou').classList.add('open');
+  document.getElementById('modalObs').value = '';
+  // Intentar inyectar datos GPS ya disponibles
+  if (ultimResultatObj && ultimaPos) {
+    actualizarModalAutopk(ultimResultatObj);
+  } else {
+    document.getElementById('modalAutopkMsg').textContent = 'Obteniendo posición GPS...';
+    document.getElementById('modalAutopkIcon').textContent = '📡';
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude:lat, longitude:lon, accuracy:acc } = pos.coords;
+        ultimaPos = { lat, lon, acc };
+        let punts = filtrarCache(lat, lon, 0.05);
+        if (punts.length < 2) punts = filtrarSeed(lat, lon, 0.10);
+        if (punts.length < 2) { try { punts = await consultarArcGIS(lat, lon, 0.06); } catch(_){} }
+        const res = calcularPK(lat, lon, punts);
+        if (res) {
+          pendingModalRes = res; pendingModalPos = ultimaPos;
+          actualizarModalAutopk(res);
+        } else {
+          document.getElementById('modalAutopkMsg').textContent = 'Sin carretera detectada. Introduce manualmente.';
+          document.getElementById('modalAutopkIcon').textContent = '⚠️';
+        }
+      }, () => {
+        document.getElementById('modalAutopkMsg').textContent = 'GPS no disponible. Introduce manualmente.';
+        document.getElementById('modalAutopkIcon').textContent = '🚫';
+      }, { enableHighAccuracy:true, timeout:15000, maximumAge:8000 });
+    }
+  }
+}
+
+function actualizarModalAutopk(res) {
+  if (!res) return;
+  const mStr = String(res.m).padStart(3,'0');
+  pendingModalRes = res;
+  document.getElementById('modalAutopkIcon').textContent = '✅';
+  document.getElementById('modalAutopkMsg').textContent = `${res.carretera} · PK ${res.km}+${mStr} · ±${Math.round(res.dist)} m del eje`;
+}
+
+async function guardarIncidenciaRapida() {
+  const nom = pendingIncType || 'Sin tipo';
+  const res = pendingModalRes || ultimResultatObj;
+  const pos = pendingModalPos || ultimaPos;
+  const ara = new Date();
+  const rec = {
+    id: genId(),
+    tipusEntrada: pendingModalTipus || 'incidencia',
+    timestamp: Date.now(),
+    fecha: ara.toLocaleDateString('es-ES'),
+    hora: ara.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+    gps: pos ? { lat:pos.lat, lon:pos.lon, accuracy:pos.acc } : null,
+    pk: {
+      carretera: res?.carretera || null,
+      km: res?.km ?? null,
+      m: res?.m ?? null,
+      sentit: sentit,
+    },
+    desc: nom,
+    obs: document.getElementById('modalObs').value,
+    sync: { status:'local' }
+  };
+  try {
+    await idbAdd(CFG.STORE_REG, rec);
+    const pkStr = res ? `${res.carretera} PK ${res.km}+${String(res.m).padStart(3,'0')}` : 'Sin PK';
+    showToast(`${nom} · ${pkStr}`, 'ok', 4000);
+    cerrarModal('modalNou');
+    renderHistorial();
+    renderStats();
+  } catch(e) {
+    showToast('Error al guardar: '+e.message, 'err');
+  }
+}
+
+function selIncType(el) {
+  document.querySelectorAll('.inc-type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  pendingIncType = el.dataset.inc;
+}
+
+/* ── HISTORIAL ──────────────────────────────────────── */
+let historialData = [];
+async function renderHistorial() {
+  historialData = await idbGetAll(CFG.STORE_REG);
+  historialData.sort((a,b) => b.timestamp - a.timestamp);
+  _paintHistorial();
+  renderStats();
+}
+
+function _paintHistorial() {
+  const q = document.getElementById('searchInc').value.toLowerCase();
+  const list = document.getElementById('historialList');
+  const COLORS = { inventari:'#1B4F72', incidencia:'#C0392B', obra:'#E67E22', captura:'#1E8449' };
+  const LABELS = { inventari:'Inventario', incidencia:'Incidencia', obra:'Obra', captura:'Foto' };
+
+  let items = historialData;
+  if (currentFilter !== 'all') items = items.filter(i => i.tipusEntrada === currentFilter);
+  if (q) items = items.filter(i =>
+    (i.pk?.carretera||'').toLowerCase().includes(q) ||
+    (i.desc||'').toLowerCase().includes(q) ||
+    (i.pk?.km != null ? String(i.pk.km) : '').includes(q)
+  );
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state"><span class="empty-icon">📂</span><div class="empty-label">Sin resultados</div><div class="empty-sub">Prueba otro filtro o búsqueda</div></div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const pkStr = item.pk?.km != null ? `PK ${item.pk.km}+${String(item.pk.m||0).padStart(3,'0')}` : 'Sin PK';
+    const road = item.pk?.carretera || '—';
+    const color = COLORS[item.tipusEntrada] || '#888';
+    const label = LABELS[item.tipusEntrada] || item.tipusEntrada;
+    const sentitStr = item.pk?.sentit === 'creciente' ? ' · ↑' : item.pk?.sentit === 'decreciente' ? ' · ↓' : '';
+    return `<div class="hist-item">
+      <div class="hist-color-bar" style="background:${color};"></div>
+      <div style="min-width:0;flex:1;">
+        <div class="hist-road">${road}${sentitStr}</div>
+        <div class="hist-pk">${pkStr}</div>
+        <div class="hist-desc">${item.desc||'—'} · ${item.fecha} ${item.hora||''}</div>
+      </div>
+      <div class="hist-badge ${item.tipusEntrada}">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(el, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  _paintHistorial();
+}
+
+async function renderStats() {
+  const all = historialData.length ? historialData : await idbGetAll(CFG.STORE_REG);
+  document.getElementById('statTotal').textContent = all.length;
+  const roads = [...new Set(all.map(r => r.pk?.carretera).filter(Boolean))];
+  document.getElementById('statKm').textContent = roads.length ? roads.slice(0,2).join(',') : '—';
+  const pend = all.filter(r => r.sync?.status === 'local').length;
+  document.getElementById('statSync').textContent = pend;
+  document.getElementById('statSync').style.color = pend > 0 ? 'var(--warn)' : 'var(--ok)';
+}
+
+/* ── FORMULARIO NUEVO ───────────────────────────────── */
+function selTipus(el, t) {
+  document.querySelectorAll('#typeSel .launcher-btn').forEach(p => {
+    p.classList.remove('selected');
+    p.style.borderWidth = '1.5px';
+    p.style.boxShadow = '';
+  });
+  el.classList.add('selected');
+  el.style.borderWidth = '2px';
+  el.style.boxShadow = '0 0 0 3px rgba(27,79,114,.12)';
+}
+
+function inyectarDadesGPS() {
+  if (!ultimResultatObj || !ultimaPos) {
+    document.getElementById('autopkStrip').style.borderColor = 'rgba(230,126,34,.3)';
+    document.getElementById('autopkMsg').textContent = 'GPS no disponible. Introduce la carretera y PK manualmente.';
+    document.getElementById('autopkIcon').textContent = '⚠️';
+    return;
+  }
+  const res = ultimResultatObj;
+  const mStr = String(res.m).padStart(3,'0');
+  document.getElementById('fCarretera').value = res.carretera;
+  document.getElementById('fKm').value = res.km;
+  document.getElementById('fM').value = mStr;
+  document.getElementById('fSentit').value = sentit;
+  document.getElementById('autopkStrip').style.borderColor = 'rgba(30,132,73,.4)';
+  document.getElementById('autopkStrip').style.background = 'var(--ok-bg)';
+  document.getElementById('autopkIcon').textContent = '✅';
+  document.getElementById('autopkMsg').textContent = `${res.carretera} · PK ${res.km}+${mStr} · ±${Math.round(res.dist)} m · GPS ±${Math.round(ultimaPos.acc)} m`;
+}
+
+function fotoSeleccionada(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('fotoLabel').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('fotoImg').src = e.target.result;
+    document.getElementById('fotoPreview').classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── COPIAR / COMPARTIR ─────────────────────────────── */
+function copiarPK() {
+  if (!ultimResultatObj) return;
+  const mStr = String(ultimResultatObj.m).padStart(3,'0');
+  const txt = `${ultimResultatObj.carretera} · PK ${ultimResultatObj.km}+${mStr}`;
+  navigator.clipboard.writeText(txt).then(() => showToast('Copiado al portapapeles', 'ok', 2000));
+}
+
+function compartirWA() {
+  if (!ultimResultatObj) return;
+  const mStr = String(ultimResultatObj.m).padStart(3,'0');
+  const txt = encodeURIComponent(`📍 *Carretera:* ${ultimResultatObj.carretera}\n🛣️ *PK:* ${ultimResultatObj.km}+${mStr}\n🧭 *Sentido:* ${sentit === 'creciente' ? '↑ Creciente' : sentit === 'decreciente' ? '↓ Decreciente' : '↔ Indeterminado'}${ultimaPos ? `\n🗺️ https://maps.google.com/?q=${ultimaPos.lat},${ultimaPos.lon}` : ''}`);
+  window.open(`https://wa.me/?text=${txt}`,'_blank');
+}
+
+/* ── AJUSTES ────────────────────────────────────────── */
+function setPerfil(p) {
+  localStorage.setItem('perfilUsuari', p);
+  document.getElementById('profileBrigada').classList.toggle('active', p==='brigada');
+  document.getElementById('profileOficina').classList.toggle('active', p==='oficina');
+  showToast(`Perfil: ${p === 'brigada' ? 'Brigada de campo' : 'Oficina / Ingeniería'}`, 'ok', 2000);
+}
+
+function guardarListaNegra(val) {
+  llistaNegra = val.split('\n').map(s=>s.trim()).filter(Boolean);
+  localStorage.setItem('llistaNegra', JSON.stringify(llistaNegra));
+  showToast(`Lista negra actualizada (${llistaNegra.length} carreteras)`, 'ok', 2000);
+}
+
+async function exportarBackup() {
+  const recs = await idbGetAll(CFG.STORE_REG);
+  const json = JSON.stringify({ app:'SuiteVialV1', ts:new Date().toISOString(), registros:recs }, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download = `suite-vial-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast(`Backup exportado (${recs.length} registros)`, 'ok');
+}
+
+function importarBackup(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const recs = data.registros || data;
+      let count = 0;
+      for (const r of recs) {
+        if (!r.id) r.id = genId();
+        try { await idbPut(CFG.STORE_REG, r); count++; } catch(_){}
+      }
+      showToast(`Importados ${count} registros`, 'ok');
+      renderHistorial();
+    } catch(e) { showToast('Error al importar: '+e.message,'err'); }
+  };
+  reader.readAsText(file);
+}
+
+async function forzarActualizacion() {
+  if (!confirm('¿Forzar actualización? Se borrarán las cachés del Service Worker.')) return;
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r=>r.unregister()));
+  }
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k=>caches.delete(k)));
+  }
+  showToast('Caché borrada. Recargando...','ok',2000);
+  setTimeout(()=>location.reload(),2000);
+}
+
+/* ── NAVEGACIÓN ─────────────────────────────────────── */
+function canviarTab(screenId, tabId) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+  if (screenId === 'screenNou') inyectarDadesGPS();
+  if (screenId === 'screenHistorial') renderHistorial();
+  if (screenId === 'screenMapa') renderStats();
+}
+
+/* ── MODAL ──────────────────────────────────────────── */
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove('open');
+  pendingModalRes = null;
+}
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) cerrarModal(m.id); });
+});
+
+/* ── TOAST ──────────────────────────────────────────── */
+function showToast(msg, type='', duration=3000) {
+  const c = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`; el.textContent = msg; c.appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); el.addEventListener('animationend',()=>el.remove()); }, duration);
+}
+
+/* ── OFFLINE BANNER ─────────────────────────────────── */
+function actualizarOfflineBanner() {
+  const badge = document.getElementById('offlineBadge');
+  badge.classList.toggle('visible', !navigator.onLine);
+}
+window.addEventListener('online', actualizarOfflineBanner);
+window.addEventListener('offline', actualizarOfflineBanner);
+
+/* ── INICIALIZACIÓN ─────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  await initDB();
+  await carregarCache();
+  actualizarOfflineBanner();
+
+  try {
+    const ln = localStorage.getItem('llistaNegra');
+    if (ln) { llistaNegra = JSON.parse(ln); document.getElementById('blacklistTA').value = llistaNegra.join('\n'); }
+  } catch(_){}
+
+  const p = localStorage.getItem('perfilUsuari') || 'brigada';
+  document.getElementById('profileBrigada').classList.toggle('active', p==='brigada');
+  document.getElementById('profileOficina').classList.toggle('active', p==='oficina');
+
+  let did = localStorage.getItem('deviceId');
+  if (!did) { did = Math.random().toString(36).slice(2,10).toUpperCase(); localStorage.setItem('deviceId',did); }
+  const disp = document.getElementById('deviceIdDisplay');
+  if (disp) disp.textContent = did;
+
+  renderHistorial();
+  renderStats();
+  actualitzarUICache();
+});
+
+/* ── SERVICE WORKER ─────────────────────────────────── */
+if ('serviceWorker' in navigator) {
+  const SW_VERSION = 'suite-vial-pilot-v1';
+  const swCode = `const CACHE='${SW_VERSION}';const SHELL=['./'];self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{if(!e.request.url.startsWith('http'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok&&e.request.method==='GET'){const c=res.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c));}return res;}).catch(()=>caches.match('./'))));});`;
+  const blob = new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob),{scope:'./'}).catch(()=>{});
+}
+</script>
+</body>
+</html>
