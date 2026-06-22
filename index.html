@@ -9238,36 +9238,68 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     document.addEventListener('DOMContentLoaded', () => setTimeout(_updateOnlineBadge, 200));
 }
 /* ============================================================
-   PK MAPA — MODULE
+   PK MAPA — MODULE  v2
    ============================================================ */
 let pkmMap = null;
-let pkmMarker = null;       // draggable crosshair marker
-let pkmGpsMarker = null;    // GPS position marker
+let pkmMarker = null;
+let pkmGpsMarker = null;
 let pkmGpsCircle = null;
-let pkmGpsWatchId = null;
-let pkmMeasureMode = null;  // 'poly' | 'area' | null
-let pkmMeasurePoints = [];
-let pkmMeasureLayers = [];
-let pkmSheetPos = 0;        // 0=peek, 1=mid, 2=full
-const PKM_SHEET_POSITIONS = [90, 220, 420]; // px from bottom
+let pkmMeasureMode = null;   // 'poly' | 'area' | null
+let pkmMeasurePoints = [];   // L.LatLng[]
+let pkmMeasureMarkers = [];  // draggable L.Marker[] per point
+let pkmMeasureLine = null;   // L.Polyline or L.Polygon
+let pkmSheetPos = 0;         // 0=hidden, 1=tools visible
+// Sheet heights (translateY from bottom = 0 baseline)
+// pos 0: only pill visible (~28px), pos 1: tools + result (~180px)
+const PKM_SNAP = [28, 185];
 
-/* ── ArcGIS PK lookup (same API used in existing autopk) ─ */
+/* ── ArcGIS PK lookup by proximity ────────────────────── */
 async function pkmLookupPK(lat, lng) {
-    try {
-        const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=150&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&f=json`;
-        const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
-        if (!r.ok) return null;
-        const d = await r.json();
-        if (!d.features || d.features.length === 0) return null;
-        // Pick closest
-        const feat = d.features[0].attributes;
-        const carr = feat.CODI_CARRETERA || feat.CARRETERA || '';
-        const km   = feat.KM !== undefined ? feat.KM : (feat.KMPK || '');
-        const m    = feat.M  !== undefined ? feat.M  : (feat.MPKFIN || 0);
-        if (!carr) return null;
-        const mStr = String(Math.round(m)).padStart(3,'0');
-        return { road: carr, pk: `${km}+${mStr}` };
-    } catch { return null; }
+    // Try ArcGIS with generous buffer (300m), multiple field name variants
+    const apis = [
+        `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&distance=300&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&orderByFields=Shape&f=json`,
+        `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&f=json`
+    ];
+    for (const url of apis) {
+        try {
+            const r = await fetch(url, { signal: AbortSignal.timeout(7000) });
+            if (!r.ok) continue;
+            const d = await r.json();
+            if (!d.features || d.features.length === 0) continue;
+            // Try multiple field name combinations
+            const feat = d.features[0].attributes;
+            const carr = feat.CODI_CARRETERA || feat.CARRETERA || feat.NOM_CARRETERA || feat.ROAD || '';
+            if (!carr) continue;
+            // KM field variants
+            const km = feat.KM ?? feat.KM_INICI ?? feat.KMPK ?? feat.KM_INI ?? '';
+            const m  = feat.M  ?? feat.METRES   ?? feat.M_INICI ?? feat.MPKFIN ?? 0;
+            const mStr = String(Math.round(Number(m))).padStart(3, '0');
+            return { road: carr, pk: `${km}+${mStr}` };
+        } catch { /* continue to next */ }
+    }
+    // Fallback: try the existing seed data if loaded
+    if (window._pksData && window._pksData.length > 0) {
+        return pkmLookupFromSeed(lat, lng);
+    }
+    return null;
+}
+
+/* ── Seed data fallback (uses global _pksData if available) ── */
+function pkmLookupFromSeed(lat, lng) {
+    if (!window._pksData) return null;
+    const degBuffer = 0.004;
+    const near = window._pksData.filter(p =>
+        Math.abs(p.lat - lat) < degBuffer && Math.abs(p.lng - lng) < degBuffer
+    );
+    if (!near.length) return null;
+    near.sort((a, b) => {
+        const da = Math.hypot(a.lat - lat, a.lng - lng);
+        const db = Math.hypot(b.lat - lat, b.lng - lng);
+        return da - db;
+    });
+    const best = near[0];
+    const mStr = String(best.m || 0).padStart(3, '0');
+    return { road: best.carretera, pk: `${best.km}+${mStr}` };
 }
 
 /* ── Nominatim geocoder ───────────────────────────────── */
@@ -9280,31 +9312,47 @@ async function pkmGeocode(q) {
     } catch { return []; }
 }
 
-/* ── PK string parser: C-14 120+200 ──────────────────── */
+/* ── PK string parser: C-14 120+200 or C-14 120 ──────── */
 function pkmParsePK(text) {
-    const m = text.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)\+(\d+)/);
-    if (!m) return null;
-    return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: parseInt(m[3]) };
+    // With metres: C-14 120+200
+    let m = text.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)\+(\d+)/);
+    if (m) return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: parseInt(m[3]) };
+    // Without metres: C-14 120
+    m = text.match(/^([A-Za-z][A-Za-z0-9-]*)\s+(\d+)$/);
+    if (m) return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: 0 };
+    return null;
 }
 
-/* ── ArcGIS reverse: search by road+km ───────────────── */
+/* ── ArcGIS search by road+km → lat/lng ──────────────── */
 async function pkmSearchByPK(road, km, m) {
-    try {
-        const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?where=CODI_CARRETERA%3D'${encodeURIComponent(road)}'%20AND%20KM%3D${km}&outFields=*&outSR=4326&returnGeometry=true&f=json`;
-        const r = await fetch(url, { signal: AbortSignal.timeout(7000) });
-        if (!r.ok) return null;
-        const d = await r.json();
-        if (!d.features || d.features.length === 0) return null;
-        // Find closest m
-        let best = d.features[0];
-        let bestDist = Math.abs((best.attributes.M || 0) - m);
-        d.features.forEach(f => {
-            const dist = Math.abs((f.attributes.M || 0) - m);
-            if (dist < bestDist) { bestDist = dist; best = f; }
-        });
-        if (!best.geometry) return null;
-        return { lat: best.geometry.y, lng: best.geometry.x };
-    } catch { return null; }
+    // Try multiple WHERE clause variants
+    const wheres = [
+        `CODI_CARRETERA='${road}' AND KM=${km}`,
+        `CARRETERA='${road}' AND KM=${km}`,
+        `CODI_CARRETERA='${road}' AND KM_INICI=${km}`,
+        `NOM_CARRETERA='${road}' AND KM=${km}`
+    ];
+    for (const where of wheres) {
+        try {
+            const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?where=${encodeURIComponent(where)}&outFields=*&outSR=4326&returnGeometry=true&f=json`;
+            const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+            if (!r.ok) continue;
+            const d = await r.json();
+            if (!d.features || d.features.length === 0) continue;
+            // Pick closest metre value
+            let best = d.features[0];
+            const mField = best.attributes.M ?? best.attributes.METRES ?? best.attributes.M_INICI ?? 0;
+            let bestDist = Math.abs(Number(mField) - m);
+            d.features.forEach(f => {
+                const fm = Number(f.attributes.M ?? f.attributes.METRES ?? f.attributes.M_INICI ?? 0);
+                const dist = Math.abs(fm - m);
+                if (dist < bestDist) { bestDist = dist; best = f; }
+            });
+            if (!best.geometry) continue;
+            return { lat: best.geometry.y, lng: best.geometry.x };
+        } catch { /* next */ }
+    }
+    return null;
 }
 
 /* ── Init the PK Mapa ────────────────────────────────── */
@@ -9375,9 +9423,9 @@ function abrirPKMapa() {
             await pkmFetchAndShowPK(e.latlng.lat, e.latlng.lng);
         });
 
-        // Sheet init
+        // Sheet init — push to hidden pos after first render so offsetHeight is known
         pkmInitSheet();
-        pkmSetSheetPos(0);
+        setTimeout(() => pkmSetSheetPos(0), 100);
 
     }, 80);
 }
@@ -9477,61 +9525,81 @@ function pkmAbrirStreetView() {
     window.open(url, '_blank');
 }
 
-/* ── Draggable bottom sheet ─────────────────────────── */
+/* ── Draggable bottom sheet — 2 positions ───────────── */
 function pkmInitSheet() {
     const sheet  = document.getElementById('pkm-sheet');
     const handle = document.getElementById('pkm-sheet-handle');
     if (!sheet || !handle) return;
 
-    let startY = 0, startTop = 0, dragging = false;
+    // Set sheet to full natural height, controlled by translateY
+    sheet.style.height = 'auto';
+    sheet.style.maxHeight = '70vh';
+
+    let startY = 0, currentTranslate = 0, dragging = false;
+
+    function getTranslate() {
+        const m = new DOMMatrix(getComputedStyle(sheet).transform);
+        return m.m42 || 0;
+    }
 
     function onStart(e) {
         dragging = true;
-        startY   = (e.touches ? e.touches[0].clientY : e.clientY);
-        startTop = sheet.getBoundingClientRect().top;
+        startY = e.touches ? e.touches[0].clientY : e.clientY;
+        currentTranslate = getTranslate();
         sheet.style.transition = 'none';
     }
     function onMove(e) {
         if (!dragging) return;
         e.preventDefault();
-        const y = (e.touches ? e.touches[0].clientY : e.clientY);
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
         const dy = y - startY;
-        const h  = window.innerHeight;
-        const newBottom = Math.max(0, Math.min(h * 0.8, (h - startTop - sheet.offsetHeight) - dy + (h - startTop - sheet.offsetHeight)));
-        // Simpler: just set translateY
-        const raw = dy;
-        sheet.style.transform = `translateY(${Math.max(-h*0.7, Math.min(PKM_SHEET_POSITIONS[0], raw))}px)`;
+        const newT = Math.max(0, currentTranslate + dy);
+        sheet.style.transform = `translateY(${newT}px)`;
     }
     function onEnd(e) {
         if (!dragging) return;
         dragging = false;
         sheet.style.transition = '';
-        sheet.style.transform = '';
-        const y = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY);
+        const y = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
         const dy = y - startY;
-        if (dy < -60 && pkmSheetPos < 2) pkmSetSheetPos(pkmSheetPos + 1);
-        else if (dy > 60 && pkmSheetPos > 0) pkmSetSheetPos(pkmSheetPos - 1);
-        else pkmSetSheetPos(pkmSheetPos);
-        if (pkmMap) pkmMap.invalidateSize();
+        if (dy < -40) pkmSetSheetPos(1);       // swipe up → open
+        else if (dy > 40) pkmSetSheetPos(0);   // swipe down → hide
+        else pkmSetSheetPos(pkmSheetPos);       // snap back
+        if (pkmMap) setTimeout(() => pkmMap.invalidateSize(), 320);
     }
 
-    handle.addEventListener('touchstart', onStart, { passive:true });
-    document.addEventListener('touchmove', onMove, { passive:false });
-    document.addEventListener('touchend', onEnd);
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove',  onMove, { passive: false });
+    document.addEventListener('touchend',   onEnd);
     handle.addEventListener('mousedown', onStart);
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('mousemove',  onMove);
+    document.addEventListener('mouseup',    onEnd);
 }
 
 function pkmSetSheetPos(pos) {
-    pkmSheetPos = Math.max(0, Math.min(2, pos));
-    const sheet = document.getElementById('pkm-sheet');
+    pkmSheetPos = pos ? 1 : 0;
+    const sheet    = document.getElementById('pkm-sheet');
     const leftCtrl = document.querySelector('.pkm-left-controls');
     if (!sheet) return;
-    const h = PKM_SHEET_POSITIONS[pkmSheetPos];
-    sheet.style.height = h + 'px';
-    sheet.style.overflow = pkmSheetPos > 0 ? 'auto' : 'hidden';
-    if (leftCtrl) leftCtrl.style.bottom = (h + 16) + 'px';
+
+    if (pkmSheetPos === 0) {
+        // Hidden: only pill visible — translateY = sheet height - pill area (~28px)
+        sheet.style.transition = 'transform 0.32s cubic-bezier(.4,0,.2,1)';
+        // Get natural height then push down leaving 28px
+        requestAnimationFrame(() => {
+            const h = sheet.offsetHeight;
+            sheet.style.transform = `translateY(${h - 28}px)`;
+            if (leftCtrl) leftCtrl.style.bottom = '52px';
+        });
+    } else {
+        // Open: fully visible
+        sheet.style.transition = 'transform 0.32s cubic-bezier(.4,0,.2,1)';
+        sheet.style.transform = 'translateY(0)';
+        requestAnimationFrame(() => {
+            const h = sheet.offsetHeight;
+            if (leftCtrl) leftCtrl.style.bottom = (h + 16) + 'px';
+        });
+    }
 }
 
 /* ── Search ─────────────────────────────────────────── */
@@ -9621,56 +9689,80 @@ function pkmActivarMesura(mode) {
     if (pkmMeasureMode === mode) { pkmTancarMesura(); return; }
     pkmTancarMesura();
     pkmMeasureMode = mode;
-    pkmMeasurePoints = [];
     document.getElementById('pkm-tool-poly').classList.toggle('active', mode === 'poly');
     document.getElementById('pkm-tool-area').classList.toggle('active', mode === 'area');
     document.getElementById('pkm-measure-close').style.display = 'flex';
     document.getElementById('pkm-measure-result').style.display = 'none';
-    showToast(mode === 'poly' ? '📏 Toca el mapa per mesurar distància' : '⬡ Toca el mapa per mesurar superfície');
+    showToast(mode === 'poly' ? '📏 Toca el mapa per afegir punts · Arrossega per moure\'ls' : '⬡ Toca el mapa per afegir punts del polígon');
     pkmSetSheetPos(1);
 }
 
+/* Draggable measure point icon */
+const _pkmDotIcon = () => L.divIcon({
+    className: '',
+    html: `<div style="width:14px;height:14px;border-radius:50%;background:#f59e0b;border:2.5px solid white;box-shadow:0 1px 6px rgba(0,0,0,0.5);cursor:grab;"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+});
+
 function pkmAddMeasurePoint(latlng) {
+    // Create draggable marker for the point
+    const marker = L.marker(latlng, {
+        icon: _pkmDotIcon(),
+        draggable: true,
+        zIndexOffset: 100
+    }).addTo(pkmMap);
+
+    marker.on('drag', () => pkmRedrawMeasure());
+    marker.on('dragend', () => pkmRedrawMeasure());
+
+    pkmMeasureMarkers.push(marker);
     pkmMeasurePoints.push(latlng);
-    // Draw dot
-    const dot = L.circleMarker(latlng, { radius: 5, color:'#f59e0b', fillColor:'#f59e0b', fillOpacity:1, weight:2 }).addTo(pkmMap);
-    pkmMeasureLayers.push(dot);
+    pkmRedrawMeasure();
+}
 
-    if (pkmMeasurePoints.length >= 2) {
-        // Draw line
-        const line = L.polyline(pkmMeasurePoints, { color:'#f59e0b', weight: 2.5, dashArray:'6,4' }).addTo(pkmMap);
-        // Remove prev line, keep only last
-        if (pkmMeasureLayers.length > 2) {
-            const old = pkmMeasureLayers.find(l => l instanceof L.Polyline || l instanceof L.Polygon);
-            if (old) { old.remove(); pkmMeasureLayers = pkmMeasureLayers.filter(l => l !== old); }
-        }
-        pkmMeasureLayers.push(line);
+function pkmRedrawMeasure() {
+    // Sync positions from draggable markers
+    pkmMeasurePoints = pkmMeasureMarkers.map(mk => mk.getLatLng());
 
-        if (pkmMeasureMode === 'poly') {
-            // Total distance
-            let dist = 0;
-            for (let i = 1; i < pkmMeasurePoints.length; i++) {
-                dist += pkmMeasurePoints[i-1].distanceTo(pkmMeasurePoints[i]);
-            }
-            const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
-            const res = document.getElementById('pkm-measure-result');
-            res.textContent = `📏 Distància: ${label}`;
-            res.style.display = 'block';
-        } else if (pkmMeasureMode === 'area' && pkmMeasurePoints.length >= 3) {
-            const poly = L.polygon(pkmMeasurePoints, { color:'#f59e0b', fillColor:'#f59e0b', fillOpacity:0.15, weight:2 }).addTo(pkmMap);
-            pkmMeasureLayers.push(poly);
-            // Shoelace area using Leaflet's latLngToLayerPoint
-            const area = pkmCalcArea(pkmMeasurePoints);
-            const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
-            const res = document.getElementById('pkm-measure-result');
-            res.textContent = `⬡ Superfície: ${label}`;
-            res.style.display = 'block';
+    // Remove old line/polygon
+    if (pkmMeasureLine) { pkmMeasureLine.remove(); pkmMeasureLine = null; }
+
+    if (pkmMeasurePoints.length < 2) return;
+
+    if (pkmMeasureMode === 'poly') {
+        pkmMeasureLine = L.polyline(pkmMeasurePoints, {
+            color: '#f59e0b', weight: 2.5, dashArray: '8,5'
+        }).addTo(pkmMap);
+
+        let dist = 0;
+        for (let i = 1; i < pkmMeasurePoints.length; i++) {
+            dist += pkmMeasurePoints[i-1].distanceTo(pkmMeasurePoints[i]);
         }
+        const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
+        const el = document.getElementById('pkm-measure-result');
+        el.innerHTML = `📏 Distància: <strong>${label}</strong> · <span style="opacity:.6;font-size:.8em">${pkmMeasurePoints.length} punts</span>`;
+        el.style.display = 'block';
+
+    } else if (pkmMeasureMode === 'area' && pkmMeasurePoints.length >= 3) {
+        pkmMeasureLine = L.polygon(pkmMeasurePoints, {
+            color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.12, weight: 2
+        }).addTo(pkmMap);
+
+        const area = pkmCalcArea(pkmMeasurePoints);
+        const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
+        const el = document.getElementById('pkm-measure-result');
+        el.innerHTML = `⬡ Superfície: <strong>${label}</strong> · <span style="opacity:.6;font-size:.8em">${pkmMeasurePoints.length} vèrtexs</span>`;
+        el.style.display = 'block';
+    } else if (pkmMeasureMode === 'area') {
+        // 2 points in area mode: just draw a line
+        pkmMeasureLine = L.polyline(pkmMeasurePoints, {
+            color: '#f59e0b', weight: 2, dashArray: '6,4'
+        }).addTo(pkmMap);
     }
 }
 
 function pkmCalcArea(points) {
-    // Spherical excess using geographic coords (approximate via meters)
     const R = 6371000;
     let area = 0;
     const n = points.length;
@@ -9688,8 +9780,9 @@ function pkmCalcArea(points) {
 function pkmTancarMesura() {
     pkmMeasureMode = null;
     pkmMeasurePoints = [];
-    pkmMeasureLayers.forEach(l => { try { l.remove(); } catch {} });
-    pkmMeasureLayers = [];
+    pkmMeasureMarkers.forEach(m => { try { m.remove(); } catch {} });
+    pkmMeasureMarkers = [];
+    if (pkmMeasureLine) { try { pkmMeasureLine.remove(); } catch {} pkmMeasureLine = null; }
     document.getElementById('pkm-tool-poly').classList.remove('active');
     document.getElementById('pkm-tool-area').classList.remove('active');
     document.getElementById('pkm-measure-close').style.display = 'none';
