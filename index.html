@@ -9757,7 +9757,6 @@ async function pkmAnarAPK() {
     if (!carr) { showToast('Introdueix la carretera', 'warn'); return; }
     pkmTancarSheet();
     pkmMostrarLoading(true);
-    showToast(`Buscant ${carr} PK ${km}+${String(m).padStart(3,'0')}...`, 'ok');
     try {
         const pos = await pkmBuscarPosPK(carr, km, m);
         if (!pos) { showToast(`No s'ha trobat ${carr}`, 'err'); return; }
@@ -9770,23 +9769,61 @@ async function pkmAnarAPK() {
 }
 
 async function pkmBuscarPosPK(road, km, m) {
+    // 1) Primer intent: motor geoloc si disponible (consultarArcGIScarretera + interpolació)
     if (typeof mapBuscarPosPK === 'function') {
-        try { const p = await mapBuscarPosPK(road, km, m); if (p) return { lat: p.lat, lon: p.lon || p.lng }; } catch {}
+        try {
+            const p = await mapBuscarPosPK(road, km, m);
+            if (p) return { lat: p.lat, lon: p.lon || p.lng };
+        } catch {}
     }
+
+    // 2) Query directa ArcGIS Spain: filtrar per carretera i rang de PK
+    // El camp numero és el PK decimal (ex: 130.0 = km 130 + 000m)
+    const pkTarget = km + m / 1000;
+    const margin = 1.5; // ±1.5 km de marge per trobar punts propers
     try {
-        const params = new URLSearchParams({ where: `UPPER(nombre)='${road}'`, outFields: 'nombre,numero', returnGeometry: true, outSR: '4326', f: 'json', resultRecordCount: 2000, orderByFields: 'numero ASC' });
+        const params = new URLSearchParams({
+            where: `UPPER(nombre)='${road}' AND numero >= ${pkTarget - margin} AND numero <= ${pkTarget + margin}`,
+            outFields: 'nombre,numero',
+            returnGeometry: true, outSR: '4326', f: 'json',
+            resultRecordCount: 200, orderByFields: 'numero ASC'
+        });
         const r = await fetch(`${PKM_ARCGIS}?${params}`, { signal: AbortSignal.timeout(12000) });
         const d = await r.json();
-        const punts = (d.features||[]).map(f => ({ pk: parseFloat(f.attributes.numero)||0, lat: f.geometry.y, lon: f.geometry.x })).filter(p=>!isNaN(p.pk)).sort((a,b)=>a.pk-b.pk);
+        let punts = (d.features||[]).map(f => ({
+            pk: parseFloat(f.attributes.numero) || 0,
+            lat: f.geometry.y, lon: f.geometry.x
+        })).filter(p => !isNaN(p.pk)).sort((a,b) => a.pk - b.pk);
+
+        // Si no troba amb rang estret, ampliar a tota la carretera
+        if (!punts.length) {
+            const p2 = new URLSearchParams({
+                where: `UPPER(nombre)='${road}'`,
+                outFields: 'nombre,numero', returnGeometry: true, outSR: '4326',
+                f: 'json', resultRecordCount: 2000, orderByFields: 'numero ASC'
+            });
+            const r2 = await fetch(`${PKM_ARCGIS}?${p2}`, { signal: AbortSignal.timeout(15000) });
+            const d2 = await r2.json();
+            punts = (d2.features||[]).map(f => ({
+                pk: parseFloat(f.attributes.numero) || 0,
+                lat: f.geometry.y, lon: f.geometry.x
+            })).filter(p => !isNaN(p.pk)).sort((a,b) => a.pk - b.pk);
+        }
+
         if (!punts.length) return null;
-        const pkTarget = km + m/1000;
-        for (let i=0; i<punts.length-1; i++) {
+
+        // Interpolació lineal entre els dos punts més propers al pkTarget
+        for (let i = 0; i < punts.length - 1; i++) {
             if (punts[i].pk <= pkTarget && punts[i+1].pk >= pkTarget) {
-                const t = (pkTarget-punts[i].pk)/(punts[i+1].pk-punts[i].pk);
-                return { lat: punts[i].lat + t*(punts[i+1].lat-punts[i].lat), lon: punts[i].lon + t*(punts[i+1].lon-punts[i].lon) };
+                const t = (pkTarget - punts[i].pk) / (punts[i+1].pk - punts[i].pk);
+                return {
+                    lat: punts[i].lat + t * (punts[i+1].lat - punts[i].lat),
+                    lon: punts[i].lon + t * (punts[i+1].lon - punts[i].lon)
+                };
             }
         }
-        return punts.reduce((a,b)=>Math.abs(b.pk-pkTarget)<Math.abs(a.pk-pkTarget)?b:a);
+        // Punt més proper si no hi ha interpolació
+        return punts.reduce((a,b) => Math.abs(b.pk - pkTarget) < Math.abs(a.pk - pkTarget) ? b : a);
     } catch { return null; }
 }
 
@@ -9863,23 +9900,24 @@ function pkmSearchInput(val) {
 
 async function pkmGoToRoadPK(road, km, m) {
     document.getElementById('pkmTopDrop').classList.remove('open');
-    document.getElementById('pkmSearchInp').value = `${road} ${km}+${String(m).padStart(3,'0')}`;
-    if (km > 0 || m > 0) {
-        pkmMostrarLoading(true);
+    document.getElementById('pkmSearchInp').value = km > 0 ? `${road} ${km}+${String(m).padStart(3,'0')}` : road;
+    pkmMostrarLoading(true);
+    try {
         const pos = await pkmBuscarPosPK(road, km, m);
-        if (pos) { pkmMap.flyTo([pos.lat, pos.lon], 15, {animate:true,duration:1.2}); pkmDragPin.setLatLng([pos.lat,pos.lon]); pkmCalcPK(pos.lat,pos.lon,false); }
-        else showToast(`No s'ha trobat ${road}`, 'err');
-        pkmMostrarLoading(false);
-    } else {
-        const cache = typeof pkCache !== 'undefined' && pkCache ? pkCache : [];
-        const punt = cache.find(p=>p.carretera===road);
-        if (punt) { pkmMap.flyTo([punt.lat, punt.lon||punt.lng], 13, {animate:true,duration:1}); pkmDragPin.setLatLng([punt.lat,punt.lon||punt.lng]); pkmCalcPK(punt.lat,punt.lon||punt.lng,true); }
-        else {
-            pkmMostrarLoading(true);
-            const pos = await pkmBuscarPosPK(road, 0, 0);
-            if (pos) { pkmMap.flyTo([pos.lat,pos.lon],13,{animate:true,duration:1}); pkmDragPin.setLatLng([pos.lat,pos.lon]); pkmCalcPK(pos.lat,pos.lon,true); }
-            pkmMostrarLoading(false);
+        if (pos) {
+            const zoom = km > 0 ? 15 : 13;
+            pkmMap.flyTo([pos.lat, pos.lon], zoom, { animate: true, duration: 1.2 });
+            pkmDragPin.setLatLng([pos.lat, pos.lon]);
+            // Usa exactament el mateix motor que el pin: consultarArcGIS + calcularPK
+            await pkmCalcPK(pos.lat, pos.lon, false);
+            if (km > 0) showToast(`${road} PK ${km}+${String(m).padStart(3,'0')} localitzat`, 'ok', 2000);
+        } else {
+            showToast(`No s'ha trobat ${road}`, 'err');
         }
+    } catch(e) {
+        showToast('Error cercant: ' + e.message, 'err');
+    } finally {
+        pkmMostrarLoading(false);
     }
 }
 function pkmGoToLatLon(lat, lon) {
