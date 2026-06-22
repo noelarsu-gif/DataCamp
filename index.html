@@ -3551,8 +3551,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="brand-sub">Gestió de Carreteres</div>
     </div>
     <div style="padding:12px;">
-        <button class="nav-item" onclick="mobileNavTo('localitzar')"><span class="nav-icon">📍</span> Localitzar</button>
-        <button class="nav-item" onclick="mobileNavTo('localitzar')"><span class="nav-icon">📍</span> Localitzar</button>
+        <button class="nav-item" onclick="mobileNavTo('localitzar')"><span class="nav-icon">📍</span> Localitzar PK</button>
         <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon">🏠</span> Inici</button>
         <button class="nav-item highlight" onclick="closeMobileNav();irAGaleria()"><span class="nav-icon">🖼️</span> Galeria</button>
         <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Historial</button>
@@ -3677,6 +3676,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-icon">📥</div>
                         <div class="action-label">Descàrregues</div>
                         <div class="action-desc">Genera PDF, Excel i ZIP de fotos</div>
+                    </div>
+
+                    <div class="action-card" style="border-left:4px solid #00D4FF;background:linear-gradient(135deg,#0d1117,#111827);" onclick="ir('localitzar')">
+                        <div class="action-icon">📍</div>
+                        <div class="action-label" style="color:#fff;">Localitzar PK</div>
+                        <div class="action-desc" style="color:rgba(255,255,255,.5);">Detecció automàtica de punt kilom.</div>
                     </div>
                     <div class="action-card" style="border-left:4px solid var(--primary);" onclick="irAIncidencies()">
                         <div class="action-icon">⚡</div>
@@ -4006,6 +4011,60 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
+
+                <!-- ─── PK-GEOLOC SETTINGS ─────────────────────── -->
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">📏 Llindar de Carretera (PK-GEOLOC)</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Distància màxima fins a la calçada per detectar un PK. 150 m = recomanat.</p>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <span style="font-size:.85rem;">Llindar:</span>
+                    <span style="font-weight:700;color:var(--primary);" id="thresholdValCfg">150 m</span>
+                  </div>
+                  <input type="range" id="thresholdSliderCfg" min="15" max="500" step="1" value="150"
+                    style="width:100%;accent-color:var(--primary);"
+                    oninput="document.getElementById('thresholdValCfg').textContent=this.value+' m';
+                             document.getElementById('thresholdVal').textContent=this.value+' m';
+                             document.getElementById('thresholdSlider').value=this.value;
+                             llindar=+this.value;">
+                  <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-muted);margin-top:2px;"><span>15 m (estricte)</span><span>500 m (ampli)</span></div>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">🚫 Llista Negra de Carreteres</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Carreteres que s'ignoraran en el càlcul (falsos positius: autopistes paral·leles, viaductes, etc.).</p>
+                  <textarea id="llistaNegraInputCfg" rows="4"
+                    style="width:100%;background:var(--input-bg,#f5f5f5);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.85rem;font-family:inherit;resize:vertical;"
+                    placeholder="C-31&#10;B-23&#10;AP-7..."
+                    oninput="actualitzarLlistaNegra(this.value);document.getElementById('llistaNegraInput').value=this.value;"></textarea>
+                  <button class="btn btn-ghost" onclick="resetLlistaNegra();document.getElementById('llistaNegraInputCfg').value='';" style="margin-top:6px;font-size:.8rem;">↺ Restaurar per defecte</button>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">🌐 Idioma PK-GEOLOC</div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;">
+                    <button class="btn btn-ghost" onclick="pkgSetLang('es');showToast('Idioma: Castellano','ok')">Castellano</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('ca');showToast('Idioma: Català','ok')">Català</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('gl');showToast('Idioma: Galego','ok')">Galego</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('eu');showToast('Idioma: Euskara','ok')">Euskara</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('va');showToast('Idioma: Valencià','ok')">Valencià</button>
+                  </div>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">📍 Trazas Pròpies (PK-GEOLOC)</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Punts de carretera marcats manualment amb el mode mapping.</p>
+                  <div id="trazasResumenCfg" style="font-size:.85rem;margin-bottom:10px;"></div>
+                  <button class="btn btn-secondary" onclick="abrirPanelTrazas()">📋 GESTIONAR TRAZAS</button>
+                  <button class="btn btn-ghost" style="margin-top:6px;" onclick="document.getElementById('inputImportTrazas').click()">📥 Importar Trazas JSON</button>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">💾 Còpia de Seguretat PK-GEOLOC (IndexedDB)</div>
+                  <button class="btn btn-secondary" onclick="document.getElementById('inputImportBackup').click()">📥 Importar Backup PK</button>
+                  <div id="backupStatusCfg" style="font-size:.8rem;color:var(--text-muted);margin-top:6px;"></div>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
 
@@ -4053,11 +4112,128 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <b>Excel:</b> Perfecte per treballar les dades numèriques en oficina.
                 </div>
 
+
+                <!-- ─── PK-GEOLOC SETTINGS ─────────────────────── -->
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">📏 Llindar de Carretera (PK-GEOLOC)</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Distància màxima fins a la calçada per detectar un PK. 150 m = recomanat.</p>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <span style="font-size:.85rem;">Llindar:</span>
+                    <span style="font-weight:700;color:var(--primary);" id="thresholdValCfg">150 m</span>
+                  </div>
+                  <input type="range" id="thresholdSliderCfg" min="15" max="500" step="1" value="150"
+                    style="width:100%;accent-color:var(--primary);"
+                    oninput="document.getElementById('thresholdValCfg').textContent=this.value+' m';
+                             document.getElementById('thresholdVal').textContent=this.value+' m';
+                             document.getElementById('thresholdSlider').value=this.value;
+                             llindar=+this.value;">
+                  <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-muted);margin-top:2px;"><span>15 m (estricte)</span><span>500 m (ampli)</span></div>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">🚫 Llista Negra de Carreteres</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Carreteres que s'ignoraran en el càlcul (falsos positius: autopistes paral·leles, viaductes, etc.).</p>
+                  <textarea id="llistaNegraInputCfg" rows="4"
+                    style="width:100%;background:var(--input-bg,#f5f5f5);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.85rem;font-family:inherit;resize:vertical;"
+                    placeholder="C-31&#10;B-23&#10;AP-7..."
+                    oninput="actualitzarLlistaNegra(this.value);document.getElementById('llistaNegraInput').value=this.value;"></textarea>
+                  <button class="btn btn-ghost" onclick="resetLlistaNegra();document.getElementById('llistaNegraInputCfg').value='';" style="margin-top:6px;font-size:.8rem;">↺ Restaurar per defecte</button>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">🌐 Idioma PK-GEOLOC</div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;">
+                    <button class="btn btn-ghost" onclick="pkgSetLang('es');showToast('Idioma: Castellano','ok')">Castellano</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('ca');showToast('Idioma: Català','ok')">Català</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('gl');showToast('Idioma: Galego','ok')">Galego</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('eu');showToast('Idioma: Euskara','ok')">Euskara</button>
+                    <button class="btn btn-ghost" onclick="pkgSetLang('va');showToast('Idioma: Valencià','ok')">Valencià</button>
+                  </div>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">📍 Trazas Pròpies (PK-GEOLOC)</div>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Punts de carretera marcats manualment amb el mode mapping.</p>
+                  <div id="trazasResumenCfg" style="font-size:.85rem;margin-bottom:10px;"></div>
+                  <button class="btn btn-secondary" onclick="abrirPanelTrazas()">📋 GESTIONAR TRAZAS</button>
+                  <button class="btn btn-ghost" style="margin-top:6px;" onclick="document.getElementById('inputImportTrazas').click()">📥 Importar Trazas JSON</button>
+                </div>
+
+                <div class="settings-section" style="margin-top:8px;">
+                  <div class="settings-section-title">💾 Còpia de Seguretat PK-GEOLOC (IndexedDB)</div>
+                  <button class="btn btn-secondary" onclick="document.getElementById('inputImportBackup').click()">📥 Importar Backup PK</button>
+                  <div id="backupStatusCfg" style="font-size:.8rem;color:var(--text-muted);margin-top:6px;"></div>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
 
 
             </div>
+
+            <!-- LOCALITZAR PK (PK-GEOLOC ENGINE) -->
+            <div id="localitzar" class="screen">
+              <div class="pk-screen-header">
+                <div style="display:flex;align-items:center;">
+                  <span class="pk-screen-logo">PK·GEOLOC</span>
+                  <span class="pk-screen-badge">v2</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <button class="pk-icon-btn" onclick="pkOpenSettings()" title="Configuracio PK">&#9881;&#65039;</button>
+                </div>
+              </div>
+              <div class="pk-offline-banner" id="offlineBanner"><span>&#128244;</span><span>MODO OFFLINE - PKs des de dades locals</span></div>
+              <div class="pk-gps-bar" id="gpsBar">
+                <div class="pk-gps-dot"></div>
+                <span class="pk-gps-label" id="gpsLabel">GPS no inicialitzat</span>
+                <span class="pk-gps-acc" id="gpsAcc" style="display:none;">&mdash;</span>
+              </div>
+              <div style="padding:8px 16px 0;display:flex;align-items:center;gap:8px;">
+                <span style="font-size:.65rem;color:#8A909E;font-weight:700;letter-spacing:.8px;text-transform:uppercase;">Sentit:</span>
+                <button class="pk-sentit-pill" id="sentitPill" onclick="canviarSentit()">
+                  <span id="sentitIcon">&#8596;</span>
+                  <span id="sentitText">Indeterminat</span>
+                </button>
+              </div>
+              <div class="pk-result-card" id="resultCard">
+                <button class="pk-copy-btn" id="copyBtn" onclick="copiarResultat()">&#128203; Copiar</button>
+                <div id="resultContent">
+                  <div class="pk-result-idle">
+                    <div class="pk-result-idle-icon">&#128739;&#65039;</div>
+                    <div class="pk-result-idle-text">Prem "&#128205; ON SOC?" per iniciar la deteccio de PK</div>
+                  </div>
+                </div>
+              </div>
+              <div class="pk-manual-panel" id="manualPanel">
+                <div class="pk-manual-header" onclick="toggleManualPanel()">
+                  <span>&#9999;&#65039; Entrada Manual de PK</span><span>&#9660;</span>
+                </div>
+                <div class="pk-manual-body">
+                  <div class="pk-manual-row">
+                    <input class="pk-manual-inp" id="fCarretera" type="text" placeholder="C-14" oninput="this.value=this.value.toUpperCase()" disabled>
+                    <button class="pk-btn-edit" id="btnEditToggle" onclick="toggleManual()">Editar</button>
+                  </div>
+                  <div class="pk-manual-row">
+                    <span style="font-size:.65rem;color:#8A909E;min-width:22px;">PK</span>
+                    <input class="pk-manual-inp" id="fPK" type="number" placeholder="42" min="0" max="9999" style="max-width:80px;" disabled>
+                    <span class="pk-manual-sep">+</span>
+                    <input class="pk-manual-inp" id="fM" type="number" placeholder="000" min="0" max="999" style="max-width:68px;" disabled>
+                    <span style="font-size:.62rem;color:#8A909E;">m</span>
+                  </div>
+                  <button class="pk-btn-apply" id="btnApplyManual" onclick="aplicarManual()">APLICAR DADES MANUALS</button>
+                </div>
+              </div>
+              <div class="pk-repair-zone" id="repairZone">
+                <div class="pk-repair-zone-title">TREBALL EN CURS</div>
+                <div class="pk-repair-zone-pk" id="repairZonePK"></div>
+                <button class="pk-btn-foto-final" onclick="ferFotoFinalitzat()">Fer foto de finalitzat</button>
+              </div>
+              <div class="pk-footer-credit">creat per <strong>N.Arroyo</strong> &middot; PK-GEOLOC v2.0 &middot; 2025</div>
+              <div class="pk-privacy-footer">&#128274; Aplicacio 100% local i anonima.</div>
+              <div style="height:130px;"></div>
+            </div>
+
         </div><!-- /page-content -->
     </div><!-- /main-content -->
 </div><!-- /app-shell -->
@@ -4383,6 +4559,7 @@ window.onload = () => {
    ============================================================ */
 const screenTitles = {
     'home':          'Inici',
+    'localitzar':    '📍 Localitzar PK',
     'config':        'Disseny del Formulari',
     'form':          'Registre de Dades',
     'puntsLlistat':  'Punts Recollits',
@@ -9160,16 +9337,25 @@ document.addEventListener('click', e => {
    PK-GEOLOC ENGINE — integrat a DATACAMP SDV
 ════════════════════════════════════════════════════════════════ */
 function pkOnScreenEnter() {
+    // Show PK fixed button and FABs
     const fab = document.getElementById('pkFabStack');
     const btn = document.getElementById('btnMain');
     if (fab) fab.style.display = 'flex';
     if (btn) btn.style.display = 'flex';
+    // Request GPS permission immediately
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(){}, function(){}, {timeout:100});
+    }
 }
 function pkOnScreenLeave() {
     const fab = document.getElementById('pkFabStack');
     const btn = document.getElementById('btnMain');
     if (fab) fab.style.display = 'none';
     if (btn) btn.style.display = 'none';
+    // Stop GPS if running
+    if (typeof gpsRunning !== 'undefined' && gpsRunning) {
+        try { navigator.geolocation.clearWatch(window._pkGpsWatchId); } catch(_) {}
+    }
 }
 function pkAbrirIncPanel() {
     document.getElementById('incPanel').classList.add('open');
@@ -9178,38 +9364,47 @@ function pkTancarIncPanel() {
     document.getElementById('incPanel').classList.remove('open');
 }
 function actualitzarLlistaNegra(val) {
-    llistaNegra = val.split('\n').map(s=>s.trim().toUpperCase()).filter(Boolean);
+    if (typeof llistaNegra !== 'undefined')
+        llistaNegra = val.split('\n').map(function(s){return s.trim().toUpperCase();}).filter(Boolean);
 }
 function resetLlistaNegra() {
-    llistaNegra = [];
-    const ta = document.getElementById('llistaNegraInput');
+    if (typeof llistaNegra !== 'undefined') llistaNegra = [];
+    var ta = document.getElementById('llistaNegraInput');
     if (ta) ta.value = '';
-    showToast('Llista negra restaurada','ok');
+    var ta2 = document.getElementById('llistaNegraInputCfg');
+    if (ta2) ta2.value = '';
+    showToast('Llista negra restaurada', 'ok');
 }
+// Alias: DC sync functions to PK engine (for config screen buttons)
+function syncPKs() { if(typeof sincronitzarPKsArcGIS==='function') sincronitzarPKsArcGIS(); }
+function clearCache() { if(typeof esborrarCachePKs==='function') esborrarCachePKs(); }
 
 /* Splash greeting */
 (function pkInitSplash() {
-    const h = new Date().getHours();
-    const greeting = h>=6&&h<13 ? 'Bon dia! 🌅' : h>=13&&h<20 ? 'Bona tarda! ☀️' : 'Bona nit! 🌙';
-    const el = document.getElementById('pkSplashGreeting');
+    var h = new Date().getHours();
+    var greeting = h>=6&&h<13 ? 'Bon dia! \uD83C\uDF05' : h>=13&&h<20 ? 'Bona tarda! \u2600\uFE0F' : 'Bona nit! \uD83C\uDF19';
+    var el = document.getElementById('pkSplashGreeting');
     if (el) el.textContent = greeting;
-    setTimeout(() => {
-        const splash = document.getElementById('pkSplashScreen');
-        if (splash) { splash.classList.add('hide'); setTimeout(()=>{splash.style.display='none';},700); }
+    setTimeout(function() {
+        var splash = document.getElementById('pkSplashScreen');
+        if (splash) {
+            splash.classList.add('hide');
+            setTimeout(function(){ splash.style.display='none'; }, 700);
+        }
     }, 2400);
 })();
 
-/* Patch ir() to manage PK FABs */
+/* Patch ir() to manage PK FABs and GPS */
 (function() {
-    const _orig = window.ir;
-    if (typeof _orig === 'function') {
+    var _origIr = window.ir;
+    if (typeof _origIr === 'function') {
         window.ir = function(screen) {
-            _orig(screen);
+            _origIr(screen);
             if (screen === 'localitzar') pkOnScreenEnter();
             else pkOnScreenLeave();
         };
     }
-    const _origMN = window.mobileNavTo;
+    var _origMN = window.mobileNavTo;
     if (typeof _origMN === 'function') {
         window.mobileNavTo = function(screen) {
             _origMN(screen);
@@ -9221,12 +9416,13 @@ function resetLlistaNegra() {
 
 /* Init PK engine on load */
 (async function pkInit() {
-    try { await initDB(); } catch(_) {}
-    try { await actualitzarUICache(); } catch(_) {}
-    try { await _carregarExclusions(); } catch(_) {}
-    try { inicialitzarUILlistaNegra(); } catch(_) {}
-    try { pkgApplyStatic(); } catch(_) {}
+    try { await initDB(); } catch(e) { console.warn('[PK] initDB:', e); }
+    try { await actualitzarUICache(); } catch(e) {}
+    try { await _carregarExclusions(); } catch(e) {}
+    try { inicialitzarUILlistaNegra(); } catch(e) {}
+    try { pkgApplyStatic(); } catch(e) {}
 })();
+
 
 window.PKG_STATIC = {"⚠️ Sin posición para abrir Street View":{"ca":"⚠️ Sense posició per obrir Street View","gl":"⚠️ Sen posición para abrir Street View","eu":"⚠️ Kokapen gabe Street View irekitzeko","va":"⚠️ Sense posició per a obrir Street View"},"Municipio, C-14 129, 41.68, 1.27...":{"ca":"Municipi, C-14 129, 41.68, 1.27...","gl":"Concello, C-14 129, 41.68, 1.27...","eu":"Udalerria, C-14 129, 41.68, 1.27...","va":"Municipi, C-14 129, 41.68, 1.27..."},"Odómetro":{"ca":"Odòmetre","gl":"Odómetro","eu":"Odometroa","va":"Odòmetre"},"ODÓMETRO":{"ca":"ODÒMETRE","gl":"ODÓMETRO","eu":"ODOMETROA","va":"ODÒMETRE"},"PK EN VIVO":{"ca":"PK EN VIU","gl":"PK EN VIVO","eu":"PK ZUZENEAN","va":"PK EN VIU"},"PARCIAL":{"ca":"PARCIAL","gl":"PARCIAL","eu":"PARTZIALA","va":"PARCIAL"},"metros":{"ca":"metres","gl":"metros","eu":"metro","va":"metres"},"▶ INICIAR":{"ca":"▶ INICIA","gl":"▶ INICIAR","eu":"▶ HASI","va":"▶ INICIA"},"⏸ PAUSA":{"ca":"⏸ PAUSA","gl":"⏸ PAUSA","eu":"⏸ ETEN","va":"⏸ PAUSA"},"📍 MARCAR":{"ca":"📍 MARCA","gl":"📍 MARCAR","eu":"📍 MARKATU","va":"📍 MARCA"},"⟲ RESET":{"ca":"⟲ RESET","gl":"⟲ RESET","eu":"⟲ RESET","va":"⟲ RESET"},"▲ ADELANTE":{"ca":"▲ ENDAVANT","gl":"▲ ADIANTE","eu":"▲ AURRERA","va":"▲ AVANT"},"▼ ATRÁS":{"ca":"▼ ENRERE","gl":"▼ ATRÁS","eu":"▼ ATZERA","va":"▼ ARRERE"},"Esperando posición…":{"ca":"Esperant posició…","gl":"Agardando posición…","eu":"Kokapenaren zain…","va":"Esperant posició…"},"Fuera de carretera":{"ca":"Fora de carretera","gl":"Fóra da estrada","eu":"Errepidetik kanpo","va":"Fora de carretera"},"Sin puntos marcados":{"ca":"Sense punts marcats","gl":"Sen puntos marcados","eu":"Markatutako punturik ez","va":"Sense punts marcats"},"¿Borrar todos los puntos?":{"ca":"Vols esborrar tots els punts?","gl":"Queres borrar todos os puntos?","eu":"Puntu guztiak ezabatu nahi dituzu?","va":"Vols esborrar tots els punts?"},"GPS pausado":{"ca":"GPS en pausa","gl":"GPS en pausa","eu":"GPS etenda","va":"GPS en pausa"},"📍 Punto marcado":{"ca":"📍 Punt marcat","gl":"📍 Punto marcado","eu":"📍 Puntua markatuta","va":"📍 Punt marcat"},"⟲ Odómetro a cero":{"ca":"⟲ Odòmetre a zero","gl":"⟲ Odómetro a cero","eu":"⟲ Odometroa zerora","va":"⟲ Odòmetre a zero"},"⟲ Parcial a cero":{"ca":"⟲ Parcial a zero","gl":"⟲ Parcial a cero","eu":"⟲ Partziala zerora","va":"⟲ Parcial a zero"},"⚠️ Activa el GPS primero (INICIAR)":{"ca":"⚠️ Activa primer el GPS (INICIA)","gl":"⚠️ Activa primeiro o GPS (INICIAR)","eu":"⚠️ Aktibatu GPSa lehenik (HASI)","va":"⚠️ Activa primer el GPS (INICIA)"},"⚠️ Permiso de ubicación denegado":{"ca":"⚠️ Permís d'ubicació denegat","gl":"⚠️ Permiso de localización denegado","eu":"⚠️ Kokapen-baimena ukatuta","va":"⚠️ Permís d'ubicació denegat"},"Herramientas del mapa":{"ca":"Eines del mapa","gl":"Ferramentas do mapa","eu":"Maparen tresnak","va":"Ferramentes del mapa"},"Error leyendo datos":{"ca":"Error en llegir les dades","gl":"Erro lendo os datos","eu":"Errorea datuak irakurtzean","va":"Error en llegir les dades"},"Error leyendo fotos":{"ca":"Error en llegir les fotos","gl":"Erro lendo as fotos","eu":"Errorea argazkiak irakurtzean","va":"Error en llegir les fotos"},"AÑADIR FOTO":{"ca":"AFEGEIX FOTO","gl":"ENGADIR FOTO","eu":"ARGAZKIA GEHITU","va":"AFIG FOTO"},"Elige el origen de la foto":{"ca":"Tria l'origen de la foto","gl":"Escolle a orixe da foto","eu":"Aukeratu argazkiaren jatorria","va":"Tria l'origen de la foto"},"📷 Hacer foto (cámara)":{"ca":"📷 Fes foto (càmera)","gl":"📷 Facer foto (cámara)","eu":"📷 Argazkia egin (kamera)","va":"📷 Fes foto (càmera)"},"🖼️ Elegir de la galería":{"ca":"🖼️ Tria de la galeria","gl":"🖼️ Escoller da galería","eu":"🖼️ Galeriatik aukeratu","va":"🖼️ Tria de la galeria"},"🖼️ Galería":{"ca":"🖼️ Galeria","gl":"🖼️ Galería","eu":"🖼️ Galeria","va":"🖼️ Galeria"},"¿Eliminar esta incidencia?":{"ca":"Vols eliminar aquesta incidència?","gl":"Queres eliminar esta incidencia?","eu":"Gertaera hau ezabatu nahi duzu?","va":"Vols eliminar esta incidència?"},"🗑️ Incidencia eliminada":{"ca":"🗑️ Incidència eliminada","gl":"🗑️ Incidencia eliminada","eu":"🗑️ Gertaera ezabatuta","va":"🗑️ Incidència eliminada"},"Eliminar incidencia":{"ca":"Elimina la incidència","gl":"Eliminar incidencia","eu":"Gertaera ezabatu","va":"Elimina la incidència"},"📴 Sin datos offline para esta zona":{"ca":"📴 Sense dades fora de línia per a aquesta zona","gl":"📴 Sen datos sen conexión para esta zona","eu":"📴 Eremu honetarako lineaz kanpoko daturik ez","va":"📴 Sense dades fora de línia per a esta zona"},"📋 Texto copiado. Selecciona las fotos en WhatsApp.":{"ca":"📋 Text copiat. Selecciona les fotos al WhatsApp.","gl":"📋 Texto copiado. Selecciona as fotos no WhatsApp.","eu":"📋 Testua kopiatuta. Hautatu argazkiak WhatsAppen.","va":"📋 Text copiat. Selecciona les fotos al WhatsApp."},"📲 Abre WhatsApp, pega el texto y adjunta las fotos.":{"ca":"📲 Obre WhatsApp, enganxa el text i adjunta les fotos.","gl":"📲 Abre WhatsApp, pega o texto e anexa as fotos.","eu":"📲 Ireki WhatsApp, itsatsi testua eta erantsi argazkiak.","va":"📲 Obri WhatsApp, apega el text i adjunta les fotos."},"✏️ INTRODUCIR PK MANUAL":{"ca":"✏️ INTRODUEIX PK MANUAL","gl":"✏️ INTRODUCIR PK MANUAL","eu":"✏️ PK ESKUZ SARTU","va":"✏️ INTRODUÏX PK MANUAL"},"Sentido establecido:":{"ca":"Sentit establert:","gl":"Sentido establecido:","eu":"Noranzkoa ezarrita:","va":"Sentit establit:"},"Localizador · Medición · Búsqueda":{"ca":"Localitzador · Mesurament · Cerca","gl":"Localizador · Medición · Busca","eu":"Kokatzailea · Neurketa · Bilaketa","va":"Localitzador · Mesurament · Busca"},"GPS no inicializado":{"ca":"GPS no inicialitzat","gl":"GPS non inicializado","eu":"GPS hasi gabe","va":"GPS no inicialitzat"},"MODO OFFLINE — PKs desde datos locales · Fotos con PK embebido":{"ca":"MODE FORA DE LÍNIA — PKs des de dades locals · Fotos amb PK incrustat","gl":"MODO SEN CONEXIÓN — PKs desde datos locais · Fotos con PK incrustado","eu":"LINEAZ KANPOKO MODUA — PKak tokiko datuetatik · PK txertatua duten argazkiak","va":"MODE FORA DE LÍNIA — PKs des de dades locals · Fotos amb PK incrustat"},"Sentido:":{"ca":"Sentit:","gl":"Sentido:","eu":"Noranzkoa:","va":"Sentit:"},"Indeterminado":{"ca":"Indeterminat","gl":"Indeterminado","eu":"Zehaztugabea","va":"Indeterminat"},"📋 Copiar":{"ca":"📋 Copia","gl":"📋 Copiar","eu":"📋 Kopiatu","va":"📋 Copia"},"Pulsa \"¿DÓNDE ESTOY?\" para iniciar la detección":{"ca":"Prem «ON SÓC?» per iniciar la detecció","gl":"Preme «ONDE ESTOU?» para iniciar a detección","eu":"Sakatu «NON NAGO?» detekzioa abiarazteko","va":"Prem «ON ESTIC?» per a iniciar la detecció"},"✏️ Entrada Manual de PK":{"ca":"✏️ Entrada Manual de PK","gl":"✏️ Entrada Manual de PK","eu":"✏️ PK eskuz sartu","va":"✏️ Entrada Manual de PK"},"Carretera":{"ca":"Carretera","gl":"Estrada","eu":"Errepidea","va":"Carretera"},"PK (Km)":{"ca":"PK (Km)","gl":"PK (Km)","eu":"PK (Km)","va":"PK (Km)"},"Metros (+)":{"ca":"Metres (+)","gl":"Metros (+)","eu":"Metroak (+)","va":"Metres (+)"},"✏️ Editar Manual":{"ca":"✏️ Edita Manual","gl":"✏️ Editar Manual","eu":"✏️ Eskuz editatu","va":"✏️ Edita Manual"},"✔ APLICAR DATOS MANUALES":{"ca":"✔ APLICA DADES MANUALS","gl":"✔ APLICAR DATOS MANUAIS","eu":"✔ ESKUZKO DATUAK APLIKATU","va":"✔ APLICA DADES MANUALS"},"¿DÓNDE ESTOY?":{"ca":"ON SÓC?","gl":"ONDE ESTOU?","eu":"NON NAGO?","va":"ON ESTIC?"},"Calculando PK...":{"ca":"Calculant PK...","gl":"Calculando PK...","eu":"PK kalkulatzen...","va":"Calculant PK..."},"Localizar":{"ca":"Localitzar","gl":"Localizar","eu":"Kokatu","va":"Localitzar"},"Mapa":{"ca":"Mapa","gl":"Mapa","eu":"Mapa","va":"Mapa"},"Incidencias":{"ca":"Incidències","gl":"Incidencias","eu":"Gertaerak","va":"Incidències"},"Fotos":{"ca":"Fotos","gl":"Fotos","eu":"Argazkiak","va":"Fotos"},"🔒 Aplicación 100% local y anónima. No se guardan registros ni horarios de trabajo en el servidor.":{"ca":"🔒 Aplicació 100% local i anònima. No es desen registres ni horaris de treball al servidor.","gl":"🔒 Aplicación 100% local e anónima. Non se gardan rexistros nin horarios de traballo no servidor.","eu":"🔒 % 100 lokala eta anonimoa den aplikazioa. Ez da erregistrorik ezta laneko ordutegirik gordetzen zerbitzarian.","va":"🔒 Aplicació 100% local i anònima. No es guarden registres ni horaris de treball al servidor."},"creado por":{"ca":"creat per","gl":"creado por","eu":"egilea:","va":"creat per"},"⚙️ Configuración":{"ca":"⚙️ Configuració","gl":"⚙️ Configuración","eu":"⚙️ Konfigurazioa","va":"⚙️ Configuració"},"📡 Base de Datos PKs (ArcGIS)":{"ca":"📡 Base de Dades PKs (ArcGIS)","gl":"📡 Base de Datos PKs (ArcGIS)","eu":"📡 PK datu-basea (ArcGIS)","va":"📡 Base de Dades PKs (ArcGIS)"},"Descarga los PKs oficiales para usar la detección automática offline.":{"ca":"Descarrega els PKs oficials per usar la detecció automàtica fora de línia.","gl":"Descarga os PKs oficiais para usar a detección automática sen conexión.","eu":"Deskargatu PK ofizialak lineaz kanpoko detekzio automatikoa erabiltzeko.","va":"Descarrega els PKs oficials per a usar la detecció automàtica fora de línia."},"⏳ Sin datos locales":{"ca":"⏳ Sense dades locals","gl":"⏳ Sen datos locais","eu":"⏳ Tokiko daturik gabe","va":"⏳ Sense dades locals"},"SINCRONITZAR PKS":{"ca":"SINCRONITZA PKS","gl":"SINCRONIZAR PKS","eu":"PKak SINKRONIZATU","va":"SINCRONITZA PKS"},"🗑️ BORRAR CACHÉ":{"ca":"🗑️ ESBORRA MEMÒRIA CAU","gl":"🗑️ BORRAR CACHÉ","eu":"🗑️ CACHEA EZABATU","va":"🗑️ ESBORRA MEMÒRIA CAU"},"📏 Umbral de Carretera":{"ca":"📏 Llindar de Carretera","gl":"📏 Limiar de Estrada","eu":"📏 Errepide-atalasea","va":"📏 Llindar de Carretera"},"Distancia máxima hasta la calzada":{"ca":"Distància màxima fins a la calçada","gl":"Distancia máxima ata a calzada","eu":"Errepideraino gehienezko distantzia","va":"Distància màxima fins a la calçada"},"De 15-30 m: muy estricto (zonas densas). 150 m: recomendado. Si la carretera más cercana está más lejos del umbral, se activa la entrada manual.":{"ca":"De 15-30 m: molt estricte (zones denses). 150 m: recomanat. Si la carretera més propera és més lluny del llindar, s'activa l'entrada manual.","gl":"De 15-30 m: moi estrito (zonas densas). 150 m: recomendado. Se a estrada máis próxima está máis lonxe do limiar, actívase a entrada manual.","eu":"15-30 m: oso zorrotza (eremu trinkoak). 150 m: gomendatua. Hurbilen dagoen errepidea atalasea baino urrunago badago, eskuzko sarrera aktibatzen da.","va":"De 15-30 m: molt estricte (zones denses). 150 m: recomanat. Si la carretera més pròxima està més lluny del llindar, s'activa l'entrada manual."},"🚫 Lista Negra de Carreteras":{"ca":"🚫 Llista Negra de Carreteres","gl":"🚫 Lista Negra de Estradas","eu":"🚫 Errepideen Zerrenda Beltza","va":"🚫 Llista Negra de Carreteres"},"Carreteras que se ignorarán en el cálculo (falsos positivos por viaductos, autopistas paralelas, etc.).":{"ca":"Carreteres que s'ignoraran en el càlcul (falsos positius per viaductes, autopistes paral·leles, etc.).","gl":"Estradas que se ignorarán no cálculo (falsos positivos por viadutos, autoestradas paralelas, etc.).","eu":"Kalkuluan baztertuko diren errepideak (biaduktuek, autobide paraleloek eta abarrek eragindako positibo faltsuak).","va":"Carreteres que s'ignoraran en el càlcul (falsos positius per viaductes, autopistes paral·leles, etc.)."},"↺ Restaurar por defecto":{"ca":"↺ Restaura per defecte","gl":"↺ Restaurar por defecto","eu":"↺ Lehenetsia berrezarri","va":"↺ Restaura per defecte"},"Mapa satélite · Incidencias Waze · Fotos con marca de agua":{"ca":"Mapa satèl·lit · Incidències Waze · Fotos amb marca d'aigua","gl":"Mapa satélite · Incidencias Waze · Fotos con marca de auga","eu":"Satelite-mapa · Waze gertaerak · Ur-markadun argazkiak","va":"Mapa satèl·lit · Incidències Waze · Fotos amb marca d'aigua"},"Motor: Haversine + Interpolación Lineal (WGS84)":{"ca":"Motor: Haversine + Interpolació Lineal (WGS84)","gl":"Motor: Haversine + Interpolación Lineal (WGS84)","eu":"Motorra: Haversine + Interpolazio Lineala (WGS84)","va":"Motor: Haversine + Interpolació Lineal (WGS84)"},"🕐 FECHA Y HORA EN LA FOTO":{"ca":"🕐 DATA I HORA A LA FOTO","gl":"🕐 DATA E HORA NA FOTO","eu":"🕐 DATA ETA ORDUA ARGAZKIAN","va":"🕐 DATA I HORA A LA FOTO"},"Se incrustará en la marca de agua":{"ca":"S'incrustarà a la marca d'aigua","gl":"Incrustarase na marca de auga","eu":"Ur-markan txertatuko da","va":"S'incrustarà a la marca d'aigua"},"📸 INCRUSTAR Y GUARDAR FOTO":{"ca":"📸 INCRUSTA I DESA LA FOTO","gl":"📸 INCRUSTAR E GARDAR FOTO","eu":"📸 ARGAZKIA TXERTATU ETA GORDE","va":"📸 INCRUSTA I GUARDA LA FOTO"},"✕ Cancelar":{"ca":"✕ Cancel·la","gl":"✕ Cancelar","eu":"✕ Utzi","va":"✕ Cancel·la"},"Cancelar":{"ca":"Cancel·la","gl":"Cancelar","eu":"Utzi","va":"Cancel·la"},"⚡ Marcar Incidencia Rápida":{"ca":"⚡ Marca Incidència Ràpida","gl":"⚡ Marcar Incidencia Rápida","eu":"⚡ Gertaera azkarra markatu","va":"⚡ Marca Incidència Ràpida"},"Animal / Atropellamiento":{"ca":"Animal / Atropellament","gl":"Animal / Atropelo","eu":"Animalia / Harrapaketa","va":"Animal / Atropellament"},"Averiado / Accidente":{"ca":"Avariat / Accident","gl":"Avariado / Accidente","eu":"Matxuratua / Istripua","va":"Avariat / Accident"},"Señalización Dañada":{"ca":"Senyalització Malmesa","gl":"Sinalización Danada","eu":"Seinaleak hondatuta","va":"Senyalització Danyada"},"Bache / Grieta":{"ca":"Sot / Esquerda","gl":"Bache / Greta","eu":"Zuloa / Pitzadura","va":"Clot / Clavill"},"Incidencia Indefinida":{"ca":"Incidència Indefinida","gl":"Incidencia Indefinida","eu":"Gertaera zehaztugabea","va":"Incidència Indefinida"},"Averiado / Accidente":{"ca":"Avariat / Accident","gl":"Avariado / Accidente","eu":"Matxuratua / Istripua","va":"Avariat / Accident"},"Buscar Municipio":{"ca":"Cerca Municipi","gl":"Buscar Concello","eu":"Udalerria bilatu","va":"Busca Municipi"},"Medir distancia":{"ca":"Mesura distància","gl":"Medir distancia","eu":"Distantzia neurtu","va":"Mesura distància"},"Medir superficie":{"ca":"Mesura superfície","gl":"Medir superficie","eu":"Azalera neurtu","va":"Mesura superfície"},"Lista Negra":{"ca":"Llista Negra","gl":"Lista Negra","eu":"Zerrenda Beltza","va":"Llista Negra"},"Por PK":{"ca":"Per PK","gl":"Por PK","eu":"PK bidez","va":"Per PK"},"Introducir Coordenadas":{"ca":"Introdueix Coordenades","gl":"Introducir Coordenadas","eu":"Koordenatuak sartu","va":"Introduïx Coordenades"},"Ir a PK Exacto":{"ca":"Vés a PK Exacte","gl":"Ir a PK Exacto","eu":"PK zehatzera joan","va":"Ves a PK Exacte"},"Medición de Distancia":{"ca":"Mesurament de Distància","gl":"Medición de Distancia","eu":"Distantzia-neurketa","va":"Mesurament de Distància"},"Medición de Superficie / Área":{"ca":"Mesurament de Superfície / Àrea","gl":"Medición de Superficie / Área","eu":"Azalera / Eremu neurketa","va":"Mesurament de Superfície / Àrea"},"Haz clic en el mapa para definir los vértices del polígono (mínimo 3).":{"ca":"Fes clic al mapa per definir els vèrtexs del polígon (mínim 3).","gl":"Fai clic no mapa para definir os vértices do polígono (mínimo 3).","eu":"Egin klik mapan poligonoaren erpinak zehazteko (gutxienez 3).","va":"Fes clic al mapa per a definir els vèrtexs del polígon (mínim 3)."},"Haz clic para añadir puntos a la polilínea.":{"ca":"Fes clic per afegir punts a la polilínia.","gl":"Fai clic para engadir puntos á polilinha.","eu":"Egin klik polilineara puntuak gehitzeko.","va":"Fes clic per a afegir punts a la polilínia."},"Polilínea":{"ca":"Polilínia","gl":"Polilinha","eu":"Polilinea","va":"Polilínia"},"✔ Cerrar Polígono y Calcular":{"ca":"✔ Tanca Polígon i Calcula","gl":"✔ Pechar Polígono e Calcular","eu":"✔ Poligonoa itxi eta kalkulatu","va":"✔ Tanca Polígon i Calcula"},"📐 CALCULAR EN EL MAPA":{"ca":"📐 CALCULA AL MAPA","gl":"📐 CALCULAR NO MAPA","eu":"📐 MAPAN KALKULATU","va":"📐 CALCULA AL MAPA"},"→ IR A ESTAS COORDENADAS":{"ca":"→ VÉS A AQUESTES COORDENADES","gl":"→ IR A ESTAS COORDENADAS","eu":"→ KOORDENATU HAUETARA JOAN","va":"→ VES A ESTES COORDENADES"},"📍 Pega desde Google Maps":{"ca":"📍 Enganxa des de Google Maps","gl":"📍 Pega desde Google Maps","eu":"📍 Itsatsi Google Maps-etik","va":"📍 Apega des de Google Maps"},"+ Añadir":{"ca":"+ Afegeix","gl":"+ Engadir","eu":"+ Gehitu","va":"+ Afig"},"+ Añadir punto":{"ca":"+ Afegeix punt","gl":"+ Engadir punto","eu":"+ Puntua gehitu","va":"+ Afig punt"},"Activar":{"ca":"Activa","gl":"Activar","eu":"Aktibatu","va":"Activa"},"⚠ Fuera de Carretera":{"ca":"⚠ Fora de Carretera","gl":"⚠ Fóra da Estrada","eu":"⚠ Errepidetik kanpo","va":"⚠ Fora de Carretera"},"🗑️ Borrar todo":{"ca":"🗑️ Esborra-ho tot","gl":"🗑️ Borrar todo","eu":"🗑️ Dena ezabatu","va":"🗑️ Esborra-ho tot"},"🗑️ Borrar":{"ca":"🗑️ Esborra","gl":"🗑️ Borrar","eu":"🗑️ Ezabatu","va":"🗑️ Esborra"},"📷 Nueva":{"ca":"📷 Nova","gl":"📷 Nova","eu":"📷 Berria","va":"📷 Nova"},"🗺️ Maps":{"ca":"🗺️ Maps","gl":"🗺️ Maps","eu":"🗺️ Maps","va":"🗺️ Maps"},"💬 WA":{"ca":"💬 WA","gl":"💬 WA","eu":"💬 WA","va":"💬 WA"},"☑ Selecc.":{"ca":"☑ Selecc.","gl":"☑ Selecc.","eu":"☑ Hautatu","va":"☑ Selecc."},"Compartir":{"ca":"Comparteix","gl":"Compartir","eu":"Partekatu","va":"Comparteix"},"Sin fotos capturadas":{"ca":"Sense fotos capturades","gl":"Sen fotos capturadas","eu":"Ez dago argazkirik","va":"Sense fotos capturades"},"Sin incidencias registradas":{"ca":"Sense incidències registrades","gl":"Sen incidencias rexistradas","eu":"Ez dago gertaerarik erregistratuta","va":"Sense incidències registrades"},"Fotos de esta sesión":{"ca":"Fotos d'aquesta sessió","gl":"Fotos desta sesión","eu":"Saio honetako argazkiak","va":"Fotos d'esta sessió"},"🗺️ Ver en el mapa":{"ca":"🗺️ Mostra al mapa","gl":"🗺️ Ver no mapa","eu":"🗺️ Mapan ikusi","va":"🗺️ Mostra al mapa"},"📸 Añadir foto":{"ca":"📸 Afegeix foto","gl":"📸 Engadir foto","eu":"📸 Argazkia gehitu","va":"📸 Afig foto"},"🟢 Con aviso":{"ca":"🟢 Amb avís","gl":"🟢 Con aviso","eu":"🟢 Abisuarekin","va":"🟢 Amb avís"},"🔵 Sin aviso":{"ca":"🔵 Sense avís","gl":"🔵 Sen aviso","eu":"🔵 Abisurik gabe","va":"🔵 Sense avís"},"🚧 Reparar ahora":{"ca":"🚧 Repara ara","gl":"🚧 Reparar agora","eu":"🚧 Orain konpondu","va":"🚧 Repara ara"},"Con aviso:":{"ca":"Amb avís:","gl":"Con aviso:","eu":"Abisuarekin:","va":"Amb avís:"},"Sin aviso:":{"ca":"Sense avís:","gl":"Sen aviso:","eu":"Abisurik gabe:","va":"Sense avís:"},"Reparar ahora:":{"ca":"Repara ara:","gl":"Reparar agora:","eu":"Orain konpondu:","va":"Repara ara:"},"Notificada al CCC (Centro Control Carreteras)":{"ca":"Notificada al CCC (Centre de Control de Carreteres)","gl":"Notificada ao CCC (Centro de Control de Estradas)","eu":"CCCri jakinarazia (Errepideen Kontrol Zentroa)","va":"Notificada al CCC (Centre de Control de Carreteres)"},"Detectada en ruta (sin notificación)":{"ca":"Detectada en ruta (sense notificació)","gl":"Detectada en ruta (sen notificación)","eu":"Bidean hautemana (jakinarazpenik gabe)","va":"Detectada en ruta (sense notificació)"},"Haz la foto del \"después\" al terminar":{"ca":"Fes la foto del «després» en acabar","gl":"Fai a foto do «despois» ao rematar","eu":"Egin «ondoren» argazkia amaitzean","va":"Fes la foto del «després» en acabar"},"← Cerrar":{"ca":"← Tanca","gl":"← Pechar","eu":"← Itxi","va":"← Tanca"},"Trabajo Finalizado":{"ca":"Treball Finalitzat","gl":"Traballo Rematado","eu":"Lana amaituta","va":"Treball Finalitzat"},"📥 Guardar":{"ca":"📥 Desa","gl":"📥 Gardar","eu":"📥 Gorde","va":"📥 Guarda"},"📷 ANTES":{"ca":"📷 ABANS","gl":"📷 ANTES","eu":"📷 LEHEN","va":"📷 ABANS"},"✅ DESPUÉS":{"ca":"✅ DESPRÉS","gl":"✅ DESPOIS","eu":"✅ ONDOREN","va":"✅ DESPRÉS"},"🚧 TRABAJO EN PROGRESO":{"ca":"🚧 TREBALL EN CURS","gl":"🚧 TRABALLO EN CURSO","eu":"🚧 LANA ABIAN","va":"🚧 TREBALL EN CURS"},"📸 Hacer foto de finalizado":{"ca":"📸 Fes foto de finalitzat","gl":"📸 Facer foto de rematado","eu":"📸 Amaierako argazkia egin","va":"📸 Fes foto de finalitzat"},"✏️ CONFIRMAR DATOS DE LA FOTO":{"ca":"✏️ CONFIRMA LES DADES DE LA FOTO","gl":"✏️ CONFIRMAR DATOS DA FOTO","eu":"✏️ ARGAZKIAREN DATUAK BERRETSI","va":"✏️ CONFIRMA LES DADES DE LA FOTO"},"Revisa o corrige la carretera y el PK":{"ca":"Revisa o corregeix la carretera i el PK","gl":"Revisa ou corrixe a estrada e o PK","eu":"Berrikusi edo zuzendu errepidea eta PK","va":"Revisa o corregix la carretera i el PK"},"PUNTO FUERA DE CARRETERA":{"ca":"PUNT FORA DE CARRETERA","gl":"PUNTO FÓRA DA ESTRADA","eu":"ERREPIDETIK KANPOKO PUNTUA","va":"PUNT FORA DE CARRETERA"},"¿Deseas introducir la Carretera y el PK manualmente?":{"ca":"Vols introduir la Carretera i el PK manualment?","gl":"Queres introducir a Estrada e o PK manualmente?","eu":"Errepidea eta PK eskuz sartu nahi dituzu?","va":"Vols introduir la Carretera i el PK manualment?"},"✏️ Sí, introducir manual":{"ca":"✏️ Sí, introdueix manual","gl":"✏️ Si, introducir manual","eu":"✏️ Bai, eskuz sartu","va":"✏️ Sí, introduïx manual"},"❓ ¿Código no funciona o es nuevo?":{"ca":"❓ El codi no funciona o és nou?","gl":"❓ O código non funciona ou é novo?","eu":"❓ Kodeak ez du funtzionatzen edo berria da?","va":"❓ El codi no funciona o és nou?"},"🔄 ACTUALIZAR APP":{"ca":"🔄 ACTUALITZA L'APP","gl":"🔄 ACTUALIZAR APP","eu":"🔄 APPA EGUNERATU","va":"🔄 ACTUALITZA L'APP"},"ACCEDER":{"ca":"ACCEDEIX","gl":"ACCEDER","eu":"SARTU","va":"ACCEDIX"},"Prueba Piloto — Acceso Restringido":{"ca":"Prova Pilot — Accés Restringit","gl":"Proba Piloto — Acceso Restrinxido","eu":"Pilotu-proba — Sarbide Mugatua","va":"Prova Pilot — Accés Restringit"},"🔒 Acceso restringido a participantes de la prueba piloto.":{"ca":"🔒 Accés restringit als participants de la prova pilot.","gl":"🔒 Acceso restrinxido aos participantes da proba piloto.","eu":"🔒 Sarbidea pilotu-probako parte-hartzaileentzat mugatua.","va":"🔒 Accés restringit als participants de la prova pilot."},"💬 ENVIAR POR WHATSAPP":{"ca":"💬 ENVIA PER WHATSAPP","gl":"💬 ENVIAR POR WHATSAPP","eu":"💬 WHATSAPP BIDEZ BIDALI","va":"💬 ENVIA PER WHATSAPP"},"📋 COPIAR":{"ca":"📋 COPIA","gl":"📋 COPIAR","eu":"📋 KOPIATU","va":"📋 COPIA"},"✓ Listo":{"ca":"✓ Fet","gl":"✓ Listo","eu":"✓ Eginda","va":"✓ Fet"},"📷 Añadir foto":{"ca":"📷 Afegeix foto","gl":"📷 Engadir foto","eu":"📷 Argazkia gehitu","va":"📷 Afig foto"},"📷 Foto adjunta":{"ca":"📷 Foto adjunta","gl":"📷 Foto anexa","eu":"📷 Erantsitako argazkia","va":"📷 Foto adjunta"},"INCIDENCIA GUARDADA":{"ca":"INCIDÈNCIA DESADA","gl":"INCIDENCIA GARDADA","eu":"GERTAERA GORDETA","va":"INCIDÈNCIA GUARDADA"},"Coordenadas fuera del área":{"ca":"Coordenades fora de l'àrea","gl":"Coordenadas fóra da área","eu":"Koordenatuak eremutik kanpo","va":"Coordenades fora de l'àrea"},"Coordenadas no válidas":{"ca":"Coordenades no vàlides","gl":"Coordenadas non válidas","eu":"Koordenatu baliogabeak","va":"Coordenades no vàlides"},"Medición borrada":{"ca":"Mesurament esborrat","gl":"Medición borrada","eu":"Neurketa ezabatuta","va":"Mesurament esborrat"},"Área borrada":{"ca":"Àrea esborrada","gl":"Área borrada","eu":"Eremua ezabatuta","va":"Àrea esborrada"},"Introduce la carretera":{"ca":"Introdueix la carretera","gl":"Introduce a estrada","eu":"Sartu errepidea","va":"Introduïx la carretera"},"Introduce las dos carreteras":{"ca":"Introdueix les dues carreteres","gl":"Introduce as dúas estradas","eu":"Sartu bi errepideak","va":"Introduïx les dos carreteres"},"Haz clic en el mapa para añadir puntos de la polilínea":{"ca":"Fes clic al mapa per afegir punts de la polilínia","gl":"Fai clic no mapa para engadir puntos da polilinha","eu":"Egin klik mapan polilinearen puntuak gehitzeko","va":"Fes clic al mapa per a afegir punts de la polilínia"},"Haz clic para añadir el segundo punto":{"ca":"Fes clic per afegir el segon punt","gl":"Fai clic para engadir o segundo punto","eu":"Egin klik bigarren puntua gehitzeko","va":"Fes clic per a afegir el segon punt"},"Clica en el mapa para definir los vértices del polígono":{"ca":"Clica al mapa per definir els vèrtexs del polígon","gl":"Clica no mapa para definir os vértices do polígono","eu":"Egin klik mapan poligonoaren erpinak zehazteko","va":"Clica al mapa per a definir els vèrtexs del polígon"},"Añade más puntos o pulsa Cerrar Polígono":{"ca":"Afegeix més punts o prem Tanca Polígon","gl":"Engade máis puntos ou preme Pechar Polígono","eu":"Gehitu puntu gehiago edo sakatu Poligonoa itxi","va":"Afig més punts o prem Tanca Polígon"},"Necesitas al menos 3 puntos para calcular el área":{"ca":"Necessites almenys 3 punts per calcular l'àrea","gl":"Necesitas polo menos 3 puntos para calcular a área","eu":"Gutxienez 3 puntu behar dituzu azalera kalkulatzeko","va":"Necessites almenys 3 punts per a calcular l'àrea"},"Buscando puntos...":{"ca":"Cercant punts...","gl":"Buscando puntos...","eu":"Puntuak bilatzen...","va":"Buscant punts..."},"Introduce el nombre de la carretera":{"ca":"Introdueix el nom de la carretera","gl":"Introduce o nome da estrada","eu":"Sartu errepidearen izena","va":"Introduïx el nom de la carretera"},"No hay ninguna foto abierta":{"ca":"No hi ha cap foto oberta","gl":"Non hai ningunha foto aberta","eu":"Ez dago argazkirik irekita","va":"No hi ha cap foto oberta"},"Error al copiar":{"ca":"Error en copiar","gl":"Erro ao copiar","eu":"Errorea kopiatzean","va":"Error en copiar"},"📋 Copiado":{"ca":"📋 Copiat","gl":"📋 Copiado","eu":"📋 Kopiatuta","va":"📋 Copiat"},"❌ No se ha podido copiar.":{"ca":"❌ No s'ha pogut copiar.","gl":"❌ Non se puido copiar.","eu":"❌ Ezin izan da kopiatu.","va":"❌ No s'ha pogut copiar."},"❌ Foto cancelada":{"ca":"❌ Foto cancel·lada","gl":"❌ Foto cancelada","eu":"❌ Argazkia bertan behera utzita","va":"❌ Foto cancel·lada"},"❌ Registro cancelado":{"ca":"❌ Registre cancel·lat","gl":"❌ Rexistro cancelado","eu":"❌ Erregistroa bertan behera utzita","va":"❌ Registre cancel·lat"},"⚠️ Esta foto no tiene coordenadas GPS":{"ca":"⚠️ Aquesta foto no té coordenades GPS","gl":"⚠️ Esta foto non ten coordenadas GPS","eu":"⚠️ Argazki honek ez du GPS koordenaturik","va":"⚠️ Esta foto no té coordenades GPS"},"⚠️ Foto no disponible":{"ca":"⚠️ Foto no disponible","gl":"⚠️ Foto non dispoñible","eu":"⚠️ Argazkia ez dago erabilgarri","va":"⚠️ Foto no disponible"},"⚠️ Incidencia no encontrada":{"ca":"⚠️ Incidència no trobada","gl":"⚠️ Incidencia non atopada","eu":"⚠️ Gertaera ez da aurkitu","va":"⚠️ Incidència no trobada"},"⚠️ No hay incidencia asociada":{"ca":"⚠️ No hi ha cap incidència associada","gl":"⚠️ Non hai incidencia asociada","eu":"⚠️ Ez dago gertaera lotuturik","va":"⚠️ No hi ha cap incidència associada"},"⚠️ No hay datos de reparación":{"ca":"⚠️ No hi ha dades de reparació","gl":"⚠️ Non hai datos de reparación","eu":"⚠️ Ez dago konponketa-daturik","va":"⚠️ No hi ha dades de reparació"},"⚠️ Mapa no disponible sin conexión":{"ca":"⚠️ Mapa no disponible sense connexió","gl":"⚠️ Mapa non dispoñible sen conexión","eu":"⚠️ Mapa ez dago erabilgarri konexiorik gabe","va":"⚠️ Mapa no disponible sense connexió"},"⚠️ GPS no disponible en este dispositivo":{"ca":"⚠️ GPS no disponible en aquest dispositiu","gl":"⚠️ GPS non dispoñible neste dispositivo","eu":"⚠️ GPS ez dago erabilgarri gailu honetan","va":"⚠️ GPS no disponible en este dispositiu"},"📋 Texto copiado. Abre WhatsApp y adjunta las fotos.":{"ca":"📋 Text copiat. Obre WhatsApp i adjunta les fotos.","gl":"📋 Texto copiado. Abre WhatsApp e anexa as fotos.","eu":"📋 Testua kopiatuta. Ireki WhatsApp eta erantsi argazkiak.","va":"📋 Text copiat. Obri WhatsApp i adjunta les fotos."},"📋 Texto copiado. Adjunta la foto en WhatsApp.":{"ca":"📋 Text copiat. Adjunta la foto al WhatsApp.","gl":"📋 Texto copiado. Anexa a foto no WhatsApp.","eu":"📋 Testua kopiatuta. Erantsi argazkia WhatsAppen.","va":"📋 Text copiat. Adjunta la foto al WhatsApp."},"📲 Abre WhatsApp y pega el texto.":{"ca":"📲 Obre WhatsApp i enganxa el text.","gl":"📲 Abre WhatsApp e pega o texto.","eu":"📲 Ireki WhatsApp eta itsatsi testua.","va":"📲 Obri WhatsApp i apega el text."},"📸 Foto añadida a la incidencia":{"ca":"📸 Foto afegida a la incidència","gl":"📸 Foto engadida á incidencia","eu":"📸 Argazkia gertaerari gehituta","va":"📸 Foto afegida a la incidència"},"📡 Capturando posición GPS...":{"ca":"📡 Capturant posició GPS...","gl":"📡 Capturando posición GPS...","eu":"📡 GPS kokapena hartzen...","va":"📡 Capturant posició GPS..."},"📡 Capturando posición exacta...":{"ca":"📡 Capturant posició exacta...","gl":"📡 Capturando posición exacta...","eu":"📡 Kokapen zehatza hartzen...","va":"📡 Capturant posició exacta..."},"📡 Adquiriendo señal GPS...":{"ca":"📡 Adquirint senyal GPS...","gl":"📡 Adquirindo sinal GPS...","eu":"📡 GPS seinalea eskuratzen...","va":"📡 Adquirint senyal GPS..."},"⏳ Procesando foto…":{"ca":"⏳ Processant foto…","gl":"⏳ Procesando foto…","eu":"⏳ Argazkia prozesatzen…","va":"⏳ Processant foto…"},"⏳ Procesando foto...":{"ca":"⏳ Processant foto...","gl":"⏳ Procesando foto...","eu":"⏳ Argazkia prozesatzen...","va":"⏳ Processant foto..."},"⏳ Procesando foto adicional...":{"ca":"⏳ Processant foto addicional...","gl":"⏳ Procesando foto adicional...","eu":"⏳ Argazki gehigarria prozesatzen...","va":"⏳ Processant foto addicional..."},"⏳ Procesando foto de finalizado...":{"ca":"⏳ Processant foto de finalitzat...","gl":"⏳ Procesando foto de rematado...","eu":"⏳ Amaierako argazkia prozesatzen...","va":"⏳ Processant foto de finalitzat..."},"⏳ Iniciando descarga de PKs...":{"ca":"⏳ Iniciant descàrrega de PKs...","gl":"⏳ Iniciando descarga de PKs...","eu":"⏳ PKen deskarga abiarazten...","va":"⏳ Iniciant descàrrega de PKs..."},"🎯 Mapa centrado en tu posición":{"ca":"🎯 Mapa centrat en la teva posició","gl":"🎯 Mapa centrado na túa posición","eu":"🎯 Mapa zure kokapenean zentratuta","va":"🎯 Mapa centrat en la teua posició"},"🏙️ Zona urbana o fuera de la red de carreteras":{"ca":"🏙️ Zona urbana o fora de la xarxa de carreteres","gl":"🏙️ Zona urbana ou fóra da rede de estradas","eu":"🏙️ Hiri-eremua edo errepide-saretik kanpo","va":"🏙️ Zona urbana o fora de la xarxa de carreteres"},"💻 GPS no disponible: introduce los datos manualmente":{"ca":"💻 GPS no disponible: introdueix les dades manualment","gl":"💻 GPS non dispoñible: introduce os datos manualmente","eu":"💻 GPS ez dago erabilgarri: sartu datuak eskuz","va":"💻 GPS no disponible: introduïx les dades manualment"},"💻 Modo PC: introduce los datos manualmente":{"ca":"💻 Mode PC: introdueix les dades manualment","gl":"💻 Modo PC: introduce os datos manualmente","eu":"💻 PC modua: sartu datuak eskuz","va":"💻 Mode PC: introduïx les dades manualment"},"💻 Precisión insuficiente: introduce los datos manualmente":{"ca":"💻 Precisió insuficient: introdueix les dades manualment","gl":"💻 Precisión insuficiente: introduce os datos manualmente","eu":"💻 Doitasun nahikoa ez: sartu datuak eskuz","va":"💻 Precisió insuficient: introduïx les dades manualment"},"✏️ Introduce la carretera y el PK visualmente":{"ca":"✏️ Introdueix la carretera i el PK visualment","gl":"✏️ Introduce a estrada e o PK visualmente","eu":"✏️ Sartu errepidea eta PK bisualki","va":"✏️ Introduïx la carretera i el PK visualment"},"✏️ Modo manual activado.":{"ca":"✏️ Mode manual activat.","gl":"✏️ Modo manual activado.","eu":"✏️ Eskuzko modua aktibatuta.","va":"✏️ Mode manual activat."},"🚧 ¡Manos a la obra! Haz la foto al terminar.":{"ca":"🚧 A la feina! Fes la foto en acabar.","gl":"🚧 Mans á obra! Fai a foto ao rematar.","eu":"🚧 Lanera! Egin argazkia amaitzean.","va":"🚧 A la faena! Fes la foto en acabar."},"🗑️ Caché borrada":{"ca":"🗑️ Memòria cau esborrada","gl":"🗑️ Caché borrada","eu":"🗑️ Cachea ezabatuta","va":"🗑️ Memòria cau esborrada"},"🗑️ Foto eliminada":{"ca":"🗑️ Foto eliminada","gl":"🗑️ Foto eliminada","eu":"🗑️ Argazkia ezabatuta","va":"🗑️ Foto eliminada"},"🗑️ Todas las incidencias borradas":{"ca":"🗑️ Totes les incidències esborrades","gl":"🗑️ Todas as incidencias borradas","eu":"🗑️ Gertaera guztiak ezabatuta","va":"🗑️ Totes les incidències esborrades"},"↺ Lista negra restaurada por defecto":{"ca":"↺ Llista negra restaurada per defecte","gl":"↺ Lista negra restaurada por defecto","eu":"↺ Zerrenda beltza lehenetsira berrezarrita","va":"↺ Llista negra restaurada per defecte"},"↺ Modo automático: carretera más cercana":{"ca":"↺ Mode automàtic: carretera més propera","gl":"↺ Modo automático: estrada máis próxima","eu":"↺ Modu automatikoa: hurbilen dagoen errepidea","va":"↺ Mode automàtic: carretera més pròxima"},"📍 Selección liberada: has salido de la carretera fijada":{"ca":"📍 Selecció alliberada: has sortit de la carretera fixada","gl":"📍 Selección liberada: saíches da estrada fixada","eu":"📍 Hautaketa askatuta: errepide finkatutik atera zara","va":"📍 Selecció alliberada: has eixit de la carretera fixada"},"⚠️ No hay carretera detectada cerca":{"ca":"⚠️ No s'ha detectat cap carretera a prop","gl":"⚠️ Non se detectou ningunha estrada preto","eu":"⚠️ Ez da inguruan errepiderik hauteman","va":"⚠️ No s'ha detectat cap carretera a prop"},"❌ Error al compartir":{"ca":"❌ Error en compartir","gl":"❌ Erro ao compartir","eu":"❌ Errorea partekatzean","va":"❌ Error en compartir"},"❌ No se pudo abrir la foto":{"ca":"❌ No s'ha pogut obrir la foto","gl":"❌ Non se puido abrir a foto","eu":"❌ Ezin izan da argazkia ireki","va":"❌ No s'ha pogut obrir la foto"},"Introduce tu código...":{"ca":"Introdueix el teu codi...","gl":"Introduce o teu código...","eu":"Sartu zure kodea...","va":"Introduïx el teu codi..."},"↔ Sentido Izq./Dcha.":{"ca":"↔ Sentit Esq./Dta.","gl":"↔ Sentido Esq./Dta.","eu":"↔ Esk./Esk. Noranzkoa","va":"↔ Sentit Esq./Dta."},"◀ Izquierda":{"ca":"◀ Esquerra","gl":"◀ Esquerda","eu":"◀ Ezkerra","va":"◀ Esquerra"},"Derecha ▶":{"ca":"Dreta ▶","gl":"Dereita ▶","eu":"Eskuina ▶","va":"Dreta ▶"},"Buscar municipio...":{"ca":"Cerca municipi...","gl":"Buscar concello...","eu":"Udalerria bilatu...","va":"Busca municipi..."},"Centrar en mi posición":{"ca":"Centra en la meva posició","gl":"Centrar na miña posición","eu":"Nire kokapenean zentratu","va":"Centra en la meua posició"},"Modo día/noche":{"ca":"Mode dia/nit","gl":"Modo día/noite","eu":"Egun/gau modua","va":"Mode dia/nit"},"Añadir más fotos (máx. 5)":{"ca":"Afegeix més fotos (màx. 5)","gl":"Engadir máis fotos (máx. 5)","eu":"Argazki gehiago gehitu (geh. 5)","va":"Afig més fotos (màx. 5)"},"Modo día/noche ":{"ca":"Mode dia/nit","gl":"Modo día/noite","eu":"Egun/gau modua","va":"Mode dia/nit"},"Anar a PK":{"ca":"Anar a PK","gl":"Ir a PK","eu":"PKra joan","va":"Anar a PK"},"Cercar":{"ca":"Cercar","gl":"Buscar","eu":"Bilatu","va":"Buscar"}};
 window.PKG_KEYED  = {"puntos_lbl":{"es":"puntos","ca":"punts","gl":"puntos","eu":"puntu","va":"punts"},"tpl_buscant":{"es":"Buscando {0} PK {1}...","ca":"Cercant {0} PK {1}...","gl":"Buscando {0} PK {1}...","eu":"{0} PK {1} bilatzen...","va":"Buscant {0} PK {1}..."},"tpl_nofound":{"es":"No se encontró {0}","ca":"No s'ha trobat {0}","gl":"Non se atopou {0}","eu":"Ez da {0} aurkitu","va":"No s'ha trobat {0}"},"tpl_dist":{"es":"Distancia: {0}","ca":"Distància: {0}","gl":"Distancia: {0}","eu":"Distantzia: {0}","va":"Distància: {0}"},"tpl_area":{"es":"📐 Área: {0}","ca":"📐 Àrea: {0}","gl":"📐 Área: {0}","eu":"📐 Azalera: {0}","va":"📐 Àrea: {0}"},"tpl_sync":{"es":"✅ {0} PKs sincronizados","ca":"✅ {0} PKs sincronitzats","gl":"✅ {0} PKs sincronizados","eu":"✅ {0} PK sinkronizatuta","va":"✅ {0} PKs sincronitzats"},"tpl_fijada":{"es":"📌 Fijada {0} · PK {1}. Se mantendrá mientras sigas en ella.","ca":"📌 Fixada {0} · PK {1}. Es mantindrà mentre hi segueixis.","gl":"📌 Fixada {0} · PK {1}. Manterase mentres sigas nela.","eu":"📌 {0} finkatuta · PK {1}. Bertan jarraitzen duzun bitartean mantenduko da.","va":"📌 Fixada {0} · PK {1}. Es mantindrà mentres hi seguisques."},"tpl_bloqueada":{"es":"🚫 {0} bloqueada por la lista negra. Introduce el PK manualmente.","ca":"🚫 {0} bloquejada per la llista negra. Introdueix el PK manualment.","gl":"🚫 {0} bloqueada pola lista negra. Introduce o PK manualmente.","eu":"🚫 {0} zerrenda beltzak blokeatuta. Sartu PK eskuz.","va":"🚫 {0} bloquejada per la llista negra. Introduïx el PK manualment."},"tpl_fuera":{"es":"⚠️ Fuera del área ({0} m > umbral {1} m). Introduce el PK manualmente.","ca":"⚠️ Fora de l'àrea ({0} m > llindar {1} m). Introdueix el PK manualment.","gl":"⚠️ Fóra da área ({0} m > limiar {1} m). Introduce o PK manualmente.","eu":"⚠️ Eremutik kanpo ({0} m > atalasea {1} m). Sartu PK eskuz.","va":"⚠️ Fora de l'àrea ({0} m > llindar {1} m). Introduïx el PK manualment."},"tpl_offline_mode":{"es":"📴 Modo offline — {0}","ca":"📴 Mode fora de línia — {0}","gl":"📴 Modo sen conexión — {0}","eu":"📴 Lineaz kanpoko modua — {0}","va":"📴 Mode fora de línia — {0}"},"tpl_offline_nodata":{"es":"📴 Offline: sin datos precisos para la zona ({0})","ca":"📴 Fora de línia: sense dades precises per a la zona ({0})","gl":"📴 Sen conexión: sen datos precisos para a zona ({0})","eu":"📴 Lineaz kanpo: eremurako datu zehatzik gabe ({0})","va":"📴 Fora de línia: sense dades precises per a la zona ({0})"},"tpl_singps":{"es":"📴 Sin GPS — usando última posición · {0} PK {1}","ca":"📴 Sense GPS — usant l'última posició · {0} PK {1}","gl":"📴 Sen GPS — usando a última posición · {0} PK {1}","eu":"📴 GPSrik gabe — azken kokapena erabiltzen · {0} PK {1}","va":"📴 Sense GPS — usant l'última posició · {0} PK {1}"},"tpl_dadesman":{"es":"✔ Datos manuales: {0} PK {1}","ca":"✔ Dades manuals: {0} PK {1}","gl":"✔ Datos manuais: {0} PK {1}","eu":"✔ Eskuzko datuak: {0} PK {1}","va":"✔ Dades manuals: {0} PK {1}"},"tpl_fotoafegida":{"es":"📸 Foto {0} añadida","ca":"📸 Foto {0} afegida","gl":"📸 Foto {0} engadida","eu":"📸 {0}. argazkia gehituta","va":"📸 Foto {0} afegida"},"tpl_maxfotos":{"es":"Máximo {0} fotos por sesión","ca":"Màxim {0} fotos per sessió","gl":"Máximo {0} fotos por sesión","eu":"Gehienez {0} argazki saio bakoitzeko","va":"Màxim {0} fotos per sessió"},"tpl_umbral":{"es":"⚠️ Umbral estricto ({0} m): si no hay carretera en el radio, se solicitará entrada manual","ca":"⚠️ Llindar estricte ({0} m): si no hi ha carretera en el radi, es demanarà entrada manual","gl":"⚠️ Limiar estrito ({0} m): se non hai estrada no radio, solicitarase entrada manual","eu":"⚠️ Atalase zorrotza ({0} m): erradioan errepiderik ez badago, eskuzko sarrera eskatuko da","va":"⚠️ Llindar estricte ({0} m): si no hi ha carretera en el radi, es demanarà entrada manual"},"Compartir_lbl":{"es":"Compartir","ca":"Comparteix","gl":"Compartir","eu":"Partekatu","va":"Comparteix"},"fotos_lbl":{"es":"fotos","ca":"fotos","gl":"fotos","eu":"argazki","va":"fotos"},"fwa_carretera":{"es":"🛣️ Carretera:","ca":"🛣️ Carretera:","gl":"🛣️ Estrada:","eu":"🛣️ Errepidea:","va":"🛣️ Carretera:"},"fwa_pk":{"es":"📍 PK:","ca":"📍 PK:","gl":"📍 PK:","eu":"📍 PK:","va":"📍 PK:"},"fwa_ubic":{"es":"🌐 Ubicación:","ca":"🌐 Ubicació:","gl":"🌐 Localización:","eu":"🌐 Kokapena:","va":"🌐 Ubicació:"},"fwa_conaviso":{"es":"📞 [CON AVISO CCC]","ca":"📞 [AMB AVÍS CCC]","gl":"📞 [CON AVISO CCC]","eu":"📞 [ABISUAREKIN CCC]","va":"📞 [AMB AVÍS CCC]"},"res_fuera":{"es":"FUERA DEL ÁREA DE CARRETERA","ca":"FORA DE L'ÀREA DE CARRETERA","gl":"FÓRA DA ÁREA DE ESTRADA","eu":"ERREPIDE-EREMUTIK KANPO","va":"FORA DE L'ÀREA DE CARRETERA"},"res_cercana":{"es":"Carretera más cercana:","ca":"Carretera més propera:","gl":"Estrada máis próxima:","eu":"Hurbilen dagoen errepidea:","va":"Carretera més pròxima:"},"res_nodetect":{"es":"Sin carretera detectada cerca","ca":"Cap carretera detectada a prop","gl":"Sen estrada detectada preto","eu":"Ez da inguruan errepiderik hauteman","va":"Cap carretera detectada a prop"},"res_errdet":{"es":"Error de detección","ca":"Error de detecció","gl":"Erro de detección","eu":"Detekzio-errorea","va":"Error de detecció"},"INC_animal":{"es":"🐗 Animal en la Calzada","ca":"🐗 Animal a la Calçada","gl":"🐗 Animal na Calzada","eu":"🐗 Animalia errepidean","va":"🐗 Animal a la Calçada"},"INC_senyalitzacio":{"es":"🛑 Señalización Dañada","ca":"🛑 Senyalització Malmesa","gl":"🛑 Sinalización Danada","eu":"🛑 Seinaleak hondatuta","va":"🛑 Senyalització Danyada"},"INC_forat":{"es":"🕳️ Bache / Grieta","ca":"🕳️ Sot / Esquerda","gl":"🕳️ Bache / Greta","eu":"🕳️ Zuloa / Pitzadura","va":"🕳️ Clot / Clavill"},"INC_altra":{"es":"⚠️ Incidencia Indefinida","ca":"⚠️ Incidència Indefinida","gl":"⚠️ Incidencia Indefinida","eu":"⚠️ Gertaera zehaztugabea","va":"⚠️ Incidència Indefinida"},"INC_averia":{"es":"🚨 Averiado / Accidente","ca":"🚨 Avariat / Accident","gl":"🚨 Avariado / Accidente","eu":"🚨 Matxuratua / Istripua","va":"🚨 Avariat / Accident"},"SENT_creciente":{"es":"Creciente","ca":"Creixent","gl":"Crecente","eu":"Gorakorra","va":"Creixent"},"SENT_decreciente":{"es":"Decreciente","ca":"Decreixent","gl":"Decrecente","eu":"Beherakorra","va":"Decreixent"},"SENT_indeterminado":{"es":"Indeterminado","ca":"Indeterminat","gl":"Indeterminado","eu":"Zehaztugabea","va":"Indeterminat"},"SENT_izq":{"es":"Izq. ◀","ca":"Esq. ◀","gl":"Esq. ◀","eu":"Ezk. ◀","va":"Esq. ◀"},"SENT_dcha":{"es":"Dcha. ▶","ca":"Dta. ▶","gl":"Dta. ▶","eu":"Esk. ▶","va":"Dta. ▶"},"SENT_foto_label":{"es":"Sentido (foto):","ca":"Sentit (foto):","gl":"Sentido (foto):","eu":"Noranzkoa (argazkia):","va":"Sentit (foto):"},"GPS_acquiring":{"es":"Adquiriendo señal GPS...","ca":"Adquirint senyal GPS...","gl":"Adquirindo sinal GPS...","eu":"GPS seinalea eskuratzen...","va":"Adquirint senyal GPS..."},"GPS_searching_pk":{"es":"Buscando PKs cercanos...","ca":"Cercant PKs propers...","gl":"Buscando PKs próximos...","eu":"Inguruko PKak bilatzen...","va":"Buscant PKs pròxims..."},"GPS_arcgis":{"es":"Consultando ArcGIS...","ca":"Consultant ArcGIS...","gl":"Consultando ArcGIS...","eu":"ArcGIS kontsultatzen...","va":"Consultant ArcGIS..."},"GPS_error":{"es":"Error de conexión","ca":"Error de connexió","gl":"Erro de conexión","eu":"Konexio-errorea","va":"Error de connexió"},"GPS_active":{"es":"GPS activo","ca":"GPS actiu","gl":"GPS activo","eu":"GPS aktibo","va":"GPS actiu"},"GPS_acquired":{"es":"Señal GPS adquirida","ca":"Senyal GPS adquirit","gl":"Sinal GPS adquirido","eu":"GPS seinalea eskuratuta","va":"Senyal GPS adquirit"},"GPS_approx":{"es":"Posición aproximada (última conocida)","ca":"Posició aproximada (última coneguda)","gl":"Posición aproximada (última coñecida)","eu":"Gutxi gorabeherako kokapena (azken ezaguna)","va":"Posició aproximada (última coneguda)"},"WA_aviso_title":{"es":"AVISO DE INCIDENCIA","ca":"AVÍS D'INCIDÈNCIA","gl":"AVISO DE INCIDENCIA","eu":"GERTAERA-ABISUA","va":"AVÍS D'INCIDÈNCIA"},"WA_tipo":{"es":"Tipo:","ca":"Tipus:","gl":"Tipo:","eu":"Mota:","va":"Tipus:"},"WA_carretera":{"es":"Carretera:","ca":"Carretera:","gl":"Estrada:","eu":"Errepidea:","va":"Carretera:"},"WA_pk":{"es":"PK:","ca":"PK:","gl":"PK:","eu":"PK:","va":"PK:"},"WA_sentido":{"es":"Sentido:","ca":"Sentit:","gl":"Sentido:","eu":"Noranzkoa:","va":"Sentit:"},"WA_fechahora":{"es":"Fecha/hora:","ca":"Data/hora:","gl":"Data/hora:","eu":"Data/ordua:","va":"Data/hora:"},"WA_ubicacion":{"es":"Ubicación:","ca":"Ubicació:","gl":"Localización:","eu":"Kokapena:","va":"Ubicació:"},"WA_ubicacion_gps":{"es":"Ubicación GPS:","ca":"Ubicació GPS:","gl":"Localización GPS:","eu":"GPS kokapena:","va":"Ubicació GPS:"},"WA_sinpk":{"es":"Sin PK asignado (coordenadas GPS)","ca":"Sense PK assignat (coordenades GPS)","gl":"Sen PK asignado (coordenadas GPS)","eu":"PKrik esleitu gabe (GPS koordenatuak)","va":"Sense PK assignat (coordenades GPS)"},"card_sinpk":{"es":"📍 Sin PK asignado","ca":"📍 Sense PK assignat","gl":"📍 Sen PK asignado","eu":"📍 PKrik esleitu gabe","va":"📍 Sense PK assignat"},"card_sincoords":{"es":"Sin coordenadas","ca":"Sense coordenades","gl":"Sen coordenadas","eu":"Koordenaturik gabe","va":"Sense coordenades"},"card_wa_foto":{"es":"💬 WhatsApp + foto","ca":"💬 WhatsApp + foto","gl":"💬 WhatsApp + foto","eu":"💬 WhatsApp + argazkia","va":"💬 WhatsApp + foto"},"card_wa":{"es":"💬 WhatsApp","ca":"💬 WhatsApp","gl":"💬 WhatsApp","eu":"💬 WhatsApp","va":"💬 WhatsApp"},"card_addfoto":{"es":"📷 Añadir foto","ca":"📷 Afegeix foto","gl":"📷 Engadir foto","eu":"📷 Argazkia gehitu","va":"📷 Afig foto"},"card_maps":{"es":"🗺️ Google Maps","ca":"🗺️ Google Maps","gl":"🗺️ Google Maps","eu":"🗺️ Google Maps","va":"🗺️ Google Maps"},"post_title":{"es":"INCIDENCIA GUARDADA","ca":"INCIDÈNCIA DESADA","gl":"INCIDENCIA GARDADA","eu":"GERTAERA GORDETA","va":"INCIDÈNCIA GUARDADA"},"post_addfoto":{"es":"📷 Añadir foto","ca":"📷 Afegeix foto","gl":"📷 Engadir foto","eu":"📷 Argazkia gehitu","va":"📷 Afig foto"},"post_otrafoto":{"es":"📷 Añadir otra foto","ca":"📷 Afegeix una altra foto","gl":"📷 Engadir outra foto","eu":"📷 Beste argazki bat gehitu","va":"📷 Afig una altra foto"},"post_sinpk":{"es":"📍 Sin PK","ca":"📍 Sense PK","gl":"📍 Sen PK","eu":"📍 PKrik gabe","va":"📍 Sense PK"},"sel_title_inc":{"es":"CONFIRMAR CARRETERA (INCIDENCIA)","ca":"CONFIRMA LA CARRETERA (INCIDÈNCIA)","gl":"CONFIRMAR ESTRADA (INCIDENCIA)","eu":"ERREPIDEA BERRETSI (GERTAERA)","va":"CONFIRMA LA CARRETERA (INCIDÈNCIA)"},"sel_title_foto":{"es":"CONFIRMAR CARRETERA (FOTO)","ca":"CONFIRMA LA CARRETERA (FOTO)","gl":"CONFIRMAR ESTRADA (FOTO)","eu":"ERREPIDEA BERRETSI (ARGAZKIA)","va":"CONFIRMA LA CARRETERA (FOTO)"},"sel_detectada":{"es":"Detectada automáticamente:","ca":"Detectada automàticament:","gl":"Detectada automaticamente:","eu":"Automatikoki hautemana:","va":"Detectada automàticament:"},"sel_correcta":{"es":"¿Es correcta o estás en otra carretera?","ca":"És correcta o ets en una altra carretera?","gl":"É correcta ou estás noutra estrada?","eu":"Zuzena da edo beste errepide batean zaude?","va":"És correcta o estàs en una altra carretera?"},"err_title_inc":{"es":"INCIDENCIA FUERA DE TRAZA","ca":"INCIDÈNCIA FORA DE TRAÇAT","gl":"INCIDENCIA FÓRA DE TRAZADO","eu":"GERTAERA TRAZATUTIK KANPO","va":"INCIDÈNCIA FORA DE TRAÇAT"},"err_title_foto":{"es":"FOTO FUERA DE TRAZA","ca":"FOTO FORA DE TRAÇAT","gl":"FOTO FÓRA DE TRAZADO","eu":"ARGAZKIA TRAZATUTIK KANPO","va":"FOTO FORA DE TRAÇAT"},"err_dist":{"es":"Distancia a la carretera más cercana:","ca":"Distància a la carretera més propera:","gl":"Distancia á estrada máis próxima:","eu":"Hurbilen dagoen errepideraino distantzia:","va":"Distància a la carretera més pròxima:"},"err_llindar":{"es":"umbral:","ca":"llindar:","gl":"limiar:","eu":"atalasea:","va":"llindar:"},"err_nopropera":{"es":"No se ha encontrado ninguna carretera cercana o el GPS no tiene señal.","ca":"No s'ha trobat cap carretera propera o el GPS no té senyal.","gl":"Non se atopou ningunha estrada próxima ou o GPS non ten sinal.","eu":"Ez da inguruko errepiderik aurkitu edo GPSak ez du seinalerik.","va":"No s'ha trobat cap carretera pròxima o el GPS no té senyal."},"err_como":{"es":"¿Cómo deseas registrarlo?","ca":"Com vols registrar-ho?","gl":"Como queres rexistralo?","eu":"Nola erregistratu nahi duzu?","va":"Com vols registrar-ho?"},"carrsel_label_fixada":{"es":"Carretera fijada","ca":"Carretera fixada","gl":"Estrada fixada","eu":"Errepide finkatua","va":"Carretera fixada"},"carrsel_label_elige":{"es":"¿Varias carreteras cerca? Elige la tuya","ca":"Diverses carreteres a prop? Tria la teva","gl":"Varias estradas preto? Escolle a túa","eu":"Errepide bat baino gehiago gertu? Aukeratu zurea","va":"Diverses carreteres a prop? Tria la teua"},"carrsel_elige_short":{"es":"Carreteras detectadas — elige la tuya","ca":"Carreteres detectades — tria la teva","gl":"Estradas detectadas — escolle a túa","eu":"Hautemandako errepideak — aukeratu zurea","va":"Carreteres detectades — tria la teua"},"carrsel_estas":{"es":"¿Estás en alguna de estas?","ca":"Ets en alguna d'aquestes?","gl":"Estás nalgunha destas?","eu":"Hauetakoren batean zaude?","va":"Estàs en alguna d'estes?"},"carrsel_cambiar":{"es":"Toca para cambiar carretera","ca":"Toca per canviar de carretera","gl":"Toca para cambiar de estrada","eu":"Ukitu errepidez aldatzeko","va":"Toca per a canviar de carretera"},"de_la_calzada":{"es":"m de la calzada","ca":"m de la calçada","gl":"m da calzada","eu":"m errepidetik","va":"m de la calçada"},"REGISTROS":{"es":"REGISTROS","ca":"REGISTRES","gl":"REXISTROS","eu":"ERREGISTRO","va":"REGISTRES"},"seleccionadas":{"es":"seleccionadas","ca":"seleccionades","gl":"seleccionadas","eu":"hautatuta","va":"seleccionades"},"Error leyendo datos":{"es":"Error leyendo datos","ca":"Error en llegir les dades","gl":"Erro lendo os datos","eu":"Errorea datuak irakurtzean","va":"Error en llegir les dades"},"Error leyendo fotos":{"es":"Error leyendo fotos","ca":"Error en llegir les fotos","gl":"Erro lendo as fotos","eu":"Errorea argazkiak irakurtzean","va":"Error en llegir les fotos"}};
@@ -11226,7 +11422,7 @@ function actualitzarUICache() {
 async function syncPKs() {
   const btn = document.getElementById('btnSync');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner-ring"></div> DESCARREGANT...';
+  btn.innerHTML = '<div class="pk-spinner-ring"></div> DESCARREGANT...';
   showToast('⏳ Iniciando descarga de PKs...', 'ok', 4000);
 
   let total = [], offset = 0, seguir = true;
@@ -11244,7 +11440,7 @@ async function syncPKs() {
         if (f.geometry && f.attributes.nombre && !isNaN(pkv))
           total.push({ carretera: f.attributes.nombre, pk: pkv, lat: f.geometry.y, lon: f.geometry.x });
       });
-      btn.innerHTML = `<div class="spinner-ring"></div> ${total.length.toLocaleString()} PKs...`;
+      btn.innerHTML = `<div class="pk-spinner-ring"></div> ${total.length.toLocaleString()} PKs...`;
       if (feats.length < BATCH) seguir = false;
       else offset += BATCH;
       if (offset > 20000) seguir = false;
@@ -11297,7 +11493,7 @@ async function consultarArcGIS(lat, lon, bufGraus = 0.06) {
 ═══════════════════════════════════════════════════════════════════ */
 function setGPSBar(state, label, acc) {
   const bar = document.getElementById('gpsBar');
-  bar.className = 'gps-bar ' + (state || '');
+  bar.className = 'pk-gps-bar ' + (state || '');
   document.getElementById('gpsLabel').textContent = label;
   const accEl = document.getElementById('gpsAcc');
   if (acc != null) { accEl.textContent = `±${Math.round(acc)} m`; accEl.classList.remove('hidden'); }
@@ -11311,11 +11507,11 @@ function mostrarResultatOK(res) {
   const mStr = String(res.m).padStart(3,'0');
   ultimResultat = `${res.carretera}, PK ${res.km}+${mStr}`;
   ultimResultatObj = res;
-  document.getElementById('resultCard').className = 'result-card state-ok fade-in';
+  document.getElementById('resultCard').className = 'pk-result-card state-ok fade-in';
   document.getElementById('resultContent').innerHTML = `
-    <div class="result-road">${res.carretera}</div>
-    <div class="result-pk">PK ${res.km}<span class="sep">+</span>${mStr}</div>
-    <div class="result-dist">±${Math.round(res.dist)} ${pkgT('de_la_calzada')}</div>
+    <div class="pk-result-road">${res.carretera}</div>
+    <div class="pk-result-pk">PK ${res.km}<span class="sep">+</span>${mStr}</div>
+    <div class="pk-result-dist">±${Math.round(res.dist)} ${pkgT('de_la_calzada')}</div>
     <button onclick="pkIncorrecte()" style="margin-top:8px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,184,0,.4);background:rgba(255,184,0,.08);color:var(--amber);font-size:.68rem;font-family:var(--font-cond);font-weight:700;letter-spacing:.5px;cursor:pointer;">⚠️ PK incorrecto</button>`
     + renderSelectorCarreteres(res.carretera);
   document.getElementById('copyBtn').className = 'copy-btn visible';
@@ -11352,16 +11548,16 @@ function renderSelectorCarreteres(actual) {
     const nom = _escapaHTML(c.carretera);
     const act = c.carretera === actual;
     const pin = carreteraFixada === c.carretera ? '📌 ' : '';
-    return `<button class="carr-chip${act ? ' active' : ''}" data-c="${nom}"
+    return `<button class="pk-carr-chip${act ? ' active' : ''}" data-c="${nom}"
               onclick="seleccionarCarretera(this.dataset.c)">${pin}${nom}<small>${Math.round(c.dist)} m</small></button>`;
   }).join('');
 
   const autoChip = carreteraFixada
-    ? `<button class="carr-chip auto" onclick="alliberarCarreteraFixada()">↺ AUTO</button>` : '';
+    ? `<button class="pk-carr-chip auto" onclick="alliberarCarreteraFixada()">↺ AUTO</button>` : '';
 
-  return `<div class="carr-sel">
-    <div class="carr-sel-label">${carreteraFixada ? pkgT('carrsel_label_fixada') : pkgT('carrsel_label_elige')}</div>
-    <div class="carr-sel-chips">${chips}${autoChip}</div>
+  return `<div class="pk-carr-sel">
+    <div class="pk-carr-sel-label">${carreteraFixada ? pkgT('carrsel_label_fixada') : pkgT('carrsel_label_elige')}</div>
+    <div class="pk-carr-sel-chips">${chips}${autoChip}</div>
   </div>`;
 }
 
@@ -11397,20 +11593,20 @@ function mostrarResultatFora(carretera, dist) {
   ultimResultat = null; ultimResultatObj = null;
   // Selector: si hi ha candidates a < 400 m, permet a l'usuari afirmar on és
   const candsProp = _ultimsCandidats.filter(c => c.dist <= 400);
-  const selector = candsProp.length ? `<div class="carr-sel">
-      <div class="carr-sel-label">${pkgT('carrsel_estas')}</div>
-      <div class="carr-sel-chips">${candsProp.map(c => {
+  const selector = candsProp.length ? `<div class="pk-carr-sel">
+      <div class="pk-carr-sel-label">${pkgT('carrsel_estas')}</div>
+      <div class="pk-carr-sel-chips">${candsProp.map(c => {
         const nom = _escapaHTML(c.carretera);
-        return `<button class="carr-chip" data-c="${nom}"
+        return `<button class="pk-carr-chip" data-c="${nom}"
                   onclick="seleccionarCarretera(this.dataset.c)">${nom}<small>${Math.round(c.dist)} m</small></button>`;
       }).join('')}</div>
     </div>` : '';
   const marcarBtn = `<button onclick="marcarPuntTraza()" style="margin-top:10px;width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:var(--accent);font-size:.75rem;font-family:var(--font-cond);font-weight:700;letter-spacing:.5px;cursor:pointer;">📍 Marcar punto de carretera</button>`;
-  document.getElementById('resultCard').className = 'result-card state-warn fade-in';
+  document.getElementById('resultCard').className = 'pk-result-card state-warn fade-in';
   document.getElementById('resultContent').innerHTML = `
-    <div class="result-warn-icon">⚠️</div>
-    <div class="result-warn-title">${pkgT('res_fuera')}</div>
-    <div class="result-warn-sub">${carretera ? `${pkgT('res_cercana')} ${carretera} (${Math.round(dist)} m)` : pkgT('res_nodetect')}</div>`
+    <div class="pk-result-warn-icon">⚠️</div>
+    <div class="pk-result-warn-title">${pkgT('res_fuera')}</div>
+    <div class="pk-result-warn-sub">${carretera ? `${pkgT('res_cercana')} ${carretera} (${Math.round(dist)} m)` : pkgT('res_nodetect')}</div>`
     + selector + marcarBtn;
   document.getElementById('copyBtn').className = 'copy-btn';
 }
@@ -11418,11 +11614,11 @@ function mostrarResultatFora(carretera, dist) {
 function mostrarResultatError(msg) {
   ultimResultat = null; ultimResultatObj = null;
   const marcarBtn = `<button onclick="marcarPuntTraza()" style="margin-top:10px;width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:var(--accent);font-size:.75rem;font-family:var(--font-cond);font-weight:700;letter-spacing:.5px;cursor:pointer;">📍 Marcar punto de carretera</button>`;
-  document.getElementById('resultCard').className = 'result-card state-err fade-in';
+  document.getElementById('resultCard').className = 'pk-result-card state-err fade-in';
   document.getElementById('resultContent').innerHTML = `
-    <div class="result-warn-icon">🚫</div>
-    <div class="result-warn-title">${pkgT('res_errdet')}</div>
-    <div class="result-warn-sub">${msg}</div>` + marcarBtn;
+    <div class="pk-result-warn-icon">🚫</div>
+    <div class="pk-result-warn-title">${pkgT('res_errdet')}</div>
+    <div class="pk-result-warn-sub">${msg}</div>` + marcarBtn;
   document.getElementById('copyBtn').className = 'copy-btn';
 }
 
@@ -11433,7 +11629,7 @@ function setBtnLoading(loading) {
   gpsRunning = loading;
   const btn = document.getElementById('btnMain');
   document.getElementById('btnIcon').outerHTML = loading
-    ? '<div class="spinner-ring" id="btnIcon"></div>'
+    ? '<div class="pk-spinner-ring" id="btnIcon"></div>'
     : '<span id="btnIcon">🔍</span>';
   document.getElementById('btnLabel').textContent = loading ? 'DETECTANDO...' : '¿DÓNDE ESTOY?';
   btn.classList.toggle('loading', loading);
@@ -14181,7 +14377,7 @@ function _pkCanviarTab(btn, screenId) {
   tancarIncPanel();
 
   // FAB stack: visible a Home i Mapa, ocult a les altres pestanyes
-  const showFab = screenId === 'screenLocalitzar';
+  const showFab = screenId === 'localitzar';
   document.getElementById('fabStack').style.display = showFab ? 'flex' : 'none';
 
   // Barra de cerca del mapa: visible NOMÉS quan estem al mapa
