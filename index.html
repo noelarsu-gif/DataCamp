@@ -2470,19 +2470,66 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* Selecció mode */
 .galeria-select-bar {
-    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--dark);
-    color: white;
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    justify-content: space-around;
+    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
+    z-index: 500;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
 }
-.galeria-select-bar.visible { display: flex; }
-.galeria-select-count { flex: 1; font-family: var(--font-cond); letter-spacing: 0.5px; }
+.galeria-select-bar.visible {
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.galeria-select-count {
+    font-family: var(--font-cond);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    text-align: center;
+    flex: 1;
+}
+.galeria-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 20px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    min-width: 72px;
+    -webkit-tap-highlight-color: transparent;
+}
+.galeria-action-btn:active { opacity: 0.6; transform: scale(0.92); }
+.galeria-action-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+.galeria-action-label {
+    font-family: var(--font);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.galeria-action-btn.danger .galeria-action-icon { filter: hue-rotate(0deg); }
+.galeria-action-btn.danger .galeria-action-label { color: #dc2626; }
+
+/* Quan la bottom bar és visible, afegim padding al grid per no tapar fotos */
+.galeria-grid.select-active { padding-bottom: 90px; }
 
 /* Grid de fotos */
 .galeria-grid {
@@ -3537,6 +3584,291 @@ input:checked + .slider:before { transform: translateX(20px); }
     .recent-continue{ padding: 6px 10px; font-size: 0.7rem; }
 }
 
+/* ============================================================
+   PK MAPA — STYLES
+   ============================================================ */
+.pkm-screen {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    padding: 0 !important;
+    background: #0d1117;
+}
+@media (min-width: 769px) {
+    .pkm-screen { height: 100vh; }
+}
+
+#pkMapaContainer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* ── Left floating controls ─────────────────── */
+.pkm-left-controls {
+    position: absolute;
+    left: 12px;
+    bottom: calc(var(--pkm-sheet-peek, 90px) + 16px);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: bottom 0.35s cubic-bezier(.4,0,.2,1);
+}
+.pkm-ctrl-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(17,24,39,0.92);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    color: #e5e7eb;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: background 0.18s, transform 0.15s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+}
+.pkm-ctrl-btn svg { width: 20px; height: 20px; }
+.pkm-ctrl-btn:active { transform: scale(0.92); background: rgba(198,12,48,0.8); }
+.pkm-ctrl-btn.locating { animation: pkmPulseBtn 1s ease-in-out infinite; }
+@keyframes pkmPulseBtn { 0%,100%{box-shadow:0 0 0 0 rgba(198,12,48,0.6)} 50%{box-shadow:0 0 0 10px rgba(198,12,48,0)} }
+
+/* ── Measure close button top-center ───────── */
+.pkm-measure-close {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(198,12,48,0.92);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 14px rgba(198,12,48,0.5);
+    animation: pkmDropIn 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.pkm-measure-close svg { width: 18px; height: 18px; }
+@keyframes pkmDropIn { from{transform:translateX(-50%) translateY(-20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+
+/* ── Search bar ─────────────────────────────── */
+.pkm-search-wrap {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 80px);
+    max-width: 480px;
+    z-index: 25;
+    background: rgba(17,24,39,0.92);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    display: flex; align-items: center;
+    padding: 0 12px 0 14px;
+    gap: 8px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.pkm-search-icon { width: 16px; height: 16px; color: #6b7280; flex-shrink: 0; }
+.pkm-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #f3f4f6;
+    font-family: var(--font);
+    font-size: 0.88rem;
+    padding: 11px 0;
+}
+.pkm-search-input::placeholder { color: #4b5563; }
+.pkm-search-clear {
+    background: none; border: none; color: #6b7280;
+    cursor: pointer; font-size: 0.9rem; padding: 2px 4px;
+    flex-shrink: 0;
+}
+.pkm-search-results {
+    position: absolute;
+    top: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 80px);
+    max-width: 480px;
+    z-index: 25;
+    background: rgba(17,24,39,0.96);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    max-height: 240px;
+    overflow-y: auto;
+}
+.pkm-search-result {
+    padding: 11px 16px;
+    cursor: pointer;
+    color: #d1d5db;
+    font-size: 0.86rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 10px;
+}
+.pkm-search-result:last-child { border-bottom: none; }
+.pkm-search-result:active { background: rgba(198,12,48,0.2); }
+.pkm-search-result-icon { font-size: 1rem; }
+.pkm-search-result-main { font-weight: 600; color: #f3f4f6; }
+.pkm-search-result-sub  { font-size: 0.76rem; color: #6b7280; }
+
+/* ── Bottom sheet ───────────────────────────── */
+.pkm-sheet {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    z-index: 20;
+    background: rgba(17,24,39,0.95);
+    border-radius: 20px 20px 0 0;
+    border-top: 1.5px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(16px);
+    touch-action: none;
+    user-select: none;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+}
+.pkm-sheet-handle {
+    padding: 10px 0 4px;
+    display: flex; justify-content: center;
+    cursor: grab;
+}
+.pkm-sheet-handle:active { cursor: grabbing; }
+.pkm-sheet-pill {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+}
+.pkm-sheet-content { padding: 8px 16px 20px; }
+
+.pkm-info-row {
+    margin-bottom: 12px;
+    min-height: 48px;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.pkm-info-badge {
+    display: flex; align-items: baseline; gap: 10px;
+    flex-wrap: wrap;
+}
+.pkm-road-name {
+    font-family: var(--font-cond);
+    font-size: 1.1rem; font-weight: 700;
+    color: #f9fafb; letter-spacing: 0.5px;
+}
+.pkm-road-pk {
+    font-size: 0.9rem; font-weight: 600;
+    color: #f59e0b;
+    font-family: var(--font-cond);
+}
+.pkm-coords {
+    font-size: 0.72rem; color: #4b5563;
+    font-family: monospace;
+}
+
+.pkm-tools-row {
+    display: flex; gap: 10px;
+    margin-top: 4px;
+}
+.pkm-tool-btn {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: 10px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.pkm-tool-btn svg { width: 22px; height: 22px; }
+.pkm-tool-btn.active {
+    background: rgba(245,158,11,0.15);
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+.pkm-tool-btn:active { opacity: 0.7; }
+
+.pkm-measure-result {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 10px;
+    font-family: var(--font-cond);
+    font-size: 1rem; font-weight: 700;
+    color: #f59e0b;
+    text-align: center;
+}
+
+/* ── PK Popover viñeta ──────────────────────── */
+.pkm-popover {
+    position: absolute;
+    z-index: 30;
+    background: rgba(17,24,39,0.96);
+    border: 1.5px solid rgba(245,158,11,0.5);
+    border-radius: 12px;
+    padding: 9px 14px 10px;
+    pointer-events: none;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    animation: pkmPopoverIn 0.22s cubic-bezier(.34,1.56,.64,1);
+    transform: translateX(-50%) translateY(-100%);
+    margin-top: -12px;
+}
+@keyframes pkmPopoverIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(calc(-100% + 8px)); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(-100%); }
+}
+.pkm-popover-road {
+    font-family: var(--font-cond);
+    font-size: 1rem; font-weight: 800;
+    color: #f9fafb; letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.pkm-popover-pk {
+    font-size: 0.82rem; font-weight: 600;
+    color: #f59e0b;
+    margin-top: 2px;
+    font-family: var(--font-cond);
+}
+.pkm-popover-arrow {
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    width: 12px; height: 7px;
+    background: rgba(17,24,39,0.96);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-left: 1.5px solid rgba(245,158,11,0.5);
+    border-right: 1.5px solid rgba(245,158,11,0.5);
+}
+
+/* GPS marker – teardrop */
+.pkm-gps-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 3px solid white;
+    box-shadow: 0 0 0 5px rgba(59,130,246,0.3);
+}
+
+/* Leaflet attribution dark */
+#pkMapaContainer .leaflet-control-attribution {
+    background: rgba(0,0,0,0.5) !important;
+    color: rgba(255,255,255,0.4) !important;
+    font-size: 10px !important;
+}
+#pkMapaContainer .leaflet-control-attribution a { color: rgba(255,255,255,0.5) !important; }
+#pkMapaContainer .leaflet-control-zoom { display: none; }
+
 </style>
 </head>
 <body>
@@ -3568,6 +3900,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon">🖼️</span> Galeria</button>
         <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Historial</button>
         <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon">🗺️</span> Mapa</button>
+        <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon">🛣️</span> PK Mapa</button>
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon">📥</span> Descàrregues</button>
         <button class="nav-item" onclick="mobileNavTo('pantallaAjustos')"><span class="nav-icon">⚙️</span> Configuració</button>
         <button class="nav-item" onclick="mobileNavTo('helpScreen')"><span class="nav-icon">❓</span> Ajuda</button>
@@ -3609,6 +3942,9 @@ input:checked + .slider:before { transform: translateX(20px); }
             </button>
             <button class="nav-item" id="nav-map" onclick="abrirMapa()">
                 <span class="nav-icon">🗺️</span> Mapa
+            </button>
+            <button class="nav-item" id="nav-pkmapa" onclick="abrirPKMapa()">
+                <span class="nav-icon">🛣️</span> PK Mapa
             </button>
             <button class="nav-item" id="nav-downloads" onclick="ir('downloads')">
                 <span class="nav-icon">📥</span> Descàrregues
@@ -3726,6 +4062,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-label">Descàrregues</div>
                         <div class="action-desc">Genera PDF, Excel i ZIP de fotos</div>
                     </div>
+                    <div class="action-card" onclick="abrirPKMapa()" style="border-left:3px solid #f59e0b;">
+                        <div class="action-icon">🛣️</div>
+                        <div class="action-label">PK Mapa</div>
+                        <div class="action-desc">Consulta PKs sobre satèl·lit, mesures i Street View</div>
+                    </div>
                 </div>
 
                 <!-- RECENT PROJECTS SECTION -->
@@ -3783,6 +4124,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="autopk-pulse" id="autopkPulse" style="display:none;"></span>
                     🔍 ON ESTIC ARA? (Auto-PK)
                 </button>
+
+                <!-- Chips carreteres properes (inventari) -->
+                <div id="autopkChipsArea" style="display:none; margin-bottom:14px;">
+                    <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+                    <div class="pk-chips-row" id="autopkChipsRow"></div>
+                </div>
                 <!-- ─────────────────────────────────────────────── -->
 
                 <div id="dynamicFields"></div>
@@ -4063,8 +4410,31 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
+                <!-- GALERIA FOTOS — PREFERÈNCIA DE GUARDAT ──────── -->
+                <div class="settings-section">
+                    <div class="settings-section-title">📷 Foto Ràpida</div>
+                    <div class="watermark-row" style="background:var(--surface-2); border-color:var(--border);">
+                        <div class="watermark-row-info">
+                            <span class="watermark-row-icon">💾</span>
+                            <div class="watermark-row-text">
+                                <div class="wm-title" style="color:var(--dark);">Guardar també al dispositiu</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px; line-height:1.4;">La foto es desarà a la galeria de l'app <em>i</em> automàticament al dispositiu</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="checkGuardarDispositiu" onchange="guardarPreferenciaFoto(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
+
+            <!-- ================================================
+                 AJUDA
+                 ================================================ -->
             <div id="helpScreen" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
@@ -4121,21 +4491,13 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <!-- Toolbar principal -->
                 <div class="galeria-toolbar" id="galeriaToolbar">
                     <span class="galeria-count-badge" id="galeriaBadge">0 fotos</span>
-                    <button class="galeria-btn" onclick="toggleSelectMode()" id="btnSelectMode">☑️ Seleccionar</button>
+                    <button class="galeria-btn" onclick="toggleSelectMode()" id="btnSelectMode">Seleccionar</button>
                     <div class="galeria-toolbar-right">
                         <button class="galeria-btn blue" onclick="carregarFotoDispositiu()" title="Carregar foto des del dispositiu">
                             📂 Carregar
                         </button>
                         <input type="file" id="galeriaLoadInput" multiple accept="image/*" hidden onchange="galeriaCarregarFotos(this)">
                     </div>
-                </div>
-
-                <!-- Barra de selecció activa -->
-                <div class="galeria-select-bar" id="galeriaSelectBar">
-                    <span class="galeria-select-count" id="galeriaSelectCount">0 seleccionades</span>
-                    <button class="galeria-btn" onclick="galeriaCompartirSeleccio()">📲 Compartir</button>
-                    <button class="galeria-btn danger" onclick="galeriaEliminarSeleccio()">🗑️ Eliminar</button>
-                    <button class="galeria-btn" onclick="toggleSelectMode()">✕ Cancel·lar</button>
                 </div>
 
                 <!-- Grid fotos -->
@@ -4151,8 +4513,117 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
             </div>
 
+        </div><!-- /page-content - THIS IS THE ORIGINAL CLOSING -->
+
+            <!-- ================================================
+                 PK MAPA SCREEN
+                 ================================================ -->
+            <div id="pkMapaScreen" class="screen pkm-screen">
+                <!-- Full-screen Leaflet map -->
+                <div id="pkMapaContainer"></div>
+
+                <!-- Left controls column -->
+                <div class="pkm-left-controls">
+                    <button class="pkm-ctrl-btn" id="pkm-center-btn" onclick="pkmCentrarGPS()" title="Centrar GPS">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                            <circle cx="12" cy="12" r="9" stroke-opacity=".3"/>
+                        </svg>
+                    </button>
+                    <button class="pkm-ctrl-btn" id="pkm-sv-btn" onclick="pkmAbrirStreetView()" title="Street View">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="3.5"/><path d="M12 11.5C9 11.5 5 13.5 5 17v1h14v-1c0-3.5-4-5.5-7-5.5z"/>
+                            <path d="M17 5l2.5 3L17 11" stroke-width="1.5" opacity=".6"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Measure close button (top center, hidden by default) -->
+                <button class="pkm-measure-close" id="pkm-measure-close" onclick="pkmTancarMesura()" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+
+                <!-- Search bar -->
+                <div class="pkm-search-wrap">
+                    <svg class="pkm-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" id="pkm-search-input" class="pkm-search-input"
+                           placeholder="Municipi o carretera (ex: C-14 120+200)"
+                           oninput="pkmSearchInput(this.value)"
+                           autocomplete="off" spellcheck="false">
+                    <button class="pkm-search-clear" id="pkm-search-clear" onclick="pkmClearSearch()" style="display:none;">✕</button>
+                </div>
+                <div class="pkm-search-results" id="pkm-search-results" style="display:none;"></div>
+
+                <!-- Draggable bottom sheet -->
+                <div class="pkm-sheet" id="pkm-sheet">
+                    <div class="pkm-sheet-handle" id="pkm-sheet-handle">
+                        <div class="pkm-sheet-pill"></div>
+                    </div>
+                    <div class="pkm-sheet-content">
+                        <!-- PK info -->
+                        <div class="pkm-info-row" id="pkm-info-row">
+                            <div class="pkm-info-badge" id="pkm-info-badge">
+                                <span class="pkm-road-name" id="pkm-road-name">— Mou el marcador —</span>
+                                <span class="pkm-road-pk" id="pkm-road-pk"></span>
+                            </div>
+                            <div class="pkm-coords" id="pkm-coords"></div>
+                        </div>
+                        <!-- Tools -->
+                        <div class="pkm-tools-row">
+                            <button class="pkm-tool-btn" id="pkm-tool-poly" onclick="pkmActivarMesura('poly')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3,20 8,8 14,14 20,5"/>
+                                </svg>
+                                <span>Distància</span>
+                            </button>
+                            <button class="pkm-tool-btn" id="pkm-tool-area" onclick="pkmActivarMesura('area')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12,3 21,20 3,20"/>
+                                </svg>
+                                <span>Superfície</span>
+                            </button>
+                            <button class="pkm-tool-btn" onclick="pkmBack()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 12H5M12 5l-7 7 7 7"/>
+                                </svg>
+                                <span>Tornar</span>
+                            </button>
+                        </div>
+                        <!-- Measure result -->
+                        <div class="pkm-measure-result" id="pkm-measure-result" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- PK Popover viñeta -->
+                <div class="pkm-popover" id="pkm-popover" style="display:none;">
+                    <div class="pkm-popover-road" id="pkm-popover-road">C-14</div>
+                    <div class="pkm-popover-pk" id="pkm-popover-pk">PK 120+000</div>
+                    <div class="pkm-popover-arrow"></div>
+                </div>
+            </div>
+
         </div><!-- /page-content -->
-    </div><!-- /main-content -->
+<!-- ============================================================
+     GALERIA — BOTTOM ACTION BAR (Samsung style)
+     ============================================================ -->
+<div class="galeria-select-bar" id="galeriaSelectBar">
+    <span class="galeria-select-count" id="galeriaSelectCount">0 seleccionades</span>
+    <button class="galeria-action-btn" onclick="galeriaCompartirSeleccio()">
+        <span class="galeria-action-icon">📤</span>
+        <span class="galeria-action-label">Compartir</span>
+    </button>
+    <button class="galeria-action-btn danger" onclick="galeriaEliminarSeleccio()">
+        <span class="galeria-action-icon">🗑️</span>
+        <span class="galeria-action-label">Eliminar</span>
+    </button>
+    <button class="galeria-action-btn" onclick="toggleSelectMode()">
+        <span class="galeria-action-icon">✕</span>
+        <span class="galeria-action-label">Cancel·lar</span>
+    </button>
+</div>
+
 </div><!-- /app-shell -->
 
 <!-- ============================================================
@@ -4363,7 +4834,8 @@ const screenTitles = {
     'helpScreen':    'Ajuda',
     'projectDetail': 'Detall del Projecte',
     'mapScreen':     'Mapa de Registres',
-    'galeriaFotos':  'Galeria de Fotos'
+    'galeriaFotos':  'Galeria de Fotos',
+    'pkMapaScreen':  'PK Mapa'
 };
 
 // Show FAB on initial load (home is active by default)
@@ -4393,11 +4865,11 @@ function ir(id) {
 
     // Update sidebar active state
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el => el.classList.remove('active'));
-    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto' };
+    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'downloads') carregarLlistaDescargues();
-    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); }
+    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); }
     if (id === 'galeriaFotos') renderGaleria();
 
     // FAB: visible only on home dashboard
@@ -4747,17 +5219,25 @@ function aplicarMarcaAigua(base64, text) {
         img.onload = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
+            canvas.width  = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-            const hBarra = canvas.height * 0.055;
-            ctx.fillStyle = "rgba(0,0,0,0.55)";
+
+            // Franja discreta: ~3.5% d'alçada, gradient de baix cap a dalt
+            const hBarra = canvas.height * 0.035;
+            const grad = ctx.createLinearGradient(0, canvas.height - hBarra, 0, canvas.height);
+            grad.addColorStop(0, "rgba(0,0,0,0)");
+            grad.addColorStop(1, "rgba(0,0,0,0.58)");
+            ctx.fillStyle = grad;
             ctx.fillRect(0, canvas.height - hBarra, canvas.width, hBarra);
-            ctx.fillStyle = "white";
-            const fontSize = Math.round(hBarra * 0.58);
-            ctx.font = `bold ${fontSize}px Barlow, Arial, sans-serif`;
-            ctx.textBaseline = "middle";
-            ctx.fillText(text, 16, canvas.height - hBarra / 2);
+
+            // Text petit i lleuger
+            const fontSize = Math.round(hBarra * 0.52);
+            ctx.font = `500 ${fontSize}px Barlow, Arial, sans-serif`;
+            ctx.fillStyle = "rgba(255,255,255,0.82)";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(text, Math.round(canvas.width * 0.015), canvas.height - Math.round(hBarra * 0.12));
+
             resolve(canvas.toDataURL("image/jpeg", 0.82));
         };
         img.src = base64;
@@ -6296,6 +6776,26 @@ function eliminarLogo() {
 }
 
 /* ============================================================
+   PREFERÈNCIA GUARDAT FOTO AL DISPOSITIU
+   ============================================================ */
+const PREF_GUARDAR_DISPOSITIU = 'datacamp_foto_save_device';
+
+function initPreferenciaFoto() {
+    const val = localStorage.getItem(PREF_GUARDAR_DISPOSITIU) === 'true';
+    const chk = document.getElementById('checkGuardarDispositiu');
+    if (chk) chk.checked = val;
+}
+
+function guardarPreferenciaFoto(val) {
+    localStorage.setItem(PREF_GUARDAR_DISPOSITIU, val ? 'true' : 'false');
+    showToast(val ? '💾 Fotos: app + dispositiu' : '📱 Fotos: només app');
+}
+
+function volGuardarAlDispositiu() {
+    return localStorage.getItem(PREF_GUARDAR_DISPOSITIU) === 'true';
+}
+
+/* ============================================================
    GALERIA DE FOTOS RÀPIDES
    ============================================================ */
 
@@ -6412,18 +6912,17 @@ function galeriaToggleSeleccio(id) {
 function toggleSelectMode() {
     galeriaSelectMode = !galeriaSelectMode;
     galeriaSeleccio.clear();
-    const grid     = document.getElementById('galeriaGrid');
-    const bar      = document.getElementById('galeriaSelectBar');
-    const btnSel   = document.getElementById('btnSelectMode');
+    const grid   = document.getElementById('galeriaGrid');
+    const bar    = document.getElementById('galeriaSelectBar');
+    const btnSel = document.getElementById('btnSelectMode');
     if (galeriaSelectMode) {
-        grid.classList.add('galeria-select-mode');
+        grid.classList.add('galeria-select-mode', 'select-active');
         bar?.classList.add('visible');
-        btnSel?.classList.add('active');
+        if (btnSel) { btnSel.classList.add('active'); btnSel.textContent = 'Seleccionant...'; }
     } else {
-        grid.classList.remove('galeria-select-mode');
+        grid.classList.remove('galeria-select-mode', 'select-active');
         bar?.classList.remove('visible');
-        btnSel?.classList.remove('active');
-        // Clear visual selection
+        if (btnSel) { btnSel.classList.remove('active'); btnSel.textContent = 'Seleccionar'; }
         document.querySelectorAll('.galeria-thumb.selected').forEach(t => {
             t.classList.remove('selected');
             const c = t.querySelector('.galeria-thumb-check');
@@ -6436,7 +6935,8 @@ function toggleSelectMode() {
 /* Actualitza comptador barra selecció */
 function actualizarSelectBar() {
     const count = document.getElementById('galeriaSelectCount');
-    if (count) count.textContent = `${galeriaSeleccio.size} seleccionada${galeriaSeleccio.size !== 1 ? 'es' : ''}`;
+    const n = galeriaSeleccio.size;
+    if (count) count.textContent = n === 0 ? 'Cap seleccionada' : `${n} seleccionada${n !== 1 ? 'es' : ''}`;
 }
 
 /* Eliminar fotos seleccionades */
@@ -6610,10 +7110,16 @@ function obrirEditorFotoDirecta(imgData) {
             <span class="autopk-status-icon" id="fdAutopkStatusIcon">📡</span>
             <span id="fdAutopkStatusText">Cercant posició GPS...</span>
         </div>
-        <button class="btn-autopk" id="btn-autopk-foto" style="margin-bottom:18px;" title="Detecta la carretera i PK automàticament per GPS">
+        <button class="btn-autopk" id="btn-autopk-foto" style="margin-bottom:12px;" title="Detecta la carretera i PK automàticament per GPS">
             <span class="autopk-pulse" id="fdAutopkPulse" style="display:none;"></span>
             🔍 ON ESTIC ARA? (Auto-PK)
         </button>
+
+        <!-- Chips carreteres properes -->
+        <div id="fdChipsArea" style="display:none; margin-bottom:14px;">
+            <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+            <div class="pk-chips-row" id="fdChipsRow"></div>
+        </div>
 
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:18px;">
             <div class="form-group" style="margin:0">
@@ -6674,17 +7180,57 @@ function obrirEditorFotoDirecta(imgData) {
     }
 
     if (btnAutoPKFoto) {
+        // Resultats locals per poder aplicar el chip seleccionat
+        let _fdResultats = [];
+
+        function fdAplicarResultat(r) {
+            const msStr    = String(r.m).padStart(3, '0');
+            const pkFormatat = `${r.km}+${msStr}`;
+            const fdPk   = document.getElementById('fd_pk');
+            const fdCarr = document.getElementById('fd_carretera');
+            if (fdPk)   fdPk.value   = pkFormatat;
+            if (fdCarr) fdCarr.value = r.carretera;
+        }
+
+        function fdMostrarChips(resultats) {
+            const area = document.getElementById('fdChipsArea');
+            const row  = document.getElementById('fdChipsRow');
+            if (!area || !row) return;
+            row.innerHTML = resultats.map((r, i) => {
+                const msStr = String(r.m).padStart(3, '0');
+                return `<button class="pk-chip${i === 0 ? ' selected' : ''}" onclick="fdSeleccionarChip(${i})" data-chip="${i}">
+                    <span class="pk-chip-road">${r.carretera}</span>
+                    <span class="pk-chip-pk">PK ${r.km}+${msStr}</span>
+                    <span class="pk-chip-dist">±${Math.round(r.dist)}m</span>
+                </button>`;
+            }).join('');
+            area.style.display = 'block';
+        }
+
+        // Funció global per poder cridar-la des de l'onclick del chip
+        window.fdSeleccionarChip = function(idx) {
+            _fdResultats.forEach((_, i) => {
+                const el = document.querySelector(`#fdChipsRow .pk-chip[data-chip="${i}"]`);
+                if (el) el.classList.toggle('selected', i === idx);
+            });
+            if (_fdResultats[idx]) fdAplicarResultat(_fdResultats[idx]);
+        };
+
         btnAutoPKFoto.addEventListener('click', async function() {
             if (!navigator.geolocation) {
                 fdAutopkMostrarEstat('error', '🚫', 'El navegador no admet geolocalització. Introdueix les dades manualment.');
                 return;
             }
+            // Amagar chips anteriors
+            const fdArea = document.getElementById('fdChipsArea');
+            if (fdArea) fdArea.style.display = 'none';
+
             fdAutopkSetLoading(true);
             fdAutopkMostrarEstat('', '📡', 'Adquirint senyal GPS...');
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     const { latitude: lat, longitude: lon, accuracy } = pos.coords;
-                    fdAutopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carretera més propera...`);
+                    fdAutopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carreteres properes...`);
                     try {
                         let punts = [];
                         const bufferGraus = 0.04;
@@ -6701,43 +7247,44 @@ function obrirEditorFotoDirecta(imgData) {
                             punts = await consultarArcGIS(lat, lon, 0.10);
                         }
                         punts = blacklistFiltrarPunts(punts);
-                        const resultat = calcularPKdePunts(lat, lon, punts);
-                        if (!resultat) {
+                        _fdResultats = calcularPKperCarreteraWidget(lat, lon, punts);
+
+                        if (_fdResultats.length === 0) {
                             fdAutopkMostrarEstat('warning', '🏙️', 'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa.');
                             showToast('🏙️ Zona Urbana o Fora d\'àrea — verificar posició');
-                        } else if (resultat.dist > AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
-                            fdAutopkMostrarEstat('warning', '⚠️', `Carretera més propera: ${resultat.carretera} (${Math.round(resultat.dist)}m). Fora de la zona de carretera (>${AUTOPK_CONFIG.LLINDAR_CARRETERA_M}m).`);
-                            showToast(`⚠️ Fora de l'àrea de la carretera (${Math.round(resultat.dist)}m)`);
-                        } else {
-                            const msStr = String(resultat.m).padStart(3, '0');
-                            const pkFormatat = `${resultat.km}+${msStr}`;
-                            const fdPk   = document.getElementById('fd_pk');
-                            const fdCarr = document.getElementById('fd_carretera');
-                            if (fdPk)   fdPk.value   = pkFormatat;
-                            if (fdCarr) fdCarr.value = resultat.carretera;
+                        } else if (_fdResultats.length === 1) {
+                            const r = _fdResultats[0];
+                            const pkFormatat = `${r.km}+${String(r.m).padStart(3,'0')}`;
+                            fdAplicarResultat(r);
                             fdAutopkMostrarEstat('success', '✅',
-                                `${resultat.carretera}  •  PK ${pkFormatat}  •  ±${Math.round(resultat.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
-                            showToast(`📍 ${resultat.carretera} — PK ${pkFormatat}`);
+                                `${r.carretera}  •  PK ${pkFormatat}  •  ±${Math.round(r.dist)}m  •  GPS ±${Math.round(accuracy)}m`);
+                            showToast(`📍 ${r.carretera} — PK ${pkFormatat}`);
+                        } else {
+                            // Múltiples carreteres → chips
+                            fdAplicarResultat(_fdResultats[0]); // aplica la més propera per defecte
+                            fdMostrarChips(_fdResultats);
+                            fdAutopkMostrarEstat('success', '✅',
+                                `${_fdResultats.length} carreteres properes — tria la correcta`);
+                            showToast(`📍 ${_fdResultats.length} carreteres properes detectades`);
                         }
                     } catch (err) {
                         const cacheLocal = cercarEnCache(lat, lon, 0.10);
                         if (cacheLocal.length > 0) {
-                            const resultat = calcularPKdePunts(lat, lon, cacheLocal);
-                            if (resultat && resultat.dist <= AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
-                                const msStr = String(resultat.m).padStart(3, '0');
-                                const pkFormatat = `${resultat.km}+${msStr}`;
-                                const fdPk   = document.getElementById('fd_pk');
-                                const fdCarr = document.getElementById('fd_carretera');
-                                if (fdPk)   fdPk.value   = pkFormatat;
-                                if (fdCarr) fdCarr.value = resultat.carretera;
+                            _fdResultats = calcularPKperCarreteraWidget(lat, lon, cacheLocal);
+                            if (_fdResultats.length === 1) {
+                                fdAplicarResultat(_fdResultats[0]);
+                                const r = _fdResultats[0];
                                 fdAutopkMostrarEstat('warning', '📴',
-                                    `Mode offline (cache). ${resultat.carretera} PK ${pkFormatat} ±${Math.round(resultat.dist)}m`);
-                                showToast(`📴 Offline — ${resultat.carretera} PK ${pkFormatat}`);
+                                    `Mode offline. ${r.carretera} PK ${r.km}+${String(r.m).padStart(3,'0')} ±${Math.round(r.dist)}m`);
+                            } else if (_fdResultats.length > 1) {
+                                fdAplicarResultat(_fdResultats[0]);
+                                fdMostrarChips(_fdResultats);
+                                fdAutopkMostrarEstat('warning', '📴', `Mode offline — ${_fdResultats.length} carreteres properes`);
                             } else {
                                 fdAutopkMostrarEstat('warning', '📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
                             }
                         } else {
-                            fdAutopkMostrarEstat('error', '🔴', `Error de connexió ArcGIS: ${err.message}. Ves a Configuració → Sincro PKs per descarregar dades offline.`);
+                            fdAutopkMostrarEstat('error', '🔴', `Error de connexió ArcGIS: ${err.message}.`);
                             showToast('🔴 Error ArcGIS. Sincronitza les dades offline des de Configuració.');
                         }
                     }
@@ -6806,9 +7353,22 @@ async function guardarFotoDirecta(imgData) {
 
     const navegarAGaleria = () => {
         hideSpinner();
+
+        // Descarregar al dispositiu si la preferència és activa
+        if (volGuardarAlDispositiu()) {
+            const url = URL.createObjectURL(currentBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
         document.getElementById('screen-foto-directa')?.remove();
         ir('galeriaFotos');
-        showToast(`📸 Foto guardada a la galeria`);
+        showToast(volGuardarAlDispositiu() ? `📸 Guardada a l'app i al dispositiu` : `📸 Foto guardada a la galeria`);
     };
 
     if (db && db.objectStoreNames.contains("galeriaFotos")) {
@@ -8336,22 +8896,50 @@ async function executarAutoPKWidget() {
    FUNCIÓ PRINCIPAL — executarAutoPK()
    Crida des del botó 🔍 del formulari
    ============================================================ */
+let _autopkResultats = []; // resultats multi-carretera inventari
+
+function autopkSeleccionarChip(idx) {
+    _autopkResultats.forEach((_, i) => {
+        const el = document.querySelector(`#autopkChipsRow .pk-chip[data-chip="${i}"]`);
+        if (el) el.classList.toggle('selected', i === idx);
+    });
+    const r = _autopkResultats[idx];
+    if (r) autopkOmplirCamps(r.carretera, r.km, r.m);
+}
+
+function autopkMostrarChips(resultats) {
+    const area = document.getElementById('autopkChipsArea');
+    const row  = document.getElementById('autopkChipsRow');
+    if (!area || !row) return;
+    row.innerHTML = resultats.map((r, i) => {
+        const msStr = String(r.m).padStart(3, '0');
+        return `<button class="pk-chip${i === 0 ? ' selected' : ''}" onclick="autopkSeleccionarChip(${i})" data-chip="${i}">
+            <span class="pk-chip-road">${r.carretera}</span>
+            <span class="pk-chip-pk">PK ${r.km}+${msStr}</span>
+            <span class="pk-chip-dist">±${Math.round(r.dist)}m</span>
+        </button>`;
+    }).join('');
+    area.style.display = 'block';
+}
+
 async function executarAutoPK() {
     if (_autopkRunning) return;
 
-    // Comprovar que hi ha camps PK / Carretera al formulari actual
     const teCamps = fields.some(f => f.type === 'carretera' || f.type === 'pk');
     if (!teCamps) {
         showToast('⚠️ El formulari no té camps Carretera/PK');
         return;
     }
 
-    // Comprovar si el navegador suporta geolocalització
     if (!navigator.geolocation) {
         autopkMostrarEstat('error', '🚫', 'El navegador no admet geolocalització. Introdueix les dades manualment.');
         showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
         return;
     }
+
+    // Amagar chips anteriors
+    const chipsArea = document.getElementById('autopkChipsArea');
+    if (chipsArea) chipsArea.style.display = 'none';
 
     autopkSetLoading(true);
     autopkMostrarEstat('', '📡', 'Adquirint senyal GPS...');
@@ -8360,9 +8948,8 @@ async function executarAutoPK() {
         async (pos) => {
             const { latitude: lat, longitude: lon, accuracy } = pos.coords;
 
-            autopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carretera més propera...`);
+            autopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carreteres properes...`);
 
-            // Avisar si la precisió és molt dolenta (mode PC / xarxa mòbil)
             if (accuracy > 200 && detectarModePC()) {
                 autopkSetLoading(false);
                 autopkMostrarEstat('warning', '💻',
@@ -8373,60 +8960,56 @@ async function executarAutoPK() {
 
             try {
                 let punts = [];
-                const bufferGraus = 0.04; // ~4km
-
-                // 1. Intentar primer amb cache local
+                const bufferGraus = 0.04;
                 const cacheLocal = cercarEnCache(lat, lon, bufferGraus);
                 if (cacheLocal.length > 0) {
                     punts = cacheLocal;
                     autopkMostrarEstat('', '💾', `Cache local: ${punts.length} PKs trobats. Calculant...`);
                 } else {
-                    // 2. Consultar ArcGIS en temps real
                     autopkMostrarEstat('', '🌐', 'Consultant ArcGIS (Generalitat de Catalunya)...');
                     punts = await consultarArcGIS(lat, lon, bufferGraus);
                 }
-
                 if (punts.length === 0) {
-                    // Buffer més gran (intent extra)
                     autopkMostrarEstat('', '🔎', 'Ampliant zona de cerca...');
                     punts = await consultarArcGIS(lat, lon, 0.10);
                 }
 
                 punts = blacklistFiltrarPunts(punts);
-                const resultat = calcularPKdePunts(lat, lon, punts);
+                _autopkResultats = calcularPKperCarreteraWidget(lat, lon, punts);
 
-                if (!resultat) {
+                if (_autopkResultats.length === 0) {
                     autopkOmplirForaArea();
-                    autopkMostrarEstat('warning', '🏙️',
-                        'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa de carreteres.');
+                    autopkMostrarEstat('warning', '🏙️', 'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa.');
                     showToast('🏙️ Zona Urbana o Fora d\'àrea — verificar posició');
-                } else if (resultat.dist > AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
-                    // Massa lluny de la carretera
-                    autopkOmplirForaArea();
-                    autopkMostrarEstat('warning', '⚠️',
-                        `Carretera més propera: ${resultat.carretera} (${Math.round(resultat.dist)}m). Fora de la zona de carretera (>${AUTOPK_CONFIG.LLINDAR_CARRETERA_M}m).`);
-                    showToast(`⚠️ Fora de l'àrea de la carretera (${Math.round(resultat.dist)}m)`);
-                } else {
-                    // ✅ Èxit! Omplir camps del formulari
-                    const msStr = String(resultat.m).padStart(3, '0');
-                    autopkOmplirCamps(resultat.carretera, resultat.km, resultat.m);
+                } else if (_autopkResultats.length === 1) {
+                    const r = _autopkResultats[0];
+                    const msStr = String(r.m).padStart(3, '0');
+                    autopkOmplirCamps(r.carretera, r.km, r.m);
                     autopkMostrarEstat('success', '✅',
-                        `${resultat.carretera}  •  PK ${resultat.km}+${msStr}  •  ±${Math.round(resultat.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
-                    showToast(`📍 ${resultat.carretera} — PK ${resultat.km}+${msStr}`);
+                        `${r.carretera}  •  PK ${r.km}+${msStr}  •  ±${Math.round(r.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
+                    showToast(`📍 ${r.carretera} — PK ${r.km}+${msStr}`);
+                } else {
+                    autopkOmplirCamps(_autopkResultats[0].carretera, _autopkResultats[0].km, _autopkResultats[0].m);
+                    autopkMostrarChips(_autopkResultats);
+                    autopkMostrarEstat('success', '✅', `${_autopkResultats.length} carreteres properes — tria la correcta`);
+                    showToast(`📍 ${_autopkResultats.length} carreteres properes detectades`);
                 }
 
             } catch (err) {
                 console.error('[AutoPK] Error ArcGIS:', err);
-                // Intentar amb cache si la xarxa ha fallat
                 const cacheLocal = cercarEnCache(lat, lon, 0.10);
                 if (cacheLocal.length > 0) {
-                    const resultat = calcularPKdePunts(lat, lon, cacheLocal);
-                    if (resultat && resultat.dist <= AUTOPK_CONFIG.LLINDAR_CARRETERA_M) {
-                        const msStr = String(resultat.m).padStart(3, '0');
-                        autopkOmplirCamps(resultat.carretera, resultat.km, resultat.m);
+                    _autopkResultats = calcularPKperCarreteraWidget(lat, lon, cacheLocal);
+                    if (_autopkResultats.length === 1) {
+                        const r = _autopkResultats[0];
+                        autopkOmplirCamps(r.carretera, r.km, r.m);
                         autopkMostrarEstat('warning', '📴',
-                            `Mode offline (cache). ${resultat.carretera} PK ${resultat.km}+${msStr} ±${Math.round(resultat.dist)}m`);
-                        showToast(`📴 Offline — ${resultat.carretera} PK ${resultat.km}+${msStr}`);
+                            `Mode offline (cache). ${r.carretera} PK ${r.km}+${String(r.m).padStart(3,'0')} ±${Math.round(r.dist)}m`);
+                        showToast(`📴 Offline — ${r.carretera} PK ${r.km}+${String(r.m).padStart(3,'0')}`);
+                    } else if (_autopkResultats.length > 1) {
+                        autopkOmplirCamps(_autopkResultats[0].carretera, _autopkResultats[0].km, _autopkResultats[0].m);
+                        autopkMostrarChips(_autopkResultats);
+                        autopkMostrarEstat('warning', '📴', `Mode offline — ${_autopkResultats.length} carreteres properes`);
                     } else {
                         autopkOmplirForaArea();
                         autopkMostrarEstat('warning', '📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
@@ -8447,27 +9030,20 @@ async function executarAutoPK() {
             switch (err.code) {
                 case err.PERMISSION_DENIED:
                     msg = 'Permís GPS denegat. Activa\'l a la configuració del navegador / dispositiu.';
-                    showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
-                    break;
+                    showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment'); break;
                 case err.POSITION_UNAVAILABLE:
                     msg = 'Posició no disponible. Comprova que el GPS del dispositiu està activat.';
-                    showToast('📡 GPS no disponible: Introdueix les dades manualment');
-                    break;
+                    showToast('📡 GPS no disponible: Introdueix les dades manualment'); break;
                 case err.TIMEOUT:
                     msg = 'El GPS ha trigat massa. Intenta-ho en un lloc amb millor cobertura.';
-                    showToast('⏱️ Temps d\'espera GPS exhaurit');
-                    break;
+                    showToast('⏱️ Temps d\'espera GPS exhaurit'); break;
                 default:
                     msg = `Error GPS (${err.code}). Introdueix les dades manualment.`;
                     showToast('💻 Mode PC o GPS desactivat: Introdueix les dades manualment');
             }
             autopkMostrarEstat('error', '🚫', msg);
         },
-        {
-            enableHighAccuracy: true,
-            timeout: AUTOPK_CONFIG.GPS_TIMEOUT,
-            maximumAge: AUTOPK_CONFIG.GPS_MAX_AGE,
-        }
+        { enableHighAccuracy: true, timeout: AUTOPK_CONFIG.GPS_TIMEOUT, maximumAge: AUTOPK_CONFIG.GPS_MAX_AGE }
     );
 }
 
@@ -8660,6 +9236,471 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     setTimeout(_updateOnlineBadge, 200);
 } else {
     document.addEventListener('DOMContentLoaded', () => setTimeout(_updateOnlineBadge, 200));
+}
+/* ============================================================
+   PK MAPA — MODULE
+   ============================================================ */
+let pkmMap = null;
+let pkmMarker = null;       // draggable crosshair marker
+let pkmGpsMarker = null;    // GPS position marker
+let pkmGpsCircle = null;
+let pkmGpsWatchId = null;
+let pkmMeasureMode = null;  // 'poly' | 'area' | null
+let pkmMeasurePoints = [];
+let pkmMeasureLayers = [];
+let pkmSheetPos = 0;        // 0=peek, 1=mid, 2=full
+const PKM_SHEET_POSITIONS = [90, 220, 420]; // px from bottom
+
+/* ── ArcGIS PK lookup (same API used in existing autopk) ─ */
+async function pkmLookupPK(lat, lng) {
+    try {
+        const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=150&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&f=json`;
+        const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
+        if (!r.ok) return null;
+        const d = await r.json();
+        if (!d.features || d.features.length === 0) return null;
+        // Pick closest
+        const feat = d.features[0].attributes;
+        const carr = feat.CODI_CARRETERA || feat.CARRETERA || '';
+        const km   = feat.KM !== undefined ? feat.KM : (feat.KMPK || '');
+        const m    = feat.M  !== undefined ? feat.M  : (feat.MPKFIN || 0);
+        if (!carr) return null;
+        const mStr = String(Math.round(m)).padStart(3,'0');
+        return { road: carr, pk: `${km}+${mStr}` };
+    } catch { return null; }
+}
+
+/* ── Nominatim geocoder ───────────────────────────────── */
+async function pkmGeocode(q) {
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=es&limit=6&format=json&addressdetails=1`;
+        const r = await fetch(url, { headers:{'Accept-Language':'ca,es'}, signal: AbortSignal.timeout(6000) });
+        if (!r.ok) return [];
+        return await r.json();
+    } catch { return []; }
+}
+
+/* ── PK string parser: C-14 120+200 ──────────────────── */
+function pkmParsePK(text) {
+    const m = text.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)\+(\d+)/);
+    if (!m) return null;
+    return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: parseInt(m[3]) };
+}
+
+/* ── ArcGIS reverse: search by road+km ───────────────── */
+async function pkmSearchByPK(road, km, m) {
+    try {
+        const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?where=CODI_CARRETERA%3D'${encodeURIComponent(road)}'%20AND%20KM%3D${km}&outFields=*&outSR=4326&returnGeometry=true&f=json`;
+        const r = await fetch(url, { signal: AbortSignal.timeout(7000) });
+        if (!r.ok) return null;
+        const d = await r.json();
+        if (!d.features || d.features.length === 0) return null;
+        // Find closest m
+        let best = d.features[0];
+        let bestDist = Math.abs((best.attributes.M || 0) - m);
+        d.features.forEach(f => {
+            const dist = Math.abs((f.attributes.M || 0) - m);
+            if (dist < bestDist) { bestDist = dist; best = f; }
+        });
+        if (!best.geometry) return null;
+        return { lat: best.geometry.y, lng: best.geometry.x };
+    } catch { return null; }
+}
+
+/* ── Init the PK Mapa ────────────────────────────────── */
+function abrirPKMapa() {
+    ir('pkMapaScreen');
+
+    // Defer Leaflet init so screen is visible first
+    setTimeout(() => {
+        if (pkmMap) {
+            pkmMap.invalidateSize();
+            return;
+        }
+        pkmMap = L.map('pkMapaContainer', {
+            center: [41.65, 1.62],
+            zoom: 13,
+            zoomControl: false,
+            attributionControl: true
+        });
+
+        // Satellite layer
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Esri, DigitalGlobe',
+            maxZoom: 19
+        }).addTo(pkmMap);
+
+        // Hybrid labels overlay
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19, opacity: 0.8
+        }).addTo(pkmMap);
+
+        // Draggable marker (teardrop SVG)
+        const dropIcon = L.divIcon({
+            className: '',
+            html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
+                <path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 30 12 30S28 21 28 12C28 5.4 22.6 0 16 0z" fill="#ef4444" stroke="white" stroke-width="1.5"/>
+                <circle cx="16" cy="12" r="5" fill="white"/>
+            </svg>`,
+            iconSize: [32, 42],
+            iconAnchor: [16, 42],
+            popupAnchor: [0, -42]
+        });
+
+        pkmMarker = L.marker([41.65, 1.62], {
+            icon: dropIcon,
+            draggable: true,
+            autoPan: true
+        }).addTo(pkmMap);
+
+        pkmMarker.on('drag', () => {
+            const { lat, lng } = pkmMarker.getLatLng();
+            pkmUpdateCoords(lat, lng);
+            pkmHidePopover();
+        });
+
+        pkmMarker.on('dragend', async () => {
+            const { lat, lng } = pkmMarker.getLatLng();
+            await pkmFetchAndShowPK(lat, lng);
+        });
+
+        // Map click moves marker
+        pkmMap.on('click', async (e) => {
+            if (pkmMeasureMode) {
+                pkmAddMeasurePoint(e.latlng);
+                return;
+            }
+            pkmMarker.setLatLng(e.latlng);
+            pkmUpdateCoords(e.latlng.lat, e.latlng.lng);
+            await pkmFetchAndShowPK(e.latlng.lat, e.latlng.lng);
+        });
+
+        // Sheet init
+        pkmInitSheet();
+        pkmSetSheetPos(0);
+
+    }, 80);
+}
+
+/* ── Coords display ─────────────────────────────────── */
+function pkmUpdateCoords(lat, lng) {
+    const el = document.getElementById('pkm-coords');
+    if (el) el.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+}
+
+/* ── Fetch PK and show popover ──────────────────────── */
+async function pkmFetchAndShowPK(lat, lng) {
+    const roadEl = document.getElementById('pkm-road-name');
+    const pkEl   = document.getElementById('pkm-road-pk');
+    if (roadEl) roadEl.textContent = '⏳ Cercant…';
+    if (pkEl) pkEl.textContent = '';
+
+    const result = await pkmLookupPK(lat, lng);
+    if (result) {
+        if (roadEl) roadEl.textContent = result.road;
+        if (pkEl) pkEl.textContent = `PK ${result.pk}`;
+        pkmShowPopover(lat, lng, result.road, result.pk);
+    } else {
+        if (roadEl) roadEl.textContent = '— Fora de xarxa de carreteres —';
+        if (pkEl) pkEl.textContent = '';
+        pkmHidePopover();
+    }
+}
+
+/* ── Popover above marker ───────────────────────────── */
+function pkmShowPopover(lat, lng, road, pk) {
+    if (!pkmMap) return;
+    const pop = document.getElementById('pkm-popover');
+    const roadEl = document.getElementById('pkm-popover-road');
+    const pkEl   = document.getElementById('pkm-popover-pk');
+    if (!pop) return;
+    roadEl.textContent = road;
+    pkEl.textContent   = `PK ${pk}`;
+
+    // Position popover at marker pixel position
+    const pt = pkmMap.latLngToContainerPoint([lat, lng]);
+    pop.style.left = pt.x + 'px';
+    pop.style.top  = (pt.y - 48) + 'px'; // above icon tip
+
+    // Restart animation
+    pop.style.display = 'none';
+    requestAnimationFrame(() => { pop.style.display = 'block'; });
+
+    // Reposition on map move
+    if (pkmMap._pkmPopoverHandler) pkmMap.off('move', pkmMap._pkmPopoverHandler);
+    pkmMap._pkmPopoverHandler = () => {
+        const pt2 = pkmMap.latLngToContainerPoint([lat, lng]);
+        pop.style.left = pt2.x + 'px';
+        pop.style.top  = (pt2.y - 48) + 'px';
+    };
+    pkmMap.on('move', pkmMap._pkmPopoverHandler);
+}
+
+function pkmHidePopover() {
+    const pop = document.getElementById('pkm-popover');
+    if (pop) pop.style.display = 'none';
+    if (pkmMap && pkmMap._pkmPopoverHandler) {
+        pkmMap.off('move', pkmMap._pkmPopoverHandler);
+    }
+}
+
+/* ── GPS center ─────────────────────────────────────── */
+function pkmCentrarGPS() {
+    const btn = document.getElementById('pkm-center-btn');
+    if (btn) btn.classList.add('locating');
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        if (btn) btn.classList.remove('locating');
+        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+        pkmMap.setView([lat, lng], 15);
+        pkmMarker.setLatLng([lat, lng]);
+        pkmUpdateCoords(lat, lng);
+        pkmFetchAndShowPK(lat, lng);
+
+        // GPS accuracy circle
+        if (pkmGpsCircle) pkmGpsCircle.remove();
+        if (pkmGpsMarker) pkmGpsMarker.remove();
+        pkmGpsCircle = L.circle([lat, lng], { radius: accuracy, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.12, weight: 1.5 }).addTo(pkmMap);
+        const gpsIcon = L.divIcon({ className:'', html:'<div class="pkm-gps-dot"></div>', iconSize:[18,18], iconAnchor:[9,9] });
+        pkmGpsMarker = L.marker([lat, lng], { icon: gpsIcon, interactive: false }).addTo(pkmMap);
+    }, () => {
+        if (btn) btn.classList.remove('locating');
+        showToast('❌ GPS no disponible');
+    }, { enableHighAccuracy: true, timeout: 12000 });
+}
+
+/* ── Street View ────────────────────────────────────── */
+function pkmAbrirStreetView() {
+    if (!pkmMarker) return;
+    const { lat, lng } = pkmMarker.getLatLng();
+    const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
+    window.open(url, '_blank');
+}
+
+/* ── Draggable bottom sheet ─────────────────────────── */
+function pkmInitSheet() {
+    const sheet  = document.getElementById('pkm-sheet');
+    const handle = document.getElementById('pkm-sheet-handle');
+    if (!sheet || !handle) return;
+
+    let startY = 0, startTop = 0, dragging = false;
+
+    function onStart(e) {
+        dragging = true;
+        startY   = (e.touches ? e.touches[0].clientY : e.clientY);
+        startTop = sheet.getBoundingClientRect().top;
+        sheet.style.transition = 'none';
+    }
+    function onMove(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        const y = (e.touches ? e.touches[0].clientY : e.clientY);
+        const dy = y - startY;
+        const h  = window.innerHeight;
+        const newBottom = Math.max(0, Math.min(h * 0.8, (h - startTop - sheet.offsetHeight) - dy + (h - startTop - sheet.offsetHeight)));
+        // Simpler: just set translateY
+        const raw = dy;
+        sheet.style.transform = `translateY(${Math.max(-h*0.7, Math.min(PKM_SHEET_POSITIONS[0], raw))}px)`;
+    }
+    function onEnd(e) {
+        if (!dragging) return;
+        dragging = false;
+        sheet.style.transition = '';
+        sheet.style.transform = '';
+        const y = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY);
+        const dy = y - startY;
+        if (dy < -60 && pkmSheetPos < 2) pkmSetSheetPos(pkmSheetPos + 1);
+        else if (dy > 60 && pkmSheetPos > 0) pkmSetSheetPos(pkmSheetPos - 1);
+        else pkmSetSheetPos(pkmSheetPos);
+        if (pkmMap) pkmMap.invalidateSize();
+    }
+
+    handle.addEventListener('touchstart', onStart, { passive:true });
+    document.addEventListener('touchmove', onMove, { passive:false });
+    document.addEventListener('touchend', onEnd);
+    handle.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+}
+
+function pkmSetSheetPos(pos) {
+    pkmSheetPos = Math.max(0, Math.min(2, pos));
+    const sheet = document.getElementById('pkm-sheet');
+    const leftCtrl = document.querySelector('.pkm-left-controls');
+    if (!sheet) return;
+    const h = PKM_SHEET_POSITIONS[pkmSheetPos];
+    sheet.style.height = h + 'px';
+    sheet.style.overflow = pkmSheetPos > 0 ? 'auto' : 'hidden';
+    if (leftCtrl) leftCtrl.style.bottom = (h + 16) + 'px';
+}
+
+/* ── Search ─────────────────────────────────────────── */
+let pkmSearchTimer = null;
+function pkmSearchInput(val) {
+    const clearBtn = document.getElementById('pkm-search-clear');
+    if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
+    clearTimeout(pkmSearchTimer);
+    if (!val.trim()) { pkmHideResults(); return; }
+
+    // PK format?
+    const pkParsed = pkmParsePK(val);
+    if (pkParsed) {
+        pkmSearchTimer = setTimeout(async () => {
+            const res = document.getElementById('pkm-search-results');
+            if (res) {
+                res.style.display = 'block';
+                res.innerHTML = `<div class="pkm-search-result"><span class="pkm-search-result-icon">🛣️</span><div><div class="pkm-search-result-main">${pkParsed.road} PK ${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}</div><div class="pkm-search-result-sub">Cercant coordenades…</div></div></div>`;
+                const coords = await pkmSearchByPK(pkParsed.road, pkParsed.km, pkParsed.m);
+                if (coords) {
+                    res.innerHTML = `<div class="pkm-search-result" onclick="pkmGoTo(${coords.lat},${coords.lng},'${pkParsed.road}','${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}')">
+                        <span class="pkm-search-result-icon">🛣️</span>
+                        <div><div class="pkm-search-result-main">${pkParsed.road} PK ${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}</div><div class="pkm-search-result-sub">Tocar per anar-hi</div></div>
+                    </div>`;
+                } else {
+                    res.innerHTML = `<div class="pkm-search-result"><span>❌</span><div><div class="pkm-search-result-main">No trobat</div><div class="pkm-search-result-sub">PK fora de la xarxa ArcGIS</div></div></div>`;
+                }
+            }
+        }, 400);
+        return;
+    }
+
+    pkmSearchTimer = setTimeout(async () => {
+        const results = await pkmGeocode(val);
+        const res = document.getElementById('pkm-search-results');
+        if (!res) return;
+        if (!results.length) {
+            res.style.display = 'block';
+            res.innerHTML = `<div class="pkm-search-result"><span>🔍</span><div class="pkm-search-result-main" style="color:#6b7280">Sense resultats</div></div>`;
+            return;
+        }
+        res.style.display = 'block';
+        res.innerHTML = results.map(r => {
+            const name = r.display_name.split(',').slice(0,2).join(', ');
+            return `<div class="pkm-search-result" onclick="pkmGoTo(${r.lat},${r.lon},'','')">
+                <span class="pkm-search-result-icon">📍</span>
+                <div>
+                    <div class="pkm-search-result-main">${r.display_name.split(',')[0]}</div>
+                    <div class="pkm-search-result-sub">${name}</div>
+                </div>
+            </div>`;
+        }).join('');
+    }, 500);
+}
+
+function pkmGoTo(lat, lng, road, pk) {
+    if (!pkmMap) return;
+    const fLat = parseFloat(lat), fLng = parseFloat(lng);
+    pkmMap.setView([fLat, fLng], 15);
+    pkmMarker.setLatLng([fLat, fLng]);
+    pkmUpdateCoords(fLat, fLng);
+    pkmHideResults();
+    document.getElementById('pkm-search-input').value = '';
+    document.getElementById('pkm-search-clear').style.display = 'none';
+    if (road) {
+        document.getElementById('pkm-road-name').textContent = road;
+        document.getElementById('pkm-road-pk').textContent   = pk ? `PK ${pk}` : '';
+        pkmShowPopover(fLat, fLng, road, pk);
+    } else {
+        pkmFetchAndShowPK(fLat, fLng);
+    }
+}
+
+function pkmHideResults() {
+    const res = document.getElementById('pkm-search-results');
+    if (res) res.style.display = 'none';
+}
+
+function pkmClearSearch() {
+    document.getElementById('pkm-search-input').value = '';
+    document.getElementById('pkm-search-clear').style.display = 'none';
+    pkmHideResults();
+}
+
+/* ── Measurement tools ──────────────────────────────── */
+function pkmActivarMesura(mode) {
+    if (pkmMeasureMode === mode) { pkmTancarMesura(); return; }
+    pkmTancarMesura();
+    pkmMeasureMode = mode;
+    pkmMeasurePoints = [];
+    document.getElementById('pkm-tool-poly').classList.toggle('active', mode === 'poly');
+    document.getElementById('pkm-tool-area').classList.toggle('active', mode === 'area');
+    document.getElementById('pkm-measure-close').style.display = 'flex';
+    document.getElementById('pkm-measure-result').style.display = 'none';
+    showToast(mode === 'poly' ? '📏 Toca el mapa per mesurar distància' : '⬡ Toca el mapa per mesurar superfície');
+    pkmSetSheetPos(1);
+}
+
+function pkmAddMeasurePoint(latlng) {
+    pkmMeasurePoints.push(latlng);
+    // Draw dot
+    const dot = L.circleMarker(latlng, { radius: 5, color:'#f59e0b', fillColor:'#f59e0b', fillOpacity:1, weight:2 }).addTo(pkmMap);
+    pkmMeasureLayers.push(dot);
+
+    if (pkmMeasurePoints.length >= 2) {
+        // Draw line
+        const line = L.polyline(pkmMeasurePoints, { color:'#f59e0b', weight: 2.5, dashArray:'6,4' }).addTo(pkmMap);
+        // Remove prev line, keep only last
+        if (pkmMeasureLayers.length > 2) {
+            const old = pkmMeasureLayers.find(l => l instanceof L.Polyline || l instanceof L.Polygon);
+            if (old) { old.remove(); pkmMeasureLayers = pkmMeasureLayers.filter(l => l !== old); }
+        }
+        pkmMeasureLayers.push(line);
+
+        if (pkmMeasureMode === 'poly') {
+            // Total distance
+            let dist = 0;
+            for (let i = 1; i < pkmMeasurePoints.length; i++) {
+                dist += pkmMeasurePoints[i-1].distanceTo(pkmMeasurePoints[i]);
+            }
+            const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
+            const res = document.getElementById('pkm-measure-result');
+            res.textContent = `📏 Distància: ${label}`;
+            res.style.display = 'block';
+        } else if (pkmMeasureMode === 'area' && pkmMeasurePoints.length >= 3) {
+            const poly = L.polygon(pkmMeasurePoints, { color:'#f59e0b', fillColor:'#f59e0b', fillOpacity:0.15, weight:2 }).addTo(pkmMap);
+            pkmMeasureLayers.push(poly);
+            // Shoelace area using Leaflet's latLngToLayerPoint
+            const area = pkmCalcArea(pkmMeasurePoints);
+            const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
+            const res = document.getElementById('pkm-measure-result');
+            res.textContent = `⬡ Superfície: ${label}`;
+            res.style.display = 'block';
+        }
+    }
+}
+
+function pkmCalcArea(points) {
+    // Spherical excess using geographic coords (approximate via meters)
+    const R = 6371000;
+    let area = 0;
+    const n = points.length;
+    for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        const xi = points[i].lng * Math.PI / 180;
+        const yi = Math.log(Math.tan(Math.PI/4 + points[i].lat * Math.PI / 360));
+        const xj = points[j].lng * Math.PI / 180;
+        const yj = Math.log(Math.tan(Math.PI/4 + points[j].lat * Math.PI / 360));
+        area += xi * yj - xj * yi;
+    }
+    return Math.abs(area / 2) * R * R;
+}
+
+function pkmTancarMesura() {
+    pkmMeasureMode = null;
+    pkmMeasurePoints = [];
+    pkmMeasureLayers.forEach(l => { try { l.remove(); } catch {} });
+    pkmMeasureLayers = [];
+    document.getElementById('pkm-tool-poly').classList.remove('active');
+    document.getElementById('pkm-tool-area').classList.remove('active');
+    document.getElementById('pkm-measure-close').style.display = 'none';
+    document.getElementById('pkm-measure-result').style.display = 'none';
+}
+
+/* ── Back button ────────────────────────────────────── */
+function pkmBack() {
+    pkmTancarMesura();
+    pkmHidePopover();
+    ir('home');
 }
 
 </script>
