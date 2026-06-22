@@ -6557,7 +6557,7 @@ document.addEventListener('keydown', e => {
 function modeFotoDirecta() {
     isFotoDirecta = true;
     tmpFotos = [];
-    document.getElementById('fotoChooserModal').style.display = 'flex';
+    document.getElementById('fCam').click();
 }
 
 function tancarFotoChooser() {
@@ -6644,7 +6644,7 @@ function obrirEditorFotoDirecta(imgData) {
         </div>
 
         <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}')">
-            💾 GENERAR I BAIXAR
+            🖼️ GUARDAR A GALERIA
         </button>
     `;
 
@@ -6854,22 +6854,11 @@ async function guardarFotoDirecta(imgData) {
     }
     // --- End save to Historial ---
 
-    /* ── AUTO-DOWNLOAD: trigger immediately via <a download>, no modal ── */
     hideSpinner();
 
-    const url = URL.createObjectURL(currentBlob);
-    const dlLink = document.createElement('a');
-    dlLink.href     = url;
-    dlLink.download = currentFileName;
-    document.body.appendChild(dlLink);
-    dlLink.click();
-    document.body.removeChild(dlLink);
-    /* Revoke after a short delay so mobile browsers have time to start the download */
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-    /* Close the editor screen and return home */
+    /* Close the editor screen and go to galeria */
     document.getElementById('screen-foto-directa')?.remove();
-    ir('home');
+    ir('galeriaFotos');
     showToast(`📸 Foto guardada a la galeria`);
 }
 
