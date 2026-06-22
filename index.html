@@ -2526,27 +2526,27 @@ input:checked + .slider:before { transform: translateX(20px); }
 .galeria-thumb-info {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 100%);
-    padding: 18px 6px 5px;
+    background: linear-gradient(to top, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0) 100%);
+    padding: 12px 5px 4px;
     pointer-events: none;
 }
 .galeria-thumb-road {
     font-family: var(--font-cond);
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: white;
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.92);
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     line-height: 1.1;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .galeria-thumb-pk {
     font-family: var(--font-cond);
-    font-size: 0.62rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.82);
+    font-size: 0.52rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.68);
     line-height: 1.1;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 /* Checkbox de selecció */
@@ -6795,8 +6795,33 @@ async function guardarFotoDirecta(imgData) {
     const res = await fetch(finalImg);
     currentBlob = await res.blob();
 
-    // --- Save to Historial + Galeria ---
-    const saveToHistorial = async (coordStr) => {
+    // --- Save to Galeria (primary, blocking navigation) ---
+    const galeriaItem = {
+        id:       'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+        imgData:  finalImg,
+        carr, pk, marge,
+        ts:       ara.getTime(),
+        coordStr: ''
+    };
+
+    const navegarAGaleria = () => {
+        hideSpinner();
+        document.getElementById('screen-foto-directa')?.remove();
+        ir('galeriaFotos');
+        showToast(`📸 Foto guardada a la galeria`);
+    };
+
+    if (db && db.objectStoreNames.contains("galeriaFotos")) {
+        const tx = db.transaction("galeriaFotos","readwrite");
+        tx.objectStore("galeriaFotos").put(galeriaItem);
+        tx.oncomplete = navegarAGaleria;
+        tx.onerror    = navegarAGaleria; // navega igualment si hi ha error
+    } else {
+        navegarAGaleria();
+    }
+
+    // --- Save to Historial (non-blocking, with geolocation) ---
+    const saveToHistorial = (coordStr) => {
         if (!db) return;
         const projecteCaptura = {
             id:           'cap_' + Date.now(),
@@ -6822,28 +6847,13 @@ async function guardarFotoDirecta(imgData) {
         };
         db.transaction("projects","readwrite").objectStore("projects").put(projecteCaptura);
         allProjectsCache.push(projecteCaptura);
-
-        // Also save to galeriaFotos store
-        if (db.objectStoreNames.contains("galeriaFotos")) {
-            db.transaction("galeriaFotos","readwrite").objectStore("galeriaFotos").put({
-                id:       'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-                imgData:  finalImg,
-                carr, pk, marge,
-                ts:       ara.getTime(),
-                coordStr: coordStr || ''
-            });
-        }
     };
 
-    // Try geolocation (non-blocking)
     try {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const coordStr = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-                    saveToHistorial(coordStr);
-                },
-                () => saveToHistorial(''),
+                pos => saveToHistorial(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
+                ()  => saveToHistorial(''),
                 { timeout: 4000 }
             );
         } else {
@@ -6852,14 +6862,6 @@ async function guardarFotoDirecta(imgData) {
     } catch(e) {
         saveToHistorial('');
     }
-    // --- End save to Historial ---
-
-    hideSpinner();
-
-    /* Close the editor screen and go to galeria */
-    document.getElementById('screen-foto-directa')?.remove();
-    ir('galeriaFotos');
-    showToast(`📸 Foto guardada a la galeria`);
 }
 
 /* ============================================================
