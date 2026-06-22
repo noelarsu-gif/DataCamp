@@ -3585,289 +3585,467 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 /* ============================================================
-   PK MAPA — STYLES
+   PK MAPA — CSS (patró fidel a PK-GEOLOC, paleta DATACAMP)
+   --pkm-accent:   #c60c30  (vermell DATACAMP)
+   --pkm-bg-0:     #111827
+   --pkm-bg-1:     #1f2937
+   --pkm-bg-2:     #1f2937
+   --pkm-bg-3:     #374151
+   --pkm-text-1:   #f9fafb
+   --pkm-text-2:   #d1d5db
+   --pkm-text-3:   #6b7280
+   --pkm-green:    #22d97a
+   --pkm-amber:    #f59e0b
+   --pkm-purple:   #c084fc
+   --pkm-red:      #f87171
+   --pkm-border:   rgba(255,255,255,.10)
+   --pkm-border-acc: rgba(198,12,48,.38)
+   --pkm-peek:     172px
    ============================================================ */
+
+/* ── Quan pkMapaScreen és actiu, surt del flux del DATACAMP ── */
+#pkMapaScreen.active {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 500 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;   /* dynamic viewport height (mobile) */
+    max-width: none !important;
+    overflow: hidden !important;
+    display: block !important;
+}
+
 .pkm-screen {
     position: relative;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: 100%;
     overflow: hidden;
     padding: 0 !important;
-    background: #0d1117;
-}
-@media (min-width: 769px) {
-    .pkm-screen { height: 100vh; }
+    background: #060a0e;
+    --pkm-peek: 172px;
 }
 
+/* Mapa fons */
 #pkMapaContainer {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+    position: absolute; inset: 0; z-index: 1;
+}
+.pkm-screen .leaflet-container { background: #060a0e; }
+.pkm-screen .leaflet-tile { filter: saturate(.85) brightness(.92); }
+.pkm-screen .leaflet-control-zoom { display: none !important; }
+.pkm-screen .leaflet-control-attribution {
+    background: rgba(6,10,14,.8) !important;
+    color: rgba(255,255,255,.3) !important;
+    font-size: .5rem !important;
 }
 
-/* ── Left floating controls ─────────────────── */
-.pkm-left-controls {
+/* ── SIDEBAR (bottom sheet) ── */
+#pkmSidebar {
     position: absolute;
-    left: 12px;
-    bottom: calc(var(--pkm-sheet-peek, 90px) + 16px);
+    left: 0; right: 0; bottom: 0;
     z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    transition: bottom 0.35s cubic-bezier(.4,0,.2,1);
-}
-.pkm-ctrl-btn {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(17,24,39,0.92);
-    border: 1.5px solid rgba(255,255,255,0.12);
-    color: #e5e7eb;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(10px);
-    transition: background 0.18s, transform 0.15s;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.45);
-}
-.pkm-ctrl-btn svg { width: 20px; height: 20px; }
-.pkm-ctrl-btn:active { transform: scale(0.92); background: rgba(198,12,48,0.8); }
-.pkm-ctrl-btn.locating { animation: pkmPulseBtn 1s ease-in-out infinite; }
-@keyframes pkmPulseBtn { 0%,100%{box-shadow:0 0 0 0 rgba(198,12,48,0.6)} 50%{box-shadow:0 0 0 10px rgba(198,12,48,0)} }
-
-/* ── Measure close button top-center ───────── */
-.pkm-measure-close {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: rgba(198,12,48,0.92);
-    border: none;
-    color: white;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 3px 14px rgba(198,12,48,0.5);
-    animation: pkmDropIn 0.25s cubic-bezier(.34,1.56,.64,1);
-}
-.pkm-measure-close svg { width: 18px; height: 18px; }
-@keyframes pkmDropIn { from{transform:translateX(-50%) translateY(-20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
-
-/* ── Search bar ─────────────────────────────── */
-.pkm-search-wrap {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 80px);
-    max-width: 480px;
-    z-index: 25;
-    background: rgba(17,24,39,0.92);
-    border: 1.5px solid rgba(255,255,255,0.12);
-    border-radius: 24px;
-    display: flex; align-items: center;
-    padding: 0 12px 0 14px;
-    gap: 8px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-.pkm-search-icon { width: 16px; height: 16px; color: #6b7280; flex-shrink: 0; }
-.pkm-search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #f3f4f6;
-    font-family: var(--font);
-    font-size: 0.88rem;
-    padding: 11px 0;
-}
-.pkm-search-input::placeholder { color: #4b5563; }
-.pkm-search-clear {
-    background: none; border: none; color: #6b7280;
-    cursor: pointer; font-size: 0.9rem; padding: 2px 4px;
-    flex-shrink: 0;
-}
-.pkm-search-results {
-    position: absolute;
-    top: 54px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 80px);
-    max-width: 480px;
-    z-index: 25;
-    background: rgba(17,24,39,0.96);
-    border: 1.5px solid rgba(255,255,255,0.1);
-    border-radius: 14px;
-    overflow: hidden;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    max-height: 240px;
-    overflow-y: auto;
-}
-.pkm-search-result {
-    padding: 11px 16px;
-    cursor: pointer;
-    color: #d1d5db;
-    font-size: 0.86rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex; align-items: center; gap: 10px;
-}
-.pkm-search-result:last-child { border-bottom: none; }
-.pkm-search-result:active { background: rgba(198,12,48,0.2); }
-.pkm-search-result-icon { font-size: 1rem; }
-.pkm-search-result-main { font-weight: 600; color: #f3f4f6; }
-.pkm-search-result-sub  { font-size: 0.76rem; color: #6b7280; }
-
-/* ── Bottom sheet ───────────────────────────── */
-.pkm-sheet {
-    position: absolute;
-    left: 0; right: 0;
-    bottom: 0;
-    z-index: 20;
-    background: rgba(17,24,39,0.95);
+    max-height: 85vh;
+    background: rgba(17,24,39,.97);
+    border-top: 1px solid rgba(198,12,48,.35);
     border-radius: 20px 20px 0 0;
-    border-top: 1.5px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(16px);
+    display: flex; flex-direction: column;
+    transform: translateY(calc(100% - var(--pkm-peek)));
+    transition: transform .42s cubic-bezier(.32,.72,0,1);
     touch-action: none;
-    user-select: none;
-    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+    will-change: transform;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.55);
 }
-.pkm-sheet-handle {
-    padding: 10px 0 4px;
-    display: flex; justify-content: center;
-    cursor: grab;
-}
-.pkm-sheet-handle:active { cursor: grabbing; }
-.pkm-sheet-pill {
-    width: 36px; height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-}
-.pkm-sheet-content { padding: 8px 16px 20px; }
+#pkmSidebar.open  { transform: translateY(0); }
+#pkmSidebar.hidden{ transform: translateY(calc(100% - var(--pkm-peek))); }
+#pkmSidebar.dragging { transition: none; }
 
-.pkm-info-row {
-    margin-bottom: 12px;
-    min-height: 48px;
-    display: flex; flex-direction: column; gap: 4px;
+.pkm-sheet-peek { flex-shrink: 0; padding: 0 14px 10px; }
+.pkm-sheet-grab {
+    padding: 10px 2px 8px; cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
 }
-.pkm-info-badge {
-    display: flex; align-items: baseline; gap: 10px;
-    flex-wrap: wrap;
+.pkm-sheet-handle-bar {
+    width: 42px; height: 4.5px; border-radius: 3px;
+    background: rgba(198,12,48,.4); margin: 0 auto 8px;
+    transition: background .25s;
 }
-.pkm-road-name {
-    font-family: var(--font-cond);
-    font-size: 1.1rem; font-weight: 700;
-    color: #f9fafb; letter-spacing: 0.5px;
+.pkm-sheet-grab:active .pkm-sheet-handle-bar { background: #c60c30; }
+.pkm-sheet-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pkm-sheet-chevron {
+    font-size: .8rem; color: #c60c30; flex-shrink: 0;
+    transition: transform .42s cubic-bezier(.32,.72,0,1);
+    background: rgba(198,12,48,.1); border: 1px solid rgba(198,12,48,.35);
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
 }
-.pkm-road-pk {
-    font-size: 0.9rem; font-weight: 600;
-    color: #f59e0b;
-    font-family: var(--font-cond);
+#pkmSidebar.open .pkm-sheet-chevron { transform: rotate(180deg); }
+.pkm-panel-head { padding: 0; border: none; background: none; }
+.pkm-panel-title {
+    font-family: var(--font-cond); font-size: .95rem; font-weight: 700;
+    color: #c60c30; letter-spacing: 2px; text-transform: uppercase;
 }
-.pkm-coords {
-    font-size: 0.72rem; color: #4b5563;
-    font-family: monospace;
-}
+.pkm-panel-sub { font-size: .62rem; color: #d1d5db; margin-top: 1px; }
 
-.pkm-tools-row {
-    display: flex; gap: 10px;
-    margin-top: 4px;
+#pkmSidebarBody {
+    flex: 1; overflow-y: auto; padding: 6px 14px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    overscroll-behavior: contain; touch-action: pan-y;
 }
-.pkm-tool-btn {
-    flex: 1;
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-    padding: 10px 8px;
-    background: rgba(255,255,255,0.05);
-    border: 1.5px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    color: #9ca3af;
-    cursor: pointer;
-    font-size: 0.7rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-.pkm-tool-btn svg { width: 22px; height: 22px; }
-.pkm-tool-btn.active {
-    background: rgba(245,158,11,0.15);
-    border-color: #f59e0b;
-    color: #f59e0b;
-}
-.pkm-tool-btn:active { opacity: 0.7; }
+#pkmSidebarBody::-webkit-scrollbar { width: 3px; }
+#pkmSidebarBody::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
 
-.pkm-measure-result {
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: rgba(245,158,11,0.1);
-    border: 1px solid rgba(245,158,11,0.3);
-    border-radius: 10px;
-    font-family: var(--font-cond);
-    font-size: 1rem; font-weight: 700;
-    color: #f59e0b;
-    text-align: center;
+/* ── Resultat card ── */
+.pkm-res-card {
+    background: #1f2937; border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px; padding: 10px 12px; transition: all .3s;
 }
+.pkm-res-card.ok   { border-color: rgba(34,217,122,.35); background: rgba(34,217,122,.05); }
+.pkm-res-card.warn { border-color: rgba(245,166,35,.35); }
+.pkm-res-road {
+    font-family: var(--font-cond); font-size: .68rem; font-weight: 700;
+    letter-spacing: 1.5px; color: #d1d5db; text-transform: uppercase;
+}
+.pkm-res-pk {
+    font-family: 'Roboto Mono', var(--font-mono, monospace); font-size: 1.85rem;
+    font-weight: 700; color: #22d97a; line-height: 1; letter-spacing: -1px;
+}
+.pkm-res-pk .sp { color: #d1d5db; font-size: 1.3rem; }
+.pkm-res-dist  { font-size: .65rem; color: #d1d5db; margin-top: 3px; font-weight: 500; }
+.pkm-res-coords{ font-family: monospace; font-size: .6rem; color: #6b7280; margin-top: 2px; }
+.pkm-res-warn  { font-size: .78rem; font-weight: 700; color: #f59e0b; }
+.pkm-res-warn-sub { font-size: .67rem; color: #d1d5db; margin-top: 2px; line-height: 1.4; }
+.pkm-res-idle  { text-align: center; padding: 6px 0; color: #9ca3af; font-size: .7rem; line-height: 1.5; }
+.pkm-res-actions { display: flex; gap: 5px; margin-top: 7px; }
+.pkm-ra-btn {
+    flex: 1; padding: 6px 4px; border-radius: 6px;
+    font-family: var(--font-cond); font-size: .62rem; font-weight: 700;
+    letter-spacing: .5px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.1); background: #374151; color: #d1d5db;
+    transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 3px;
+}
+.pkm-ra-btn:hover { border-color: #c60c30; color: #c60c30; background: rgba(198,12,48,.1); }
+.pkm-ra-btn.pkm-gmaps { background: rgba(234,67,53,.08); border-color: rgba(234,67,53,.4); color: #f87171; }
 
-/* ── PK Popover viñeta ──────────────────────── */
-.pkm-popover {
+/* ── Formularis ── */
+.pkm-sec-label {
+    font-size: .58rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #d1d5db; margin-bottom: 4px;
+}
+.pkm-form-card { background: #1f2937; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 9px; }
+.pkm-mpk-row { display: flex; align-items: center; gap: 3px; }
+.pkm-mpk-inp {
+    padding: 13px 4px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1); background: #374151;
+    color: #f9fafb; font-family: monospace; font-size: 1rem; font-weight: 500;
+    outline: none; transition: border-color .2s; text-align: center;
+    -webkit-appearance: none; min-width: 0; flex: 1;
+}
+.pkm-mpk-inp:focus { border-color: #c60c30; }
+.pkm-mpk-inp::placeholder { color: #6b7280; font-size: .6rem; }
+.pkm-mpk-inp.pkm-road { flex: 2; text-align: left; padding-left: 6px; }
+.pkm-mpk-inp.pkm-km   { flex: 1.4; }
+.pkm-mpk-inp.pkm-m    { flex: 1.2; }
+.pkm-mpk-sep { color: #6b7280; font-size: .85rem; flex-shrink: 0; }
+.pkm-mpk-btn {
+    flex-shrink: 0; width: 50px; height: 48px; border-radius: 8px;
+    border: 1px solid #c60c30; background: rgba(198,12,48,.15);
+    color: #c60c30; font-size: 1.3rem; font-weight: 900; cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.pkm-mpk-btn:hover { background: rgba(198,12,48,.3); }
+
+/* Coordenades acordió */
+.pkm-coord-accordion { background: #1f2937; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; overflow: hidden; }
+.pkm-coord-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 11px; cursor: pointer; user-select: none; transition: background .15s;
+}
+.pkm-coord-head:hover { background: rgba(255,255,255,.03); }
+.pkm-coord-label { font-size: .72rem; font-weight: 600; color: #d1d5db; }
+.pkm-coord-arrow { font-size: .65rem; color: #6b7280; transition: transform .25s; }
+.pkm-coord-accordion.open .pkm-coord-arrow { transform: rotate(180deg); }
+.pkm-coord-body { display: none; padding: 0 10px 10px; flex-direction: column; gap: 7px; }
+.pkm-coord-accordion.open .pkm-coord-body { display: flex; }
+.pkm-coord-inp {
+    width: 100%; padding: 13px 10px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1); background: #374151;
+    color: #f9fafb; font-family: monospace; font-size: .8rem;
+    outline: none; transition: border-color .2s; -webkit-appearance: none; box-sizing: border-box;
+}
+.pkm-coord-inp:focus { border-color: #c60c30; }
+.pkm-coord-inp::placeholder { color: #6b7280; font-size: .68rem; }
+.pkm-coord-btn {
+    width: 100%; padding: 14px; border-radius: 8px;
+    border: 1px solid #c60c30; background: rgba(198,12,48,.15);
+    color: #c60c30; font-family: var(--font-cond); font-size: .82rem;
+    font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all .2s; box-sizing: border-box;
+}
+.pkm-coord-btn:hover { background: rgba(198,12,48,.3); }
+
+/* Amidament distància */
+.pkm-amid-card { background: #1f2937; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; overflow: hidden; transition: border-color .3s; }
+.pkm-amid-card.active { border-color: rgba(245,166,35,.4); }
+.pkm-amid-head { padding: 13px 11px; display: flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; transition: background .15s; }
+.pkm-amid-head:hover { background: rgba(255,255,255,.03); }
+.pkm-amid-toggle {
+    padding: 9px 16px; border-radius: 20px; font-size: .6rem; font-weight: 700; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.1); background: #374151; color: #d1d5db;
+    font-family: var(--font); transition: all .2s; margin-left: auto;
+}
+.pkm-amid-toggle.on { background: rgba(245,166,35,.15); border-color: rgba(245,166,35,.4); color: #f59e0b; }
+.pkm-amid-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 7px; }
+.pkm-amid-free-pts { display: flex; flex-direction: column; gap: 3px; max-height: 100px; overflow-y: auto; }
+.pkm-amid-free-pt {
+    display: flex; align-items: center; gap: 5px; padding: 4px 7px;
+    border-radius: 5px; border: 1px solid rgba(255,255,255,.1); background: #374151; font-size: .62rem;
+}
+.pkm-amid-free-pt-n { font-weight: 700; color: #c60c30; min-width: 16px; font-family: monospace; }
+.pkm-amid-free-pt-val { flex: 1; color: #f9fafb; font-family: monospace; }
+.pkm-amid-free-pt-del { background: none; border: none; color: #6b7280; cursor: pointer; font-size: .7rem; padding: 1px; line-height: 1; }
+.pkm-amid-free-pt-del:hover { color: #f87171; }
+.pkm-amid-hint { font-size: .64rem; color: #9ca3af; text-align: center; padding: 3px; line-height: 1.5; }
+.pkm-amid-add-btn {
+    width: 100%; padding: 12px; border-radius: 8px; font-family: var(--font); font-size: .62rem;
+    font-weight: 600; cursor: pointer; border: 1px dashed rgba(255,255,255,.18);
+    background: transparent; color: #9ca3af; transition: all .2s;
+}
+.pkm-amid-add-btn:hover { border-color: #c60c30; color: #c60c30; background: rgba(198,12,48,.1); }
+.pkm-amid-result { background: #374151; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 10px; display: none; }
+.pkm-amid-result.show { display: block; }
+.pkm-amid-res-dist { font-family: monospace; font-size: 1.4rem; font-weight: 700; color: #f59e0b; letter-spacing: -1px; line-height: 1; }
+.pkm-amid-res-sub { font-size: .62rem; color: #d1d5db; margin-top: 2px; }
+.pkm-amid-clear-btn {
+    width: 100%; padding: 12px; border-radius: 8px; font-family: var(--font-cond); font-size: .62rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+    border: 1px solid rgba(248,113,113,.25); background: rgba(248,113,113,.07); color: #f87171; margin-top: 3px;
+}
+.pkm-amid-clear-btn:hover { background: rgba(248,113,113,.15); }
+
+/* Mesura superfície */
+.pkm-area-card { background: #1f2937; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; overflow: hidden; transition: border-color .3s; }
+.pkm-area-card.active { border-color: rgba(192,132,252,.5); }
+.pkm-area-head { padding: 13px 11px; display: flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; transition: background .15s; }
+.pkm-area-head:hover { background: rgba(255,255,255,.03); }
+.pkm-area-toggle {
+    padding: 9px 16px; border-radius: 20px; font-size: .6rem; font-weight: 700; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.1); background: #374151; color: #d1d5db;
+    font-family: var(--font); transition: all .2s; margin-left: auto;
+}
+.pkm-area-toggle.on { background: rgba(192,132,252,.15); border-color: rgba(192,132,252,.4); color: #c084fc; }
+.pkm-area-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 7px; }
+.pkm-area-result { background: #374151; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 10px; display: none; }
+.pkm-area-result.show { display: block; }
+.pkm-area-res-val { font-family: monospace; font-size: 1.35rem; font-weight: 700; color: #c084fc; letter-spacing: -1px; line-height: 1; }
+.pkm-area-res-sub { font-size: .62rem; color: #d1d5db; margin-top: 2px; }
+.pkm-area-hint { font-size: .64rem; color: #9ca3af; text-align: center; padding: 3px; line-height: 1.5; }
+.pkm-area-pts-list { display: flex; flex-direction: column; gap: 3px; max-height: 90px; overflow-y: auto; }
+.pkm-area-pt { display: flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 5px; border: 1px solid rgba(255,255,255,.1); background: #374151; font-size: .6rem; }
+.pkm-area-pt-n { font-weight: 700; color: #c084fc; min-width: 16px; font-family: monospace; }
+.pkm-area-pt-val { flex: 1; color: #f9fafb; font-family: monospace; }
+.pkm-area-pt-del { background: none; border: none; color: #6b7280; cursor: pointer; font-size: .7rem; padding: 1px; line-height: 1; }
+.pkm-area-pt-del:hover { color: #f87171; }
+.pkm-area-close-btn {
+    width: 100%; padding: 12px; border-radius: 8px; font-family: var(--font-cond); font-size: .65rem;
+    font-weight: 700; cursor: pointer; letter-spacing: .5px; transition: all .2s;
+    border: 1px solid rgba(192,132,252,.35); background: rgba(192,132,252,.1); color: #c084fc;
+}
+.pkm-area-close-btn:hover { background: rgba(192,132,252,.2); }
+.pkm-area-clear-btn {
+    width: 100%; padding: 12px; border-radius: 8px; font-family: var(--font-cond); font-size: .62rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+    border: 1px solid rgba(248,113,113,.25); background: rgba(248,113,113,.07); color: #f87171; margin-top: 3px;
+}
+.pkm-area-clear-btn:hover { background: rgba(248,113,113,.15); }
+
+.pkm-back-btn {
+    width: 100%; padding: 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.1);
+    background: #374151; color: #9ca3af; font-family: var(--font-cond); font-size: .75rem;
+    font-weight: 700; letter-spacing: .5px; cursor: pointer; transition: all .2s;
+}
+.pkm-back-btn:hover { border-color: #c60c30; color: #c60c30; background: rgba(198,12,48,.1); }
+
+/* ── Cercador flotant ── */
+#pkmTopBar {
     position: absolute;
-    z-index: 30;
-    background: rgba(17,24,39,0.96);
-    border: 1.5px solid rgba(245,158,11,0.5);
-    border-radius: 12px;
-    padding: 9px 14px 10px;
-    pointer-events: none;
-    min-width: 120px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-    animation: pkmPopoverIn 0.22s cubic-bezier(.34,1.56,.64,1);
-    transform: translateX(-50%) translateY(-100%);
-    margin-top: -12px;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 62px; right: 10px;
+    z-index: 200;
+    background: transparent !important;
 }
-@keyframes pkmPopoverIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(calc(-100% + 8px)); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(-100%); }
+#pkmTopBarInner { position: relative; background: transparent !important; }
+#pkmSearchPill {
+    position: relative; display: flex; align-items: center;
+    background: rgba(17,24,39,.92);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid rgba(198,12,48,.30);
+    border-radius: 999px;
+    box-shadow: 0 6px 28px rgba(0,0,0,.55);
+    transition: border-color .25s, box-shadow .25s;
+    overflow: hidden;
 }
-.pkm-popover-road {
-    font-family: var(--font-cond);
-    font-size: 1rem; font-weight: 800;
-    color: #f9fafb; letter-spacing: 1px;
-    text-transform: uppercase;
+#pkmSearchPill:focus-within {
+    border-color: #c60c30;
+    box-shadow: 0 6px 28px rgba(0,0,0,.55), 0 0 0 3px rgba(198,12,48,.15);
 }
-.pkm-popover-pk {
-    font-size: 0.82rem; font-weight: 600;
-    color: #f59e0b;
-    margin-top: 2px;
-    font-family: var(--font-cond);
+#pkmSearchInp {
+    flex: 1; padding: 15px 8px 15px 20px;
+    background: transparent !important; border: none !important;
+    box-shadow: none !important; outline: none !important;
+    -webkit-appearance: none; appearance: none;
+    color: #f9fafb; font-size: 1rem; font-family: var(--font); min-width: 0;
 }
-.pkm-popover-arrow {
-    position: absolute;
-    bottom: -7px; left: 50%;
-    transform: translateX(-50%);
-    width: 12px; height: 7px;
-    background: rgba(17,24,39,0.96);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-    border-left: 1.5px solid rgba(245,158,11,0.5);
-    border-right: 1.5px solid rgba(245,158,11,0.5);
+#pkmSearchInp::placeholder { color: rgba(156,163,175,.55); }
+#pkmSearchBtn {
+    flex-shrink: 0; margin-right: 6px; width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(198,12,48,.18); border: 1px solid rgba(198,12,48,.5);
+    color: #c60c30; font-size: 1.15rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .2s;
 }
+#pkmSearchBtn:active { transform: scale(.9); }
+#pkmTopDrop {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 600;
+    border-radius: 18px; overflow: hidden;
+    background: rgba(17,24,39,.97);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(198,12,48,.22);
+    box-shadow: 0 14px 44px rgba(0,0,0,.75);
+    display: none; flex-direction: column;
+    max-height: 220px; overflow-y: auto; visibility: hidden;
+}
+#pkmTopDrop.open { display: flex; visibility: visible; }
+#pkmTopDrop .pkm-drop-item {
+    padding: 13px 18px; font-size: .92rem; color: #d1d5db; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,.06); transition: background .12s;
+}
+#pkmTopDrop .pkm-drop-item:hover { background: rgba(198,12,48,.1); color: #c60c30; }
+#pkmTopDrop .pkm-drop-item:last-child { border-bottom: none; }
 
-/* GPS marker – teardrop */
+/* ── Mapa principal ── */
+#pkmMapMain { position: absolute; inset: 0; z-index: 1; }
+
+/* Loading */
+#pkmLoading {
+    position: absolute; inset: 0; z-index: 600;
+    background: rgba(17,24,39,.7); backdrop-filter: blur(3px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+#pkmLoading.visible { opacity: 1; pointer-events: all; }
+.pkm-loading-ring {
+    width: 30px; height: 30px; border: 3px solid rgba(255,255,255,.1);
+    border-top-color: #c60c30; border-radius: 50%;
+    animation: pkmspin .7s linear infinite;
+}
+@keyframes pkmspin { to { transform: rotate(360deg); } }
+.pkm-loading-text { font-size: .67rem; color: #f9fafb; letter-spacing: .5px; text-transform: uppercase; font-family: var(--font-cond); }
+
+/* Botó tornar flotant (dalt-esquerra) */
+#pkmBtnBack {
+    position: absolute;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 10px;
+    z-index: 201;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid rgba(198,12,48,.5);
+    background: rgba(17,24,39,.92);
+    color: #c60c30; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,.5);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: background .2s, transform .15s;
+}
+#pkmBtnBack:active { transform: scale(.9); background: #c60c30; color: white; }
+
+/* Centrar GPS */
+#pkmBtnCentrar {
+    position: absolute;
+    bottom: calc(var(--pkm-peek, 172px) + 14px); right: 12px;
+    z-index: 35; width: 50px; height: 50px; border-radius: 50%;
+    border: 1px solid rgba(198,12,48,.4);
+    background: rgba(17,24,39,.9); color: #c60c30; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,.5);
+    transition: bottom .42s cubic-bezier(.32,.72,0,1), transform .18s, background .25s;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+#pkmBtnCentrar:hover, #pkmBtnCentrar:active {
+    background: #c60c30; color: white;
+    transform: scale(1.08); box-shadow: 0 6px 24px rgba(198,12,48,.4);
+}
+#pkmBtnCentrar.locating { animation: pkmPulseBtn 1s ease-in-out infinite; }
+@keyframes pkmPulseBtn { 0%,100%{box-shadow:0 0 0 0 rgba(198,12,48,.6)} 50%{box-shadow:0 0 0 10px rgba(198,12,48,0)} }
+
+/* Street View */
+#pkmBtnStreetView {
+    position: absolute;
+    bottom: calc(var(--pkm-peek, 172px) + 14px); left: 12px;
+    z-index: 35;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    width: 64px; height: 64px; border-radius: 18px;
+    border: 1px solid rgba(198,12,48,.4);
+    background: rgba(17,24,39,.92); color: #d1d5db; cursor: pointer;
+    box-shadow: 0 6px 22px rgba(0,0,0,.55);
+    transition: bottom .42s cubic-bezier(.32,.72,0,1), transform .18s;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    font-family: var(--font-cond); font-size: .6rem; font-weight: 700; letter-spacing: 1px;
+}
+#pkmBtnStreetView:active { transform: scale(.92); }
+
+/* Sortir mesura */
+#pkmBtnSortirMesura {
+    position: absolute;
+    top: calc(76px + env(safe-area-inset-top, 0px));
+    left: 50%; transform: translateX(-50%);
+    z-index: 36; display: none;
+    align-items: center; gap: 8px; padding: 10px 22px;
+    border-radius: 999px; border: 1.5px solid rgba(255,80,80,.55);
+    background: rgba(17,24,39,.93);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    color: #ff6b6b; font-family: var(--font-cond); font-size: .78rem;
+    font-weight: 700; letter-spacing: .8px; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(0,0,0,.6);
+    transition: opacity .25s, transform .25s; white-space: nowrap;
+}
+#pkmBtnSortirMesura.visible { display: flex; }
+#pkmBtnSortirMesura:active { transform: translateX(-50%) scale(.95); }
+
+/* Popup marcador */
+.pkm-pin-popup { padding: 12px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+.pkm-pp-road { font-family: var(--font-cond); font-size: .68rem; font-weight: 700; color: #9ca3af; letter-spacing: 1.5px; text-transform: uppercase; }
+.pkm-pp-pk   { font-family: monospace; font-size: 1.4rem; font-weight: 700; color: #c60c30; line-height: 1; }
+.pkm-screen .leaflet-popup-content-wrapper {
+    background: rgba(17,24,39,.95) !important; border: 1px solid rgba(198,12,48,.3) !important;
+    border-radius: 12px !important; box-shadow: 0 8px 32px rgba(0,0,0,.6) !important;
+}
+.pkm-screen .leaflet-popup-tip { background: rgba(17,24,39,.95) !important; }
+
+/* GPS dot */
 .pkm-gps-dot {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #3b82f6;
-    border: 3px solid white;
-    box-shadow: 0 0 0 5px rgba(59,130,246,0.3);
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #3b82f6; border: 3px solid white;
+    box-shadow: 0 0 0 5px rgba(59,130,246,.3);
 }
 
-/* Leaflet attribution dark */
-#pkMapaContainer .leaflet-control-attribution {
-    background: rgba(0,0,0,0.5) !important;
-    color: rgba(255,255,255,0.4) !important;
-    font-size: 10px !important;
+/* Desktop: panel lateral flotant */
+@media (min-width: 900px) {
+    #pkmSidebar {
+        left: 14px; right: auto; top: 14px; bottom: 14px;
+        width: 360px; height: auto; border-radius: 18px;
+        border-bottom: 1px solid rgba(198,12,48,.35);
+        transform: none !important;
+    }
+    .pkm-sheet-handle-bar, .pkm-sheet-chevron { display: none; }
+    .pkm-sheet-grab { cursor: default; }
+    #pkmTopBar { left: 390px; right: 10px; }
+    #pkmBtnCentrar { bottom: 24px; }
+    #pkmBtnStreetView { bottom: 24px; }
+    #pkmBtnSortirMesura { display: none !important; }
 }
-#pkMapaContainer .leaflet-control-attribution a { color: rgba(255,255,255,0.5) !important; }
-#pkMapaContainer .leaflet-control-zoom { display: none; }
 
 </style>
 </head>
@@ -4519,89 +4697,189 @@ input:checked + .slider:before { transform: translateX(20px); }
                  PK MAPA SCREEN
                  ================================================ -->
             <div id="pkMapaScreen" class="screen pkm-screen">
-                <!-- Full-screen Leaflet map -->
+
+              <!-- ── HOJA INFERIOR D'EINES (bottom sheet) ── -->
+              <aside id="pkmSidebar">
+                <div class="pkm-sheet-peek" id="pkmSheetPeek">
+                  <div class="pkm-sheet-grab" id="pkmSheetGrab" onclick="pkmToggleSheet()">
+                    <div class="pkm-sheet-handle-bar"></div>
+                    <div class="pkm-sheet-titlebar">
+                      <div class="pkm-panel-head">
+                        <div class="pkm-panel-title">PK·MAPA</div>
+                        <div class="pkm-panel-sub">Localitzador · Mesurament · Cerca</div>
+                      </div>
+                      <span class="pkm-sheet-chevron" id="pkmSheetChevron">▲</span>
+                    </div>
+                  </div>
+                  <!-- RESULTAT — sempre visible -->
+                  <div>
+                    <div class="pkm-res-card" id="pkmResCard">
+                      <div class="pkm-res-idle" id="pkmResIdle">Mou el pin o toca el mapa</div>
+                      <div id="pkmResData" style="display:none;">
+                        <div class="pkm-res-road" id="pkmResRoad">—</div>
+                        <div class="pkm-res-pk" id="pkmResPK">—</div>
+                        <div class="pkm-res-dist" id="pkmResDist"></div>
+                        <div class="pkm-res-coords" id="pkmResCoords"></div>
+                      </div>
+                      <div id="pkmResWarn" style="display:none;">
+                        <div class="pkm-res-warn">⚠ Fora de Carretera</div>
+                        <div class="pkm-res-warn-sub" id="pkmResWarnSub"></div>
+                      </div>
+                    </div>
+                    <div class="pkm-res-actions" id="pkmResActions" style="display:none;">
+                      <button class="pkm-ra-btn pkm-gmaps" onclick="pkmObrirMaps()" title="Google Maps">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#EA4335"/></svg>
+                        Maps
+                      </button>
+                      <button class="pkm-ra-btn" onclick="pkmCompartirWA()">💬 WA</button>
+                      <button class="pkm-ra-btn" onclick="pkmCopiar()">📋</button>
+                    </div>
+                  </div>
+                </div><!-- /pkm-sheet-peek -->
+
+                <div id="pkmSidebarBody">
+                  <!-- ANAR A PK -->
+                  <div>
+                    <div class="pkm-sec-label">Anar a PK Exacte</div>
+                    <div class="pkm-form-card">
+                      <div class="pkm-mpk-row">
+                        <input class="pkm-mpk-inp pkm-road" id="pkmLkCarr" type="text" placeholder="Carr." maxlength="10" oninput="this.value=this.value.toUpperCase()">
+                        <input class="pkm-mpk-inp pkm-km"   id="pkmLkKm"   type="number" placeholder="KM" min="0" max="9999">
+                        <span class="pkm-mpk-sep">+</span>
+                        <input class="pkm-mpk-inp pkm-m"    id="pkmLkM"    type="number" placeholder="m" min="0" max="999">
+                        <button class="pkm-mpk-btn" onclick="pkmAnarAPK()" title="Anar a PK">›</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- COORDENADES -->
+                  <div>
+                    <div class="pkm-sec-label">Introduir Coordenades</div>
+                    <div class="pkm-coord-accordion" id="pkmCoordAccordion">
+                      <div class="pkm-coord-head" onclick="pkmToggleCoord()">
+                        <span class="pkm-coord-label">📍 Enganxa des de Google Maps</span>
+                        <span class="pkm-coord-arrow">▼</span>
+                      </div>
+                      <div class="pkm-coord-body" id="pkmCoordBody">
+                        <input class="pkm-coord-inp" id="pkmCoordLat" type="number" placeholder="Latitud  (41.6xxx)" step="any">
+                        <input class="pkm-coord-inp" id="pkmCoordLon" type="number" placeholder="Longitud  (1.2xxx)" step="any">
+                        <button class="pkm-coord-btn" onclick="pkmAnarACoords()">→ ANAR A AQUESTES COORDENADES</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- AMIDAMENT DISTÀNCIA -->
+                  <div>
+                    <div class="pkm-sec-label">Mesurament de Distància</div>
+                    <div class="pkm-amid-card" id="pkmAmidCard">
+                      <div class="pkm-amid-head" onclick="pkmToggleAmidament()">
+                        <span style="font-size:.9rem;">📐</span>
+                        <span style="font-size:.72rem;font-weight:600;color:#d1d5db;">Mesurar distància</span>
+                        <button class="pkm-amid-toggle" id="pkmAmidToggleBtn">Activar</button>
+                      </div>
+                      <div class="pkm-amid-body" id="pkmAmidBody" style="display:none;">
+                        <div class="pkm-amid-free-pts" id="pkmFreePtsList"></div>
+                        <div class="pkm-amid-hint" id="pkmFreeHint">Toca per afegir punts a la polilínia.</div>
+                        <button class="pkm-amid-add-btn" onclick="pkmAfegirPuntLliure()">+ Afegir punt</button>
+                        <div class="pkm-amid-result" id="pkmAmidResult">
+                          <div class="pkm-amid-res-dist" id="pkmAmidDistText">—</div>
+                          <div class="pkm-amid-res-sub" id="pkmAmidDistSub"></div>
+                        </div>
+                        <button class="pkm-amid-clear-btn" onclick="pkmEsborrarAmidament()">🗑️ Esborrar</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MESURA SUPERFÍCIE -->
+                  <div>
+                    <div class="pkm-sec-label">Mesurament de Superfície / Àrea</div>
+                    <div class="pkm-area-card" id="pkmAreaCard">
+                      <div class="pkm-area-head" onclick="pkmToggleArea()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:#c084fc;flex-shrink:0;"><polygon points="3,20 10,4 21,17"/><line x1="3" y1="20" x2="21" y2="17"/><line x1="10" y1="4" x2="3" y2="20"/></svg>
+                        <span style="font-size:.72rem;font-weight:600;color:#d1d5db;">Mesurar superfície</span>
+                        <button class="pkm-area-toggle" id="pkmAreaToggleBtn">Activar</button>
+                      </div>
+                      <div class="pkm-area-body" id="pkmAreaBody" style="display:none;">
+                        <div class="pkm-area-hint" id="pkmAreaHint">Toca el mapa per definir els vèrtexs del polígon (mínim 3).</div>
+                        <div class="pkm-area-pts-list" id="pkmAreaPtsList"></div>
+                        <div class="pkm-area-result" id="pkmAreaResult">
+                          <div class="pkm-area-res-val" id="pkmAreaValText">—</div>
+                          <div class="pkm-area-res-sub" id="pkmAreaSubText"></div>
+                        </div>
+                        <button class="pkm-area-close-btn" onclick="pkmTancarPoligon()">✔ Tancar Polígon i Calcular</button>
+                        <button class="pkm-area-clear-btn" onclick="pkmEsborrarArea()">🗑️ Esborrar</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- BACK -->
+                  <div>
+                    <button class="pkm-back-btn" onclick="pkmBack()">← Tornar al DATACAMP</button>
+                  </div>
+
+                </div><!-- /pkmSidebarBody -->
+              </aside>
+
+              <!-- Cercador flotant -->
+              <div id="pkmTopBar">
+                <div id="pkmTopBarInner">
+                  <div id="pkmSearchPill">
+                    <input id="pkmSearchInp" type="text"
+                      placeholder="Municipi, C-14 129, 41.68, 1.27..."
+                      autocomplete="off" autocorrect="off" spellcheck="false"
+                      oninput="pkmSearchInput(this.value)"
+                      onkeydown="if(event.key==='Enter'){event.preventDefault();pkmSearchInput(this.value);}">
+                    <button id="pkmSearchBtn" onclick="pkmSearchInput(document.getElementById('pkmSearchInp').value)" aria-label="Cercar">⌕</button>
+                  </div>
+                  <div id="pkmTopDrop"></div>
+                </div>
+              </div>
+
+              <!-- Mapa pantalla completa -->
+              <div id="pkmMapMain">
                 <div id="pkMapaContainer"></div>
 
-                <!-- Left controls column -->
-                <div class="pkm-left-controls">
-                    <button class="pkm-ctrl-btn" id="pkm-center-btn" onclick="pkmCentrarGPS()" title="Centrar GPS">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                            <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
-                            <circle cx="12" cy="12" r="9" stroke-opacity=".3"/>
-                        </svg>
-                    </button>
-                    <button class="pkm-ctrl-btn" id="pkm-sv-btn" onclick="pkmAbrirStreetView()" title="Street View">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="3.5"/><path d="M12 11.5C9 11.5 5 13.5 5 17v1h14v-1c0-3.5-4-5.5-7-5.5z"/>
-                            <path d="M17 5l2.5 3L17 11" stroke-width="1.5" opacity=".6"/>
-                        </svg>
-                    </button>
+                <div id="pkmLoading">
+                  <div class="pkm-loading-ring"></div>
+                  <div class="pkm-loading-text">Calculant PK...</div>
                 </div>
 
-                <!-- Measure close button (top center, hidden by default) -->
-                <button class="pkm-measure-close" id="pkm-measure-close" onclick="pkmTancarMesura()" style="display:none;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                <!-- Botó tornar flotant (dalt-esquerra) -->
+                <button id="pkmBtnBack" onclick="pkmBack()" title="Tornar al DATACAMP">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                  </svg>
                 </button>
 
-                <!-- Search bar -->
-                <div class="pkm-search-wrap">
-                    <svg class="pkm-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
-                    </svg>
-                    <input type="text" id="pkm-search-input" class="pkm-search-input"
-                           placeholder="Municipi o carretera (ex: C-14 120+200)"
-                           oninput="pkmSearchInput(this.value)"
-                           autocomplete="off" spellcheck="false">
-                    <button class="pkm-search-clear" id="pkm-search-clear" onclick="pkmClearSearch()" style="display:none;">✕</button>
-                </div>
-                <div class="pkm-search-results" id="pkm-search-results" style="display:none;"></div>
+                <!-- Centrar GPS -->
+                <button id="pkmBtnCentrar" onclick="pkmCentrarGPS()" title="Centrar en la meva posició">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                    <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                  </svg>
+                </button>
 
-                <!-- Draggable bottom sheet -->
-                <div class="pkm-sheet" id="pkm-sheet">
-                    <div class="pkm-sheet-handle" id="pkm-sheet-handle">
-                        <div class="pkm-sheet-pill"></div>
-                    </div>
-                    <div class="pkm-sheet-content">
-                        <!-- PK info -->
-                        <div class="pkm-info-row" id="pkm-info-row">
-                            <div class="pkm-info-badge" id="pkm-info-badge">
-                                <span class="pkm-road-name" id="pkm-road-name">— Mou el marcador —</span>
-                                <span class="pkm-road-pk" id="pkm-road-pk"></span>
-                            </div>
-                            <div class="pkm-coords" id="pkm-coords"></div>
-                        </div>
-                        <!-- Tools -->
-                        <div class="pkm-tools-row">
-                            <button class="pkm-tool-btn" id="pkm-tool-poly" onclick="pkmActivarMesura('poly')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3,20 8,8 14,14 20,5"/>
-                                </svg>
-                                <span>Distància</span>
-                            </button>
-                            <button class="pkm-tool-btn" id="pkm-tool-area" onclick="pkmActivarMesura('area')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12,3 21,20 3,20"/>
-                                </svg>
-                                <span>Superfície</span>
-                            </button>
-                            <button class="pkm-tool-btn" onclick="pkmBack()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M19 12H5M12 5l-7 7 7 7"/>
-                                </svg>
-                                <span>Tornar</span>
-                            </button>
-                        </div>
-                        <!-- Measure result -->
-                        <div class="pkm-measure-result" id="pkm-measure-result" style="display:none;"></div>
-                    </div>
-                </div>
+                <!-- Street View -->
+                <button id="pkmBtnStreetView" onclick="pkmAbrirStreetView()" title="Obrir Street View">
+                  <svg viewBox="0 0 24 36" width="26" height="38" fill="currentColor">
+                    <circle cx="12" cy="3.8" r="3" fill="#c60c30"/>
+                    <rect x="9" y="7.5" width="6" height="9" rx="2.5" fill="currentColor"/>
+                    <rect x="4" y="8" width="4.5" height="2" rx="1" fill="currentColor"/>
+                    <rect x="15.5" y="8" width="4.5" height="2" rx="1" fill="currentColor"/>
+                    <rect x="9" y="16" width="2.5" height="10" rx="1.2" fill="currentColor" transform="rotate(5 9 16)"/>
+                    <rect x="12.5" y="16" width="2.5" height="10" rx="1.2" fill="currentColor" transform="rotate(-5 14 16)"/>
+                    <rect x="7.5" y="25" width="4" height="2" rx="1" fill="#c60c30"/>
+                    <rect x="12" y="25" width="4" height="2" rx="1" fill="#c60c30"/>
+                  </svg>
+                  <span>Street</span>
+                </button>
 
-                <!-- PK Popover viñeta -->
-                <div class="pkm-popover" id="pkm-popover" style="display:none;">
-                    <div class="pkm-popover-road" id="pkm-popover-road">C-14</div>
-                    <div class="pkm-popover-pk" id="pkm-popover-pk">PK 120+000</div>
-                    <div class="pkm-popover-arrow"></div>
-                </div>
+                <!-- Sortir mesura -->
+                <button id="pkmBtnSortirMesura" onclick="pkmSortirMesura()">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  SORTIR MESURA
+                </button>
+              </div>
+
             </div>
 
         </div><!-- /page-content -->
@@ -4871,6 +5149,10 @@ function ir(id) {
     if (id === 'downloads') carregarLlistaDescargues();
     if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); }
     if (id === 'galeriaFotos') renderGaleria();
+    if (id === 'pkMapaScreen') {
+        // Forçar invalidateSize de Leaflet després que la pantalla sigui visible i fixed
+        setTimeout(() => { if (pkmMap) pkmMap.invalidateSize(); pkmSyncPeek(); }, 120);
+    }
 
     // FAB: visible only on home dashboard
     const fab = document.getElementById('fab-foto-rapida');
@@ -9238,563 +9520,651 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     document.addEventListener('DOMContentLoaded', () => setTimeout(_updateOnlineBadge, 200));
 }
 /* ============================================================
-   PK MAPA — MODULE  v2
+   PK MAPA — MODULE v3 (fidel a PK-GEOLOC index.html)
    ============================================================ */
 let pkmMap = null;
-let pkmMarker = null;
+let pkmDragPin = null;
 let pkmGpsMarker = null;
 let pkmGpsCircle = null;
-let pkmMeasureMode = null;   // 'poly' | 'area' | null
-let pkmMeasurePoints = [];   // L.LatLng[]
-let pkmMeasureMarkers = [];  // draggable L.Marker[] per point
-let pkmMeasureLine = null;   // L.Polyline or L.Polygon
-let pkmSheetPos = 0;         // 0=hidden, 1=tools visible
-// Sheet heights (translateY from bottom = 0 baseline)
-// pos 0: only pill visible (~28px), pos 1: tools + result (~180px)
-const PKM_SNAP = [28, 185];
+let pkmInicialitzat = false;
+let pkmUltimResultat = null;
+let pkmAmidamentActiu = false;
+let pkmAreaActiu = false;
+let pkmAmidPunts = [];        // polilínia lliure
+let pkmAmidLayer = null;
+let pkmAreaPunts = [];
+let pkmAreaLayer = null;
+let pkmAreaMarkers = [];
+let pkmAmidMarkers = [];
+let pkmSheetPos = 1;          // 1=peek (default), 0=obert
 
-/* ── ArcGIS PK lookup by proximity ────────────────────── */
-async function pkmLookupPK(lat, lng) {
-    // Try ArcGIS with generous buffer (300m), multiple field name variants
-    const apis = [
-        `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&distance=300&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&orderByFields=Shape&f=json`,
-        `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?geometry=${lng},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter&outFields=*&returnGeometry=false&f=json`
-    ];
-    for (const url of apis) {
-        try {
-            const r = await fetch(url, { signal: AbortSignal.timeout(7000) });
-            if (!r.ok) continue;
-            const d = await r.json();
-            if (!d.features || d.features.length === 0) continue;
-            // Try multiple field name combinations
-            const feat = d.features[0].attributes;
-            const carr = feat.CODI_CARRETERA || feat.CARRETERA || feat.NOM_CARRETERA || feat.ROAD || '';
-            if (!carr) continue;
-            // KM field variants
-            const km = feat.KM ?? feat.KM_INICI ?? feat.KMPK ?? feat.KM_INI ?? '';
-            const m  = feat.M  ?? feat.METRES   ?? feat.M_INICI ?? feat.MPKFIN ?? 0;
-            const mStr = String(Math.round(Number(m))).padStart(3, '0');
-            return { road: carr, pk: `${km}+${mStr}` };
-        } catch { /* continue to next */ }
-    }
-    // Fallback: try the existing seed data if loaded
-    if (window._pksData && window._pksData.length > 0) {
-        return pkmLookupFromSeed(lat, lng);
-    }
-    return null;
-}
-
-/* ── Seed data fallback (uses global _pksData if available) ── */
-function pkmLookupFromSeed(lat, lng) {
-    if (!window._pksData) return null;
-    const degBuffer = 0.004;
-    const near = window._pksData.filter(p =>
-        Math.abs(p.lat - lat) < degBuffer && Math.abs(p.lng - lng) < degBuffer
-    );
-    if (!near.length) return null;
-    near.sort((a, b) => {
-        const da = Math.hypot(a.lat - lat, a.lng - lng);
-        const db = Math.hypot(b.lat - lat, b.lng - lng);
-        return da - db;
-    });
-    const best = near[0];
-    const mStr = String(best.m || 0).padStart(3, '0');
-    return { road: best.carretera, pk: `${best.km}+${mStr}` };
-}
-
-/* ── Nominatim geocoder ───────────────────────────────── */
-async function pkmGeocode(q) {
-    try {
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=es&limit=6&format=json&addressdetails=1`;
-        const r = await fetch(url, { headers:{'Accept-Language':'ca,es'}, signal: AbortSignal.timeout(6000) });
-        if (!r.ok) return [];
-        return await r.json();
-    } catch { return []; }
-}
-
-/* ── PK string parser: C-14 120+200 or C-14 120 ──────── */
-function pkmParsePK(text) {
-    // With metres: C-14 120+200
-    let m = text.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)\+(\d+)/);
-    if (m) return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: parseInt(m[3]) };
-    // Without metres: C-14 120
-    m = text.match(/^([A-Za-z][A-Za-z0-9-]*)\s+(\d+)$/);
-    if (m) return { road: m[1].toUpperCase(), km: parseInt(m[2]), m: 0 };
-    return null;
-}
-
-/* ── ArcGIS search by road+km → lat/lng ──────────────── */
-async function pkmSearchByPK(road, km, m) {
-    // Try multiple WHERE clause variants
-    const wheres = [
-        `CODI_CARRETERA='${road}' AND KM=${km}`,
-        `CARRETERA='${road}' AND KM=${km}`,
-        `CODI_CARRETERA='${road}' AND KM_INICI=${km}`,
-        `NOM_CARRETERA='${road}' AND KM=${km}`
-    ];
-    for (const where of wheres) {
-        try {
-            const url = `https://sig.gencat.cat/arcgis/rest/services/GTCA/GTCA_PKS/MapServer/0/query?where=${encodeURIComponent(where)}&outFields=*&outSR=4326&returnGeometry=true&f=json`;
-            const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-            if (!r.ok) continue;
-            const d = await r.json();
-            if (!d.features || d.features.length === 0) continue;
-            // Pick closest metre value
-            let best = d.features[0];
-            const mField = best.attributes.M ?? best.attributes.METRES ?? best.attributes.M_INICI ?? 0;
-            let bestDist = Math.abs(Number(mField) - m);
-            d.features.forEach(f => {
-                const fm = Number(f.attributes.M ?? f.attributes.METRES ?? f.attributes.M_INICI ?? 0);
-                const dist = Math.abs(fm - m);
-                if (dist < bestDist) { bestDist = dist; best = f; }
-            });
-            if (!best.geometry) continue;
-            return { lat: best.geometry.y, lng: best.geometry.x };
-        } catch { /* next */ }
-    }
-    return null;
-}
-
-/* ── Init the PK Mapa ────────────────────────────────── */
+/* ── Init ─────────────────────────────────────────────── */
 function abrirPKMapa() {
     ir('pkMapaScreen');
-
-    // Defer Leaflet init so screen is visible first
-    setTimeout(() => {
-        if (pkmMap) {
-            pkmMap.invalidateSize();
-            return;
+    setTimeout(async () => {
+        if (pkmInicialitzat) { if (pkmMap) pkmMap.invalidateSize(); return; }
+        if (typeof L === 'undefined') {
+            await new Promise((resolve, reject) => {
+                if (document.querySelector('link[href*="leaflet.css"]') === null) {
+                    const css = document.createElement('link');
+                    css.rel = 'stylesheet';
+                    css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                    document.head.appendChild(css);
+                }
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('Leaflet no disponible'));
+                document.head.appendChild(script);
+            }).catch(err => {
+                document.getElementById('pkMapaContainer').innerHTML =
+                    `<div style="color:#f59e0b;padding:40px 20px;text-align:center;">⚠️ Mapa no disponible sense connexió</div>`;
+                return;
+            });
         }
-        pkmMap = L.map('pkMapaContainer', {
-            center: [41.65, 1.62],
-            zoom: 13,
-            zoomControl: false,
-            attributionControl: true
-        });
+        if (typeof L === 'undefined') return;
+        pkmInicialitzat = true;
 
-        // Satellite layer
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Esri, DigitalGlobe',
-            maxZoom: 19
-        }).addTo(pkmMap);
+        pkmMap = L.map('pkMapaContainer', { zoomControl: false, attributionControl: true })
+                  .setView([41.65, 1.62], 13);
 
-        // Hybrid labels overlay
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19, opacity: 0.8
-        }).addTo(pkmMap);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            { attribution: 'Esri', maxZoom: 19 }).addTo(pkmMap);
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+            { maxZoom: 19, opacity: 0.85 }).addTo(pkmMap);
 
-        // Draggable marker (teardrop SVG)
+        // Pin arrossegable (teardrop)
         const dropIcon = L.divIcon({
             className: '',
             html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-                <path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 30 12 30S28 21 28 12C28 5.4 22.6 0 16 0z" fill="#ef4444" stroke="white" stroke-width="1.5"/>
-                <circle cx="16" cy="12" r="5" fill="white"/>
-            </svg>`,
-            iconSize: [32, 42],
-            iconAnchor: [16, 42],
-            popupAnchor: [0, -42]
+                <path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 30 12 30S28 21 28 12C28 5.4 22.6 0 16 0z" fill="#c60c30" stroke="white" stroke-width="1.5"/>
+                <circle cx="16" cy="12" r="5" fill="white"/></svg>`,
+            iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44]
+        });
+        pkmDragPin = L.marker([41.65, 1.62], { icon: dropIcon, draggable: true, autoPan: true }).addTo(pkmMap);
+        pkmDragPin.on('drag', () => {
+            const {lat, lng} = pkmDragPin.getLatLng();
+            pkmMostrarIdle(); pkmActualizarCoords(lat, lng);
+        });
+        pkmDragPin.on('dragend', async () => {
+            const {lat, lng} = pkmDragPin.getLatLng();
+            await pkmCalcPK(lat, lng, true);
         });
 
-        pkmMarker = L.marker([41.65, 1.62], {
-            icon: dropIcon,
-            draggable: true,
-            autoPan: true
-        }).addTo(pkmMap);
-
-        pkmMarker.on('drag', () => {
-            const { lat, lng } = pkmMarker.getLatLng();
-            pkmUpdateCoords(lat, lng);
-            pkmHidePopover();
-        });
-
-        pkmMarker.on('dragend', async () => {
-            const { lat, lng } = pkmMarker.getLatLng();
-            await pkmFetchAndShowPK(lat, lng);
-        });
-
-        // Map click moves marker
+        // Clic al mapa
         pkmMap.on('click', async (e) => {
-            if (pkmMeasureMode) {
-                pkmAddMeasurePoint(e.latlng);
-                return;
-            }
-            pkmMarker.setLatLng(e.latlng);
-            pkmUpdateCoords(e.latlng.lat, e.latlng.lng);
-            await pkmFetchAndShowPK(e.latlng.lat, e.latlng.lng);
+            if (pkmAmidamentActiu) { pkmAfegirPuntLliureAt(e.latlng); return; }
+            if (pkmAreaActiu) { pkmAfegirPuntArea(e.latlng); return; }
+            pkmDragPin.setLatLng(e.latlng);
+            pkmActualizarCoords(e.latlng.lat, e.latlng.lng);
+            await pkmCalcPK(e.latlng.lat, e.latlng.lng, true);
         });
 
-        // Sheet init — push to hidden pos after first render so offsetHeight is known
+        // Tocar mapa replica la hoja
+        pkmMap.getContainer().addEventListener('pointerdown', () => {
+            if (window.innerWidth >= 900) return;
+            if (pkmSheetPos === 0) pkmTancarSheet();
+        }, { passive: true });
+
+        // Sheet init
         pkmInitSheet();
-        setTimeout(() => pkmSetSheetPos(0), 100);
+        setTimeout(pkmSyncPeek, 200);
 
     }, 80);
 }
 
-/* ── Coords display ─────────────────────────────────── */
-function pkmUpdateCoords(lat, lng) {
-    const el = document.getElementById('pkm-coords');
-    if (el) el.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-}
-
-/* ── Fetch PK and show popover ──────────────────────── */
-async function pkmFetchAndShowPK(lat, lng) {
-    const roadEl = document.getElementById('pkm-road-name');
-    const pkEl   = document.getElementById('pkm-road-pk');
-    if (roadEl) roadEl.textContent = '⏳ Cercant…';
-    if (pkEl) pkEl.textContent = '';
-
-    const result = await pkmLookupPK(lat, lng);
-    if (result) {
-        if (roadEl) roadEl.textContent = result.road;
-        if (pkEl) pkEl.textContent = `PK ${result.pk}`;
-        pkmShowPopover(lat, lng, result.road, result.pk);
-    } else {
-        if (roadEl) roadEl.textContent = '— Fora de xarxa de carreteres —';
-        if (pkEl) pkEl.textContent = '';
-        pkmHidePopover();
-    }
-}
-
-/* ── Popover above marker ───────────────────────────── */
-function pkmShowPopover(lat, lng, road, pk) {
+/* ── PK calc (reutilitza motor geoloc) ─────────────────── */
+async function pkmCalcPK(lat, lon, final) {
     if (!pkmMap) return;
-    const pop = document.getElementById('pkm-popover');
-    const roadEl = document.getElementById('pkm-popover-road');
-    const pkEl   = document.getElementById('pkm-popover-pk');
-    if (!pop) return;
-    roadEl.textContent = road;
-    pkEl.textContent   = `PK ${pk}`;
+    if (final) pkmMostrarLoading(true);
+    try {
+        let punts = [];
+        if (typeof filtrarCache === 'function') punts = filtrarCache(lat, lon, 0.06);
+        if (punts.length < 2 && typeof consultarArcGIS === 'function') punts = await consultarArcGIS(lat, lon, 0.08);
+        if (punts.length < 2 && typeof consultarArcGIS === 'function') punts = await consultarArcGIS(lat, lon, 0.15);
+        if (typeof filtrarSeed === 'function') {
+            const carrsMap = new Set(punts.map(p => p.carretera));
+            punts = [...punts, ...filtrarSeed(lat, lon, 0.10).filter(p => !carrsMap.has(p.carretera))];
+        }
+        // Si no hi ha motor geoloc: crida directa ArcGIS Spain
+        if (punts.length < 2) punts = await pkmConsultarArcGIS(lat, lon, 0.08);
+        if (punts.length < 2) punts = await pkmConsultarArcGIS(lat, lon, 0.15);
 
-    // Position popover at marker pixel position
-    const pt = pkmMap.latLngToContainerPoint([lat, lng]);
-    pop.style.left = pt.x + 'px';
-    pop.style.top  = (pt.y - 48) + 'px'; // above icon tip
+        const llindarVal = (typeof llindar !== 'undefined') ? llindar * 2 : 300;
+        let res = null;
+        if (typeof calcularPK === 'function' && punts.length > 0) res = calcularPK(lat, lon, punts);
+        else if (punts.length > 0) res = pkmCalcularPKdePunts(lat, lon, punts);
 
-    // Restart animation
-    pop.style.display = 'none';
-    requestAnimationFrame(() => { pop.style.display = 'block'; });
-
-    // Reposition on map move
-    if (pkmMap._pkmPopoverHandler) pkmMap.off('move', pkmMap._pkmPopoverHandler);
-    pkmMap._pkmPopoverHandler = () => {
-        const pt2 = pkmMap.latLngToContainerPoint([lat, lng]);
-        pop.style.left = pt2.x + 'px';
-        pop.style.top  = (pt2.y - 48) + 'px';
-    };
-    pkmMap.on('move', pkmMap._pkmPopoverHandler);
+        if (res && res.dist <= llindarVal) pkmMostrarOK(lat, lon, res);
+        else pkmMostrarFora(res);
+    } catch(e) { pkmMostrarFora(null); }
+    finally { if (final) pkmMostrarLoading(false); }
 }
 
-function pkmHidePopover() {
-    const pop = document.getElementById('pkm-popover');
-    if (pop) pop.style.display = 'none';
-    if (pkmMap && pkmMap._pkmPopoverHandler) {
-        pkmMap.off('move', pkmMap._pkmPopoverHandler);
-    }
+/* Direct ArcGIS Spain query (fallback sense motor geoloc) */
+async function pkmConsultarArcGIS(lat, lon, buf) {
+    try {
+        const params = new URLSearchParams({
+            geometry: `${lon-buf},${lat-buf},${lon+buf},${lat+buf}`,
+            geometryType: 'esriGeometryEnvelope', inSR: '4326',
+            spatialRel: 'esriSpatialRelIntersects',
+            outFields: 'nombre,numero', returnGeometry: true, outSR: '4326', f: 'json',
+            resultRecordCount: 500
+        });
+        const r = await fetch(`${PKM_ARCGIS}?${params}`, { signal: AbortSignal.timeout(8000) });
+        const d = await r.json();
+        return (d.features||[]).map(f => ({
+            carretera: (f.attributes.nombre||'').trim().toUpperCase(),
+            pk: parseFloat(f.attributes.numero)||0,
+            lat: f.geometry.y, lon: f.geometry.x
+        })).filter(p => p.carretera && !isNaN(p.pk));
+    } catch { return []; }
 }
 
-/* ── GPS center ─────────────────────────────────────── */
+/* ── UI resultats ──────────────────────────────────────── */
+function pkmMostrarOK(lat, lon, res) {
+    pkmUltimResultat = { ...res, lat, lon };
+    const mStr = String(res.m).padStart(3,'0');
+    document.getElementById('pkmResIdle').style.display = 'none';
+    document.getElementById('pkmResWarn').style.display = 'none';
+    document.getElementById('pkmResData').style.display = 'block';
+    document.getElementById('pkmResActions').style.display = 'flex';
+    document.getElementById('pkmResCard').className = 'pkm-res-card ok';
+    document.getElementById('pkmResRoad').textContent = res.carretera;
+    document.getElementById('pkmResPK').innerHTML = `${res.km}<span class="sp">+</span>${mStr}`;
+    document.getElementById('pkmResDist').textContent = `A ${Math.round(res.dist)} m de la calçada`;
+    document.getElementById('pkmResCoords').textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    pkmDragPin.bindPopup(`<div class="pkm-pin-popup"><span class="pkm-pp-road">${res.carretera}</span><span class="pkm-pp-pk">PK ${res.km}+${mStr}</span></div>`).openPopup();
+}
+function pkmMostrarFora(res) {
+    pkmUltimResultat = null;
+    document.getElementById('pkmResIdle').style.display = 'none';
+    document.getElementById('pkmResData').style.display = 'none';
+    document.getElementById('pkmResWarn').style.display = 'block';
+    document.getElementById('pkmResActions').style.display = 'none';
+    document.getElementById('pkmResCard').className = 'pkm-res-card warn';
+    const d = res ? ` (${res.carretera} a ${Math.round(res.dist)} m)` : '';
+    document.getElementById('pkmResWarnSub').textContent = 'Punt fora de la xarxa de carreteres.' + d;
+}
+function pkmMostrarIdle() {
+    pkmUltimResultat = null;
+    document.getElementById('pkmResIdle').style.display = 'block';
+    document.getElementById('pkmResData').style.display = 'none';
+    document.getElementById('pkmResWarn').style.display = 'none';
+    document.getElementById('pkmResActions').style.display = 'none';
+    document.getElementById('pkmResCard').className = 'pkm-res-card';
+}
+function pkmActualizarCoords(lat, lng) {
+    document.getElementById('pkmResCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+}
+function pkmMostrarLoading(v) { document.getElementById('pkmLoading').classList.toggle('visible', v); }
+
+/* ── Accions resultat ──────────────────────────────────── */
+function pkmObrirMaps() {
+    if (!pkmUltimResultat) return;
+    window.open(`https://maps.google.com/?q=${pkmUltimResultat.lat},${pkmUltimResultat.lon}`, '_blank');
+}
+function pkmAbrirStreetView() {
+    const r = pkmUltimResultat;
+    const ll = r ? [r.lat, r.lon] : (pkmMap ? [pkmMap.getCenter().lat, pkmMap.getCenter().lng] : null);
+    if (!ll) { showToast('⚠️ Sense posició per a Street View', 'warn'); return; }
+    window.open(`https://maps.google.com/?q=${ll[0]},${ll[1]}&layer=c&cbll=${ll[0]},${ll[1]}`, '_blank');
+}
+async function pkmCompartirWA() {
+    if (!pkmUltimResultat) return;
+    const { carretera, km, m, lat, lon } = pkmUltimResultat;
+    const mStr = String(m).padStart(3,'0');
+    const text = `📍 *Carretera:* ${carretera}\n🛣️ *PK:* ${km}+${mStr}\n🗺️ *Ubicació:* https://maps.google.com/?q=${lat},${lon}`;
+    if (navigator.canShare?.({ text })) { try { await navigator.share({ text }); return; } catch(e) { if (e.name==='AbortError') return; } }
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+}
+async function pkmCopiar() {
+    if (!pkmUltimResultat) return;
+    const { carretera, km, m, lat, lon } = pkmUltimResultat;
+    const text = `${carretera} PK ${km}+${String(m).padStart(3,'0')} | ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    try { await navigator.clipboard.writeText(text); showToast('📋 Copiat', 'ok', 2000); }
+    catch { showToast('Error copiant', 'err'); }
+}
+
+/* ── GPS centrar ───────────────────────────────────────── */
 function pkmCentrarGPS() {
-    const btn = document.getElementById('pkm-center-btn');
+    const btn = document.getElementById('pkmBtnCentrar');
     if (btn) btn.classList.add('locating');
-
     navigator.geolocation.getCurrentPosition(pos => {
         if (btn) btn.classList.remove('locating');
-        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-        pkmMap.setView([lat, lng], 15);
-        pkmMarker.setLatLng([lat, lng]);
-        pkmUpdateCoords(lat, lng);
-        pkmFetchAndShowPK(lat, lng);
-
-        // GPS accuracy circle
+        const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+        pkmMap.flyTo([lat, lon], 16, { animate: true, duration: .9 });
+        pkmDragPin.setLatLng([lat, lon]);
+        pkmActualizarCoords(lat, lon);
+        pkmCalcPK(lat, lon, true);
         if (pkmGpsCircle) pkmGpsCircle.remove();
         if (pkmGpsMarker) pkmGpsMarker.remove();
-        pkmGpsCircle = L.circle([lat, lng], { radius: accuracy, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.12, weight: 1.5 }).addTo(pkmMap);
-        const gpsIcon = L.divIcon({ className:'', html:'<div class="pkm-gps-dot"></div>', iconSize:[18,18], iconAnchor:[9,9] });
-        pkmGpsMarker = L.marker([lat, lng], { icon: gpsIcon, interactive: false }).addTo(pkmMap);
-    }, () => {
+        pkmGpsCircle = L.circle([lat, lon], { radius: accuracy, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: .12, weight: 1.5 }).addTo(pkmMap);
+        const gpsIcon = L.divIcon({ className:'', html:'<div class="pkm-gps-dot"></div>', iconSize:[16,16], iconAnchor:[8,8] });
+        pkmGpsMarker = L.marker([lat, lon], { icon: gpsIcon, interactive: false }).addTo(pkmMap);
+        showToast('🎯 Mapa centrat en la teva posició', 'ok', 2000);
+    }, err => {
         if (btn) btn.classList.remove('locating');
-        showToast('❌ GPS no disponible');
-    }, { enableHighAccuracy: true, timeout: 12000 });
+        showToast('⚠️ GPS no disponible', 'warn');
+    }, { enableHighAccuracy: true, timeout: 35000, maximumAge: 5000 });
 }
 
-/* ── Street View ────────────────────────────────────── */
-function pkmAbrirStreetView() {
-    if (!pkmMarker) return;
-    const { lat, lng } = pkmMarker.getLatLng();
-    const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
-    window.open(url, '_blank');
+/* ── Anar a PK ─────────────────────────────────────────── */
+async function pkmAnarAPK() {
+    const carr = document.getElementById('pkmLkCarr').value.trim().toUpperCase();
+    const km   = parseInt(document.getElementById('pkmLkKm').value) || 0;
+    const m    = Math.min(999, parseInt(document.getElementById('pkmLkM').value) || 0);
+    if (!carr) { showToast('Introdueix la carretera', 'warn'); return; }
+    pkmTancarSheet();
+    pkmMostrarLoading(true);
+    showToast(`Buscant ${carr} PK ${km}+${String(m).padStart(3,'0')}...`, 'ok');
+    try {
+        const pos = await pkmBuscarPosPK(carr, km, m);
+        if (!pos) { showToast(`No s'ha trobat ${carr}`, 'err'); return; }
+        pkmMap.flyTo([pos.lat, pos.lon], 15, { animate: true, duration: 1.2 });
+        pkmDragPin.setLatLng([pos.lat, pos.lon]);
+        await pkmCalcPK(pos.lat, pos.lon, false);
+        showToast(`${carr} PK ${km}+${String(m).padStart(3,'0')} localitzat`, 'ok');
+    } catch(e) { showToast('Error: ' + e.message, 'err'); }
+    finally { pkmMostrarLoading(false); }
 }
 
-/* ── Draggable bottom sheet — 2 positions ───────────── */
-function pkmInitSheet() {
-    const sheet  = document.getElementById('pkm-sheet');
-    const handle = document.getElementById('pkm-sheet-handle');
-    if (!sheet || !handle) return;
-
-    // Set sheet to full natural height, controlled by translateY
-    sheet.style.height = 'auto';
-    sheet.style.maxHeight = '70vh';
-
-    let startY = 0, currentTranslate = 0, dragging = false;
-
-    function getTranslate() {
-        const m = new DOMMatrix(getComputedStyle(sheet).transform);
-        return m.m42 || 0;
+async function pkmBuscarPosPK(road, km, m) {
+    if (typeof mapBuscarPosPK === 'function') {
+        try { const p = await mapBuscarPosPK(road, km, m); if (p) return { lat: p.lat, lon: p.lon || p.lng }; } catch {}
     }
-
-    function onStart(e) {
-        dragging = true;
-        startY = e.touches ? e.touches[0].clientY : e.clientY;
-        currentTranslate = getTranslate();
-        sheet.style.transition = 'none';
-    }
-    function onMove(e) {
-        if (!dragging) return;
-        e.preventDefault();
-        const y = e.touches ? e.touches[0].clientY : e.clientY;
-        const dy = y - startY;
-        const newT = Math.max(0, currentTranslate + dy);
-        sheet.style.transform = `translateY(${newT}px)`;
-    }
-    function onEnd(e) {
-        if (!dragging) return;
-        dragging = false;
-        sheet.style.transition = '';
-        const y = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-        const dy = y - startY;
-        if (dy < -40) pkmSetSheetPos(1);       // swipe up → open
-        else if (dy > 40) pkmSetSheetPos(0);   // swipe down → hide
-        else pkmSetSheetPos(pkmSheetPos);       // snap back
-        if (pkmMap) setTimeout(() => pkmMap.invalidateSize(), 320);
-    }
-
-    handle.addEventListener('touchstart', onStart, { passive: true });
-    document.addEventListener('touchmove',  onMove, { passive: false });
-    document.addEventListener('touchend',   onEnd);
-    handle.addEventListener('mousedown', onStart);
-    document.addEventListener('mousemove',  onMove);
-    document.addEventListener('mouseup',    onEnd);
-}
-
-function pkmSetSheetPos(pos) {
-    pkmSheetPos = pos ? 1 : 0;
-    const sheet    = document.getElementById('pkm-sheet');
-    const leftCtrl = document.querySelector('.pkm-left-controls');
-    if (!sheet) return;
-
-    if (pkmSheetPos === 0) {
-        // Hidden: only pill visible — translateY = sheet height - pill area (~28px)
-        sheet.style.transition = 'transform 0.32s cubic-bezier(.4,0,.2,1)';
-        // Get natural height then push down leaving 28px
-        requestAnimationFrame(() => {
-            const h = sheet.offsetHeight;
-            sheet.style.transform = `translateY(${h - 28}px)`;
-            if (leftCtrl) leftCtrl.style.bottom = '52px';
-        });
-    } else {
-        // Open: fully visible
-        sheet.style.transition = 'transform 0.32s cubic-bezier(.4,0,.2,1)';
-        sheet.style.transform = 'translateY(0)';
-        requestAnimationFrame(() => {
-            const h = sheet.offsetHeight;
-            if (leftCtrl) leftCtrl.style.bottom = (h + 16) + 'px';
-        });
-    }
-}
-
-/* ── Search ─────────────────────────────────────────── */
-let pkmSearchTimer = null;
-function pkmSearchInput(val) {
-    const clearBtn = document.getElementById('pkm-search-clear');
-    if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
-    clearTimeout(pkmSearchTimer);
-    if (!val.trim()) { pkmHideResults(); return; }
-
-    // PK format?
-    const pkParsed = pkmParsePK(val);
-    if (pkParsed) {
-        pkmSearchTimer = setTimeout(async () => {
-            const res = document.getElementById('pkm-search-results');
-            if (res) {
-                res.style.display = 'block';
-                res.innerHTML = `<div class="pkm-search-result"><span class="pkm-search-result-icon">🛣️</span><div><div class="pkm-search-result-main">${pkParsed.road} PK ${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}</div><div class="pkm-search-result-sub">Cercant coordenades…</div></div></div>`;
-                const coords = await pkmSearchByPK(pkParsed.road, pkParsed.km, pkParsed.m);
-                if (coords) {
-                    res.innerHTML = `<div class="pkm-search-result" onclick="pkmGoTo(${coords.lat},${coords.lng},'${pkParsed.road}','${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}')">
-                        <span class="pkm-search-result-icon">🛣️</span>
-                        <div><div class="pkm-search-result-main">${pkParsed.road} PK ${pkParsed.km}+${String(pkParsed.m).padStart(3,'0')}</div><div class="pkm-search-result-sub">Tocar per anar-hi</div></div>
-                    </div>`;
-                } else {
-                    res.innerHTML = `<div class="pkm-search-result"><span>❌</span><div><div class="pkm-search-result-main">No trobat</div><div class="pkm-search-result-sub">PK fora de la xarxa ArcGIS</div></div></div>`;
-                }
+    try {
+        const params = new URLSearchParams({ where: `UPPER(nombre)='${road}'`, outFields: 'nombre,numero', returnGeometry: true, outSR: '4326', f: 'json', resultRecordCount: 2000, orderByFields: 'numero ASC' });
+        const r = await fetch(`${PKM_ARCGIS}?${params}`, { signal: AbortSignal.timeout(12000) });
+        const d = await r.json();
+        const punts = (d.features||[]).map(f => ({ pk: parseFloat(f.attributes.numero)||0, lat: f.geometry.y, lon: f.geometry.x })).filter(p=>!isNaN(p.pk)).sort((a,b)=>a.pk-b.pk);
+        if (!punts.length) return null;
+        const pkTarget = km + m/1000;
+        for (let i=0; i<punts.length-1; i++) {
+            if (punts[i].pk <= pkTarget && punts[i+1].pk >= pkTarget) {
+                const t = (pkTarget-punts[i].pk)/(punts[i+1].pk-punts[i].pk);
+                return { lat: punts[i].lat + t*(punts[i+1].lat-punts[i].lat), lon: punts[i].lon + t*(punts[i+1].lon-punts[i].lon) };
             }
-        }, 400);
+        }
+        return punts.reduce((a,b)=>Math.abs(b.pk-pkTarget)<Math.abs(a.pk-pkTarget)?b:a);
+    } catch { return null; }
+}
+
+/* ── Coordenades ───────────────────────────────────────── */
+function pkmToggleCoord() {
+    const acc = document.getElementById('pkmCoordAccordion');
+    acc.classList.toggle('open');
+}
+function pkmAnarACoords() {
+    const lat = parseFloat(document.getElementById('pkmCoordLat').value);
+    const lon = parseFloat(document.getElementById('pkmCoordLon').value);
+    if (isNaN(lat) || isNaN(lon)) { showToast('Coordenades no vàlides', 'warn'); return; }
+    if (lat < 27 || lat > 44 || lon < -20 || lon > 5) { showToast('Coordenades fora de l\'àrea', 'warn'); return; }
+    pkmMap.flyTo([lat, lon], 15, { animate: true, duration: 1 });
+    pkmDragPin.setLatLng([lat, lon]);
+    pkmCalcPK(lat, lon, true);
+    pkmToggleCoord();
+}
+
+/* ── Cerca ─────────────────────────────────────────────── */
+let pkmSearchTimeout = null;
+let pkmSearchCache = [];
+function pkmSearchInput(val) {
+    clearTimeout(pkmSearchTimeout);
+    const drop = document.getElementById('pkmTopDrop');
+    if (!val.trim()) { drop.classList.remove('open'); return; }
+
+    // PK format: C-14 120+200
+    const pkMatch = val.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)(?:\+(\d+))?/);
+    if (pkMatch) {
+        const road = pkMatch[1].toUpperCase(), km = parseInt(pkMatch[2]), m = parseInt(pkMatch[3]||0);
+        drop.innerHTML = `<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${road}',${km},${m})">🛣️ ${road} PK ${km}+${String(m).padStart(3,'0')} — Tocar per anar-hi</div>`;
+        drop.classList.add('open');
         return;
     }
 
-    pkmSearchTimer = setTimeout(async () => {
-        const results = await pkmGeocode(val);
-        const res = document.getElementById('pkm-search-results');
-        if (!res) return;
-        if (!results.length) {
-            res.style.display = 'block';
-            res.innerHTML = `<div class="pkm-search-result"><span>🔍</span><div class="pkm-search-result-main" style="color:#6b7280">Sense resultats</div></div>`;
+    pkmSearchTimeout = setTimeout(async () => {
+        const q = val.toUpperCase().trim();
+        // Cerca local en cache PKs
+        const cache = typeof pkCache !== 'undefined' && pkCache ? pkCache : [];
+        cache.forEach(p => { if (p.carretera && !pkmSearchCache.find(c=>c.nom===p.carretera)) pkmSearchCache.push({nom:p.carretera}); });
+        let res = pkmSearchCache.filter(c=>c.nom.includes(q)).slice(0,5);
+        // Si poc, consulta ArcGIS
+        if (res.length < 3) {
+            try {
+                const params = new URLSearchParams({ where:`UPPER(nombre) LIKE '${q}%'`, outFields:'nombre,numero', returnGeometry:true, outSR:'4326', f:'json', resultRecordCount:100 });
+                const r = await fetch(`${PKM_ARCGIS}?${params}`, {signal:AbortSignal.timeout(6000)});
+                const d = await r.json();
+                (d.features||[]).forEach(f => {
+                    const nm = (f.attributes.nombre||'').trim().toUpperCase();
+                    if (nm && !pkmSearchCache.find(c=>c.nom===nm)) pkmSearchCache.push({nom:nm});
+                });
+                res = pkmSearchCache.filter(c=>c.nom.includes(q)).slice(0,5);
+            } catch {}
+        }
+        // Nominatim municipis
+        try {
+            const nr = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=es&limit=5&format=json&addressdetails=1`, {headers:{'Accept-Language':'ca,es'},signal:AbortSignal.timeout(5000)});
+            const nj = await nr.json();
+            const munis = nj.map(r => ({ nom: r.display_name.split(',')[0], lat: parseFloat(r.lat), lon: parseFloat(r.lon) }));
+            const carritems = res.map(c => `<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${c.nom}',0,0)">🛣️ ${c.nom}</div>`).join('');
+            const muniitems = munis.map(m => `<div class="pkm-drop-item" onclick="pkmGoToLatLon(${m.lat},${m.lon})">📍 ${m.nom}</div>`).join('');
+            const combined = carritems + muniitems;
+            if (!combined) { drop.classList.remove('open'); return; }
+            drop.innerHTML = combined;
+            drop.classList.add('open');
             return;
-        }
-        res.style.display = 'block';
-        res.innerHTML = results.map(r => {
-            const name = r.display_name.split(',').slice(0,2).join(', ');
-            return `<div class="pkm-search-result" onclick="pkmGoTo(${r.lat},${r.lon},'','')">
-                <span class="pkm-search-result-icon">📍</span>
-                <div>
-                    <div class="pkm-search-result-main">${r.display_name.split(',')[0]}</div>
-                    <div class="pkm-search-result-sub">${name}</div>
-                </div>
-            </div>`;
-        }).join('');
-    }, 500);
+        } catch {}
+        if (!res.length) { drop.classList.remove('open'); return; }
+        drop.innerHTML = res.map(c=>`<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${c.nom}',0,0)">🛣️ ${c.nom}</div>`).join('');
+        drop.classList.add('open');
+    }, 350);
 }
 
-function pkmGoTo(lat, lng, road, pk) {
-    if (!pkmMap) return;
-    const fLat = parseFloat(lat), fLng = parseFloat(lng);
-    pkmMap.setView([fLat, fLng], 15);
-    pkmMarker.setLatLng([fLat, fLng]);
-    pkmUpdateCoords(fLat, fLng);
-    pkmHideResults();
-    document.getElementById('pkm-search-input').value = '';
-    document.getElementById('pkm-search-clear').style.display = 'none';
-    if (road) {
-        document.getElementById('pkm-road-name').textContent = road;
-        document.getElementById('pkm-road-pk').textContent   = pk ? `PK ${pk}` : '';
-        pkmShowPopover(fLat, fLng, road, pk);
+async function pkmGoToRoadPK(road, km, m) {
+    document.getElementById('pkmTopDrop').classList.remove('open');
+    document.getElementById('pkmSearchInp').value = `${road} ${km}+${String(m).padStart(3,'0')}`;
+    if (km > 0 || m > 0) {
+        pkmMostrarLoading(true);
+        const pos = await pkmBuscarPosPK(road, km, m);
+        if (pos) { pkmMap.flyTo([pos.lat, pos.lon], 15, {animate:true,duration:1.2}); pkmDragPin.setLatLng([pos.lat,pos.lon]); pkmCalcPK(pos.lat,pos.lon,false); }
+        else showToast(`No s'ha trobat ${road}`, 'err');
+        pkmMostrarLoading(false);
     } else {
-        pkmFetchAndShowPK(fLat, fLng);
-    }
-}
-
-function pkmHideResults() {
-    const res = document.getElementById('pkm-search-results');
-    if (res) res.style.display = 'none';
-}
-
-function pkmClearSearch() {
-    document.getElementById('pkm-search-input').value = '';
-    document.getElementById('pkm-search-clear').style.display = 'none';
-    pkmHideResults();
-}
-
-/* ── Measurement tools ──────────────────────────────── */
-function pkmActivarMesura(mode) {
-    if (pkmMeasureMode === mode) { pkmTancarMesura(); return; }
-    pkmTancarMesura();
-    pkmMeasureMode = mode;
-    document.getElementById('pkm-tool-poly').classList.toggle('active', mode === 'poly');
-    document.getElementById('pkm-tool-area').classList.toggle('active', mode === 'area');
-    document.getElementById('pkm-measure-close').style.display = 'flex';
-    document.getElementById('pkm-measure-result').style.display = 'none';
-    showToast(mode === 'poly' ? '📏 Toca el mapa per afegir punts · Arrossega per moure\'ls' : '⬡ Toca el mapa per afegir punts del polígon');
-    pkmSetSheetPos(1);
-}
-
-/* Draggable measure point icon */
-const _pkmDotIcon = () => L.divIcon({
-    className: '',
-    html: `<div style="width:14px;height:14px;border-radius:50%;background:#f59e0b;border:2.5px solid white;box-shadow:0 1px 6px rgba(0,0,0,0.5);cursor:grab;"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
-});
-
-function pkmAddMeasurePoint(latlng) {
-    // Create draggable marker for the point
-    const marker = L.marker(latlng, {
-        icon: _pkmDotIcon(),
-        draggable: true,
-        zIndexOffset: 100
-    }).addTo(pkmMap);
-
-    marker.on('drag', () => pkmRedrawMeasure());
-    marker.on('dragend', () => pkmRedrawMeasure());
-
-    pkmMeasureMarkers.push(marker);
-    pkmMeasurePoints.push(latlng);
-    pkmRedrawMeasure();
-}
-
-function pkmRedrawMeasure() {
-    // Sync positions from draggable markers
-    pkmMeasurePoints = pkmMeasureMarkers.map(mk => mk.getLatLng());
-
-    // Remove old line/polygon
-    if (pkmMeasureLine) { pkmMeasureLine.remove(); pkmMeasureLine = null; }
-
-    if (pkmMeasurePoints.length < 2) return;
-
-    if (pkmMeasureMode === 'poly') {
-        pkmMeasureLine = L.polyline(pkmMeasurePoints, {
-            color: '#f59e0b', weight: 2.5, dashArray: '8,5'
-        }).addTo(pkmMap);
-
-        let dist = 0;
-        for (let i = 1; i < pkmMeasurePoints.length; i++) {
-            dist += pkmMeasurePoints[i-1].distanceTo(pkmMeasurePoints[i]);
+        const cache = typeof pkCache !== 'undefined' && pkCache ? pkCache : [];
+        const punt = cache.find(p=>p.carretera===road);
+        if (punt) { pkmMap.flyTo([punt.lat, punt.lon||punt.lng], 13, {animate:true,duration:1}); pkmDragPin.setLatLng([punt.lat,punt.lon||punt.lng]); pkmCalcPK(punt.lat,punt.lon||punt.lng,true); }
+        else {
+            pkmMostrarLoading(true);
+            const pos = await pkmBuscarPosPK(road, 0, 0);
+            if (pos) { pkmMap.flyTo([pos.lat,pos.lon],13,{animate:true,duration:1}); pkmDragPin.setLatLng([pos.lat,pos.lon]); pkmCalcPK(pos.lat,pos.lon,true); }
+            pkmMostrarLoading(false);
         }
-        const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
-        const el = document.getElementById('pkm-measure-result');
-        el.innerHTML = `📏 Distància: <strong>${label}</strong> · <span style="opacity:.6;font-size:.8em">${pkmMeasurePoints.length} punts</span>`;
-        el.style.display = 'block';
-
-    } else if (pkmMeasureMode === 'area' && pkmMeasurePoints.length >= 3) {
-        pkmMeasureLine = L.polygon(pkmMeasurePoints, {
-            color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.12, weight: 2
-        }).addTo(pkmMap);
-
-        const area = pkmCalcArea(pkmMeasurePoints);
-        const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
-        const el = document.getElementById('pkm-measure-result');
-        el.innerHTML = `⬡ Superfície: <strong>${label}</strong> · <span style="opacity:.6;font-size:.8em">${pkmMeasurePoints.length} vèrtexs</span>`;
-        el.style.display = 'block';
-    } else if (pkmMeasureMode === 'area') {
-        // 2 points in area mode: just draw a line
-        pkmMeasureLine = L.polyline(pkmMeasurePoints, {
-            color: '#f59e0b', weight: 2, dashArray: '6,4'
-        }).addTo(pkmMap);
     }
 }
+function pkmGoToLatLon(lat, lon) {
+    document.getElementById('pkmTopDrop').classList.remove('open');
+    pkmMap.flyTo([lat, lon], 14, {animate:true,duration:1});
+    pkmDragPin.setLatLng([lat, lon]);
+    pkmCalcPK(lat, lon, true);
+}
 
-function pkmCalcArea(points) {
-    const R = 6371000;
-    let area = 0;
-    const n = points.length;
-    for (let i = 0; i < n; i++) {
-        const j = (i + 1) % n;
-        const xi = points[i].lng * Math.PI / 180;
-        const yi = Math.log(Math.tan(Math.PI/4 + points[i].lat * Math.PI / 360));
-        const xj = points[j].lng * Math.PI / 180;
-        const yj = Math.log(Math.tan(Math.PI/4 + points[j].lat * Math.PI / 360));
-        area += xi * yj - xj * yi;
+/* ── Bottom sheet ──────────────────────────────────────── */
+function pkmInitSheet() {
+    const sh   = document.getElementById('pkmSidebar');
+    const peek = document.getElementById('pkmSheetPeek');
+    const scr  = document.getElementById('pkMapaScreen');
+    if (!sh || !peek || !scr) return;
+
+    const syncPeek = () => {
+        const hPx = Math.min(peek.offsetHeight + 8, Math.round(window.innerHeight * 0.55));
+        scr.style.setProperty('--pkm-peek', hPx + 'px');
+        const btn1 = document.getElementById('pkmBtnCentrar');
+        const btn2 = document.getElementById('pkmBtnStreetView');
+        if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
+        if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+    };
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncPeek).observe(peek);
+    window.addEventListener('resize', syncPeek);
+
+    let startY = 0, curDelta = 0, dragging = false;
+    const sheetH = () => sh.offsetHeight;
+    const peekH  = () => parseFloat(getComputedStyle(scr).getPropertyValue('--pkm-peek')) || 172;
+    const posY = (pos) => pos === 0 ? 0 : Math.max(sheetH() - peekH(), 0);
+
+    function onStart(e) {
+        if (window.innerWidth >= 900) return;
+        if (e.target.closest('#pkmSidebarBody')) return;
+        dragging = true; curDelta = 0;
+        startY = e.touches ? e.touches[0].clientY : e.clientY;
+        sh.classList.add('dragging');
     }
-    return Math.abs(area / 2) * R * R;
+    function onMove(e) {
+        if (!dragging) return;
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        curDelta = y - startY;
+        const ty = Math.min(Math.max(posY(pkmSheetPos) + curDelta, 0), posY(1));
+        sh.style.transform = 'translateY(' + ty + 'px)';
+        if (e.cancelable) e.preventDefault();
+    }
+    function onEnd() {
+        if (!dragging) return;
+        dragging = false;
+        sh.classList.remove('dragging');
+        sh.style.transform = '';
+        if      (curDelta < -72) pkmObrirSheet();
+        else if (curDelta >  72) pkmTancarSheet();
+        else { if (pkmSheetPos === 0) pkmObrirSheet(); else pkmTancarSheet(); }
+        if (pkmMap) setTimeout(() => pkmMap.invalidateSize(), 400);
+    }
+    peek.addEventListener('touchstart', onStart, { passive: true });
+    peek.addEventListener('touchmove',  onMove,  { passive: false });
+    peek.addEventListener('touchend',   onEnd);
+    peek.addEventListener('mousedown',  onStart);
+    document.addEventListener('mousemove', (e)=>{ if(dragging) onMove(e); });
+    document.addEventListener('mouseup',   ()=>{ if(dragging) onEnd(); });
 }
 
-function pkmTancarMesura() {
-    pkmMeasureMode = null;
-    pkmMeasurePoints = [];
-    pkmMeasureMarkers.forEach(m => { try { m.remove(); } catch {} });
-    pkmMeasureMarkers = [];
-    if (pkmMeasureLine) { try { pkmMeasureLine.remove(); } catch {} pkmMeasureLine = null; }
-    document.getElementById('pkm-tool-poly').classList.remove('active');
-    document.getElementById('pkm-tool-area').classList.remove('active');
-    document.getElementById('pkm-measure-close').style.display = 'none';
-    document.getElementById('pkm-measure-result').style.display = 'none';
+function pkmSyncPeek() {
+    const peek = document.getElementById('pkmSheetPeek');
+    const scr  = document.getElementById('pkMapaScreen');
+    if (!peek || !scr) return;
+    const hPx = Math.min(peek.offsetHeight + 8, Math.round(window.innerHeight * 0.55));
+    scr.style.setProperty('--pkm-peek', hPx + 'px');
+    const btn1 = document.getElementById('pkmBtnCentrar');
+    const btn2 = document.getElementById('pkmBtnStreetView');
+    if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
+    if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+}
+function pkmObrirSheet() {
+    const sh = document.getElementById('pkmSidebar');
+    if (sh) { sh.classList.add('open'); sh.classList.remove('hidden'); }
+    pkmSheetPos = 0;
+    const chev = document.getElementById('pkmSheetChevron');
+    if (chev) chev.style.transform = 'rotate(180deg)';
+}
+function pkmTancarSheet() {
+    const sh = document.getElementById('pkmSidebar');
+    if (sh) { sh.classList.remove('open'); sh.classList.remove('hidden'); }
+    pkmSheetPos = 1;
+    const chev = document.getElementById('pkmSheetChevron');
+    if (chev) chev.style.transform = '';
+}
+function pkmToggleSheet() { if (pkmSheetPos===0) pkmTancarSheet(); else pkmObrirSheet(); }
+
+/* ── Amidament distància (polilínia lliure) ────────────── */
+function pkmToggleAmidament() {
+    if (pkmAreaActiu) pkmToggleArea();
+    pkmAmidamentActiu = !pkmAmidamentActiu;
+    const btn  = document.getElementById('pkmAmidToggleBtn');
+    const body = document.getElementById('pkmAmidBody');
+    const card = document.getElementById('pkmAmidCard');
+    btn.textContent = pkmAmidamentActiu ? 'Desactivar' : 'Activar';
+    btn.className = 'pkm-amid-toggle' + (pkmAmidamentActiu ? ' on' : '');
+    card.className = 'pkm-amid-card' + (pkmAmidamentActiu ? ' active' : '');
+    body.style.display = pkmAmidamentActiu ? 'flex' : 'none';
+    if (pkmMap) pkmMap.getContainer().style.cursor = pkmAmidamentActiu ? 'crosshair' : '';
+    if (pkmAmidamentActiu) { pkmTancarSheet(); showToast('Toca el mapa per afegir punts a la polilínia', 'ok', 3000); }
+    if (!pkmAmidamentActiu) pkmEsborrarAmidament(true);
+    pkmSyncBtnSortir();
+}
+function pkmAfegirPuntLliure() {
+    if (!pkmMap) return;
+    const c = pkmMap.getCenter();
+    pkmAfegirPuntLliureAt(c);
+}
+function pkmAfegirPuntLliureAt(latlng) {
+    // Marker arrossegable
+    const dotIcon = L.divIcon({ className:'', html:'<div style="width:12px;height:12px;border-radius:50%;background:#f59e0b;border:2px solid white;box-shadow:0 1px 6px rgba(0,0,0,.5);cursor:grab;"></div>', iconSize:[12,12], iconAnchor:[6,6] });
+    const mk = L.marker(latlng, { icon: dotIcon, draggable: true }).addTo(pkmMap);
+    mk.on('drag', () => pkmRedrawAmid());
+    mk.on('dragend', () => pkmRedrawAmid());
+    pkmAmidMarkers.push(mk);
+    pkmAmidPunts.push(latlng);
+    pkmRedrawAmid();
+    pkmRenderAmidPts();
+}
+function pkmRedrawAmid() {
+    pkmAmidPunts = pkmAmidMarkers.map(mk => mk.getLatLng());
+    if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    if (pkmAmidPunts.length < 2) return;
+    pkmAmidLayer = L.polyline(pkmAmidPunts, { color:'#f59e0b', weight:3, dashArray:'8,5' }).addTo(pkmMap);
+    let dist = 0;
+    for (let i=1; i<pkmAmidPunts.length; i++) dist += pkmAmidPunts[i-1].distanceTo(pkmAmidPunts[i]);
+    const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
+    const res = document.getElementById('pkmAmidResult');
+    document.getElementById('pkmAmidDistText').textContent = label;
+    document.getElementById('pkmAmidDistSub').textContent = `${pkmAmidPunts.length} punts`;
+    res.classList.add('show');
+}
+function pkmRenderAmidPts() {
+    const el = document.getElementById('pkmFreePtsList');
+    if (!el) return;
+    el.innerHTML = pkmAmidMarkers.map((mk,i) => {
+        const ll = mk.getLatLng();
+        return `<div class="pkm-amid-free-pt"><span class="pkm-amid-free-pt-n">${i+1}</span><span class="pkm-amid-free-pt-val">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</span><button class="pkm-amid-free-pt-del" onclick="pkmEsborrarPuntAmid(${i})">✕</button></div>`;
+    }).join('');
+}
+function pkmEsborrarPuntAmid(i) {
+    pkmAmidMarkers[i].remove();
+    pkmAmidMarkers.splice(i,1);
+    pkmAmidPunts.splice(i,1);
+    pkmRedrawAmid();
+    pkmRenderAmidPts();
+}
+function pkmEsborrarAmidament(silent) {
+    pkmAmidMarkers.forEach(m => m.remove());
+    pkmAmidMarkers = []; pkmAmidPunts = [];
+    if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    document.getElementById('pkmFreePtsList').innerHTML = '';
+    document.getElementById('pkmAmidResult').classList.remove('show');
+    if (!silent) showToast('Mesurament esborrat', 'ok', 1500);
 }
 
-/* ── Back button ────────────────────────────────────── */
+/* ── Mesura superfície ─────────────────────────────────── */
+function pkmToggleArea() {
+    if (pkmAmidamentActiu) pkmToggleAmidament();
+    pkmAreaActiu = !pkmAreaActiu;
+    const btn  = document.getElementById('pkmAreaToggleBtn');
+    const body = document.getElementById('pkmAreaBody');
+    const card = document.getElementById('pkmAreaCard');
+    btn.textContent = pkmAreaActiu ? 'Desactivar' : 'Activar';
+    btn.className = 'pkm-area-toggle' + (pkmAreaActiu ? ' on' : '');
+    card.className = 'pkm-area-card' + (pkmAreaActiu ? ' active' : '');
+    body.style.display = pkmAreaActiu ? 'flex' : 'none';
+    if (pkmMap) pkmMap.getContainer().style.cursor = pkmAreaActiu ? 'crosshair' : '';
+    if (pkmAreaActiu) { pkmTancarSheet(); showToast('Clica al mapa per definir els vèrtexs del polígon', 'ok', 3000); }
+    if (!pkmAreaActiu) pkmEsborrarArea(true);
+    pkmSyncBtnSortir();
+}
+function pkmAfegirPuntArea(latlng) {
+    const dotIcon = L.divIcon({ className:'', html:'<div style="width:12px;height:12px;border-radius:50%;background:#c084fc;border:2px solid white;box-shadow:0 1px 6px rgba(0,0,0,.5);cursor:grab;"></div>', iconSize:[12,12], iconAnchor:[6,6] });
+    const mk = L.marker(latlng, { icon: dotIcon, draggable: true }).addTo(pkmMap);
+    mk.on('drag', () => pkmRedrawArea());
+    mk.on('dragend', () => pkmRedrawArea());
+    pkmAreaMarkers.push(mk); pkmAreaPunts.push(latlng);
+    pkmRedrawArea();
+    pkmRenderAreaPts();
+    const hint = document.getElementById('pkmAreaHint');
+    if (hint) hint.textContent = pkmAreaPunts.length >= 3 ? 'Afegeix més punts o tanca el polígon' : 'Clica al mapa per afegir vèrtexs';
+}
+function pkmRedrawArea() {
+    pkmAreaPunts = pkmAreaMarkers.map(mk => mk.getLatLng());
+    if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
+    if (pkmAreaPunts.length < 2) return;
+    const style = pkmAreaPunts.length >= 3
+        ? { color:'#c084fc', fillColor:'#c084fc', fillOpacity:.13, weight:2 }
+        : { color:'#c084fc', weight:2, fill: false };
+    pkmAreaLayer = (pkmAreaPunts.length >= 3 ? L.polygon : L.polyline)(pkmAreaPunts, style).addTo(pkmMap);
+}
+function pkmRenderAreaPts() {
+    const el = document.getElementById('pkmAreaPtsList');
+    if (!el) return;
+    el.innerHTML = pkmAreaMarkers.map((mk,i) => {
+        const ll = mk.getLatLng();
+        return `<div class="pkm-area-pt"><span class="pkm-area-pt-n">${i+1}</span><span class="pkm-area-pt-val">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</span><button class="pkm-area-pt-del" onclick="pkmEsborrarPuntArea(${i})">✕</button></div>`;
+    }).join('');
+}
+function pkmEsborrarPuntArea(i) {
+    pkmAreaMarkers[i].remove(); pkmAreaMarkers.splice(i,1); pkmAreaPunts.splice(i,1);
+    pkmRedrawArea(); pkmRenderAreaPts();
+}
+function pkmTancarPoligon() {
+    if (pkmAreaPunts.length < 3) { showToast('Necessites almenys 3 punts', 'warn'); return; }
+    const area = pkmCalcArea(pkmAreaPunts);
+    const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
+    document.getElementById('pkmAreaValText').textContent = label;
+    document.getElementById('pkmAreaSubText').textContent = `${pkmAreaPunts.length} vèrtexs`;
+    document.getElementById('pkmAreaResult').classList.add('show');
+}
+function pkmEsborrarArea(silent) {
+    pkmAreaMarkers.forEach(m => m.remove());
+    pkmAreaMarkers = []; pkmAreaPunts = [];
+    if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
+    document.getElementById('pkmAreaPtsList').innerHTML = '';
+    document.getElementById('pkmAreaResult').classList.remove('show');
+    if (!silent) showToast('Àrea esborrada', 'ok', 1500);
+}
+function pkmCalcArea(pts) {
+    const R = 6371000; let area = 0; const n = pts.length;
+    for (let i=0; i<n; i++) {
+        const j=(i+1)%n;
+        const xi=pts[i].lng*Math.PI/180, yi=Math.log(Math.tan(Math.PI/4+pts[i].lat*Math.PI/360));
+        const xj=pts[j].lng*Math.PI/180, yj=Math.log(Math.tan(Math.PI/4+pts[j].lat*Math.PI/360));
+        area += xi*yj - xj*yi;
+    }
+    return Math.abs(area/2)*R*R;
+}
+
+/* ── Sortir mesura (botó top-center) ───────────────────── */
+function pkmSyncBtnSortir() {
+    const btn = document.getElementById('pkmBtnSortirMesura');
+    if (btn) btn.classList.toggle('visible', pkmAmidamentActiu || pkmAreaActiu);
+}
+function pkmSortirMesura() {
+    if (pkmAmidamentActiu) pkmToggleAmidament();
+    if (pkmAreaActiu) pkmToggleArea();
+}
+
+/* ── Fallback PK calc sense motor ─────────────────────── */
+function pkmCalcularPKdePunts(lat, lng, punts) {
+    if (!punts.length) return null;
+    const cars = {};
+    punts.forEach(p => { if (!cars[p.carretera]) cars[p.carretera]=[]; cars[p.carretera].push(p); });
+    let best = null;
+    Object.entries(cars).forEach(([carr, pts]) => {
+        pts.sort((a,b)=>a.pk-b.pk);
+        for (let i=0; i<pts.length-1; i++) {
+            const A=pts[i], B=pts[i+1];
+            const dx=B.lat-A.lat, dy=B.lon-A.lon, lenSq=dx*dx+dy*dy;
+            const t=lenSq>0?Math.max(0,Math.min(1,((lat-A.lat)*dx+(lng-A.lon)*dy)/lenSq)):0;
+            const pLat=A.lat+t*dx, pLon=A.lon+t*dy;
+            const dist=pkmHaversine(lat,lng,pLat,pLon);
+            const pkDec=A.pk+t*(B.pk-A.pk), km=Math.floor(pkDec), m=Math.round((pkDec-km)*1000);
+            if (!best||dist<best.dist) best={carretera:carr,km,m,dist};
+        }
+    });
+    return best;
+}
+function pkmHaversine(lat1,lon1,lat2,lon2) {
+    const R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ── Back ──────────────────────────────────────────────── */
 function pkmBack() {
-    pkmTancarMesura();
-    pkmHidePopover();
+    if (pkmAmidamentActiu) pkmToggleAmidament();
+    if (pkmAreaActiu) pkmToggleArea();
     ir('home');
 }
+
+/* ── Sheet init auto ───────────────────────────────────── */
+(function pkmInitSheetAuto() {
+    // S'executa quan el DOM és llest però espera fins que abrirPKMapa s'hagi cridat
+    // El setTimeout a abrirPKMapa s'encarrega de cridar pkmInitSheet()
+})();
+
 
 </script>
 </html>
