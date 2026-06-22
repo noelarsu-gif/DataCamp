@@ -268,54 +268,265 @@ html, body {
 }
 
 /* ============================================================
-   HOME DASHBOARD
+   HOME DASHBOARD — PK WIDGET
    ============================================================ */
-.dashboard-hero {
-    background: linear-gradient(135deg, var(--dark) 0%, #1f2937 100%);
+.pk-widget {
+    background: linear-gradient(135deg, var(--dark) 0%, #1a2332 100%);
     border-radius: var(--radius-lg);
-    padding: 36px 40px;
-    margin-bottom: 28px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    box-shadow: var(--shadow-md);
+    color: white;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     overflow: hidden;
-    color: white;
 }
-.dashboard-hero::before {
+.pk-widget::after {
     content: '';
     position: absolute;
-    right: -40px; top: -40px;
-    width: 280px; height: 280px;
+    right: -30px; top: -30px;
+    width: 180px; height: 180px;
     background: var(--primary);
-    opacity: 0.06;
+    opacity: 0.05;
     border-radius: 50%;
+    pointer-events: none;
 }
-.dashboard-hero::after {
-    content: '';
-    position: absolute;
-    right: 60px; bottom: -80px;
-    width: 200px; height: 200px;
-    background: var(--primary);
-    opacity: 0.04;
-    border-radius: 50%;
+.pk-widget-idle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
-.hero-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 12px;
+.pk-widget-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
-.hero-title {
-    font-family: var(--font-cond);
-    font-size: 2.4rem;
-    font-weight: 900;
+.pk-widget-icon {
+    font-size: 1.8rem;
     line-height: 1;
+    flex-shrink: 0;
+}
+.pk-widget-label {
+    font-family: var(--font-cond);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--primary);
+    margin-bottom: 2px;
+}
+.pk-widget-hint {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+}
+.pk-widget-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 11px 20px;
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    min-height: 44px;
+    letter-spacing: 0.3px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 12px rgba(198,12,48,0.35);
+    flex-shrink: 0;
+}
+.pk-widget-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.pk-widget-btn:active { transform: scale(0.97); }
+.pk-widget-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.pk-widget-pulse {
+    width: 8px; height: 8px;
+    background: white;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pkPulse 1s ease-in-out infinite;
+}
+@keyframes pkPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+}
+.pk-widget-result {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.pk-result-road {
+    font-family: var(--font-cond);
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    min-width: 60px;
+}
+.pk-result-pk {
+    font-family: var(--font-cond);
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+.pk-result-meta {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.45);
+    flex: 1;
+    min-width: 80px;
+    line-height: 1.5;
+}
+.pk-widget-btn-sm {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    font-family: var(--font);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    min-height: 36px;
+}
+.pk-widget-btn-sm:hover { background: rgba(255,255,255,0.14); color: white; }
+.pk-chips-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.4);
     margin-bottom: 10px;
 }
-.hero-sub {
-    font-size: 0.9rem;
-    color: rgba(255,255,255,0.5);
-    max-width: 420px;
+.pk-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.pk-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 90px;
+}
+.pk-chip:hover, .pk-chip:focus {
+    background: rgba(198,12,48,0.2);
+    border-color: var(--primary);
+    outline: none;
+}
+.pk-chip.selected {
+    background: rgba(198,12,48,0.25);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(198,12,48,0.3);
+}
+.pk-chip-road {
+    font-family: var(--font-cond);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.pk-chip-pk {
+    font-family: var(--font-cond);
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+}
+.pk-chip-dist {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+}
+.pk-widget-msg {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.6);
+}
+.pk-widget-msg span:first-child { font-size: 1.1rem; flex-shrink: 0; }
+
+/* ============================================================
+   BLACKLIST DE CARRETERES — Configuració
+   ============================================================ */
+.blacklist-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.blacklist-input-row input {
+    flex: 1;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.blacklist-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-height: 36px;
+}
+.blacklist-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff1f2;
+    border: 1.5px solid #fecdd3;
+    color: #be123c;
+    border-radius: 20px;
+    padding: 5px 10px 5px 13px;
+    font-family: var(--font-cond);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.blacklist-chip-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #be123c;
+    font-size: 0.85rem;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    min-height: unset;
+    display: flex;
+    align-items: center;
+}
+.blacklist-chip-del:hover { opacity: 1; }
+.blacklist-empty {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 4px 0;
 }
 
 .action-grid {
@@ -2145,6 +2356,333 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 /* ============================================================
+   FAB — BOTÓ FLOTANT FOTO RÀPIDA (dashboard only)
+   ============================================================ */
+#fab-foto-rapida {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue) 0%, #1e3a8a 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;              /* shown only on home screen via JS */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 6px 20px rgba(29,78,216,0.45), 0 2px 8px rgba(0,0,0,0.20);
+    z-index: 400;
+    transition: transform 0.18s cubic-bezier(.4,0,.2,1),
+                box-shadow 0.18s cubic-bezier(.4,0,.2,1);
+    -webkit-tap-highlight-color: transparent;
+}
+#fab-foto-rapida.visible { display: flex; }
+#fab-foto-rapida:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 10px 28px rgba(29,78,216,0.55), 0 4px 12px rgba(0,0,0,0.22);
+}
+#fab-foto-rapida:active { transform: scale(0.93); }
+
+/* FAB tooltip label */
+#fab-foto-rapida::after {
+    content: 'Foto Ràpida';
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--dark);
+    color: white;
+    font-family: var(--font-cond);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+}
+#fab-foto-rapida:hover::after { opacity: 1; }
+
+/* On mobile, no tooltip (touch) */
+@media (max-width: 768px) {
+    #fab-foto-rapida { bottom: 20px; right: 16px; width: 56px; height: 56px; font-size: 1.4rem; }
+    #fab-foto-rapida::after { display: none; }
+}
+
+/* ============================================================
+   GALERIA DE FOTOS RÀPIDES
+   ============================================================ */
+/* Toolbar de la galeria */
+.galeria-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.galeria-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+.galeria-count-badge {
+    font-family: var(--font-cond);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    background: var(--bg-alt);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+.galeria-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    min-height: 38px;
+}
+.galeria-btn:hover { background: var(--bg-alt); border-color: var(--text-muted); }
+.galeria-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+.galeria-btn.danger { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+.galeria-btn.danger:hover { background: #ffe4e6; }
+.galeria-btn.blue  { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+.galeria-btn.blue:hover  { background: #1e40af; }
+
+/* Selecció mode */
+.galeria-select-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--dark);
+    color: white;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.galeria-select-bar.visible { display: flex; }
+.galeria-select-count { flex: 1; font-family: var(--font-cond); letter-spacing: 0.5px; }
+
+/* Grid de fotos */
+.galeria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+}
+@media (max-width: 768px) {
+    .galeria-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+}
+@media (max-width: 390px) {
+    .galeria-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+}
+
+.galeria-thumb {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg-alt);
+}
+.galeria-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.22s ease;
+}
+.galeria-thumb:hover img { transform: scale(1.04); }
+.galeria-thumb:hover { box-shadow: var(--shadow-md); }
+.galeria-thumb.selected {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(29,78,216,0.30);
+}
+
+/* Overlay info (carretera + pk) */
+.galeria-thumb-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 100%);
+    padding: 18px 6px 5px;
+    pointer-events: none;
+}
+.galeria-thumb-road {
+    font-family: var(--font-cond);
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+.galeria-thumb-pk {
+    font-family: var(--font-cond);
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.1;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Checkbox de selecció */
+.galeria-thumb-check {
+    position: absolute;
+    top: 6px; left: 6px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid rgba(255,255,255,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    z-index: 2;
+    transition: var(--transition);
+}
+.galeria-select-mode .galeria-thumb-check { display: flex; }
+.galeria-thumb.selected .galeria-thumb-check {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+/* Estat buit */
+.galeria-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+}
+.galeria-empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.galeria-empty-title {
+    font-family: var(--font-cond);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.galeria-empty-sub { font-size: 0.82rem; line-height: 1.5; }
+
+/* ============================================================
+   VISOR FOTO AMPLIADA (modal)
+   ============================================================ */
+#galeriaVisor {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.94);
+    z-index: 3000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#galeriaVisor.open { display: flex; }
+
+.visor-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+    z-index: 1;
+}
+.visor-title {
+    font-family: var(--font-cond);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.visor-img-wrap {
+    max-width: 100vw;
+    max-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 0;
+}
+.visor-img-wrap img {
+    max-width: 100vw;
+    max-height: calc(100vh - 140px);
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+}
+.visor-bottombar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+}
+.visor-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 20px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    min-height: 44px;
+}
+.visor-btn:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.4); }
+.visor-btn.primary { background: var(--accent-blue); border-color: var(--accent-blue); }
+.visor-btn.primary:hover { background: #1e40af; }
+.visor-close {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+    backdrop-filter: blur(8px);
+}
+.visor-close:hover { background: rgba(255,255,255,0.22); }
+
+/* ============================================================
    NOTIFICACION TOAST
    ============================================================ */
 .toast {
@@ -2999,312 +3537,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .recent-continue{ padding: 6px 10px; font-size: 0.7rem; }
 }
 
-
-/* ══════════════════════════════════════════
-   MÓDULOS: GALERIA + INCIDÈNCIES + FABs
-   Heredats de PK-GEOLOC, adaptats a DataCamp
-   ══════════════════════════════════════════ */
-.fab-stack{position:fixed;right:16px;bottom:24px;z-index:200;
-  display:flex;flex-direction:column;align-items:center;gap:10px;}
-.fab-inc{width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  border:2px solid rgba(255,255,255,.2);color:#fff;font-size:1.3rem;cursor:pointer;
-  box-shadow:0 4px 20px rgba(198,12,48,.5);transition:var(--transition);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.fab-inc:hover,.fab-inc:active{transform:scale(1.08);box-shadow:0 6px 28px rgba(198,12,48,.7);}
-.fab-cam-float{width:46px;height:46px;border-radius:50%;
-  background:linear-gradient(135deg,#1d4ed8,#1e3a8a);
-  border:2px solid rgba(255,255,255,.2);color:#fff;font-size:1.15rem;cursor:pointer;
-  box-shadow:0 4px 16px rgba(29,78,216,.5);transition:var(--transition);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.fab-cam-float:hover,.fab-cam-float:active{transform:scale(1.08);box-shadow:0 6px 24px rgba(29,78,216,.7);}
-.inc-quick-panel{position:fixed;left:0;right:0;bottom:0;z-index:250;
-  background:var(--surface);border-top:2px solid var(--border);border-radius:20px 20px 0 0;
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);
-  padding-bottom:env(safe-area-inset-bottom,16px);box-shadow:0 -8px 40px rgba(0,0,0,.15);}
-.inc-quick-panel.open{transform:translateY(0);}
-.panel-handle-dc{width:38px;height:4px;background:var(--border-dark);border-radius:2px;margin:12px auto 0;}
-.inc-panel-title-dc{text-align:center;font-family:var(--font-cond);font-size:.8rem;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:10px 0 14px;}
-.inc-buttons-dc{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px;}
-.inc-btn-dc{padding:18px 10px;border-radius:var(--radius);border:1.5px solid var(--border);
-  background:var(--surface-2);color:var(--text);font-family:var(--font);
-  font-size:.8rem;font-weight:600;cursor:pointer;transition:var(--transition);
-  display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;line-height:1.3;}
-.inc-btn-dc-icon{font-size:1.8rem;line-height:1;}
-.inc-btn-dc:hover,.inc-btn-dc:active{background:var(--bg-alt);border-color:var(--border-dark);transform:scale(.97);}
-.inc-btn-dc.animal:hover,.inc-btn-dc.animal:active{border-color:#d97706;background:#fffbeb;}
-.inc-btn-dc.senyalitzacio:hover,.inc-btn-dc.senyalitzacio:active{border-color:var(--primary);background:var(--primary-light);}
-.inc-btn-dc.forat:hover,.inc-btn-dc.forat:active{border-color:#7c3aed;background:#f5f3ff;}
-.inc-btn-dc.altra:hover,.inc-btn-dc.altra:active{border-color:#0284c7;background:#f0f9ff;}
-.inc-btn-dc.averia:hover,.inc-btn-dc.averia:active{border-color:#dc2626;background:#fef2f2;}
-@keyframes incFlash{0%{opacity:.5;transform:scale(.94)}100%{opacity:1;transform:scale(1)}}
-.inc-btn-dc.inc-pressed{animation:incFlash .3s ease;}
-.action-card.red-card{border-left:4px solid var(--primary);}
-/* GALERIA */
-.galeria-screen{display:flex;flex-direction:column;height:100%;}
-.galeria-subtabs{display:flex;border-bottom:2px solid var(--border);background:var(--surface);}
-.galeria-subtab{flex:1;padding:11px 4px;font-family:var(--font-cond);font-size:.78rem;font-weight:700;
-  letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);
-  background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;
-  transition:color .2s,border-color .2s;margin-bottom:-2px;}
-.galeria-subtab.active{color:var(--primary);border-bottom-color:var(--primary);}
-.galeria-toolbar{display:flex;align-items:center;justify-content:space-between;
-  padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);gap:8px;flex-wrap:wrap;}
-.galeria-foto-grid{flex:1;overflow-y:auto;
-  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
-  padding:2px;align-content:start;background:var(--bg);}
-.galeria-card{position:relative;aspect-ratio:1/1;overflow:hidden;cursor:pointer;background:var(--bg-alt);}
-.galeria-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s;}
-.galeria-card:hover img{transform:scale(1.04);}
-.galeria-card.selected::after{content:'';position:absolute;inset:0;background:rgba(198,12,48,.18);
-  border:3px solid var(--primary);pointer-events:none;}
-.galeria-pk-overlay{position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(transparent,rgba(0,0,0,.75));
-  padding:12px 5px 4px;font-family:var(--font-cond);font-size:.62rem;font-weight:700;
-  color:#fff;letter-spacing:.4px;padding-left:5px;pointer-events:none;}
-.galeria-check{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.8);background:rgba(0,0,0,.3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.65rem;color:transparent;transition:var(--transition);z-index:2;}
-.galeria-card.selected .galeria-check{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:900;}
-.sel-toolbar-dc{display:none;align-items:center;justify-content:space-between;
-  padding:8px 14px;background:var(--primary-light);border-bottom:1px solid var(--primary-glow);}
-.sel-toolbar-dc.visible{display:flex;}
-.sel-count-dc{font-family:var(--font-cond);font-size:.82rem;font-weight:700;color:var(--primary);letter-spacing:1px;}
-.sel-actions-dc{display:flex;gap:8px;}
-.sel-btn-dc{padding:7px 13px;border-radius:var(--radius-sm);font-family:var(--font-cond);
-  font-size:.72rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--transition);}
-.sel-btn-dc.del{border:1px solid #dc2626;background:#fef2f2;color:#dc2626;}
-.sel-btn-dc.share{border:1px solid var(--accent-blue);background:var(--accent-blue-lt);color:var(--accent-blue);}
-.galeria-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:10px;color:var(--text-light);min-height:200px;font-size:.85rem;}
-.galeria-empty-icon{font-size:2.5rem;opacity:.3;}
-/* INCIDENCIAS */
-.inc-screen{display:flex;flex-direction:column;height:100%;}
-.inc-screen-header{display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);}
-.inc-screen-count{font-family:var(--font-cond);font-size:.75rem;font-weight:700;
-  color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
-.inc-list-dc{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg);}
-.incident-card-dc{background:var(--surface);border-radius:var(--radius);
-  border:1.5px solid var(--border);padding:14px;position:relative;box-shadow:var(--shadow-sm);
-  display:flex;gap:12px;align-items:flex-start;transition:var(--transition);}
-.incident-card-dc:hover{box-shadow:var(--shadow);}
-.incident-card-dc.animal{border-left:4px solid #d97706;}
-.incident-card-dc.senyalitzacio{border-left:4px solid var(--primary);}
-.incident-card-dc.forat{border-left:4px solid #7c3aed;}
-.incident-card-dc.altra{border-left:4px solid #0284c7;}
-.incident-card-dc.averia{border-left:4px solid #dc2626;}
-.inc-icon-dc{font-size:1.8rem;line-height:1;flex-shrink:0;}
-.inc-body-dc{flex:1;min-width:0;}
-.inc-title-dc{font-family:var(--font-cond);font-weight:700;font-size:.95rem;color:var(--dark);margin-bottom:2px;}
-.inc-pk-dc{font-family:var(--font-cond);font-size:.8rem;font-weight:600;color:var(--primary);margin-bottom:2px;}
-.inc-datetime-dc{font-size:.72rem;color:var(--text-muted);margin-bottom:6px;}
-.inc-thumb-dc{width:60px;height:60px;object-fit:cover;border-radius:var(--radius-sm);cursor:pointer;
-  border:1.5px solid var(--border);flex-shrink:0;}
-.inc-del-dc{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;
-  font-size:.95rem;color:var(--text-light);padding:4px 6px;border-radius:var(--radius-sm);transition:var(--transition);}
-.inc-del-dc:hover{background:var(--primary-light);color:var(--primary);}
-.inc-actions-dc{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.inc-action-btn-dc{padding:7px 11px;border-radius:var(--radius-sm);font-size:.72rem;font-weight:700;
-  font-family:var(--font-cond);letter-spacing:.5px;cursor:pointer;border:1.5px solid var(--border);
-  background:var(--surface-2);color:var(--text);transition:var(--transition);text-decoration:none;display:inline-block;}
-.inc-action-btn-dc.maps{border-color:#0284c7;background:#f0f9ff;color:#0284c7;}
-.inc-action-btn-dc.whatsapp{border-color:#16a34a;background:#f0fdf4;color:#16a34a;}
-.inc-action-btn-dc.add-foto{border-color:var(--accent-blue);background:var(--accent-blue-lt);color:var(--accent-blue);}
-.inc-post-sheet-dc{position:fixed;left:0;right:0;bottom:0;z-index:260;
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);}
-.inc-post-sheet-dc.open{transform:translateY(0);}
-.inc-post-box-dc{background:var(--surface);border-radius:20px 20px 0 0;
-  border-top:2px solid var(--border);box-shadow:0 -8px 40px rgba(0,0,0,.12);
-  padding-bottom:env(safe-area-inset-bottom,16px);}
-.inc-post-head-dc{display:flex;align-items:center;gap:12px;padding:16px 16px 10px;}
-.inc-post-check-dc{width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:#f0fdf4;border:2px solid #16a34a;color:#16a34a;
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;}
-.inc-post-title-dc{font-family:var(--font-cond);font-weight:900;font-size:.95rem;color:var(--dark);letter-spacing:1px;}
-.inc-post-sub-dc{font-size:.75rem;color:var(--text-muted);margin-top:2px;}
-.inc-post-thumb-wrap-dc{display:flex;gap:6px;padding:0 16px 8px;align-items:center;}
-.inc-post-thumb-dc{width:54px;height:54px;object-fit:cover;border-radius:var(--radius-sm);border:1.5px solid var(--border);}
-.inc-post-thumb-badge-dc{font-size:.7rem;color:var(--text-muted);font-family:var(--font-cond);}
-.inc-post-btns-dc{display:flex;gap:8px;padding:8px 16px 12px;flex-wrap:wrap;}
-.inc-post-btn-dc{flex:1;min-width:120px;padding:11px 14px;border-radius:var(--radius-sm);
-  font-family:var(--font-cond);font-size:.78rem;font-weight:700;letter-spacing:.5px;
-  cursor:pointer;border:1.5px solid var(--border);background:var(--surface-2);color:var(--text);
-  transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:5px;}
-.inc-post-btn-dc.foto{border-color:var(--accent-blue);background:var(--accent-blue-lt);color:var(--accent-blue);}
-.inc-post-btn-dc.done{border-color:#16a34a;background:#f0fdf4;color:#16a34a;}
-/* Visor foto incidencia */
-#dcIncFotoViewer{position:fixed;inset:0;z-index:501;background:#000;display:none;flex-direction:column;}
-#dcIncFotoViewer.open{display:flex;}
-.ifv-topbar-dc{display:flex;align-items:center;gap:8px;padding:12px 14px;
-  background:rgba(0,0,0,.9);border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;}
-.ifv-title-dc{font-family:var(--font-cond);font-size:.82rem;font-weight:700;
-  color:#fff;letter-spacing:1px;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ifv-img-wrap-dc{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;min-height:0;}
-.ifv-img-wrap-dc img{width:100%;height:100%;object-fit:contain;}
-.ifv-botbar-dc{background:rgba(0,0,0,.9);border-top:1px solid rgba(255,255,255,.1);
-  padding:12px 14px 20px;display:flex;gap:10px;flex-shrink:0;}
-.ifv-btn-dc{flex:1;padding:13px 10px;border-radius:var(--radius);
-  font-family:var(--font-cond);font-size:.88rem;font-weight:700;letter-spacing:1px;
-  cursor:pointer;transition:var(--transition);border:1.5px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.08);color:#fff;}
-.ifv-btn-dc.share{border-color:#1d4ed8;background:rgba(29,78,216,.2);color:#93c5fd;}
-.ifv-btn-dc.del{border-color:#dc2626;background:rgba(220,38,38,.1);color:#fca5a5;}
-/* Visor foto galeria normal */
-.galeria-viewer{position:fixed;inset:0;z-index:500;background:#000;display:none;flex-direction:column;}
-.galeria-viewer.open{display:flex;}
-.gv-topbar{display:flex;align-items:center;gap:8px;padding:12px 14px;
-  background:rgba(0,0,0,.9);border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;}
-.gv-title{font-family:var(--font-cond);font-size:.82rem;font-weight:700;
-  color:#fff;letter-spacing:1px;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.gv-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;min-height:0;}
-.gv-img-wrap img{width:100%;height:100%;object-fit:contain;}
-.gv-botbar{display:flex;gap:8px;padding:12px 14px 20px;background:rgba(0,0,0,.9);
-  border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;flex-wrap:wrap;}
-.gv-btn{flex:1;min-width:80px;padding:13px 10px;border-radius:var(--radius);
-  font-family:var(--font-cond);font-size:.82rem;font-weight:700;letter-spacing:1px;
-  cursor:pointer;transition:var(--transition);border:1.5px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.08);color:#fff;}
-.gv-btn.wa-avis{border-color:#25d366;background:rgba(37,211,102,.2);color:#4ade80;}
-.gv-btn.wa-noavis{border-color:#60a5fa;background:rgba(96,165,250,.15);color:#93c5fd;}
-.gv-btn.save-btn{border-color:#fbbf24;background:rgba(251,191,36,.1);color:#fcd34d;}
-.gv-btn.del-btn{border-color:#f87171;background:rgba(248,113,113,.1);color:#fca5a5;}
-/* Modal decisio PK */
-.pk-decision-modal{position:fixed;inset:0;z-index:600;
-  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
-  display:none;align-items:flex-end;justify-content:center;}
-.pk-decision-modal.open{display:flex;}
-.pk-dm-box{background:var(--surface);border-radius:20px 20px 0 0;width:100%;
-  max-width:480px;padding:20px 16px 32px;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
-.pk-dm-title{font-family:var(--font-cond);font-weight:900;font-size:1rem;color:var(--dark);
-  margin-bottom:6px;letter-spacing:1px;}
-.pk-dm-sub{font-size:.8rem;color:var(--text-muted);line-height:1.5;margin-bottom:14px;}
-.pk-dm-fields{display:none;gap:8px;margin-bottom:12px;}
-.pk-dm-fields.visible{display:flex;}
-.pk-dm-input{flex:1;padding:10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
-  background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:.9rem;}
-.pk-dm-btns{display:flex;flex-direction:column;gap:8px;}
-.pk-dm-btn{width:100%;padding:13px;border-radius:var(--radius-sm);font-family:var(--font-cond);
-  font-size:.85rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--transition);}
-.pk-dm-btn.primary{background:var(--primary);border:none;color:#fff;}
-.pk-dm-btn.primary:hover{background:var(--primary-dark);}
-.pk-dm-btn.secondary{background:var(--surface-2);border:1.5px solid var(--border);color:var(--text);}
-.pk-dm-btn.cancel{background:none;border:1.5px solid var(--border);color:var(--text-muted);}
-.pk-dm-candidates{display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
-.pk-dm-chip{padding:7px 12px;border-radius:99px;font-family:var(--font-cond);
-  font-size:.75rem;font-weight:700;border:1.5px solid var(--border);
-  background:var(--surface-2);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-.pk-dm-chip small{font-size:.65rem;color:var(--text-muted);}
-.pk-dm-chip.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
-/* Modal confirm PK */
-.modal-confirm-pk{position:fixed;inset:0;z-index:600;
-  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:flex-end;}
-.modal-confirm-pk.open{display:flex;}
-.mcp-box{background:var(--surface);border-radius:20px 20px 0 0;width:100%;
-  padding:20px 16px 32px;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
-.mcp-title{font-family:var(--font-cond);font-weight:900;font-size:.95rem;color:var(--dark);
-  letter-spacing:1px;margin-bottom:4px;text-align:center;}
-.mcp-sub{font-size:.75rem;color:var(--text-muted);text-align:center;margin-bottom:14px;}
-.mcp-fields{display:flex;gap:8px;margin-bottom:12px;}
-.mcp-input{flex:1;padding:10px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
-  background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:.9rem;}
-.mcp-btn{width:100%;padding:13px;border-radius:var(--radius-sm);font-family:var(--font-cond);
-  font-size:.85rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--transition);margin-bottom:6px;}
-.mcp-btn.ok{background:var(--primary);border:none;color:#fff;}
-.mcp-btn.cancel{background:var(--surface-2);border:1.5px solid var(--border);color:var(--text-muted);}
-.sentit-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
-  border-radius:99px;font-family:var(--font-cond);font-size:.68rem;font-weight:700;letter-spacing:.5px;
-  border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-muted);}
-.sentit-badge.creciente{border-color:var(--cat-obra);background:var(--cat-obra-lt);color:var(--cat-obra);}
-.sentit-badge.decreciente{border-color:var(--primary);background:var(--primary-light);color:var(--primary);}
-
-
-/* ── Tarjetes incidències estil pk-geoloc (DataCamp) ── */
-.incident-card-dc{
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:var(--radius);
-  padding:12px 14px 12px 18px;
-  display:flex;gap:10px;align-items:flex-start;
-  transition:var(--transition);
-  position:relative;overflow:hidden;
-  min-height:0;flex-shrink:0;
-  box-shadow:var(--shadow-sm);
-}
-.incident-card-dc::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;
-}
-.incident-card-dc.animal::before{background:#d97706;}
-.incident-card-dc.senyalitzacio::before{background:var(--primary);}
-.incident-card-dc.forat::before{background:#7c3aed;}
-.incident-card-dc.altra::before{background:#0284c7;}
-.incident-card-dc.averia::before{background:#dc2626;}
-.inc-del-dc{
-  position:absolute;top:8px;right:8px;z-index:2;
-  width:30px;height:30px;border-radius:8px;
-  border:1px solid rgba(198,12,48,.28);background:rgba(198,12,48,.08);
-  color:var(--primary);font-size:.86rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:var(--transition);padding:0;
-}
-.inc-del-dc:active{transform:scale(.9);}
-.inc-del-dc:hover{background:rgba(198,12,48,.18);}
-.inc-icon-dc{font-size:1.55rem;flex-shrink:0;line-height:1;width:32px;text-align:center;}
-.inc-body-dc{flex:1;min-width:0;padding-right:34px;}
-.inc-title-dc{
-  font-family:var(--font-cond);font-size:.9rem;font-weight:700;
-  letter-spacing:.8px;color:var(--dark);text-transform:uppercase;
-  margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.inc-pk-dc{
-  font-family:var(--font-cond);font-size:.8rem;color:var(--primary);
-  font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.inc-datetime-dc{
-  font-size:.65rem;color:var(--text-muted);margin-top:3px;letter-spacing:.2px;
-}
-.inc-meta-dc{
-  font-size:.65rem;color:var(--text-light);margin-top:5px;
-  line-height:1.6;word-break:break-word;
-}
-.inc-meta-row-dc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.inc-sentit-dc{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:2px 8px;border-radius:20px;
-  font-size:.62rem;font-weight:700;margin-top:6px;letter-spacing:.3px;
-  border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-muted);
-}
-.inc-sentit-dc.creixent{background:#f0fdf4;border-color:#16a34a;color:#16a34a;}
-.inc-sentit-dc.decreixent{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
-.inc-sentit-dc.indet{background:var(--surface-2);color:var(--text-muted);border-color:var(--border);}
-.inc-actions-dc{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-.inc-action-btn-dc{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:5px 11px;border-radius:20px;font-size:.68rem;font-weight:700;
-  letter-spacing:.3px;cursor:pointer;border:none;transition:var(--transition);
-  text-decoration:none;white-space:nowrap;
-}
-.inc-action-btn-dc.maps{background:rgba(29,78,216,.12);color:#1d4ed8;border:1px solid rgba(29,78,216,.3);}
-.inc-action-btn-dc.maps:hover{background:rgba(29,78,216,.22);}
-.inc-action-btn-dc.whatsapp{background:rgba(22,163,74,.12);color:#16a34a;border:1px solid rgba(22,163,74,.3);}
-.inc-action-btn-dc.whatsapp:hover{background:rgba(22,163,74,.22);}
-.inc-action-btn-dc.whatsapp.con-foto{background:rgba(22,163,74,.2);border-color:rgba(22,163,74,.5);font-weight:800;}
-.inc-action-btn-dc.add-foto{background:rgba(124,58,237,.12);color:#7c3aed;border:1px solid rgba(124,58,237,.35);}
-.inc-action-btn-dc.add-foto:hover{background:rgba(124,58,237,.22);}
-.inc-thumb-dc{
-  width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;
-  border:1.5px solid var(--border-dark);cursor:pointer;
-  box-shadow:var(--shadow-sm);transition:transform .15s;
-}
-.inc-thumb-dc:active{transform:scale(.94);}
-.inc-empty-dc{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;color:var(--text-light);min-height:200px;font-size:.85rem;text-align:center;
-}
-.inc-empty-icon-dc{font-size:2.5rem;opacity:.3;}
-
 </style>
 </head>
 <body>
@@ -3333,7 +3565,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
     <div style="padding:12px;">
         <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon">🏠</span> Inici</button>
-        <button class="nav-item highlight" onclick="closeMobileNav();irAGaleria()"><span class="nav-icon">🖼️</span> Galeria</button>
+        <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon">🖼️</span> Galeria</button>
         <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Historial</button>
         <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon">🗺️</span> Mapa</button>
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon">📥</span> Descàrregues</button>
@@ -3365,7 +3597,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <button class="nav-item active" id="nav-home" onclick="ir('home')">
                 <span class="nav-icon">🏠</span> Inici
             </button>
-            <button class="nav-item highlight" id="nav-foto" onclick="irAGaleria()">
+            <button class="nav-item highlight" id="nav-foto" onclick="abrirGaleria()">
                 <span class="nav-icon">🖼️</span> Galeria
             </button>
         </div>
@@ -3427,11 +3659,51 @@ input:checked + .slider:before { transform: translateX(20px); }
                  HOME
                  ================================================ -->
             <div id="home" class="screen active">
-                <div class="dashboard-hero">
-                    <div class="hero-label">Benvingut a DATACAMP</div>
-                    <div class="hero-title">Eina de Recollida<br>de Dades en Camp</div>
-                    <div class="hero-sub">Gestiona inventaris de carreteres, captura fotos georeferenciades i genera informes professionals.</div>
+
+                <!-- ── WIDGET ON ESTIC — PK LOCALITZADOR ─────────── -->
+                <div class="pk-widget" id="pkWidget">
+                    <!-- Estat idle -->
+                    <div class="pk-widget-idle" id="pkWidgetIdle">
+                        <div class="pk-widget-left">
+                            <div class="pk-widget-icon">📍</div>
+                            <div>
+                                <div class="pk-widget-label">Localitzador PK</div>
+                                <div class="pk-widget-hint">On estic ara?</div>
+                            </div>
+                        </div>
+                        <button class="pk-widget-btn" id="pkWidgetBtn" onclick="executarAutoPKWidget()">
+                            <span class="pk-widget-pulse" id="pkWidgetPulse" style="display:none;"></span>
+                            <span id="pkWidgetBtnTxt">🔍 DETECTAR</span>
+                        </button>
+                    </div>
+
+                    <!-- Resultat: una carretera o cap -->
+                    <div class="pk-widget-result" id="pkWidgetResult" style="display:none;">
+                        <div class="pk-result-road" id="pkResultRoad">—</div>
+                        <div class="pk-result-pk" id="pkResultPK">PK —</div>
+                        <div class="pk-result-meta" id="pkResultMeta"></div>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
+                            🔄 Actualitzar
+                        </button>
+                    </div>
+
+                    <!-- Chips: múltiples carreteres properes -->
+                    <div class="pk-chips-area" id="pkChipsArea" style="display:none;">
+                        <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+                        <div class="pk-chips-row" id="pkChipsRow"></div>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()" style="margin-top:8px;">
+                            🔄 Actualitzar
+                        </button>
+                    </div>
+
+                    <!-- Missatge d'error / advertència -->
+                    <div class="pk-widget-msg" id="pkWidgetMsg" style="display:none;">
+                        <span id="pkWidgetMsgIcon">⚠️</span>
+                        <span id="pkWidgetMsgTxt"></span>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">Reintentar</button>
+                    </div>
                 </div>
+                <!-- ── /WIDGET ─────────────────────────────────────── -->
 
                 <div class="action-grid">
                     <div class="action-card primary" onclick="openProjectModal()">
@@ -3439,10 +3711,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-label">Nou Projecte</div>
                         <div class="action-desc">Crea un inventari nou o seguiment d'obra</div>
                     </div>
-                    <div class="action-card blue" onclick="irAGaleria()">
+                    <div class="action-card blue" onclick="abrirGaleria()">
                         <div class="action-icon">🖼️</div>
                         <div class="action-label">Galeria</div>
-                        <div class="action-desc">Fotos georeferenciades i incidències</div>
+                        <div class="action-desc">Fotos ràpides capturades al camp</div>
                     </div>
                     <div class="action-card" onclick="historial()">
                         <div class="action-icon">📂</div>
@@ -3453,11 +3725,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-icon">📥</div>
                         <div class="action-label">Descàrregues</div>
                         <div class="action-desc">Genera PDF, Excel i ZIP de fotos</div>
-                    </div>
-                    <div class="action-card" style="border-left:4px solid var(--primary);" onclick="irAIncidencies()">
-                        <div class="action-icon">⚡</div>
-                        <div class="action-label">Incidències</div>
-                        <div class="action-desc">Registre ràpid amb GPS i foto</div>
                     </div>
                 </div>
 
@@ -3516,37 +3783,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="autopk-pulse" id="autopkPulse" style="display:none;"></span>
                     🔍 ON ESTIC ARA? (Auto-PK)
                 </button>
-
-                <!-- EXTRA PK FEATURES (apareix després de detecció) ── -->
-                <div id="dcExtraPK" style="display:none;margin-top:8px;border-radius:var(--radius);background:var(--surface);border:1.5px solid var(--border);overflow:hidden;">
-
-                  <!-- Altres carreteres properes -->
-                  <div id="dcCandidatsRow" style="display:none;padding:12px 14px 8px;">
-                    <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Altres carreteres properes:</div>
-                    <div id="dcCandidatsChips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-                  </div>
-
-                  <!-- Sentit de la marxa -->
-                  <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;">
-                    <span style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">Sentit:</span>
-                    <button id="dcSentitBtn" onclick="dcCanviarSentit()"
-                      style="padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;border:1.5px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;">
-                      ↔ Indeterminat
-                    </button>
-                  </div>
-
-                  <!-- Accions PK -->
-                  <div style="padding:8px 14px 12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-                    <button onclick="dcPKIncorrecte()"
-                      style="flex:1;min-width:120px;padding:9px 12px;border-radius:var(--radius-sm);background:#fef2f2;border:1.5px solid #fca5a5;color:#dc2626;font-size:.78rem;font-weight:700;cursor:pointer;">
-                      ⚠️ PK Incorrecte
-                    </button>
-                    <button onclick="dcIniciarTrazas()"
-                      style="flex:1;min-width:120px;padding:9px 12px;border-radius:var(--radius-sm);background:var(--primary-light);border:1.5px solid var(--primary);color:var(--primary);font-size:.78rem;font-weight:700;cursor:pointer;">
-                      📍 Mapeo de Trazas
-                    </button>
-                  </div>
-                </div>
                 <!-- ─────────────────────────────────────────────── -->
 
                 <div id="dynamicFields"></div>
@@ -3813,12 +4049,22 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
+                <!-- LLISTA NEGRA DE CARRETERES ──────────────────── -->
+                <div class="settings-section">
+                    <div class="settings-section-title">🚫 Llista Negra de Carreteres</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                        El localitzador PK ignorarà les carreteres que afegeixis aquí. Útil per excloure vies que no gestioneu (autopistes, nacionals, etc.).
+                    </p>
+                    <input type="text" id="blacklistInput" placeholder="Ex: AP-7, N-340..." onkeydown="if(event.key==='Enter')blacklistAfegir()" style="width:100%; margin-bottom:8px; text-transform:uppercase; font-size:1rem; font-weight:600; letter-spacing:0.5px;">
+                    <button class="btn btn-danger btn-sm" onclick="blacklistAfegir()" style="margin-bottom:14px;">+ AFEGIR CARRETERA</button>
+                    <div class="blacklist-chips" id="blacklistChips">
+                        <span class="blacklist-empty" id="blacklistEmpty">Cap carretera exclosa</span>
+                    </div>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
-
-            <!-- ================================================
-                 HELP
-                 ================================================ -->
             <div id="helpScreen" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
@@ -3863,9 +4109,75 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <button class="btn btn-ghost" style="margin-top:8px;" onclick="ir('home')">TORNAR AL MENÚ</button>
             </div>
 
+            <!-- ================================================
+                 GALERIA FOTOS RÀPIDES
+                 ================================================ -->
+            <div id="galeriaFotos" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('home')">←</button>
+                    <h3>🖼️ Galeria de Fotos</h3>
+                </div>
+
+                <!-- Toolbar principal -->
+                <div class="galeria-toolbar" id="galeriaToolbar">
+                    <span class="galeria-count-badge" id="galeriaBadge">0 fotos</span>
+                    <button class="galeria-btn" onclick="toggleSelectMode()" id="btnSelectMode">☑️ Seleccionar</button>
+                    <div class="galeria-toolbar-right">
+                        <button class="galeria-btn blue" onclick="carregarFotoDispositiu()" title="Carregar foto des del dispositiu">
+                            📂 Carregar
+                        </button>
+                        <input type="file" id="galeriaLoadInput" multiple accept="image/*" hidden onchange="galeriaCarregarFotos(this)">
+                    </div>
+                </div>
+
+                <!-- Barra de selecció activa -->
+                <div class="galeria-select-bar" id="galeriaSelectBar">
+                    <span class="galeria-select-count" id="galeriaSelectCount">0 seleccionades</span>
+                    <button class="galeria-btn" onclick="galeriaCompartirSeleccio()">📲 Compartir</button>
+                    <button class="galeria-btn danger" onclick="galeriaEliminarSeleccio()">🗑️ Eliminar</button>
+                    <button class="galeria-btn" onclick="toggleSelectMode()">✕ Cancel·lar</button>
+                </div>
+
+                <!-- Grid fotos -->
+                <div class="galeria-grid galeria-select-mode-off" id="galeriaGrid">
+                    <!-- populated by renderGaleria() -->
+                </div>
+
+                <!-- Estat buit -->
+                <div class="galeria-empty" id="galeriaEmpty" style="display:none;">
+                    <div class="galeria-empty-icon">📷</div>
+                    <div class="galeria-empty-title">Galeria buida</div>
+                    <div class="galeria-empty-sub">Fes servir el botó <strong>📷</strong> del dashboard per capturar fotos ràpides, o carrega imatges des del dispositiu.</div>
+                </div>
+            </div>
+
         </div><!-- /page-content -->
     </div><!-- /main-content -->
 </div><!-- /app-shell -->
+
+<!-- ============================================================
+     FAB — FOTO RÀPIDA (visible only on home dashboard)
+     ============================================================ -->
+<button id="fab-foto-rapida" onclick="modeFotoDirecta()" title="Foto Ràpida">
+    📷
+</button>
+
+<!-- ============================================================
+     VISOR FOTO RÀPIDA (modal pantalla completa)
+     ============================================================ -->
+<div id="galeriaVisor">
+    <div class="visor-topbar">
+        <div class="visor-title" id="visorTitle">Foto Ràpida</div>
+        <button class="visor-close" onclick="tancarVisor()">✕</button>
+    </div>
+    <div class="visor-img-wrap">
+        <img id="visorImg" src="" alt="">
+    </div>
+    <div class="visor-bottombar">
+        <button class="visor-btn primary" onclick="visorCompartir()">📲 Compartir</button>
+        <button class="visor-btn" onclick="visorDescarregar()">💾 Guardar</button>
+    </div>
+</div>
 
 <!-- ============================================================
      MODALS
@@ -3948,158 +4260,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
-<!-- ════ INPUTS hidden per a càmera / galeria ════ -->
-<input type="file" id="dcInputCaptura" accept="image/*" capture="environment" style="display:none;">
-<input type="file" id="dcInputGaleria" accept="image/*" style="display:none;">
-<input type="file" id="dcInputIncFoto" accept="image/*" capture="environment" style="display:none;">
-<input type="file" id="dcInputIncGaleria" accept="image/*" style="display:none;">
-<!-- ════ PANEL INCIDÈNCIES RÀPIDES ════ -->
-<div class="inc-quick-panel" id="dcIncPanel">
-  <div class="panel-handle-dc"></div>
-  <div class="inc-panel-title-dc">⚡ Marcar Incidència Ràpida</div>
-  <div class="inc-buttons-dc">
-    <button class="inc-btn-dc animal" onclick="dcRegistrarIncidencia('animal','🐗 Animal a la Calçada')"><span class="inc-btn-dc-icon">🐗</span>Animal / Atropellament</button>
-    <button class="inc-btn-dc senyalitzacio" onclick="dcRegistrarIncidencia('senyalitzacio','🛑 Senyalització Danyada')"><span class="inc-btn-dc-icon">🛑</span>Senyalització Danyada</button>
-    <button class="inc-btn-dc forat" onclick="dcRegistrarIncidencia('forat','🕳️ Clot / Esquerda')"><span class="inc-btn-dc-icon">🕳️</span>Clot / Esquerda</button>
-    <button class="inc-btn-dc altra" onclick="dcRegistrarIncidencia('altra','⚠️ Incidència Indefinida')"><span class="inc-btn-dc-icon">⚠️</span>Incidència Indefinida</button>
-    <button class="inc-btn-dc averia" onclick="dcRegistrarIncidencia('averia','🚨 Avaria / Accident')"><span class="inc-btn-dc-icon">🚨</span>Avaria / Accident</button>
-  </div>
-</div>
-<!-- ════ FAB STACK ════ -->
-<div class="fab-stack" id="dcFabStack" style="display:flex;">
-  <button class="fab-cam-float" onclick="dcObrirCamera()" title="Foto amb PK">📷</button>
-  <button class="fab-inc" id="dcFabInc" onclick="dcToggleIncPanel()" title="Incidència ràpida">⚡</button>
-</div>
-<!-- ════ HOJA POST-INCIDENCIA ════ -->
-<div class="inc-post-sheet-dc" id="dcIncPostSheet">
-  <div class="inc-post-box-dc">
-    <div class="panel-handle-dc" style="margin-bottom:0;"></div>
-    <div class="inc-post-head-dc">
-      <div class="inc-post-check-dc">✓</div>
-      <div><div class="inc-post-title-dc" id="dcIncPostTitle">INCIDÈNCIA DESADA</div><div class="inc-post-sub-dc" id="dcIncPostSub">—</div></div>
-    </div>
-    <div class="inc-post-thumb-wrap-dc" id="dcIncPostThumbWrap" style="display:none;">
-      <img class="inc-post-thumb-dc" id="dcIncPostThumb" alt="foto">
-      <img class="inc-post-thumb-dc" id="dcIncPostThumb2" alt="foto 2" style="display:none;">
-      <span class="inc-post-thumb-badge-dc" id="dcIncPostThumbBadge">📷 Foto adjunta</span>
-    </div>
-    <div class="inc-post-btns-dc">
-      <button class="inc-post-btn-dc foto" id="dcIncPostFotoBtn" onclick="dcAfegirFotoIncidencia()">📷 Afegeix foto</button>
-      <button class="inc-post-btn-dc done" onclick="dcTancarSheetPostInc()">✓ Fet</button>
-    </div>
-  </div>
-</div>
-<!-- ════ HOJA SELECCIO ORIGEN FOTO INC ════ -->
-<div class="inc-post-sheet-dc" id="dcIncFotoSrcSheet">
-  <div class="inc-post-box-dc">
-    <div class="panel-handle-dc" style="margin-bottom:0;"></div>
-    <div class="inc-post-head-dc">
-      <div class="inc-post-check-dc" style="background:#eff6ff;border-color:#1d4ed8;color:#1d4ed8;">📷</div>
-      <div><div class="inc-post-title-dc">AFEGEIX FOTO</div><div class="inc-post-sub-dc">Tria l'origen de la foto</div></div>
-    </div>
-    <div class="inc-post-btns-dc">
-      <button class="inc-post-btn-dc foto" onclick="dcIncFotoCameraGo()">📷 Fer foto (càmera)</button>
-      <button class="inc-post-btn-dc" style="border-color:#7c3aed;background:#f5f3ff;color:#7c3aed;" onclick="dcIncFotoGaleriaGo()">🖼️ Triar de la galeria</button>
-      <button class="inc-post-btn-dc done" onclick="dcTancarSheetFotoSrc()">✕ Cancel·lar</button>
-    </div>
-  </div>
-</div>
-<!-- ════ VISOR FOTO INCIDENCIA ════ -->
-<div id="dcIncFotoViewer">
-  <div class="ifv-topbar-dc">
-    <button class="ifv-btn-dc" style="flex:none;padding:8px 12px;font-size:.75rem;" onclick="dcCloseIncFotoViewer()">← Tancar</button>
-    <span class="ifv-title-dc" id="dcIfvTitle">Foto incidència</span>
-  </div>
-  <div class="ifv-img-wrap-dc"><img id="dcIfvImg" src="" alt="foto incidència"></div>
-  <div class="ifv-botbar-dc">
-    <button class="ifv-btn-dc share" onclick="dcCompartirFotoIncVisor()">💬 Compartir</button>
-    <button class="ifv-btn-dc" style="border-color:#fbbf24;background:rgba(251,191,36,.1);color:#fcd34d;" onclick="dcDescarregarFotoIncVisor()">📥 Guardar</button>
-    <button class="ifv-btn-dc del" onclick="dcEliminarFotoIncVisor()">🗑️ Eliminar</button>
-  </div>
-</div>
-<!-- ════ VISOR FOTO GALERIA ════ -->
-<div class="galeria-viewer" id="dcGaleriaViewer">
-  <div class="gv-topbar">
-    <button class="gv-btn" style="flex:none;padding:8px 12px;font-size:.75rem;" onclick="dcCloseGaleriaViewer()">← Tancar</button>
-    <span class="gv-title" id="dcGvTitle">Foto</span>
-    <button class="gv-btn save-btn" style="flex:none;padding:8px 12px;font-size:.72rem;" onclick="dcDescarregarFotoGaleria()">📥</button>
-  </div>
-  <div class="gv-img-wrap"><img id="dcGvImg" src="" alt="foto"></div>
-  <div class="gv-botbar">
-    <button class="gv-btn wa-avis" onclick="dcCompartirFotoGaleriaWA('CON AVISO')">🟢 Amb avís</button>
-    <button class="gv-btn wa-noavis" onclick="dcCompartirFotoGaleriaWA('SIN AVISO')">🔵 Sense avís</button>
-    <button class="gv-btn del-btn" onclick="dcEliminarFotoGaleria()">🗑️ Eliminar</button>
-  </div>
-</div>
-<!-- ════ MODAL DECISIO PK ════ -->
-<div class="pk-decision-modal" id="dcPkDecisionModal">
-  <div class="pk-dm-box">
-    <div class="pk-dm-title" id="dcPkDmTitle">⚠️ Punt fora de la carretera</div>
-    <div class="pk-dm-sub" id="dcPkDmSub">Introdueix el PK manualment per continuar.</div>
-    <div class="pk-dm-candidates" id="dcPkDmCandidates"></div>
-    <div class="pk-dm-fields" id="dcPkDmFields">
-      <input class="pk-dm-input" id="dcPkDmCarr" type="text" placeholder="Carretera (ex: C-14)" style="text-transform:uppercase;">
-      <input class="pk-dm-input" id="dcPkDmKm" type="number" placeholder="Km" style="max-width:80px;">
-      <input class="pk-dm-input" id="dcPkDmM" type="number" placeholder="+m" style="max-width:70px;" min="0" max="999">
-    </div>
-    <div class="pk-dm-btns">
-      <button class="pk-dm-btn primary" id="dcPkDbManualBtn" onclick="dcPkDecisioManual()">✏️ INTRODUIR PK MANUAL</button>
-      <button class="pk-dm-btn secondary" onclick="dcPkDecisioSensePK()">📍 Continuar sense PK (coordenades GPS)</button>
-      <button class="pk-dm-btn cancel" onclick="dcPkDecisioCancel()">✕ Cancel·lar</button>
-    </div>
-  </div>
-</div>
-<!-- ════ MODAL CONFIRMAR PK ════ -->
-<div class="modal-confirm-pk" id="dcModalConfirmPK">
-  <div class="mcp-box">
-    <div class="mcp-title">✏️ CONFIRMA LES DADES DE LA FOTO</div>
-    <div class="mcp-sub">Revisa o corregeix la carretera i el PK</div>
-    <div class="mcp-fields">
-      <input class="mcp-input" id="dcMcpCarr" type="text" placeholder="Carretera" style="text-transform:uppercase;flex:2;">
-      <input class="mcp-input" id="dcMcpKm" type="number" placeholder="Km" style="max-width:80px;">
-      <input class="mcp-input" id="dcMcpM" type="number" placeholder="+m" style="max-width:70px;" min="0" max="999">
-    </div>
-    <button class="mcp-btn ok" onclick="dcMcpConfirmar()">📸 INCRUSTA I DESA LA FOTO</button>
-    <button class="mcp-btn cancel" onclick="dcMcpCancel()">✕ Cancel·lar</button>
-  </div>
-</div>
-<!-- ════ PANTALLA GALERIA ════ -->
-<div id="dcScreenGaleria" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">
-    <button onclick="dcCloseGaleriaScreen()" style="width:38px;height:38px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface-2);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
-    <span style="flex:1;font-family:var(--font-cond);font-weight:700;font-size:1rem;color:var(--dark);letter-spacing:.5px;">🖼️ GALERIA DE FOTOS</span>
-    <button onclick="dcObrirCamera()" style="padding:7px 11px;border-radius:var(--radius-sm);border:1.5px solid var(--accent-blue);background:var(--accent-blue-lt);color:var(--accent-blue);font-family:var(--font-cond);font-size:.72rem;font-weight:700;cursor:pointer;">📷 Nova</button>
-    <button onclick="document.getElementById('dcInputGaleria').click()" style="padding:7px 11px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:var(--font-cond);font-size:.72rem;font-weight:700;cursor:pointer;">🖼️ Afegir</button>
-  </div>
-  <div class="galeria-subtabs">
-    <button class="galeria-subtab active" id="dcSubtabFotos" onclick="dcCanviarSubtabGaleria('fotos')">📷 Fotos</button>
-    <button class="galeria-subtab" id="dcSubtabIncFotos" onclick="dcCanviarSubtabGaleria('inc')">⚠️ Incidències</button>
-  </div>
-  <div class="galeria-toolbar" id="dcGaleriaToolbarFotos">
-    <span id="dcSelCountDc" style="display:none;" class="sel-count-dc"></span>
-    <div class="sel-actions-dc" id="dcSelActions" style="display:none;">
-      <button class="sel-btn-dc share" onclick="dcCompartirSeleccio()">💬 Compartir</button>
-      <button class="sel-btn-dc del" onclick="dcEliminarSeleccio()">🗑️ Eliminar</button>
-    </div>
-    <button class="btn btn-sm btn-ghost" id="dcBtnSeleccio" onclick="dcToggleSeleccio()" style="margin-left:auto;">☑ Selecc.</button>
-  </div>
-  <div class="galeria-foto-grid" id="dcPhotosList"></div>
-  <div class="galeria-foto-grid" id="dcIncFotosList" style="display:none;"></div>
-</div>
-<!-- ════ PANTALLA INCIDENCIES ════ -->
-<div id="dcScreenIncidencies" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;">
-    <button onclick="dcCloseIncidenciesScreen()" style="width:38px;height:38px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface-2);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
-    <span style="flex:1;font-family:var(--font-cond);font-weight:700;font-size:1rem;color:var(--dark);letter-spacing:.5px;">⚡ INCIDÈNCIES</span>
-    <span id="dcIncCount" style="font-family:var(--font-cond);font-size:.72rem;font-weight:700;color:var(--text-muted);">0 REGISTRES</span>
-  </div>
-  <div class="inc-list-dc" id="dcIncidentsList">
-    <div class="galeria-empty"><div class="galeria-empty-icon">📋</div><div>Sense incidències registrades</div></div>
-  </div>
-</div>
-
-
-
 <script>
 
 /* ============================================================
@@ -4114,9 +4274,15 @@ let isFotoDirecta = false;
 /* ============================================================
    DB INIT
    ============================================================ */
-const req = indexedDB.open("GencatDinaV5", 1);
+const req = indexedDB.open("GencatDinaV5", 2);
 req.onupgradeneeded = e => {
-    e.target.result.createObjectStore("projects", { keyPath: "id" });
+    const d = e.target.result;
+    if (!d.objectStoreNames.contains("projects")) {
+        d.createObjectStore("projects", { keyPath: "id" });
+    }
+    if (!d.objectStoreNames.contains("galeriaFotos")) {
+        d.createObjectStore("galeriaFotos", { keyPath: "id" });
+    }
 };
 req.onsuccess = e => {
     db = e.target.result;
@@ -4196,8 +4362,15 @@ const screenTitles = {
     'pantallaAjustos':'Configuració',
     'helpScreen':    'Ajuda',
     'projectDetail': 'Detall del Projecte',
-    'mapScreen':     'Mapa de Registres'
+    'mapScreen':     'Mapa de Registres',
+    'galeriaFotos':  'Galeria de Fotos'
 };
+
+// Show FAB on initial load (home is active by default)
+document.addEventListener('DOMContentLoaded', () => {
+    const fab = document.getElementById('fab-foto-rapida');
+    if (fab) fab.classList.add('visible');
+});
 
 function ir(id) {
     if (id === 'home') {
@@ -4220,16 +4393,21 @@ function ir(id) {
 
     // Update sidebar active state
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el => el.classList.remove('active'));
-    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map' };
+    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto' };
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'downloads') carregarLlistaDescargues();
+    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); }
+    if (id === 'galeriaFotos') renderGaleria();
+
+    // FAB: visible only on home dashboard
+    const fab = document.getElementById('fab-foto-rapida');
+    if (fab) {
+        if (id === 'home') fab.classList.add('visible');
+        else fab.classList.remove('visible');
+    }
+
     window.scrollTo(0, 0);
-    // FABs: visibles SOLO en home de datacamp
-    const dcFab = document.getElementById('dcFabStack');
-    if (dcFab) dcFab.style.display = (id === 'home') ? 'flex' : 'none';
-    // Cerrar panel incidencies si estaba abierto
-    try { dcTancarIncPanel(); } catch(_) {}
 }
 
 function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
@@ -4368,7 +4546,7 @@ function mobileNavTo(id) {
 }
 function mobileNavToFoto() {
     closeMobileNav();
-    modeFotoDirecta();
+    abrirGaleria();
 }
 
 /* Close menus on outside click */
@@ -6118,6 +6296,262 @@ function eliminarLogo() {
 }
 
 /* ============================================================
+   GALERIA DE FOTOS RÀPIDES
+   ============================================================ */
+
+// IndexedDB store "galeriaFotos": { id, imgData, carr, pk, marge, ts, coordStr }
+
+let galeriaSelectMode = false;
+const galeriaSeleccio = new Set();
+let galeriaItems = [];      // cache local
+let visorCurrentId = null;  // id de la foto al visor
+
+/* Obre la pantalla galeria */
+function abrirGaleria() {
+    ir('galeriaFotos');
+}
+
+/* Carrega fotos des del dispositiu */
+function carregarFotoDispositiu() {
+    document.getElementById('galeriaLoadInput').click();
+}
+
+/* Processa fitxers carregats manualment */
+function galeriaCarregarFotos(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    const promises = files.map(f => new Promise((res) => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.readAsDataURL(f);
+    }));
+    Promise.all(promises).then(imgs => {
+        const tx = db.transaction("galeriaFotos","readwrite");
+        const store = tx.objectStore("galeriaFotos");
+        imgs.forEach(imgData => {
+            store.put({
+                id: 'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                imgData,
+                carr: '',
+                pk: '',
+                marge: '',
+                ts: Date.now(),
+                coordStr: ''
+            });
+        });
+        tx.oncomplete = () => { renderGaleria(); showToast(`📂 ${imgs.length} foto(es) carregada(es)`); };
+    });
+    input.value = '';
+}
+
+/* Llegeix totes les fotos de la galeria */
+function galeriaLlegirTotes(callback) {
+    if (!db.objectStoreNames.contains("galeriaFotos")) { callback([]); return; }
+    const store = db.transaction("galeriaFotos","readonly").objectStore("galeriaFotos");
+    store.getAll().onsuccess = e => callback(e.target.result || []);
+}
+
+/* Renderitza el grid */
+function renderGaleria() {
+    galeriaLlegirTotes(items => {
+        galeriaItems = items.sort((a,b) => b.ts - a.ts);
+        const grid  = document.getElementById('galeriaGrid');
+        const empty = document.getElementById('galeriaEmpty');
+        const badge = document.getElementById('galeriaBadge');
+        if (!grid) return;
+
+        badge.textContent = `${items.length} foto${items.length !== 1 ? 's' : ''}`;
+
+        if (items.length === 0) {
+            grid.innerHTML = '';
+            if (empty) empty.style.display = 'block';
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+
+        grid.innerHTML = items.map(item => {
+            const roadLabel = item.carr || '—';
+            const pkLabel   = item.pk   ? `PK ${item.pk}` : '';
+            const sel       = galeriaSeleccio.has(item.id) ? 'selected' : '';
+            return `
+            <div class="galeria-thumb ${sel}" data-id="${item.id}" onclick="galeriaThumbnailClick('${item.id}')">
+                <img src="${item.imgData}" loading="lazy" alt="${roadLabel}">
+                <div class="galeria-thumb-check">${sel ? '✓' : ''}</div>
+                <div class="galeria-thumb-info">
+                    <div class="galeria-thumb-road">${roadLabel}</div>
+                    ${pkLabel ? `<div class="galeria-thumb-pk">${pkLabel}</div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    });
+}
+
+/* Click en miniatura: si mode selecció → toggle; si no → obre visor */
+function galeriaThumbnailClick(id) {
+    if (galeriaSelectMode) {
+        galeriaToggleSeleccio(id);
+    } else {
+        galeriaObrirVisor(id);
+    }
+}
+
+/* Toggle selecció d'una foto */
+function galeriaToggleSeleccio(id) {
+    if (galeriaSeleccio.has(id)) galeriaSeleccio.delete(id);
+    else galeriaSeleccio.add(id);
+    const thumb = document.querySelector(`.galeria-thumb[data-id="${id}"]`);
+    if (thumb) {
+        thumb.classList.toggle('selected', galeriaSeleccio.has(id));
+        const check = thumb.querySelector('.galeria-thumb-check');
+        if (check) check.textContent = galeriaSeleccio.has(id) ? '✓' : '';
+    }
+    actualizarSelectBar();
+}
+
+/* Activar/desactivar mode selecció */
+function toggleSelectMode() {
+    galeriaSelectMode = !galeriaSelectMode;
+    galeriaSeleccio.clear();
+    const grid     = document.getElementById('galeriaGrid');
+    const bar      = document.getElementById('galeriaSelectBar');
+    const btnSel   = document.getElementById('btnSelectMode');
+    if (galeriaSelectMode) {
+        grid.classList.add('galeria-select-mode');
+        bar?.classList.add('visible');
+        btnSel?.classList.add('active');
+    } else {
+        grid.classList.remove('galeria-select-mode');
+        bar?.classList.remove('visible');
+        btnSel?.classList.remove('active');
+        // Clear visual selection
+        document.querySelectorAll('.galeria-thumb.selected').forEach(t => {
+            t.classList.remove('selected');
+            const c = t.querySelector('.galeria-thumb-check');
+            if (c) c.textContent = '';
+        });
+    }
+    actualizarSelectBar();
+}
+
+/* Actualitza comptador barra selecció */
+function actualizarSelectBar() {
+    const count = document.getElementById('galeriaSelectCount');
+    if (count) count.textContent = `${galeriaSeleccio.size} seleccionada${galeriaSeleccio.size !== 1 ? 'es' : ''}`;
+}
+
+/* Eliminar fotos seleccionades */
+function galeriaEliminarSeleccio() {
+    if (galeriaSeleccio.size === 0) { showToast('Cap foto seleccionada'); return; }
+    const ids = Array.from(galeriaSeleccio);
+    const tx  = db.transaction("galeriaFotos","readwrite");
+    const store = tx.objectStore("galeriaFotos");
+    ids.forEach(id => store.delete(id));
+    tx.oncomplete = () => {
+        galeriaSeleccio.clear();
+        toggleSelectMode();
+        renderGaleria();
+        showToast(`🗑️ ${ids.length} foto(es) eliminada(es)`);
+    };
+}
+
+/* Compartir fotos seleccionades */
+async function galeriaCompartirSeleccio() {
+    if (galeriaSeleccio.size === 0) { showToast('Cap foto seleccionada'); return; }
+    const ids   = Array.from(galeriaSeleccio);
+    const items = galeriaItems.filter(i => ids.includes(i.id));
+    try {
+        const files = await Promise.all(items.map(async (item, idx) => {
+            const res  = await fetch(item.imgData);
+            const blob = await res.blob();
+            const name = item.carr
+                ? `${item.carr}_PK${item.pk}_${item.marge || ''}_${idx+1}.jpg`.replace(/[^a-z0-9_.-]/gi,'_')
+                : `foto_rapida_${idx+1}.jpg`;
+            return new File([blob], name, { type: 'image/jpeg' });
+        }));
+        if (navigator.canShare && navigator.canShare({ files })) {
+            await navigator.share({ files, title: 'Fotos Ràpides DATACAMP' });
+        } else {
+            // Fallback: descarregar totes
+            files.forEach(f => {
+                const url = URL.createObjectURL(f);
+                const a = document.createElement('a');
+                a.href = url; a.download = f.name;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+            });
+            showToast(`💾 ${files.length} fotos descarregades`);
+        }
+    } catch (e) {
+        if (e.name !== 'AbortError') showToast('❌ Error en compartir');
+    }
+}
+
+/* ──── VISOR ─────────────────────────────────────────────── */
+function galeriaObrirVisor(id) {
+    const item = galeriaItems.find(i => i.id === id);
+    if (!item) return;
+    visorCurrentId = id;
+    const visor = document.getElementById('galeriaVisor');
+    const img   = document.getElementById('visorImg');
+    const title = document.getElementById('visorTitle');
+    img.src = item.imgData;
+    let t = item.carr || 'Foto Ràpida';
+    if (item.pk) t += ` — PK ${item.pk}`;
+    if (item.marge) t += ` (${item.marge})`;
+    title.textContent = t;
+    visor.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function tancarVisor() {
+    document.getElementById('galeriaVisor').classList.remove('open');
+    document.getElementById('visorImg').src = '';
+    document.body.style.overflow = '';
+    visorCurrentId = null;
+}
+
+async function visorCompartir() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    try {
+        const res  = await fetch(item.imgData);
+        const blob = await res.blob();
+        const name = item.carr
+            ? `${item.carr}_PK${item.pk}_${item.marge || ''}.jpg`.replace(/[^a-z0-9_.-]/gi,'_')
+            : 'foto_rapida.jpg';
+        const file = new File([blob], name, { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: name });
+        } else {
+            visorDescarregar();
+        }
+    } catch(e) {
+        if (e.name !== 'AbortError') visorDescarregar();
+    }
+}
+
+function visorDescarregar() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    const name = item.carr
+        ? `${item.carr}_PK${item.pk}_${item.marge || ''}.jpg`.replace(/[^a-z0-9_.-]/gi,'_')
+        : 'foto_rapida.jpg';
+    const a = document.createElement('a');
+    a.href = item.imgData;
+    a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast(`💾 ${name}`);
+}
+
+/* Tancar visor amb Escape */
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        const visor = document.getElementById('galeriaVisor');
+        if (visor?.classList.contains('open')) tancarVisor();
+    }
+});
+
+/* ============================================================
    FOTO DIRECTA
    ============================================================ */
 function modeFotoDirecta() {
@@ -6266,6 +6700,7 @@ function obrirEditorFotoDirecta(imgData) {
                             fdAutopkMostrarEstat('', '🔎', 'Ampliant zona de cerca...');
                             punts = await consultarArcGIS(lat, lon, 0.10);
                         }
+                        punts = blacklistFiltrarPunts(punts);
                         const resultat = calcularPKdePunts(lat, lon, punts);
                         if (!resultat) {
                             fdAutopkMostrarEstat('warning', '🏙️', 'No s\'han trobat PKs de carretera a prop. Zona urbana o fora de la xarxa.');
@@ -6360,7 +6795,7 @@ async function guardarFotoDirecta(imgData) {
     const res = await fetch(finalImg);
     currentBlob = await res.blob();
 
-    // --- Save to Historial ---
+    // --- Save to Historial + Galeria ---
     const saveToHistorial = async (coordStr) => {
         if (!db) return;
         const projecteCaptura = {
@@ -6386,8 +6821,18 @@ async function guardarFotoDirecta(imgData) {
             tipusEntrada: 'captura'
         };
         db.transaction("projects","readwrite").objectStore("projects").put(projecteCaptura);
-        // Refresh cache if list is visible
         allProjectsCache.push(projecteCaptura);
+
+        // Also save to galeriaFotos store
+        if (db.objectStoreNames.contains("galeriaFotos")) {
+            db.transaction("galeriaFotos","readwrite").objectStore("galeriaFotos").put({
+                id:       'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                imgData:  finalImg,
+                carr, pk, marge,
+                ts:       ara.getTime(),
+                coordStr: coordStr || ''
+            });
+        }
     };
 
     // Try geolocation (non-blocking)
@@ -6425,7 +6870,7 @@ async function guardarFotoDirecta(imgData) {
     /* Close the editor screen and return home */
     document.getElementById('screen-foto-directa')?.remove();
     ir('home');
-    showToast(`📸 Foto descarregada: ${currentFileName}`);
+    showToast(`📸 Foto guardada a la galeria`);
 }
 
 /* ============================================================
@@ -7393,6 +7838,79 @@ function actualizarDBWithGeo(t) {
 }
 
 /* ============================================================
+   LLISTA NEGRA DE CARRETERES
+   Persistida a localStorage. El motor AutoPK la consulta abans
+   de retornar qualsevol resultat.
+   ============================================================ */
+const BLACKLIST_KEY = 'datacamp_blacklist_v1';
+
+function blacklistCarregar() {
+    try {
+        const raw = localStorage.getItem(BLACKLIST_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+}
+function blacklistGuardar(llista) {
+    try { localStorage.setItem(BLACKLIST_KEY, JSON.stringify(llista)); } catch(e) {}
+}
+function blacklistGet() {
+    return blacklistCarregar();
+}
+
+function blacklistAfegir() {
+    const inp = document.getElementById('blacklistInput');
+    if (!inp) return;
+    const val = inp.value.trim().toUpperCase().replace(/\s+/g, ' ');
+    if (!val) return;
+    const llista = blacklistCarregar();
+    if (llista.includes(val)) {
+        showToast('⚠️ Ja és a la llista negra');
+        inp.value = '';
+        return;
+    }
+    llista.push(val);
+    blacklistGuardar(llista);
+    inp.value = '';
+    blacklistRenderChips();
+    showToast(`🚫 "${val}" afegida a la llista negra`);
+}
+
+function blacklistEliminar(carr) {
+    const llista = blacklistCarregar().filter(c => c !== carr);
+    blacklistGuardar(llista);
+    blacklistRenderChips();
+    showToast(`✅ "${carr}" eliminada de la llista negra`);
+}
+
+function blacklistRenderChips() {
+    const container = document.getElementById('blacklistChips');
+    const emptyMsg  = document.getElementById('blacklistEmpty');
+    if (!container) return;
+    const llista = blacklistCarregar();
+    if (llista.length === 0) {
+        container.innerHTML = '<span class="blacklist-empty" id="blacklistEmpty">Cap carretera exclosa</span>';
+        return;
+    }
+    container.innerHTML = llista.map(c => `
+        <span class="blacklist-chip">
+            ${c}
+            <button class="blacklist-chip-del" onclick="blacklistEliminar('${c}')" title="Eliminar">✕</button>
+        </span>`).join('');
+}
+
+/* Filtra una llista de punts PK excloent les carreteres a la blacklist */
+function blacklistFiltrarPunts(punts) {
+    const llista = blacklistGet();
+    if (llista.length === 0) return punts;
+    return punts.filter(p => !llista.includes((p.carretera || '').toUpperCase().trim()));
+}
+
+/* Inicialitzar chips quan es carrega la pàgina */
+window.addEventListener('DOMContentLoaded', () => {
+    blacklistRenderChips();
+});
+
+/* ============================================================
    AUTO-PK — MÒDUL DE GEOLOCALITZACIÓ INTEL·LIGENT
    Detecció automàtica de carretera i Punt Kilométric (PK)
    mitjançant l'API REST d'ArcGIS de la Generalitat de Catalunya
@@ -7595,6 +8113,7 @@ function cercarEnCache(lat, lon, bufferGraus = 0.05) {
 function calcularPKdePunts(userLat, userLon, punts) {
     if (!punts || punts.length === 0) return null;
 
+    // Agrupar per carretera
     const perCarretera = {};
     punts.forEach(p => {
         if (!perCarretera[p.carretera]) perCarretera[p.carretera] = [];
@@ -7602,31 +8121,30 @@ function calcularPKdePunts(userLat, userLon, punts) {
     });
 
     let millor = null;
-    // Store all candidates per road for multi-road selector
-    window._dcCandidats = [];
 
     Object.entries(perCarretera).forEach(([carr, pks]) => {
+        // Ordenar per PK
         pks.sort((a, b) => a.pk - b.pk);
-        let millorCarr = null;
+
+        // Provar tots els parells consecutius
         for (let i = 0; i < pks.length - 1; i++) {
             const res = interpolarPK(userLat, userLon, pks[i], pks[i+1]);
-            if (res && (!millorCarr || res.dist < millorCarr.dist)) millorCarr = res;
+            if (res && (!millor || res.dist < millor.dist)) {
+                millor = res;
+            }
         }
-        if (!millorCarr && pks.length === 1) {
-            const d = distanciaM(userLat, userLon, pks[0].lat, pks[0].lon);
-            millorCarr = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk % 1) * 1000), carretera: carr, dist: d };
-        }
-        if (millorCarr) {
-            window._dcCandidats.push(millorCarr);
-            if (!millor || millorCarr.dist < millor.dist) millor = millorCarr;
+
+        // Si només hi ha un punt, usem distància directa
+        if (pks.length === 1) {
+            const d = haversineM(userLat, userLon, pks[0].lat, pks[0].lon);
+            if (!millor || d < millor.dist) {
+                millor = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk % 1) * 1000), carretera: carr, dist: d };
+            }
         }
     });
 
-    // Sort candidates by distance
-    window._dcCandidats.sort((a, b) => a.dist - b.dist);
     return millor;
 }
-
 
 /* ============================================================
    DETECCIÓ PC / GPS NO DISPONIBLE
@@ -7636,6 +8154,191 @@ function detectarModePC() {
     const ua = navigator.userAgent.toLowerCase();
     const esMobile = /android|iphone|ipad|ipod|mobile|tablet/i.test(ua);
     return !esMobile;
+}
+
+/* ============================================================
+   PK WIDGET — Dashboard Home
+   Widget lleuger que reutilitza el motor AutoPK existent.
+   Mostra el resultat directament al dashboard sense tocar el formulari.
+   Si hi ha múltiples carreteres properes, mostra chips seleccionables.
+   ============================================================ */
+
+let _pkWidgetRunning = false;
+let _pkWidgetResultats = []; // tots els resultats per carretera
+let _pkWidgetSelected = null; // resultat seleccionat
+
+function pkWidgetReset() {
+    document.getElementById('pkWidgetIdle').style.display = 'flex';
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
+}
+
+function pkWidgetSetLoading(actiu) {
+    _pkWidgetRunning = actiu;
+    const btn   = document.getElementById('pkWidgetBtn');
+    const pulse = document.getElementById('pkWidgetPulse');
+    const txt   = document.getElementById('pkWidgetBtnTxt');
+    if (!btn) return;
+    btn.disabled = actiu;
+    if (pulse) pulse.style.display = actiu ? 'inline-block' : 'none';
+    if (txt)   txt.textContent     = actiu ? 'DETECTANT...' : '🔍 DETECTAR';
+}
+
+function pkWidgetMostrarResultat(resultat) {
+    // Amagar la resta
+    document.getElementById('pkWidgetIdle').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
+    // Mostrar resultat principal
+    const msStr = String(resultat.m).padStart(3, '0');
+    document.getElementById('pkResultRoad').textContent = resultat.carretera;
+    document.getElementById('pkResultPK').textContent   = `PK ${resultat.km}+${msStr}`;
+    document.getElementById('pkResultMeta').textContent = `±${Math.round(resultat.dist)}m de la calçada`;
+    document.getElementById('pkWidgetResult').style.display = 'flex';
+    _pkWidgetSelected = resultat;
+}
+
+function pkWidgetMostrarChips(resultats) {
+    // Amagar la resta
+    document.getElementById('pkWidgetIdle').style.display = 'none';
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
+    // Construir chips
+    const row = document.getElementById('pkChipsRow');
+    row.innerHTML = resultats.map((r, i) => {
+        const msStr = String(r.m).padStart(3, '0');
+        return `<button class="pk-chip${i === 0 ? ' selected' : ''}" onclick="pkWidgetSeleccionarChip(${i})" data-chip="${i}">
+            <span class="pk-chip-road">${r.carretera}</span>
+            <span class="pk-chip-pk">PK ${r.km}+${msStr}</span>
+            <span class="pk-chip-dist">±${Math.round(r.dist)}m</span>
+        </button>`;
+    }).join('');
+    document.getElementById('pkChipsArea').style.display = 'block';
+    // Seleccionar el primer per defecte
+    pkWidgetSeleccionarChip(0);
+}
+
+function pkWidgetSeleccionarChip(idx) {
+    _pkWidgetSelected = _pkWidgetResultats[idx];
+    // Actualitzar visual
+    document.querySelectorAll('#pkChipsRow .pk-chip').forEach((el, i) => {
+        el.classList.toggle('selected', i === idx);
+    });
+}
+
+function pkWidgetMostrarError(icon, text) {
+    document.getElementById('pkWidgetIdle').style.display = 'none';
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkWidgetMsgIcon').textContent = icon;
+    document.getElementById('pkWidgetMsgTxt').textContent  = text;
+    document.getElementById('pkWidgetMsg').style.display   = 'flex';
+}
+
+/** Calcula PK per a TOTES les carreteres (no només la millor) */
+function calcularPKperCarreteraWidget(userLat, userLon, punts) {
+    if (!punts || punts.length === 0) return [];
+
+    const perCarretera = {};
+    punts.forEach(p => {
+        if (!perCarretera[p.carretera]) perCarretera[p.carretera] = [];
+        perCarretera[p.carretera].push(p);
+    });
+
+    const resultats = [];
+    Object.entries(perCarretera).forEach(([carr, pks]) => {
+        pks.sort((a, b) => a.pk - b.pk);
+        let millor = null;
+        for (let i = 0; i < pks.length - 1; i++) {
+            const res = interpolarPK(userLat, userLon, pks[i], pks[i+1]);
+            if (res && (!millor || res.dist < millor.dist)) millor = res;
+        }
+        if (!millor && pks.length === 1) {
+            const d = haversineM(userLat, userLon, pks[0].lat, pks[0].lon);
+            millor = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk % 1) * 1000), carretera: carr, dist: d };
+        }
+        if (millor && millor.dist <= AUTOPK_CONFIG.LLINDAR_CARRETERA_M) resultats.push(millor);
+    });
+
+    // Ordenar per distància: la més propera primer
+    resultats.sort((a, b) => a.dist - b.dist);
+    return resultats;
+}
+
+async function executarAutoPKWidget() {
+    if (_pkWidgetRunning) return;
+
+    if (!navigator.geolocation) {
+        pkWidgetMostrarError('🚫', 'El navegador no admet geolocalització.');
+        return;
+    }
+
+    pkWidgetReset();
+    pkWidgetSetLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+            const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+            try {
+                let punts = [];
+                const bufferGraus = 0.04;
+                const cacheLocal = cercarEnCache(lat, lon, bufferGraus);
+                if (cacheLocal.length > 0) {
+                    punts = cacheLocal;
+                } else {
+                    punts = await consultarArcGIS(lat, lon, bufferGraus);
+                }
+                if (punts.length === 0) {
+                    punts = await consultarArcGIS(lat, lon, 0.10);
+                }
+
+                punts = blacklistFiltrarPunts(punts);
+                _pkWidgetResultats = calcularPKperCarreteraWidget(lat, lon, punts);
+
+                if (_pkWidgetResultats.length === 0) {
+                    pkWidgetMostrarError('🏙️', 'No s\'han trobat carreteres properes. Zona urbana o fora de xarxa.');
+                } else if (_pkWidgetResultats.length === 1) {
+                    pkWidgetMostrarResultat(_pkWidgetResultats[0]);
+                    showToast(`📍 ${_pkWidgetResultats[0].carretera} — PK ${_pkWidgetResultats[0].km}+${String(_pkWidgetResultats[0].m).padStart(3,'0')}`);
+                } else {
+                    // Múltiples carreteres properes → chips
+                    pkWidgetMostrarChips(_pkWidgetResultats);
+                    showToast(`📍 ${_pkWidgetResultats.length} carreteres properes detectades`);
+                }
+            } catch (err) {
+                // Fallback cache
+                const cache = cercarEnCache(lat, lon, 0.10);
+                if (cache.length > 0) {
+                    _pkWidgetResultats = calcularPKperCarreteraWidget(lat, lon, cache);
+                    if (_pkWidgetResultats.length === 1) {
+                        pkWidgetMostrarResultat(_pkWidgetResultats[0]);
+                    } else if (_pkWidgetResultats.length > 1) {
+                        pkWidgetMostrarChips(_pkWidgetResultats);
+                    } else {
+                        pkWidgetMostrarError('📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
+                    }
+                } else {
+                    pkWidgetMostrarError('🔴', 'Error de connexió. Ves a Configuració → Sincro PKs per activar el mode offline.');
+                }
+            }
+            pkWidgetSetLoading(false);
+        },
+        (err) => {
+            pkWidgetSetLoading(false);
+            switch (err.code) {
+                case err.PERMISSION_DENIED:
+                    pkWidgetMostrarError('🔒', 'Permís GPS denegat. Activa\'l a la configuració del dispositiu.'); break;
+                case err.POSITION_UNAVAILABLE:
+                    pkWidgetMostrarError('📡', 'GPS no disponible. Comprova que el GPS és activat.'); break;
+                case err.TIMEOUT:
+                    pkWidgetMostrarError('⏱️', 'GPS lent. Prova en un lloc amb millor cobertura.'); break;
+                default:
+                    pkWidgetMostrarError('🚫', 'Error GPS. Introdueix les dades manualment.');
+            }
+        },
+        { enableHighAccuracy: true, timeout: AUTOPK_CONFIG.GPS_TIMEOUT, maximumAge: AUTOPK_CONFIG.GPS_MAX_AGE }
+    );
 }
 
 /* ============================================================
@@ -7698,6 +8401,7 @@ async function executarAutoPK() {
                     punts = await consultarArcGIS(lat, lon, 0.10);
                 }
 
+                punts = blacklistFiltrarPunts(punts);
                 const resultat = calcularPKdePunts(lat, lon, punts);
 
                 if (!resultat) {
@@ -7711,8 +8415,6 @@ async function executarAutoPK() {
                     autopkMostrarEstat('warning', '⚠️',
                         `Carretera més propera: ${resultat.carretera} (${Math.round(resultat.dist)}m). Fora de la zona de carretera (>${AUTOPK_CONFIG.LLINDAR_CARRETERA_M}m).`);
                     showToast(`⚠️ Fora de l'àrea de la carretera (${Math.round(resultat.dist)}m)`);
-                    window._dcLastPK = { lat, lon, acc: accuracy, carretera: resultat.carretera, km: resultat.km, m: resultat.m, dist: resultat.dist };
-                    dcMostrarExtraPK(resultat.carretera);
                 } else {
                     // ✅ Èxit! Omplir camps del formulari
                     const msStr = String(resultat.m).padStart(3, '0');
@@ -7720,9 +8422,6 @@ async function executarAutoPK() {
                     autopkMostrarEstat('success', '✅',
                         `${resultat.carretera}  •  PK ${resultat.km}+${msStr}  •  ±${Math.round(resultat.dist)}m de la calçada  •  GPS ±${Math.round(accuracy)}m`);
                     showToast(`📍 ${resultat.carretera} — PK ${resultat.km}+${msStr}`);
-                    // Store last result for extra features
-                    window._dcLastPK = { lat, lon, acc: accuracy, carretera: resultat.carretera, km: resultat.km, m: resultat.m, dist: resultat.dist };
-                    dcMostrarExtraPK(resultat.carretera);
                 }
 
             } catch (err) {
@@ -7972,1333 +8671,5 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     document.addEventListener('DOMContentLoaded', () => setTimeout(_updateOnlineBadge, 200));
 }
 
-
-/* ═══════════════════════════════════════════════════════════
-   MÓDULO GPS/PK + INCIDÈNCIES + GALERIA
-   Port de PK-GEOLOC → DataCamp. Prefijo dc_ per evitar conflictes.
-═══════════════════════════════════════════════════════════ */
-
-/* ── Configuració ────────────────────────────────────────── */
-const DC_IDB_NAME  = 'dc_pkmod_v1';
-const DC_IDB_VER   = 1;
-const DC_STORE_INC    = 'incidencies';
-const DC_STORE_PHOTOS = 'fotos';
-const DC_STORE_CACHE  = 'pk_cache';
-const DC_ARCGIS_URL   = 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query';
-let DC_LLINDAR = 150;
-
-/* ── IndexedDB ───────────────────────────────────────────── */
-let dcDb = null;
-function dcInitDB() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open(DC_IDB_NAME, DC_IDB_VER);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(DC_STORE_CACHE))
-        d.createObjectStore(DC_STORE_CACHE, { keyPath: 'id' });
-      if (!d.objectStoreNames.contains(DC_STORE_INC))
-        d.createObjectStore(DC_STORE_INC, { keyPath: 'id', autoIncrement: true });
-      if (!d.objectStoreNames.contains(DC_STORE_PHOTOS))
-        d.createObjectStore(DC_STORE_PHOTOS, { keyPath: 'id', autoIncrement: true });
-    };
-    req.onsuccess = e => { dcDb = e.target.result; res(dcDb); };
-    req.onerror = () => rej(req.error);
-  });
-}
-async function dcIdbReady() {
-  if (!dcDb) { try { await dcInitDB(); } catch(e) { throw new Error('IndexedDB no disponible: ' + e?.message); } }
-  return dcDb;
-}
-async function dcIdbGet(store, key) {
-  await dcIdbReady();
-  return new Promise((res,rej) => {
-    const tx = dcDb.transaction(store,'readonly');
-    const req = tx.objectStore(store).get(key);
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-async function dcIdbPut(store, obj) {
-  await dcIdbReady();
-  return new Promise((res,rej) => {
-    const tx = dcDb.transaction(store,'readwrite');
-    const req = tx.objectStore(store).put(obj);
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-async function dcIdbAdd(store, obj) {
-  await dcIdbReady();
-  return new Promise((res,rej) => {
-    const tx = dcDb.transaction(store,'readwrite');
-    const req = tx.objectStore(store).add(obj);
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-async function dcIdbGetAll(store) {
-  await dcIdbReady();
-  return new Promise((res,rej) => {
-    const tx = dcDb.transaction(store,'readonly');
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-async function dcIdbDelete(store, key) {
-  await dcIdbReady();
-  return new Promise((res,rej) => {
-    const tx = dcDb.transaction(store,'readwrite');
-    const req = tx.objectStore(store).delete(key);
-    req.onsuccess = () => res();
-    req.onerror = () => rej(req.error);
-  });
-}
-
-/* ── Motor geogràfic (Haversine) ─────────────────────────── */
-function dcHaversineM(la1,lo1,la2,lo2){
-  const R=6371000,r=d=>d*Math.PI/180;
-  const dLa=r(la2-la1),dLo=r(lo2-lo1);
-  const a=Math.sin(dLa/2)**2+Math.cos(r(la1))*Math.cos(r(la2))*Math.sin(dLo/2)**2;
-  return R*2*Math.asin(Math.sqrt(a));
-}
-function dcInterpolarPK(uLat,uLon,pA,pB){
-  const dA=dcHaversineM(uLat,uLon,pA.lat,pA.lon);
-  const dB=dcHaversineM(uLat,uLon,pB.lat,pB.lon);
-  const dAB=dcHaversineM(pA.lat,pA.lon,pB.lat,pB.lon);
-  if(dAB<0.1) return null;
-  const t=Math.max(0,Math.min(1,(dA*dA+dAB*dAB-dB*dB)/(2*dAB*dAB)));
-  const pLat=pA.lat+(pB.lat-pA.lat)*t;
-  const pLon=pA.lon+(pB.lon-pA.lon)*t;
-  const dist=dcHaversineM(uLat,uLon,pLat,pLon);
-  const pkInt=pA.pk+(pB.pk-pA.pk)*t;
-  return{pkDec:pkInt,lat:pLat,lon:pLon,dist,carretera:pA.carretera};
-}
-function dcCalcularPK(lat,lon,punts){
-  if(!punts||punts.length<2) return null;
-  // Agrupar per carretera
-  const grups={};
-  for(const p of punts){
-    if(!grups[p.carretera]) grups[p.carretera]=[];
-    grups[p.carretera].push(p);
-  }
-  let best=null;
-  for(const carr in grups){
-    const ps=grups[carr].sort((a,b)=>a.pk-b.pk);
-    for(let i=0;i<ps.length-1;i++){
-      const r=dcInterpolarPK(lat,lon,ps[i],ps[i+1]);
-      if(r&&(!best||r.dist<best.dist)){
-        const km=Math.floor(r.pkDec);
-        const m=Math.round((r.pkDec-km)*1000);
-        best={carretera:carr,km,m,dist:r.dist,pkDec:r.pkDec};
-      }
-    }
-  }
-  return best;
-}
-
-/* ── Cache local i ArcGIS ────────────────────────────────── */
-let dcPkCache = null;
-async function dcCarregarCache(){
-  if(dcPkCache) return dcPkCache;
-  try{
-    const row=await dcIdbGet(DC_STORE_CACHE,'pks');
-    dcPkCache=row?.data||null;
-  }catch{dcPkCache=null;}
-  return dcPkCache;
-}
-function dcFiltrarCache(lat,lon,buf=0.06){
-  if(!Array.isArray(dcPkCache)) return [];
-  return dcPkCache.filter(p=>p.lat>=lat-buf&&p.lat<=lat+buf&&p.lon>=lon-buf&&p.lon<=lon+buf);
-}
-function dcFiltrarSeed(lat,lon,buf=0.08){
-  if(typeof PK_SEED==='undefined') return [];
-  const res=[],lMin=lat-buf,lMax=lat+buf,oMin=lon-buf,oMax=lon+buf;
-  for(const c in PK_SEED){
-    for(const[pk,pL,pO] of PK_SEED[c]){
-      if(pL>=lMin&&pL<=lMax&&pO>=oMin&&pO<=oMax) res.push({carretera:c,pk,lat:pL,lon:pO});
-    }
-  }
-  return res;
-}
-async function dcConsultarArcGIS(lat,lon,buf=0.06){
-  if(!navigator.onLine) throw new Error('OFFLINE');
-  const params=new URLSearchParams({
-    where:'1=1',
-    geometry:`${lon-buf},${lat-buf},${lon+buf},${lat+buf}`,
-    geometryType:'esriGeometryEnvelope',inSR:'4326',spatialRel:'esriSpatialRelIntersects',
-    outFields:'nombre,numero',returnGeometry:true,outSR:'4326',f:'json',resultRecordCount:200
-  });
-  const r=await fetch(`${DC_ARCGIS_URL}?${params}`,{signal:AbortSignal.timeout(12000)});
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j=await r.json();
-  if(j.error) throw new Error(j.error.message||`Codi ${j.error.code}`);
-  return (j.features||[]).map(f=>({
-    carretera:f.attributes.nombre,
-    pk:parseFloat(f.attributes.numero),
-    lat:f.geometry.y,lon:f.geometry.x
-  })).filter(p=>p.carretera&&!isNaN(p.pk));
-}
-
-/* ── Obtenció posició fresca + PK ─────────────────────────── */
-let dcUltimaPos = null;
-let dcUltimResultatObj = null;
-let dcSentit = 'indeterminado';
-
-function dcObtenirPosicioFrescaAmbPK(timeout=10000){
-  return new Promise(resolve=>{
-    if(!navigator.geolocation){ resolve({pos:null,res:null,error:true}); return; }
-    navigator.geolocation.getCurrentPosition(
-      async geoPos=>{
-        const lat=geoPos.coords.latitude,lon=geoPos.coords.longitude,acc=geoPos.coords.accuracy;
-        const pos={lat,lon,acc};
-        dcUltimaPos=pos;
-        let res=null;
-        try{
-          let punts=dcFiltrarCache(lat,lon,0.05);
-          if(punts.length<2){ punts=dcFiltrarSeed(lat,lon,0.08); if(punts.length<2) punts=dcFiltrarSeed(lat,lon,0.15); }
-          if(punts.length<2&&navigator.onLine){ punts=await dcConsultarArcGIS(lat,lon,0.07); if(punts.length<2) punts=await dcConsultarArcGIS(lat,lon,0.12); }
-          const r=dcCalcularPK(lat,lon,punts);
-          if(r){ res=r; if(r.dist<=DC_LLINDAR) dcUltimResultatObj=r; }
-        }catch(e){
-          try{
-            let fb=dcFiltrarCache(lat,lon,0.12);
-            if(!fb.length){ fb=dcFiltrarSeed(lat,lon,0.15); if(fb.length<2) fb=dcFiltrarSeed(lat,lon,0.22); }
-            const r=dcCalcularPK(lat,lon,fb);
-            if(r){ res=r; if(r.dist<=DC_LLINDAR) dcUltimResultatObj=r; }
-          }catch(_){}
-        }
-        resolve({pos,res,error:false});
-      },
-      ()=>resolve({pos:dcUltimaPos,res:dcUltimResultatObj,error:true}),
-      {enableHighAccuracy:true,timeout,maximumAge:3000}
-    );
-  });
-}
-function dcCalDecisioManualPK(res){ return !res||res.dist==null||res.dist>DC_LLINDAR; }
-
-/* ── MODAL DECISIÓ PK ─────────────────────────────────────── */
-let dcPkDecisioResolve=null;
-let dcPkDecisioManualExpanded=false;
-function dcMostrarModalDecisioPK(pos,resAuto,context,mode='error'){
-  dcPkDecisioManualExpanded=false;
-  ['dcPkDmCarr','dcPkDmKm','dcPkDmM'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('dcPkDmFields').classList.remove('visible');
-  document.getElementById('dcPkDbManualBtn').textContent='✏️ INTRODUIR PK MANUAL';
-  const candidatesEl=document.getElementById('dcPkDmCandidates');
-  candidatesEl.style.display='none';candidatesEl.innerHTML='';
-  const titleEl=document.getElementById('dcPkDmTitle');
-  const subEl=document.getElementById('dcPkDmSub');
-  if(mode==='selector'){
-    titleEl.textContent='🔀 Confirma la carretera';titleEl.style.color='var(--accent-blue)';
-    const mStr=resAuto?String(resAuto.m).padStart(3,'0'):'';
-    subEl.innerHTML=resAuto?`Detectada: <strong>${resAuto.carretera} · PK ${resAuto.km}+${mStr}</strong> (${Math.round(resAuto.dist)} m).<br><br>Confirma o corregeix el PK:`:'Confirma o corregeix el PK:';
-  }else{
-    titleEl.textContent='⚠️ Punt fora de la carretera';titleEl.style.color='var(--primary)';
-    const dMsg=resAuto?.dist?`Distància: <strong>${Math.round(resAuto.dist)} m</strong> (llindar: ${DC_LLINDAR} m).`:'No s\'ha trobat cap carretera propera.';
-    subEl.innerHTML=`${dMsg}<br><br><strong>Introdueix el PK manualment o continua sense PK:</strong>`;
-  }
-  document.getElementById('dcPkDecisionModal').classList.add('open');
-  return new Promise(resolve=>{dcPkDecisioResolve=resolve;});
-}
-function dcPkDecisioManual(){
-  if(!dcPkDecisioManualExpanded){
-    dcPkDecisioManualExpanded=true;
-    document.getElementById('dcPkDmFields').classList.add('visible');
-    document.getElementById('dcPkDbManualBtn').textContent='✔ CONFIRMAR PK MANUAL';
-    document.getElementById('dcPkDmCarr').focus();
-    return;
-  }
-  const carr=document.getElementById('dcPkDmCarr').value.trim().toUpperCase();
-  const km=parseInt(document.getElementById('dcPkDmKm').value)||0;
-  const m=Math.min(999,parseInt(document.getElementById('dcPkDmM').value)||0);
-  if(!carr){showToast('⚠️ Introdueix la carretera (ex: C-26)');document.getElementById('dcPkDmCarr').focus();return;}
-  document.getElementById('dcPkDecisionModal').classList.remove('open');
-  if(dcPkDecisioResolve){dcPkDecisioResolve({res:{carretera:carr,km,m,dist:0,pkDec:km+m/1000},sensePK:false});dcPkDecisioResolve=null;}
-}
-function dcPkDecisioSensePK(){
-  document.getElementById('dcPkDecisionModal').classList.remove('open');
-  if(dcPkDecisioResolve){dcPkDecisioResolve({res:null,sensePK:true});dcPkDecisioResolve=null;}
-}
-function dcPkDecisioCancel(){
-  document.getElementById('dcPkDecisionModal').classList.remove('open');
-  if(dcPkDecisioResolve){dcPkDecisioResolve(null);dcPkDecisioResolve=null;}
-}
-
-/* ── MODAL CONFIRMAR PK ──────────────────────────────────── */
-let dcMcpResolve=null;
-function dcMostrarModalConfirmPK(carr='',km='',m=''){
-  document.getElementById('dcMcpCarr').value=carr;
-  document.getElementById('dcMcpKm').value=km;
-  document.getElementById('dcMcpM').value=m;
-  document.getElementById('dcModalConfirmPK').classList.add('open');
-  return new Promise(resolve=>{dcMcpResolve=resolve;});
-}
-function dcMcpConfirmar(){
-  const carr=document.getElementById('dcMcpCarr').value.trim().toUpperCase();
-  const km=parseInt(document.getElementById('dcMcpKm').value)||0;
-  const m=Math.min(999,parseInt(document.getElementById('dcMcpM').value)||0);
-  document.getElementById('dcModalConfirmPK').classList.remove('open');
-  if(dcMcpResolve){dcMcpResolve({carretera:carr,km,m});dcMcpResolve=null;}
-}
-function dcMcpCancel(){
-  document.getElementById('dcModalConfirmPK').classList.remove('open');
-  if(dcMcpResolve){dcMcpResolve(null);dcMcpResolve=null;}
-}
-
-/* ── NAVEGACIÓ PANTALLES ─────────────────────────────────── */
-function irAGaleria(){
-  const s=document.getElementById('dcScreenGaleria');
-  s.style.display='flex';
-  // FABs solo en home, no en galeria
-  document.getElementById('dcFabStack').style.display='none';
-  dcTancarIncPanel();
-  dcCanviarSubtabGaleria('fotos');
-}
-function dcCloseGaleriaScreen(){
-  document.getElementById('dcScreenGaleria').style.display='none';
-  document.getElementById('dcFabStack').style.display='flex';
-  dcTancarIncPanel();
-}
-function irAIncidencies(){
-  const s=document.getElementById('dcScreenIncidencies');
-  s.style.display='flex';
-  // FABs visibles en pantalla incidencies
-  document.getElementById('dcFabStack').style.display='flex';
-  dcTancarIncPanel();
-  dcRenderitzarIncidencies();
-}
-function dcCloseIncidenciesScreen(){
-  document.getElementById('dcScreenIncidencies').style.display='none';
-  document.getElementById('dcFabStack').style.display='flex';
-  dcTancarIncPanel();
-}
-
-/* ── FAB / PANEL INCIDENCIES RÀPIDES ─────────────────────── */
-let dcIncPanel_open=false;
-function dcToggleIncPanel(){
-  dcIncPanel_open=!dcIncPanel_open;
-  document.getElementById('dcIncPanel').classList.toggle('open',dcIncPanel_open);
-  document.getElementById('dcFabInc').textContent=dcIncPanel_open?'✕':'⚡';
-}
-function dcTancarIncPanel(){
-  dcIncPanel_open=false;
-  document.getElementById('dcIncPanel').classList.remove('open');
-  const fab=document.getElementById('dcFabInc');
-  if(fab) fab.textContent='⚡';
-}
-
-/* ── REGISTRAR INCIDENCIA ─────────────────────────────────── */
-async function dcRegistrarIncidencia(tipus,nom){
-  const btn=event?.target?.closest('.inc-btn-dc');
-  if(btn){btn.classList.add('inc-pressed');setTimeout(()=>btn.classList.remove('inc-pressed'),400);}
-  dcTancarIncPanel();
-  showToast('📡 Capturant posició exacta...');
-  const{pos,res:resAuto,error}=await dcObtenirPosicioFrescaAmbPK();
-  let resDefinitiu=resAuto,sensePK=false;
-  if(error||dcCalDecisioManualPK(resAuto)){
-    const d=await dcMostrarModalDecisioPK(pos,resAuto,tipus,'error');
-    if(d===null){showToast("❌ Registre cancel·lat");return;}
-    resDefinitiu=d.res;sensePK=d.sensePK;
-  }else{
-    const preCarr=resAuto?.carretera||'';
-    const preKm=resAuto?.km??'';
-    const preM=resAuto?.m??'';
-    const conf=await dcMostrarModalConfirmPK(preCarr,preKm,preM);
-    if(conf===null){showToast("❌ Registre cancel·lat");return;}
-    resDefinitiu={...resAuto,carretera:conf.carretera,km:conf.km,m:conf.m};
-    if(!conf.carretera||conf.carretera==='—') sensePK=true;
-  }
-  await dcGuardarIncidencia(tipus,nom,pos,resDefinitiu,sensePK);
-}
-
-async function dcGuardarIncidencia(tipus,nom,pos,res,sensePK=false){
-  const ara=new Date();
-  const inc={
-    tipus,nom,
-    carretera:sensePK?null:(res?.carretera||'—'),
-    km:sensePK?null:(res?.km??0),
-    m:sensePK?null:(res?.m??0),
-    sensePK,
-    lat:pos?.lat??null,lon:pos?.lon??null,acc:pos?.acc??null,
-    sentit:dcSentit,
-    ts:ara.toISOString(),
-    ts_legible:dcFormatarDataHora(ara),
-    fotoId:null,thumb:null,fotoId2:null,thumb2:null,
-  };
-  try{
-    const newId=await dcIdbAdd(DC_STORE_INC,inc);
-    const toastPK=sensePK
-      ?`📍 ${nom} — sense PK (coords GPS)`
-      :`✅ ${nom} — ${inc.carretera} PK ${inc.km}+${String(inc.m).padStart(3,'0')}`;
-    showToast(toastPK);
-    dcRenderitzarIncidencies();
-    dcMostrarSheetPostInc(newId,{...inc,id:newId});
-  }catch(e){showToast('❌ Error al desar la incidència: '+e.message);}
-}
-
-/* ── HOJA POST-INCIDENCIA ─────────────────────────────────── */
-let dcIncFotoPendentId=null,dcIncPostData=null,dcIncPostAutoTimer=null;
-function dcMostrarSheetPostInc(id,inc){
-  dcIncPostData=inc;
-  const sub=inc.sensePK
-    ?`Sense PK · ${inc.ts_legible}`
-    :`${inc.carretera} · PK ${inc.km}+${String(inc.m).padStart(3,'0')} · ${inc.ts_legible}`;
-  document.getElementById('dcIncPostTitle').textContent='INCIDÈNCIA DESADA';
-  document.getElementById('dcIncPostSub').textContent=sub;
-  document.getElementById('dcIncPostThumbWrap').style.display='none';
-  document.getElementById('dcIncPostThumb2').style.display='none';
-  document.getElementById('dcIncPostThumbBadge').textContent='📷 Foto adjunta';
-  document.getElementById('dcIncPostFotoBtn').style.display='flex';
-  document.getElementById('dcIncPostSheet').classList.add('open');
-  clearTimeout(dcIncPostAutoTimer);
-  dcIncPostAutoTimer=setTimeout(()=>dcTancarSheetPostInc(),9000);
-}
-function dcTancarSheetPostInc(){
-  clearTimeout(dcIncPostAutoTimer);
-  document.getElementById('dcIncPostSheet').classList.remove('open');
-  dcIncPostData=null;
-}
-async function dcAfegirFotoIncidencia(id){
-  clearTimeout(dcIncPostAutoTimer);
-  dcIncFotoPendentId=id??dcIncPostData?.id??null;
-  if(dcIncFotoPendentId==null){showToast("⚠️ Sense incidència associada");return;}
-  try{
-    const inc=await dcIdbGet(DC_STORE_INC,dcIncFotoPendentId);
-    if(inc&&inc.fotoId!=null&&inc.fotoId2!=null){showToast("⚠️ Màxim 2 fotos per incidència");return;}
-  }catch(_){}
-  document.getElementById('dcIncFotoSrcSheet').classList.add('open');
-}
-function dcTancarSheetFotoSrc(){document.getElementById('dcIncFotoSrcSheet').classList.remove('open');}
-function dcIncFotoCameraGo(){dcTancarSheetFotoSrc();if(dcIncFotoPendentId==null){showToast("⚠️ Sense incidència");return;}document.getElementById('dcInputIncFoto').click();}
-function dcIncFotoGaleriaGo(){dcTancarSheetFotoSrc();if(dcIncFotoPendentId==null){showToast("⚠️ Sense incidència");return;}document.getElementById('dcInputIncGaleria').click();}
-
-/* ── PROCESSAMENT FOTOS D'INCIDENCIA ─────────────────────── */
-async function dcProcessarFotoIncidencia(file,id){
-  try{
-    const inc=await dcIdbGet(DC_STORE_INC,id);
-    if(!inc){showToast("⚠️ Incidència no trobada");return;}
-    const preCarr=inc.sensePK?'':(inc.carretera||'');
-    const preKm=inc.sensePK?'':(inc.km??'');
-    const preM=inc.sensePK?'':(inc.m??'');
-    const conf=await dcMostrarModalConfirmPK(preCarr,preKm,preM);
-    if(conf===null){showToast("❌ Foto cancel·lada");return;}
-    const carr=conf.carretera,km=conf.km,m=conf.m,mStr=String(m).padStart(3,'0');
-    const sensePKFoto=(!carr||carr==='—');
-    const pkStr=sensePKFoto?(inc.lat&&inc.lon?`GPS ${inc.lat.toFixed(5)}, ${inc.lon.toFixed(5)}`:'Sense PK'):`${carr}, PK ${km}+${mStr}`;
-    const ara=inc.ts?new Date(inc.ts):new Date();
-    showToast('⏳ Processant foto…');
-    const blobFinal=await dcAplicarMarcaAigua(file,pkStr,ara);
-    const thumb=await dcFerThumbnail(blobFinal,96);
-    const nomFitxer=`${sensePKFoto?'GPS':carr.replace(/[^A-Z0-9]/g,'_')}_${km}+${mStr}_${dcDataHoraFitxer(ara)}.jpg`;
-    const fotoId=await dcIdbAdd(DC_STORE_PHOTOS,{
-      nom:nomFitxer,blob:blobFinal,
-      carretera:sensePKFoto?null:carr,km:sensePKFoto?null:km,m:sensePKFoto?null:m,sensePK:sensePKFoto,
-      lat:inc.lat,lon:inc.lon,ts:ara.toISOString(),ts_legible:pkStr,incId:id,
-    });
-    const esSegona=inc.fotoId!=null;
-    if(esSegona){inc.fotoId2=fotoId;inc.thumb2=thumb;}
-    else{inc.fotoId=fotoId;inc.thumb=thumb;}
-    if(!sensePKFoto){inc.carretera=carr;inc.km=km;inc.m=m;inc.sensePK=false;}
-    await dcIdbPut(DC_STORE_INC,inc);
-    dcRenderitzarIncidencies();
-    dcRenderitzarFotos();
-    showToast('📸 Foto afegida a la incidència');
-    if(dcIncPostData&&dcIncPostData.id===id){
-      if(esSegona){
-        dcIncPostData.fotoId2=fotoId;dcIncPostData.thumb2=thumb;
-        document.getElementById('dcIncPostThumb2').src=thumb;
-        document.getElementById('dcIncPostThumb2').style.display='';
-        document.getElementById('dcIncPostThumbBadge').textContent='📷 2 fotos adjuntes';
-        document.getElementById('dcIncPostFotoBtn').style.display='none';
-      }else{
-        dcIncPostData.fotoId=fotoId;dcIncPostData.thumb=thumb;
-        document.getElementById('dcIncPostThumb').src=thumb;
-        document.getElementById('dcIncPostThumbWrap').style.display='flex';
-        document.getElementById('dcIncPostFotoBtn').textContent='📷 Afegeix altra foto';
-      }
-      clearTimeout(dcIncPostAutoTimer);
-      dcIncPostAutoTimer=setTimeout(()=>dcTancarSheetPostInc(),9000);
-    }
-  }catch(err){showToast('❌ Error al processar la foto: '+err.message);}
-}
-
-document.getElementById('dcInputIncFoto').addEventListener('change',async function(e){
-  const file=e.target.files?.[0];this.value='';
-  if(!file||dcIncFotoPendentId==null) return;
-  await dcProcessarFotoIncidencia(file,dcIncFotoPendentId);
-});
-document.getElementById('dcInputIncGaleria').addEventListener('change',async function(e){
-  const file=e.target.files?.[0];this.value='';
-  if(!file||dcIncFotoPendentId==null) return;
-  await dcProcessarFotoIncidencia(file,dcIncFotoPendentId);
-});
-
-/* ── VISOR FOTO INCIDENCIA ────────────────────────────────── */
-let dcIfvFotoId=null,dcIfvBlob=null,dcIfvNom='';
-async function dcObrirFotoIncidencia(fotoId){
-  try{
-    const foto=await dcIdbGet(DC_STORE_PHOTOS,fotoId);
-    if(!foto?.blob){showToast("⚠️ Foto no disponible");return;}
-    dcIfvFotoId=fotoId;dcIfvBlob=foto.blob;dcIfvNom=foto.nom||'foto_incidencia.jpg';
-    document.getElementById('dcIfvImg').src=URL.createObjectURL(foto.blob);
-    let titol=dcIfvNom.replace('.jpg','').replace(/_/g,' ');
-    if(foto.incId!=null){
-      try{const inc=await dcIdbGet(DC_STORE_INC,foto.incId);if(inc)titol=dcTipusIcon(inc.tipus)+' '+dcNomIncidencia(inc.tipus);}catch(_){}
-    }
-    document.getElementById('dcIfvTitle').textContent=titol;
-    document.getElementById('dcIncFotoViewer').classList.add('open');
-  }catch(e){showToast("❌ No s'ha pogut obrir la foto");}
-}
-function dcCloseIncFotoViewer(){
-  document.getElementById('dcIncFotoViewer').classList.remove('open');
-  document.getElementById('dcIfvImg').src='';
-  dcIfvFotoId=null;dcIfvBlob=null;dcIfvNom='';
-}
-async function dcCompartirFotoIncVisor(){
-  if(!dcIfvBlob){showToast('⚠️ Sense foto oberta');return;}
-  const file=new File([dcIfvBlob],dcIfvNom,{type:'image/jpeg'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'Incidència'});return;}catch(e){if(e.name==='AbortError')return;}
-  }
-  dcDescarregarBlob(dcIfvBlob,dcIfvNom);
-  showToast('📥 Foto descarregada');
-}
-async function dcDescarregarFotoIncVisor(){
-  if(dcIfvBlob&&dcIfvNom) dcDescarregarBlob(dcIfvBlob,dcIfvNom);
-}
-async function dcEliminarFotoIncVisor(){
-  if(!dcIfvFotoId) return;
-  if(!confirm('Eliminar aquesta foto de la incidència?')) return;
-  const fotoId=dcIfvFotoId;
-  await dcIdbDelete(DC_STORE_PHOTOS,fotoId);
-  try{
-    const incs=await dcIdbGetAll(DC_STORE_INC);
-    for(const inc of incs){
-      let ch=false;
-      if(inc.fotoId===fotoId){inc.fotoId=null;inc.thumb=null;ch=true;}
-      if(inc.fotoId2===fotoId){inc.fotoId2=null;inc.thumb2=null;ch=true;}
-      if(ch) await dcIdbPut(DC_STORE_INC,inc);
-    }
-  }catch(_){}
-  dcCloseIncFotoViewer();
-  dcRenderitzarIncidencies();
-  dcRenderitzarFotos();
-  showToast('🗑️ Foto eliminada');
-}
-
-/* ── RENDERITZAR INCIDÈNCIES ──────────────────────────────── */
-async function dcRenderitzarIncidencies(){
-  const lista=document.getElementById('dcIncidentsList');
-  const comptador=document.getElementById('dcIncCount');
-  if(!lista) return;
-  try{
-    const incs=await dcIdbGetAll(DC_STORE_INC);
-    if(comptador) comptador.textContent=`${incs.length} REGISTRES`;
-    if(!incs.length){
-      lista.innerHTML='<div class="inc-empty-dc"><div class="inc-empty-icon-dc">📋</div><div>Sense incidències registrades</div></div>';
-      return;
-    }
-    const sorted=[...incs].sort((a,b)=>b.ts.localeCompare(a.ts));
-    lista.innerHTML=sorted.map(inc=>{
-      const sp=!!inc.sensePK;
-      const mStr=sp?null:String(inc.m||0).padStart(3,'0');
-      // Sentit
-      const sf=inc.sentidoFoto||'';
-      let sentitTxt,sentitClass;
-      if(sf==='izq'){sentitTxt='Esq. ◀';sentitClass='decreixent';}
-      else if(sf==='dcha'){sentitTxt='Dta. ▶';sentitClass='creixent';}
-      else if(inc.sentit==='creciente'){sentitTxt='↑ Creixent';sentitClass='creixent';}
-      else if(inc.sentit==='decreciente'){sentitTxt='↓ Decreixent';sentitClass='decreixent';}
-      else{sentitTxt='↔ Indeterminat';sentitClass='indet';}
-      const coordsStr=inc.lat?`${inc.lat.toFixed(5)}, ${inc.lon.toFixed(5)}`:'';
-      const teFoto=inc.fotoId!=null,teFoto2=inc.fotoId2!=null;
-      const nFotos=(teFoto?1:0)+(teFoto2?1:0);
-      // Línia PK
-      const pkLine=sp
-        ?`<div class="inc-pk-dc" style="color:var(--text-muted);font-style:italic;">📍 Sense PK assignat</div>`
-        :`<div class="inc-pk-dc">${inc.carretera} · PK ${inc.km}+${mStr}</div>`;
-      // Miniatures
-      const thumbHTML=[
-        (teFoto&&inc.thumb)?`<img class="inc-thumb-dc" src="${inc.thumb}" alt="foto" onclick="dcObrirFotoIncidencia(${inc.fotoId})">` :'',
-        (teFoto2&&inc.thumb2)?`<img class="inc-thumb-dc" src="${inc.thumb2}" alt="foto 2" onclick="dcObrirFotoIncidencia(${inc.fotoId2})">` :'',
-      ].join('');
-      // Botons d'acció — sempre visibles (Maps + WA + Foto)
-      let accioBtns='';
-      {
-        // Missatge WA complet (estil pk-geoloc), amb o sense coordenades
-        const pkLinia=sp
-          ?`*Ubicació:* Sense PK assignat\n`
-          :`*Carretera:* ${inc.carretera}\n*PK:* ${inc.km}+${mStr}\n`;
-        const gpsLinia=inc.lat&&inc.lon
-          ?`\n*Ubicació GPS:* https://maps.google.com/?q=${inc.lat},${inc.lon}`
-          :'';
-        const waText=encodeURIComponent(
-          `⚠️ *AVÍS D'INCIDÈNCIA* ⚠️\n\n`+
-          `*Tipus:* ${dcNomIncidencia(inc.tipus)}\n`+
-          pkLinia+
-          `*Sentit:* ${sentitTxt}\n`+
-          `*Data/hora:* ${inc.ts_legible}`+
-          gpsLinia
-        );
-        const waUrl=`https://api.whatsapp.com/send?text=${waText}`;
-        // Botó Maps — només si hi ha coordenades
-        const mapsBtn=inc.lat&&inc.lon
-          ?`<a class="inc-action-btn-dc maps" href="https://maps.google.com/?q=${inc.lat},${inc.lon}" target="_blank" rel="noopener">🗺️ Google Maps</a>`
-          :'';
-        // WA amb foto (Web Share) o WA text
-        const waBtn=teFoto
-          ?`<button class="inc-action-btn-dc whatsapp con-foto" onclick="dcCompartirIncidenciaWA(${inc.id})">💬 WhatsApp + foto</button>`
-          :`<a class="inc-action-btn-dc whatsapp" href="${waUrl}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-        const fotoBtn=nFotos<2
-          ?`<button class="inc-action-btn-dc add-foto" onclick="dcAfegirFotoIncidencia(${inc.id})">📷 Afegeix foto</button>`
-          :'';
-        accioBtns=`<div class="inc-actions-dc">
-          ${mapsBtn}
-          ${waBtn}
-          ${fotoBtn}
-        </div>`;
-      }
-      return `
-      <div class="incident-card-dc ${inc.tipus}">
-        <button class="inc-del-dc" title="Eliminar incidència" onclick="dcEsborrarIncidencia(${inc.id})">🗑️</button>
-        <div class="inc-icon-dc">${dcTipusIcon(inc.tipus)}</div>
-        ${thumbHTML}
-        <div class="inc-body-dc">
-          <div class="inc-title-dc">${dcNomIncidencia(inc.tipus)}</div>
-          ${pkLine}
-          <div class="inc-datetime-dc">🕐 ${inc.ts_legible}</div>
-          <div class="inc-meta-dc">
-            <span class="inc-meta-row-dc">${coordsStr||(sp?'Sense coordenades':`${inc.carretera} PK ${inc.km}+${mStr}`)}</span>
-          </div>
-          <span class="inc-sentit-dc ${sentitClass}">${sentitTxt}</span>
-          ${accioBtns}
-        </div>
-      </div>`;
-    }).join('');
-  }catch(e){
-    lista.innerHTML='<div class="inc-empty-dc"><div>Error en carregar les dades</div></div>';
-  }
-}
-
-async function dcEsborrarIncidencia(id){
-  if(!confirm('Eliminar aquesta incidència?')) return;
-  try{
-    const inc=await dcIdbGet(DC_STORE_INC,id);
-    if(inc&&inc.fotoId!=null) try{await dcIdbDelete(DC_STORE_PHOTOS,inc.fotoId);}catch(_){}
-    if(inc&&inc.fotoId2!=null) try{await dcIdbDelete(DC_STORE_PHOTOS,inc.fotoId2);}catch(_){}
-    await dcIdbDelete(DC_STORE_INC,id);
-    dcRenderitzarIncidencies();
-    dcRenderitzarFotos();
-    showToast('🗑️ Incidència eliminada');
-  }catch(e){showToast('❌ '+e.message);}
-}
-
-async function dcCompartirIncidenciaWA(incId){
-  try{
-    const inc=await dcIdbGet(DC_STORE_INC,incId);
-    if(!inc) return;
-    const sp=!!inc.sensePK;
-    const mStr=sp?null:String(inc.m||0).padStart(3,'0');
-    const sf=inc.sentidoFoto||'';
-    let sentitTxt;
-    if(sf==='izq') sentitTxt='Esq. ◀';
-    else if(sf==='dcha') sentitTxt='Dta. ▶';
-    else if(inc.sentit==='creciente') sentitTxt='↑ Creixent';
-    else if(inc.sentit==='decreciente') sentitTxt='↓ Decreixent';
-    else sentitTxt='↔ Indeterminat';
-    const pkLinia=sp
-      ?`*Ubicació:* Sense PK assignat
-`
-      :`*Carretera:* ${inc.carretera}
-*PK:* ${inc.km}+${mStr}
-`;
-    const gpsLinia=inc.lat&&inc.lon?`
-*Ubicació GPS:* https://maps.google.com/?q=${inc.lat},${inc.lon}`:'';
-    const text=`⚠️ *AVÍS D'INCIDÈNCIA* ⚠️
-
-`+
-      `*Tipus:* ${dcNomIncidencia(inc.tipus)}
-`+
-      pkLinia+
-      `*Sentit:* ${sentitTxt}
-`+
-      `*Data/hora:* ${inc.ts_legible}`+
-      gpsLinia;
-    const foto=inc.fotoId?await dcIdbGet(DC_STORE_PHOTOS,inc.fotoId):null;
-    const files=foto?[new File([foto.blob],foto.nom||'foto.jpg',{type:'image/jpeg'})]:[]; 
-    const sd=files.length?{files,text,title:'DataCamp'}:{text,title:'DataCamp'};
-    if(navigator.canShare&&navigator.canShare(sd)){
-      try{await navigator.share(sd);return;}catch(e){if(e.name==='AbortError')return;}
-    }
-    let copiat=false;
-    try{await navigator.clipboard.writeText(text);copiat=true;}catch(_){}
-    const msg=files.length
-      ?(copiat?'📋 Text copiat. Adjunta la foto al WhatsApp.':'📲 Obre WhatsApp i adjunta la foto.')
-      :(copiat?'📋 Text copiat. Obre WhatsApp.':'📲 Obre WhatsApp.');
-    showToast(msg);
-    setTimeout(()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank'),400);
-  }catch(e){showToast('❌ Error al compartir');}
-}
-
-/* ── HELPERS ─────────────────────────────────────────────── */
-function dcTipusIcon(tipus){return{animal:'🐗',senyalitzacio:'🛑',forat:'🕳️',altra:'⚠️',averia:'🚨'}[tipus]||'❓';}
-function dcNomIncidencia(tipus){return{animal:'Animal / Atropellament',senyalitzacio:'Senyalització Danyada',forat:'Clot / Esquerda',altra:'Incidència Indefinida',averia:'Avaria / Accident'}[tipus]||'Incidència';}
-function dcFormatarDataHora(data){
-  const any=data.getFullYear(),mes=String(data.getMonth()+1).padStart(2,'0'),dia=String(data.getDate()).padStart(2,'0');
-  const hh=String(data.getHours()).padStart(2,'0'),mm=String(data.getMinutes()).padStart(2,'0'),ss=String(data.getSeconds()).padStart(2,'0');
-  return `${any}-${mes}-${dia} ${hh}:${mm}:${ss}`;
-}
-function dcDataHoraFitxer(data){
-  return `${data.getFullYear()}${String(data.getMonth()+1).padStart(2,'0')}${String(data.getDate()).padStart(2,'0')}_${String(data.getHours()).padStart(2,'0')}${String(data.getMinutes()).padStart(2,'0')}${String(data.getSeconds()).padStart(2,'0')}`;
-}
-function dcDescarregarBlob(blob,nom){
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
-}
-
-/* ── MARCA D'AIGUA (Canvas) ──────────────────────────────── */
-function dcAplicarMarcaAigua(file,pkStr,ara){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    img.onload=()=>{
-      const c=document.createElement('canvas');
-      c.width=img.width;c.height=img.height;
-      const ctx=c.getContext('2d');
-      ctx.drawImage(img,0,0);
-      const fs=Math.max(16,Math.round(img.width/40));
-      ctx.font=`bold ${fs}px Barlow, system-ui, sans-serif`;
-      const pad=Math.round(fs*0.6),lh=Math.round(fs*1.5);
-      const dateStr=dcFormatarDataHora(ara);
-      const lines=[pkStr,dateStr];
-      const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
-      const boxW=maxW+pad*2,boxH=lines.length*lh+pad*1.2;
-      const x=img.width-boxW-pad,y=img.height-boxH-pad;
-      ctx.fillStyle='rgba(0,0,0,0.62)';
-      ctx.beginPath();
-      const r=Math.round(fs*0.4);
-      ctx.moveTo(x+r,y);ctx.lineTo(x+boxW-r,y);ctx.quadraticCurveTo(x+boxW,y,x+boxW,y+r);
-      ctx.lineTo(x+boxW,y+boxH-r);ctx.quadraticCurveTo(x+boxW,y+boxH,x+boxW-r,y+boxH);
-      ctx.lineTo(x+r,y+boxH);ctx.quadraticCurveTo(x,y+boxH,x,y+boxH-r);
-      ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
-      ctx.fill();
-      ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=4;
-      lines.forEach((l,i)=>ctx.fillText(l,x+pad,y+pad*0.6+(i+1)*lh));
-      c.toBlob(b=>b?resolve(b):reject(new Error('Canvas toBlob failed')),'image/jpeg',0.88);
-    };
-    img.onerror=()=>reject(new Error('Error carregant la imatge'));
-    img.src=URL.createObjectURL(file);
-  });
-}
-function dcFerThumbnail(blob,size=96){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      const c=document.createElement('canvas');c.width=size;c.height=size;
-      const ctx=c.getContext('2d');
-      const min=Math.min(img.width,img.height);
-      const sx=(img.width-min)/2,sy=(img.height-min)/2;
-      ctx.drawImage(img,sx,sy,min,min,0,0,size,size);
-      resolve(c.toDataURL('image/jpeg',0.7));
-    };
-    img.onerror=()=>resolve(null);
-    img.src=URL.createObjectURL(blob);
-  });
-}
-
-/* ── CAMERA / FOTO RAPIDA ─────────────────────────────────── */
-function dcObrirCamera(){document.getElementById('dcInputCaptura').click();}
-
-document.getElementById('dcInputCaptura').addEventListener('change',async function(e){
-  const file=e.target.files?.[0];this.value='';if(!file) return;
-  showToast('📡 Capturant posició GPS...');
-  const{pos,res,error}=await dcObtenirPosicioFrescaAmbPK(5000);
-  let resF=res,sensePK=false;
-  if(error||dcCalDecisioManualPK(res)){
-    const d=await dcMostrarModalDecisioPK(pos,res,'foto','error');
-    if(d===null){showToast("❌ Foto cancel·lada");return;}
-    resF=d.res;sensePK=d.sensePK;
-  }else{
-    const conf=await dcMostrarModalConfirmPK(res?.carretera||'',res?.km??'',res?.m??'');
-    if(conf===null){showToast("❌ Foto cancel·lada");return;}
-    resF={...res,carretera:conf.carretera,km:conf.km,m:conf.m};
-    if(!conf.carretera||conf.carretera==='—') sensePK=true;
-  }
-  await dcGuardarFotoNova(file,pos,resF,sensePK);
-});
-
-document.getElementById('dcInputGaleria').addEventListener('change',async function(e){
-  const file=e.target.files?.[0];this.value='';if(!file) return;
-  const conf=await dcMostrarModalConfirmPK('','','');
-  if(conf===null){showToast("❌ Foto cancel·lada");return;}
-  const carr=conf.carretera,km=conf.km,m=conf.m,mStr=String(m).padStart(3,'0');
-  const sensePK=!carr||carr==='—';
-  const ara=new Date();
-  const pkStr=sensePK?'Galeria':`${carr}, PK ${km}+${mStr}`;
-  showToast('⏳ Processant foto...');
-  const blobFinal=await dcAplicarMarcaAigua(file,pkStr,ara);
-  const thumb=await dcFerThumbnail(blobFinal,96);
-  const nom=`${sensePK?'GALERIA':carr.replace(/[^A-Z0-9]/g,'_')}_${km}+${mStr}_${dcDataHoraFitxer(ara)}.jpg`;
-  await dcIdbAdd(DC_STORE_PHOTOS,{nom,blob:blobFinal,carretera:sensePK?null:carr,km:sensePK?null:km,m:sensePK?null:m,sensePK,lat:null,lon:null,ts:ara.toISOString(),ts_legible:pkStr,thumb});
-  dcRenderitzarFotos();
-  showToast('✅ Foto desada a la galeria');
-});
-
-async function dcGuardarFotoNova(file,pos,res,sensePK){
-  const ara=new Date();
-  const carr=sensePK?null:(res?.carretera||null);
-  const km=sensePK?null:(res?.km??null);
-  const m=sensePK?null:(res?.m??null);
-  const mStr=m!=null?String(m).padStart(3,'0'):'000';
-  const pkStr=sensePK?(pos?.lat?`GPS ${pos.lat.toFixed(5)}, ${pos.lon.toFixed(5)}`:'Sense PK'):`${carr}, PK ${km}+${mStr}`;
-  showToast('⏳ Processant foto...');
-  const blobFinal=await dcAplicarMarcaAigua(file,pkStr,ara);
-  const thumb=await dcFerThumbnail(blobFinal,96);
-  const nom=`${sensePK?'GPS':carr.replace(/[^A-Z0-9]/g,'_')}_${km??0}+${mStr}_${dcDataHoraFitxer(ara)}.jpg`;
-  await dcIdbAdd(DC_STORE_PHOTOS,{nom,blob:blobFinal,carretera:carr,km,m,sensePK,lat:pos?.lat??null,lon:pos?.lon??null,ts:ara.toISOString(),ts_legible:pkStr,thumb});
-  dcRenderitzarFotos();
-  showToast('✅ Foto desada');
-}
-
-/* ── GALERIA FOTOS ────────────────────────────────────────── */
-let dcFotosSubtab='fotos';
-let dcModeSeleccio=false;
-let dcFotosSeleccionades=new Set();
-let dcFotosDB=[];
-let dcGvBlob=null,dcGvNom='',dcGvFotoId=null;
-
-function dcCanviarSubtabGaleria(subtab){
-  dcFotosSubtab=subtab;
-  document.getElementById('dcSubtabFotos').classList.toggle('active',subtab==='fotos');
-  document.getElementById('dcSubtabIncFotos').classList.toggle('active',subtab==='inc');
-  document.getElementById('dcPhotosList').style.display=subtab==='fotos'?'':'none';
-  document.getElementById('dcIncFotosList').style.display=subtab==='inc'?'':'none';
-  document.getElementById('dcGaleriaToolbarFotos').style.display=subtab==='fotos'?'':'none';
-  if(subtab==='inc') dcRenderitzarIncFotos();
-  else dcRenderitzarFotos();
-}
-
-async function dcRenderitzarFotos(){
-  const lista=document.getElementById('dcPhotosList');
-  if(!lista) return;
-  dcFotosSeleccionades.clear();
-  try{
-    dcFotosDB=await dcIdbGetAll(DC_STORE_PHOTOS);
-    const sorted=[...dcFotosDB].filter(f=>f.incId==null).sort((a,b)=>b.ts.localeCompare(a.ts));
-    if(!sorted.length){lista.innerHTML='<div class="galeria-empty"><div class="galeria-empty-icon">📸</div><div>Sense fotos capturades</div></div>';return;}
-    lista.innerHTML='';
-    sorted.forEach(foto=>{
-      const url=URL.createObjectURL(foto.blob);
-      const sp=!!foto.sensePK;
-      const mStr=sp?'000':String(foto.m||0).padStart(3,'0');
-      const pkLabel=sp?(foto.lat?`📍 ${foto.lat.toFixed(4)}, ${foto.lon.toFixed(4)}`:'📍 Sense PK'):`${foto.carretera||'—'} PK ${foto.km||0}+${mStr}`;
-      const card=document.createElement('div');
-      card.className='galeria-card';card.dataset.id=foto.id;
-      card.innerHTML=`<img src="${url}" alt="${foto.nom}" loading="lazy"><div class="galeria-check">✓</div><div class="galeria-pk-overlay">${pkLabel}</div>`;
-      card.querySelector('img').addEventListener('click',()=>{
-        if(dcModeSeleccio) dcToggleFotoSeleccionada(foto.id,card);
-        else dcObrirGaleriaViewer(url,foto.nom,foto.id,foto.blob);
-      });
-      card.querySelector('.galeria-check').addEventListener('click',e=>{
-        e.stopPropagation();
-        if(!dcModeSeleccio) dcActivarSeleccio();
-        dcToggleFotoSeleccionada(foto.id,card);
-      });
-      lista.appendChild(card);
-    });
-  }catch(e){lista.innerHTML='<div class="galeria-empty"><div>Error en carregar fotos</div></div>';}
-  dcActualitzarBarraSeleccio();
-}
-
-async function dcRenderitzarIncFotos(){
-  const lista=document.getElementById('dcIncFotosList');
-  if(!lista) return;
-  try{
-    const tots=await dcIdbGetAll(DC_STORE_PHOTOS);
-    const incFotos=tots.filter(f=>f.incId!=null).sort((a,b)=>b.ts.localeCompare(a.ts));
-    if(!incFotos.length){lista.innerHTML='<div class="galeria-empty"><div class="galeria-empty-icon">⚠️</div><div>Sense fotos d\'incidències</div></div>';return;}
-    lista.innerHTML='';
-    incFotos.forEach(foto=>{
-      const url=URL.createObjectURL(foto.blob);
-      const mStr=foto.m!=null?String(foto.m).padStart(3,'0'):'000';
-      const pkLabel=foto.sensePK||!foto.carretera?(foto.lat?`📍 ${foto.lat.toFixed(4)}, ${foto.lon.toFixed(4)}`:'📍 Sense PK'):`${foto.carretera} PK ${foto.km||0}+${mStr}`;
-      const card=document.createElement('div');
-      card.className='galeria-card';card.dataset.id=foto.id;
-      card.innerHTML=`<img src="${url}" alt="${foto.nom}" loading="lazy"><div class="galeria-pk-overlay">${pkLabel}</div>`;
-      card.querySelector('img').addEventListener('click',()=>dcObrirFotoIncidencia(foto.id));
-      lista.appendChild(card);
-    });
-  }catch(e){lista.innerHTML='<div class="galeria-empty"><div>Error en carregar fotos</div></div>';}
-}
-
-function dcObrirGaleriaViewer(url,nom,id,blob){
-  dcGvBlob=blob;dcGvNom=nom;dcGvFotoId=id;
-  document.getElementById('dcGvImg').src=url;
-  document.getElementById('dcGvTitle').textContent=nom.replace('.jpg','').replace(/_/g,' ');
-  document.getElementById('dcGaleriaViewer').classList.add('open');
-}
-function dcCloseGaleriaViewer(){
-  document.getElementById('dcGaleriaViewer').classList.remove('open');
-  document.getElementById('dcGvImg').src='';
-  dcGvBlob=null;dcGvNom='';dcGvFotoId=null;
-}
-function dcDescarregarFotoGaleria(){if(dcGvBlob&&dcGvNom) dcDescarregarBlob(dcGvBlob,dcGvNom);}
-async function dcEliminarFotoGaleria(){
-  if(!dcGvFotoId) return;
-  if(!confirm('Eliminar aquesta foto?')) return;
-  await dcIdbDelete(DC_STORE_PHOTOS,dcGvFotoId);
-  dcCloseGaleriaViewer();dcRenderitzarFotos();showToast('🗑️ Foto eliminada');
-}
-async function dcCompartirFotoGaleriaWA(avis='SIN AVISO'){
-  if(!dcGvBlob){showToast('⚠️ Sense foto oberta');return;}
-  try{
-    const foto=dcFotosDB.find(f=>f.id===dcGvFotoId);
-    let text='';
-    if(foto&&!foto.sensePK&&foto.carretera){
-      const mStr=String(foto.m||0).padStart(3,'0');
-      const ccLine=avis==='CON AVISO'?'\nINCIDÈNCIA NOTIFICADA AL CCC':'';
-      text=`Carretera: ${foto.carretera}\nPK: ${foto.km}+${mStr}${ccLine}`+(foto.lat&&foto.lon?`\nGPS: http://maps.google.com/maps?q=${foto.lat},${foto.lon}`:'');
-    }
-    const file=new File([dcGvBlob],dcGvNom,{type:'image/jpeg'});
-    const sd=text?{files:[file],text,title:'DataCamp'}:{files:[file],title:'DataCamp'};
-    if(navigator.canShare&&navigator.canShare(sd)){
-      try{await navigator.share(sd);return;}catch(e){if(e.name==='AbortError')return;}
-    }
-    if(text){
-      let cp=false;try{await navigator.clipboard.writeText(text.replace(/\\n/g,'\n'));cp=true;}catch(_){}
-      showToast(cp?'📋 Text copiat. Adjunta la foto al WhatsApp.':'📲 Obre WhatsApp i adjunta la foto.');
-      setTimeout(()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text.replace(/\\n/g,'\n'))}`,'_blank'),400);
-    }else{
-      dcDescarregarBlob(dcGvBlob,dcGvNom);showToast('📥 Foto descarregada');
-    }
-  }catch(e){showToast('❌ Error al compartir');}
-}
-
-/* ── SELECCIO MULTIPLE ───────────────────────────────────── */
-function dcToggleSeleccio(){if(dcModeSeleccio)dcDesactivarSeleccio();else dcActivarSeleccio();}
-function dcActivarSeleccio(){
-  dcModeSeleccio=true;
-  const btn=document.getElementById('dcBtnSeleccio');
-  if(btn){btn.style.color='var(--primary)';btn.style.borderColor='var(--primary)';}
-  dcActualitzarBarraSeleccio();
-}
-function dcDesactivarSeleccio(){
-  dcModeSeleccio=false;dcFotosSeleccionades.clear();
-  document.querySelectorAll('.galeria-card').forEach(c=>c.classList.remove('selected'));
-  const btn=document.getElementById('dcBtnSeleccio');
-  if(btn){btn.style.color='';btn.style.borderColor='';}
-  dcActualitzarBarraSeleccio();
-}
-function dcToggleFotoSeleccionada(id,card){
-  if(dcFotosSeleccionades.has(id)){dcFotosSeleccionades.delete(id);card.classList.remove('selected');}
-  else{dcFotosSeleccionades.add(id);card.classList.add('selected');}
-  dcActualitzarBarraSeleccio();
-}
-function dcActualitzarBarraSeleccio(){
-  const cnt=document.getElementById('dcSelCountDc');
-  const act=document.getElementById('dcSelActions');
-  if(!cnt||!act) return;
-  const n=dcFotosSeleccionades.size;
-  if(dcModeSeleccio&&n>0){
-    cnt.style.display='';cnt.textContent=`${n} seleccionades`;act.style.display='flex';
-  }else{cnt.style.display='none';act.style.display='none';}
-}
-async function dcEliminarSeleccio(){
-  if(!dcFotosSeleccionades.size) return;
-  if(!confirm(`Eliminar ${dcFotosSeleccionades.size} foto(s)?`)) return;
-  for(const id of [...dcFotosSeleccionades]) await dcIdbDelete(DC_STORE_PHOTOS,id);
-  showToast(`🗑️ ${dcFotosSeleccionades.size} foto(s) eliminada(es)`);
-  dcDesactivarSeleccio();dcRenderitzarFotos();
-}
-async function dcCompartirSeleccio(){
-  if(!dcFotosSeleccionades.size) return;
-  const ids=[...dcFotosSeleccionades];
-  const fotos=dcFotosDB.filter(f=>ids.includes(f.id));
-  if(!fotos.length) return;
-  const totsAmbPK=fotos.every(f=>!f.sensePK&&f.carretera&&f.carretera!=='—');
-  let text=null;
-  if(totsAmbPK&&fotos.length>1){
-    const ref=fotos[0];
-    if(fotos.every(f=>f.carretera===ref.carretera&&f.km===ref.km&&f.m===ref.m)){
-      const ambAvis=window.confirm(`📍 ${ref.carretera} PK ${ref.km}+${String(ref.m||0).padStart(3,'0')}\n\nEnviar AMB AVÍS al CCC?\n\nAcceptar = Amb avís 🟢\nCancel·lar = Sense avís 🔵`);
-      const mStr=String(ref.m??0).padStart(3,'0');
-      text=`Carretera: ${ref.carretera}\nPK: ${ref.km}+${mStr}`+(ambAvis?'\nINCIDÈNCIA NOTIFICADA AL CCC':'')+(ref.lat&&ref.lon?`\nGPS: http://maps.google.com/maps?q=${ref.lat},${ref.lon}`:'');
-    }
-  }
-  const files=fotos.map(f=>new File([f.blob],f.nom,{type:'image/jpeg'}));
-  const sd=text?{files,text,title:'DataCamp'}:{files,title:'DataCamp'};
-  if(navigator.canShare&&navigator.canShare(sd)){
-    try{await navigator.share(sd);dcDesactivarSeleccio();return;}catch(e){if(e.name==='AbortError')return;}
-  }
-  if(text){
-    let cp=false;try{await navigator.clipboard.writeText(text.replace(/\\n/g,'\n'));cp=true;}catch(_){}
-    showToast(cp?'📋 Text copiat. Selecciona les fotos al WhatsApp.':'📲 Obre WhatsApp i adjunta les fotos.');
-    setTimeout(()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text.replace(/\\n/g,'\n'))}`,'_blank'),400);
-    dcDesactivarSeleccio();return;
-  }
-  showToast(`⬇️ Descarregant ${fotos.length} foto(s)...`);
-  for(let i=0;i<fotos.length;i++){dcDescarregarBlob(fotos[i].blob,fotos[i].nom);if(i<fotos.length-1)await new Promise(r=>setTimeout(r,350));}
-  dcDesactivarSeleccio();
-}
-
-/* ── INICIALITZACIÓ ──────────────────────────────────────── */
-(async()=>{
-  try{ await dcInitDB(); }catch(e){ console.warn('[DC-PK] initDB:',e); }
-  try{ await dcCarregarCache(); }catch(e){ console.warn('[DC-PK] cache:',e); }
-})();
-
-// Cerrar panel incidencies al tocar fuera
-document.addEventListener('click', e => {
-  try {
-    if (typeof dcIncPanel_open !== 'undefined' && dcIncPanel_open &&
-        !e.target.closest('.inc-quick-panel') &&
-        !e.target.closest('#dcFabStack')) {
-      dcTancarIncPanel();
-    }
-  } catch(_) {}
-});
-
-
-
-/* ═══════════════════════════════════════════════════════════════════
-   EXTRA PK FEATURES — Funcions addicionals integrades a DATACAMP
-   (selector carreteres múltiples, PK incorrecte, mapeo de trazas)
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ── Variables ─────────────────────────────────────────────────── */
-let _dcSentit = 'indeterminado'; // 'creciente' | 'decreciente' | 'indeterminado'
-let _dcHistorialPos = [];
-let _trazaDir = 'asc';
-let _trazaSessio = [];
-
-/* ── Extra PK panel: mostra/amaga ──────────────────────────────── */
-function dcMostrarExtraPK(carreteraActual) {
-    const panel = document.getElementById('dcExtraPK');
-    if (!panel) return;
-    panel.style.display = 'block';
-
-    // Candidates (altres carreteres properes dins 300m)
-    const candidatsRow = document.getElementById('dcCandidatsRow');
-    const chipsEl = document.getElementById('dcCandidatsChips');
-    const candidats = (window._dcCandidats || []).filter(c =>
-        c.carretera !== carreteraActual && c.dist <= 300
-    );
-
-    if (candidats.length > 0 && chipsEl && candidatsRow) {
-        candidatsRow.style.display = 'block';
-        chipsEl.innerHTML = candidats.map(c => {
-            const msStr = String(c.m).padStart(3,'0');
-            return `<button onclick="dcSeleccionarCarretera('${c.carretera}',${c.km},${c.m})"
-              style="padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:700;
-                     border:1.5px solid var(--border);background:var(--bg);color:var(--text);
-                     cursor:pointer;white-space:nowrap;">
-              ${c.carretera} <span style="color:var(--text-muted);font-size:.65rem;">${Math.round(c.dist)}m</span>
-            </button>`;
-        }).join('');
-    } else {
-        if (candidatsRow) candidatsRow.style.display = 'none';
-    }
-
-    // Actualitzar sentit
-    dcActualitzarSentitUI();
-}
-
-function dcOcultarExtraPK() {
-    const panel = document.getElementById('dcExtraPK');
-    if (panel) panel.style.display = 'none';
-}
-
-/* ── Selector carretera alternativa ─────────────────────────────── */
-function dcSeleccionarCarretera(carretera, km, m) {
-    autopkOmplirCamps(carretera, km, m);
-    const msStr = String(m).padStart(3,'0');
-    autopkMostrarEstat('success', '📌',
-        `${carretera}  •  PK ${km}+${msStr}  •  Seleccionada manualment`);
-    if (window._dcLastPK) window._dcLastPK = { ...window._dcLastPK, carretera, km, m };
-    showToast(`📌 Canviat a ${carretera} — PK ${km}+${msStr}`);
-    // Update candidates to highlight selected
-    const chipsEl = document.getElementById('dcCandidatsChips');
-    if (chipsEl) {
-        // re-render with new active
-        const prev = (window._dcCandidats || []).filter(c => c.carretera !== carretera && c.dist <= 300);
-        dcMostrarExtraPK(carretera);
-    }
-}
-
-/* ── Sentit de la marxa ─────────────────────────────────────────── */
-function dcCanviarSentit() {
-    const order = ['indeterminado', 'creciente', 'decreciente'];
-    const idx = order.indexOf(_dcSentit);
-    _dcSentit = order[(idx + 1) % order.length];
-    dcActualitzarSentitUI();
-}
-
-function dcActualitzarSentitUI() {
-    const btn = document.getElementById('dcSentitBtn');
-    if (!btn) return;
-    if (_dcSentit === 'creciente') {
-        btn.textContent = '↑ Creixent';
-        btn.style.borderColor = '#86efac'; btn.style.color = '#16a34a'; btn.style.background = '#f0fdf4';
-    } else if (_dcSentit === 'decreciente') {
-        btn.textContent = '↓ Decreixent';
-        btn.style.borderColor = '#fca5a5'; btn.style.color = '#dc2626'; btn.style.background = '#fef2f2';
-    } else {
-        btn.textContent = '↔ Indeterminat';
-        btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text)'; btn.style.background = 'var(--bg)';
-    }
-}
-
-/* ── PK Incorrecte ──────────────────────────────────────────────── */
-function dcPKIncorrecte() {
-    const last = window._dcLastPK;
-    if (!last) { showToast('⚠️ Primer detecta la posició'); return; }
-    const { carretera, km, m } = last;
-    const msStr = String(m).padStart(3,'0');
-    if (!confirm(`Marcar PK ${km}+${msStr} de ${carretera} com a incorrecte?\n\nS'exclouran els PKs propers (rang ${Math.max(0,km-1)}+000 → ${km+1}+000) de la propera cerca.`)) return;
-
-    // Store exclusion in localStorage
-    const LS_KEY = 'dc_pk_exclusions';
-    let excls = [];
-    try { excls = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(_) {}
-    excls.push({ carretera, kmDes: Math.max(0, km-1), kmFins: km+1, ts: Date.now() });
-    localStorage.setItem(LS_KEY, JSON.stringify(excls));
-
-    showToast(`✅ PK ${km}+${msStr} de ${carretera} marcat com incorrecte`, 'ok', 3000);
-    autopkMostrarEstat('warning', '🚫', `${carretera} PK ${km}+${msStr} marcat com incorrecte. La pròxima cerca l'evitarà.`);
-}
-
-/* Apply exclusions to punts before calculation */
-const _dcCalcOriginal = calcularPKdePunts;
-function calcularPKdePunts(userLat, userLon, punts) {
-    let LS_KEY = 'dc_pk_exclusions';
-    let excls = [];
-    try { excls = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(_) {}
-    const filtered = excls.length ? punts.filter(p => {
-        return !excls.some(e =>
-            e.carretera === p.carretera && p.pk >= e.kmDes && p.pk <= e.kmFins
-        );
-    }) : punts;
-    return _dcCalcOriginal(userLat, userLon, filtered);
-}
-
-/* ── Trazas: Mapeo manual de punts ─────────────────────────────── */
-function dcIniciarTrazas() {
-    // Pre-fill from last detected PK
-    const last = window._dcLastPK;
-    if (last) {
-        const el = document.getElementById('trazaPanelCarr');
-        if (el && !el.value) el.value = last.carretera;
-        const elKm = document.getElementById('trazaPanelKm');
-        if (elKm && !elKm.value) elKm.value = last.km;
-        const elM = document.getElementById('trazaPanelM');
-        if (elM && !elM.value) elM.value = last.m;
-    }
-    _trazaSessio = [];
-    dcTrazaActualitzarLlista();
-    document.getElementById('trazaPanelGPS').textContent = '';
-    document.getElementById('trazaBtnDeshacer').style.display = 'none';
-    // Open panel
-    document.getElementById('trazaOverlay').classList.add('open');
-    document.getElementById('trazaPanel').classList.add('open');
-}
-
-function trazaFinalizar() {
-    document.getElementById('trazaOverlay').classList.remove('open');
-    document.getElementById('trazaPanel').classList.remove('open');
-    if (_trazaSessio.length > 0) {
-        // Save to localStorage
-        const LS_KEY = 'dc_trazas';
-        let all = [];
-        try { all = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(_) {}
-        all = all.concat(_trazaSessio);
-        localStorage.setItem(LS_KEY, JSON.stringify(all));
-        showToast(`✅ ${_trazaSessio.length} punt(s) de traza desats`, 'ok', 3000);
-    }
-    _trazaSessio = [];
-}
-
-function dcTrazaSetDir(dir) {
-    _trazaDir = dir;
-    document.getElementById('trazaDirAsc').classList.toggle('active', dir === 'asc');
-    document.getElementById('trazaDirDesc').classList.toggle('active', dir === 'desc');
-}
-
-function dcTrazaGuardarPunto() {
-    const carr = (document.getElementById('trazaPanelCarr').value || '').trim().toUpperCase();
-    const km = parseInt(document.getElementById('trazaPanelKm').value) || 0;
-    const m = parseInt(document.getElementById('trazaPanelM').value) || 0;
-    if (!carr) { showToast('⚠️ Introdueix la carretera', 'warn'); return; }
-
-    const statusEl = document.getElementById('trazaPanelGPS');
-    statusEl.textContent = '📡 Adquirint GPS...';
-
-    navigator.geolocation.getCurrentPosition(function(pos) {
-        const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
-        const punt = { carretera: carr, km, m, lat, lon, acc: Math.round(acc), dir: _trazaDir, ts: Date.now() };
-        _trazaSessio.push(punt);
-
-        // Advance PK for next point
-        if (_trazaDir === 'asc') {
-            let newM = m + 100;
-            let newKm = km;
-            if (newM >= 1000) { newM -= 1000; newKm += 1; }
-            document.getElementById('trazaPanelKm').value = newKm;
-            document.getElementById('trazaPanelM').value = newM;
-        } else {
-            let newM = m - 100;
-            let newKm = km;
-            if (newM < 0) { newM += 1000; newKm = Math.max(0, newKm - 1); }
-            document.getElementById('trazaPanelKm').value = newKm;
-            document.getElementById('trazaPanelM').value = newM;
-        }
-
-        const msStr = String(m).padStart(3,'0');
-        statusEl.textContent = `✅ ${carr} PK ${km}+${msStr} desat (±${Math.round(acc)}m)`;
-        document.getElementById('trazaBtnDeshacer').style.display = 'block';
-        dcTrazaActualitzarLlista();
-    }, function(err) {
-        statusEl.textContent = '❌ Error GPS: ' + (err.message || 'No disponible');
-        showToast('❌ Error GPS al desar punt', 'err');
-    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-}
-
-function dcTrazaGuardarYFinalizar() {
-    if (_trazaSessio.length === 0 && !document.getElementById('trazaPanelCarr').value) {
-        trazaFinalizar();
-        return;
-    }
-    dcTrazaGuardarPunto();
-    setTimeout(trazaFinalizar, 2000);
-}
-
-function dcTrazaDeshacer() {
-    if (_trazaSessio.length === 0) return;
-    const removed = _trazaSessio.pop();
-    const msStr = String(removed.m).padStart(3,'0');
-    showToast(`↩ Desfet: ${removed.carretera} PK ${removed.km}+${msStr}`);
-    if (_trazaSessio.length === 0) document.getElementById('trazaBtnDeshacer').style.display = 'none';
-    // Restore PK inputs to previous point
-    document.getElementById('trazaPanelKm').value = removed.km;
-    document.getElementById('trazaPanelM').value = removed.m;
-    dcTrazaActualitzarLlista();
-}
-
-function dcTrazaActualitzarLlista() {
-    const wrap = document.getElementById('trazaPanelListWrap');
-    const list = document.getElementById('trazaPanelList');
-    if (!wrap || !list) return;
-    if (_trazaSessio.length === 0) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'block';
-    list.innerHTML = _trazaSessio.slice().reverse().map((p, i) => {
-        const msStr = String(p.m).padStart(3,'0');
-        const real_i = _trazaSessio.length - 1 - i;
-        return `<div class="traza-list-item">
-          <div><span class="traza-list-road">${p.carretera}</span> <span class="traza-list-pk">PK ${p.km}+${msStr}</span> <span style="font-size:.65rem;color:var(--text-light);">±${p.acc}m</span></div>
-          <button class="traza-list-del" onclick="dcTrazaEliminarPunt(${real_i})">🗑️</button>
-        </div>`;
-    }).join('');
-}
-
-function dcTrazaEliminarPunt(idx) {
-    _trazaSessio.splice(idx, 1);
-    dcTrazaActualitzarLlista();
-    if (_trazaSessio.length === 0) document.getElementById('trazaBtnDeshacer').style.display = 'none';
-}
-
-/* Also hide extra panel when AutoPK starts a new search */
-const _dcOrigExecutarAutoPK = executarAutoPK;
-function executarAutoPK() {
-    dcOcultarExtraPK();
-    _dcSentit = 'indeterminado';
-    _dcCalcCount = (_dcCalcCount || 0) + 1;
-    _dcOrigExecutarAutoPK();
-}
-let _dcCalcCount = 0;
-
-/* ── Trazas list accessible from Historial ─────────────────────── */
-// Exposed for future Historial screen integration
-window.dcGetTrazas = function() {
-    try { return JSON.parse(localStorage.getItem('dc_trazas') || '[]'); } catch(_) { return []; }
-};
-window.dcClearTrazas = function() {
-    localStorage.removeItem('dc_trazas');
-    showToast('Trazas esborrades', 'ok');
-};
-
 </script>
-
-<!-- ═══════════════════════════════════════════════════════
-     TRAZA PANEL — Mapeo manual de punts de carretera
-     (PK-GEOLOC feature integrat a DATACAMP)
-     ═══════════════════════════════════════════════════════ -->
-<style>
-.traza-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:890;opacity:0;pointer-events:none;transition:opacity .3s;}
-.traza-overlay.open{opacity:1;pointer-events:all;}
-.traza-panel{position:fixed;bottom:0;left:0;right:0;z-index:900;background:#fff;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:88dvh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.18);}
-.traza-panel.open{transform:translateY(0);}
-.traza-panel-handle{width:40px;height:4px;background:var(--border-dark);border-radius:2px;margin:12px auto 4px;flex-shrink:0;}
-.traza-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.traza-panel-title{font-size:.95rem;font-weight:700;color:var(--text);}
-.traza-panel-body{padding:16px 20px;overflow-y:auto;flex:1;}
-.traza-field-lbl{font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;margin-top:12px;}
-.traza-inp{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-size:.9rem;font-family:var(--font);box-sizing:border-box;}
-.traza-inp:focus{border-color:var(--primary);outline:none;background:#fff;}
-.traza-pk-row{display:flex;align-items:center;gap:8px;}
-.traza-pk-row .traza-inp{margin-bottom:0;}
-.traza-dir-btns{display:flex;gap:8px;margin-top:6px;}
-.traza-dir-btn{flex:1;padding:9px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg);font-size:.8rem;font-weight:600;cursor:pointer;color:var(--text);transition:var(--transition);}
-.traza-dir-btn.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
-.traza-list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:6px;font-size:.8rem;}
-.traza-list-road{font-weight:700;color:var(--text);}
-.traza-list-pk{color:var(--primary);font-weight:700;}
-.traza-list-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;}
-.traza-panel-actions{padding:12px 20px calc(env(safe-area-inset-bottom,0)+12px);border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:8px;}
-.traza-btn-continuar{padding:14px;border-radius:var(--radius);background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;color:#fff;font-family:var(--font-cond);font-size:.95rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--transition);}
-.traza-btn-continuar:active{transform:scale(.97);}
-.traza-btn-fin{padding:12px;border-radius:var(--radius);background:var(--bg);border:1.5px solid var(--border-dark);color:var(--text);font-size:.85rem;font-weight:700;cursor:pointer;}
-.traza-btn-deshacer{padding:12px;border-radius:var(--radius);background:#fef2f2;border:1.5px solid #fca5a5;color:#dc2626;font-size:.85rem;font-weight:700;cursor:pointer;}
-.traza-gps-status{font-size:.72rem;color:var(--text-muted);text-align:center;padding:6px 0;min-height:1.5em;}
-</style>
-<div class="traza-overlay" id="trazaOverlay" onclick="trazaFinalizar()"></div>
-<div class="traza-panel" id="trazaPanel">
-  <div class="traza-panel-handle"></div>
-  <div class="traza-panel-header">
-    <span class="traza-panel-title">📍 Mapeo de Carretera</span>
-    <button onclick="trazaFinalizar()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted);">✕</button>
-  </div>
-  <div class="traza-panel-body">
-    <div class="traza-field-lbl">Carretera</div>
-    <input class="traza-inp" id="trazaPanelCarr" type="text" placeholder="C-14" maxlength="12"
-      oninput="this.value=this.value.toUpperCase()">
-
-    <div class="traza-field-lbl">Punt kilom&egrave;tric inicial</div>
-    <div class="traza-pk-row">
-      <input class="traza-inp" id="trazaPanelKm" type="number" placeholder="42" min="0" max="9999" style="max-width:90px;">
-      <span style="font-weight:700;color:var(--text-muted);">+</span>
-      <input class="traza-inp" id="trazaPanelM" type="number" placeholder="000" min="0" max="999" style="max-width:80px;">
-      <span style="font-size:.8rem;color:var(--text-muted);">m</span>
-    </div>
-
-    <div class="traza-field-lbl">Direcci&oacute; del marcatge</div>
-    <div class="traza-dir-btns">
-      <button class="traza-dir-btn active" id="trazaDirAsc" onclick="dcTrazaSetDir('asc')">&#8593; Ascendent</button>
-      <button class="traza-dir-btn" id="trazaDirDesc" onclick="dcTrazaSetDir('desc')">&#8595; Descendent</button>
-    </div>
-
-    <div id="trazaPanelListWrap" style="display:none;margin-top:14px;">
-      <div class="traza-field-lbl">Punts marcats aquesta sessi&oacute;</div>
-      <div id="trazaPanelList"></div>
-    </div>
-    <div class="traza-gps-status" id="trazaPanelGPS"></div>
-  </div>
-  <div class="traza-panel-actions">
-    <button class="traza-btn-continuar" onclick="dcTrazaGuardarPunto()">
-      &#128205; DESAR PUNT I CONTINUAR
-    </button>
-    <div style="display:flex;gap:8px;">
-      <button class="traza-btn-fin" onclick="dcTrazaGuardarYFinalizar()" style="flex:2;">&#9989; Finalitzar mapeo</button>
-      <button class="traza-btn-deshacer" id="trazaBtnDeshacer" onclick="dcTrazaDeshacer()" style="flex:1;display:none;">&#8617; Desfer</button>
-    </div>
-  </div>
-</div>
-
 </html>
