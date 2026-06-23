@@ -9537,6 +9537,9 @@ let pkmAreaLayer = null;
 let pkmAreaMarkers = [];
 let pkmAmidMarkers = [];
 let pkmSheetPos = 1;          // 1=peek (default), 0=obert
+const PKM_ARCGIS = (typeof AUTOPK_CONFIG !== 'undefined' && AUTOPK_CONFIG.ARCGIS_URL)
+    ? AUTOPK_CONFIG.ARCGIS_URL
+    : 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query';
 
 /* ── Init ─────────────────────────────────────────────── */
 function abrirPKMapa() {
@@ -9912,11 +9915,12 @@ async function pkmGoToRoadPK(road, km, m) {
             const zoom = km > 0 ? 15 : 13;
             pkmMap.flyTo([pos.lat, pos.lon], zoom, { animate: true, duration: 1.2 });
             pkmDragPin.setLatLng([pos.lat, pos.lon]);
-            // Usa exactament el mateix motor que el pin: consultarArcGIS + calcularPK
             await pkmCalcPK(pos.lat, pos.lon, false);
-            if (km > 0) showToast(`${road} PK ${km}+${String(m).padStart(3,'0')} localitzat`, 'ok', 2000);
+            const label = km > 0 ? `${road} PK ${km}+${String(m).padStart(3,'0')}` : road;
+            showToast('🛣️ ' + label + ' localitzat', 'ok', 2000);
         } else {
-            showToast(`No s'ha trobat ${road}`, 'err');
+            if (km > 0) showToast('No s\'ha pogut precisar ' + road, 'warn', 3000);
+            else showToast('No s\'ha trobat ' + road, 'err');
         }
     } catch(e) {
         showToast('Error cercant: ' + e.message, 'err');
