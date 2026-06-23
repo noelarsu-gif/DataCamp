@@ -4843,11 +4843,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <!-- Barra de filtres -->
                 <div class="galeria-filters" id="galeriaFilters">
-                    <!-- Fila 1: ordre + carreteres -->
-                    <div class="galeria-filter-row" id="galeriaFilterCarr">
+                    <!-- Fila 1: carretera dropdown -->
+                    <div class="galeria-filter-row">
                         <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Carretera:</span>
-                        <button class="galeria-filter-chip active" data-carr="TOTES" onclick="galeriaFiltrarCarr('TOTES')">Totes</button>
-                        <!-- poblat per JS -->
+                        <select id="galeriaSelectCarr" onchange="galeriaFiltrarCarr(this.value)" style="flex:1;min-width:0;padding:5px 10px;border-radius:20px;border:1.5px solid var(--border-dark);background:var(--surface);color:var(--text);font-family:var(--font-cond);font-size:0.82rem;font-weight:700;cursor:pointer;outline:none;appearance:auto;">
+                            <option value="TOTES">Totes</option>
+                        </select>
                     </div>
                     <!-- Fila 2: data -->
                     <div class="galeria-filter-row">
@@ -7419,30 +7420,13 @@ function renderGaleria() {
 }
 
 function _galeriaActualitzarChipsCarr(items) {
-    const row = document.getElementById('galeriaFilterCarr');
-    if (!row) return;
-    // Carreteres úniques presents
+    const sel = document.getElementById('galeriaSelectCarr');
+    if (!sel) return;
     const carrs = [...new Set(items.map(i => i.carr || '—'))].sort();
-    // Mantenir chip "Totes" + afegir les carreteres
-    const existing = Array.from(row.querySelectorAll('[data-carr]'));
-    const existingCarrs = existing.filter(e => e.dataset.carr !== 'TOTES').map(e => e.dataset.carr);
-    // Netejar i reconstruir si ha canviat
-    if (JSON.stringify(existingCarrs) !== JSON.stringify(carrs)) {
-        // Eliminar els chips de carretera (no el de "Totes")
-        existing.filter(e => e.dataset.carr !== 'TOTES').forEach(e => e.remove());
-        carrs.forEach(c => {
-            const btn = document.createElement('button');
-            btn.className = 'galeria-filter-chip' + (galeriaFCarr === c ? ' active' : '');
-            btn.dataset.carr = c;
-            btn.textContent = c;
-            btn.onclick = () => galeriaFiltrarCarr(c);
-            row.appendChild(btn);
-        });
-    }
-    // Sincronitzar active
-    row.querySelectorAll('[data-carr]').forEach(b => {
-        b.classList.toggle('active', b.dataset.carr === galeriaFCarr);
-    });
+    // Reconstruir options
+    sel.innerHTML = '<option value="TOTES">Totes les carreteres</option>' +
+        carrs.map(c => `<option value="${c}"${galeriaFCarr === c ? ' selected' : ''}>${c}</option>`).join('');
+    sel.value = galeriaFCarr;
 }
 
 function galeriaFiltrarCarr(carr) {
