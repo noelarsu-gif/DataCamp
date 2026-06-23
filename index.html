@@ -5048,8 +5048,11 @@ req.onsuccess = e => {
             };
         }
     };
-    /* Populate recents as soon as DB is ready */
-    setTimeout(renderRecents, 100);
+    /* Populate recents and preload cache as soon as DB is ready */
+    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
+        allProjectsCache = e.target.result || [];
+        setTimeout(renderRecents, 50);
+    };
 };
 
 /* Load logo from storage */
@@ -6525,62 +6528,99 @@ function clonarP(id) {
    ============================================================ */
 function carregarLlistaDescargues() {
     const container = document.getElementById("listaDescargas");
-    if (!container || !db) return;
+    if (!container) return;
+
+    /* Si DB no és llesta encara, reintenta en 300ms */
+    if (!db) {
+        setTimeout(carregarLlistaDescargues, 300);
+        return;
+    }
 
     const q = (document.getElementById('dlSearch')?.value || '').toLowerCase().trim();
 
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        let projectes = e.target.result || [];
+    const _renderDl = (allData) => {
+        try {
+            let projectes = (allData || []);
 
-        /* ── EXCLUDE quick photos: captura type never appears in downloads ── */
-        projectes = projectes.filter(p => (p.tipusEntrada || 'inventari') !== 'captura');
+            /* ── EXCLUDE quick photos: captura type never appears in downloads ── */
+            projectes = projectes.filter(p => (p.tipusEntrada || 'inventari') !== 'captura');
 
-        /* Filter by search query */
-        if (q) {
-            projectes = projectes.filter(p => {
-                const carr = (p.registros||[]).flatMap(r=>r.values||[])
-                    .find(v=>v.label.toLowerCase().includes('carretera'))?.val || '';
-                return p.titulo.toLowerCase().includes(q) || carr.toLowerCase().includes(q);
-            });
-        }
+            /* Filter by search query */
+            if (q) {
+                projectes = projectes.filter(p => {
+                    try {
+                        const carr = (p.registros||[]).flatMap(r=>r.values||[])
+                            .find(v=>v.label && v.label.toLowerCase().includes('carretera'))?.val || '';
+                        return p.titulo.toLowerCase().includes(q) || carr.toLowerCase().includes(q);
+                    } catch(e) { return true; }
+                });
+            }
 
-        /* Sort newest first */
-        projectes.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+            /* Sort newest first */
+            projectes.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
 
-        /* Update count */
-        const countEl = document.getElementById('dlCount');
-        if (countEl) countEl.textContent = `${projectes.length} projecte${projectes.length!==1?'s':''}`;
+            /* Update count */
+            const countEl = document.getElementById('dlCount');
+            if (countEl) countEl.textContent = `${projectes.length} projecte${projectes.length!==1?'s':''}`;
 
-        if (projectes.length === 0) {
-            container.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
-                <div style='font-size:2.5rem;margin-bottom:12px;'>&#128229;</div>
-                <div style='font-weight:600;'>Cap projecte trobat</div>
-                <div style='font-size:0.82rem;margin-top:6px;'>${q ? 'Prova amb un altre terme de cerca' : 'Crea el primer projecte o inventari des de l\'inici'}</div>
+            if (projectes.length === 0) {
+                container.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
+                    <div style='font-size:2.5rem;margin-bottom:12px;'>&#128229;</div>
+                    <div style='font-weight:600;'>Cap projecte trobat</div>
+                    <div style='font-size:0.82rem;margin-top:6px;'>${q ? 'Prova amb un altre terme de cerca' : "Crea el primer projecte o inventari des de l'inici"}</div>
+                </div>`;
+                return;
+            }
+
+            /* ── Build HTML with per-card try/catch to avoid silent render failures ── */
+            const tableRows = projectes.map(p => { try { return buildTableRow(p); } catch(e) { console.error('[DL] buildTableRow error', p?.id, e); return ''; } }).join('');
+            const cards     = projectes.map(p => { try { return buildCard(p); } catch(e) { console.error('[DL] buildCard error', p?.id, e); return ''; } }).join('');
+
+            container.innerHTML = `
+                <div class="dl-table-wrap">
+                    <table class="dl-table">
+                        <thead>
+                            <tr>
+                                <th class="dl-col-name">Obra / Projecte</th>
+                                <th class="dl-col-carr">Carretera</th>
+                                <th class="dl-col-date">&#218;ltima Mod.</th>
+                                <th class="dl-col-type">Tipus</th>
+                                <th class="dl-col-act">Accions</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+                <div class="dl-cards-wrap">${cards}</div>`;
+        } catch(err) {
+            console.error('[DL] render error:', err);
+            container.innerHTML = `<div style='text-align:center;padding:40px;color:var(--text-muted);'>
+                <div style='font-size:1.5rem;'>⚠️</div>
+                <div style='font-weight:600;margin-top:8px;'>Error carregant descàrregues</div>
+                <div style='font-size:0.82rem;margin-top:4px;'>${err.message}</div>
             </div>`;
-            return;
         }
-
-        /* ── Build HTML ── */
-        const tableRows = projectes.map(p => buildTableRow(p)).join('');
-        const cards     = projectes.map(p => buildCard(p)).join('');
-
-        container.innerHTML = `
-            <div class="dl-table-wrap">
-                <table class="dl-table">
-                    <thead>
-                        <tr>
-                            <th class="dl-col-name">Obra / Projecte</th>
-                            <th class="dl-col-carr">Carretera</th>
-                            <th class="dl-col-date">&#218;ltima Mod.</th>
-                            <th class="dl-col-type">Tipus</th>
-                            <th class="dl-col-act">Accions</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-            </div>
-            <div class="dl-cards-wrap">${cards}</div>`;
     };
+
+    /* Primer intenta des del cache en memòria (instant), després refresca des de DB */
+    if (allProjectsCache && allProjectsCache.length > 0) {
+        _renderDl([...allProjectsCache]);
+    }
+
+    /* Sempre fa la query a DB per tenir dades actualitzades */
+    try {
+        const tx = db.transaction("projects");
+        tx.objectStore("projects").getAll().onsuccess = e => _renderDl(e.target.result || []);
+        tx.onerror = err => console.error('[DL] DB transaction error:', err);
+    } catch(e) {
+        console.error('[DL] DB error:', e);
+        /* Si DB falla però tenim cache, ja s'ha renderitzat dalt */
+        if (!allProjectsCache || allProjectsCache.length === 0) {
+            container.innerHTML = `<div style='text-align:center;padding:40px;color:var(--text-muted);'>
+                <div>⚠️ Error accedint a la base de dades</div>
+            </div>`;
+        }
+    }
 }
 
 function _projMeta(p) {
