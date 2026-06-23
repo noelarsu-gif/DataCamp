@@ -3815,6 +3815,22 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .pkm-amid-add-btn:hover { border-color: #c60c30; color: #c60c30; background: rgba(198,12,48,.1); }
 .pkm-amid-result { background: #374151; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 10px; display: none; }
+/* Etiqueta flotant sobre el mapa */
+.pkm-map-label {
+    background: rgba(20,22,30,0.88);
+    border: 1.5px solid #f59e0b;
+    border-radius: 8px;
+    padding: 4px 10px;
+    color: #f59e0b;
+    font-family: 'Barlow Condensed', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+    transform: translate(-50%, -110%);
+}
+.pkm-map-label.area { border-color: #c084fc; color: #c084fc; }
 .pkm-amid-result.show { display: block; }
 .pkm-amid-res-dist { font-family: monospace; font-size: 1.4rem; font-weight: 700; color: #f59e0b; letter-spacing: -1px; line-height: 1; }
 .pkm-amid-res-sub { font-size: .62rem; color: #d1d5db; margin-top: 2px; }
@@ -9537,9 +9553,6 @@ let pkmAreaLayer = null;
 let pkmAreaMarkers = [];
 let pkmAmidMarkers = [];
 let pkmSheetPos = 1;          // 1=peek (default), 0=obert
-const PKM_ARCGIS = (typeof AUTOPK_CONFIG !== 'undefined' && AUTOPK_CONFIG.ARCGIS_URL)
-    ? AUTOPK_CONFIG.ARCGIS_URL
-    : 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query';
 
 /* ── Init ─────────────────────────────────────────────── */
 function abrirPKMapa() {
@@ -9915,12 +9928,11 @@ async function pkmGoToRoadPK(road, km, m) {
             const zoom = km > 0 ? 15 : 13;
             pkmMap.flyTo([pos.lat, pos.lon], zoom, { animate: true, duration: 1.2 });
             pkmDragPin.setLatLng([pos.lat, pos.lon]);
+            // Usa exactament el mateix motor que el pin: consultarArcGIS + calcularPK
             await pkmCalcPK(pos.lat, pos.lon, false);
-            const label = km > 0 ? `${road} PK ${km}+${String(m).padStart(3,'0')}` : road;
-            showToast('🛣️ ' + label + ' localitzat', 'ok', 2000);
+            if (km > 0) showToast(`${road} PK ${km}+${String(m).padStart(3,'0')} localitzat`, 'ok', 2000);
         } else {
-            if (km > 0) showToast('No s\'ha pogut precisar ' + road, 'warn', 3000);
-            else showToast('No s\'ha trobat ' + road, 'err');
+            showToast(`No s'ha trobat ${road}`, 'err');
         }
     } catch(e) {
         showToast('Error cercant: ' + e.message, 'err');
@@ -10050,18 +10062,24 @@ function pkmAfegirPuntLliureAt(latlng) {
     pkmRedrawAmid();
     pkmRenderAmidPts();
 }
+let pkmAmidLabelMarker = null;
 function pkmRedrawAmid() {
     pkmAmidPunts = pkmAmidMarkers.map(mk => mk.getLatLng());
     if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    if (pkmAmidLabelMarker) { pkmAmidLabelMarker.remove(); pkmAmidLabelMarker = null; }
     if (pkmAmidPunts.length < 2) return;
     pkmAmidLayer = L.polyline(pkmAmidPunts, { color:'#f59e0b', weight:3, dashArray:'8,5' }).addTo(pkmMap);
     let dist = 0;
     for (let i=1; i<pkmAmidPunts.length; i++) dist += pkmAmidPunts[i-1].distanceTo(pkmAmidPunts[i]);
     const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
-    const res = document.getElementById('pkmAmidResult');
+    // Etiqueta flotant al centre de la polilínia
+    const mid = pkmAmidPunts[Math.floor((pkmAmidPunts.length-1)/2)];
+    const icon = L.divIcon({ className:'', html:`<div class="pkm-map-label">${label}</div>`, iconSize:null, iconAnchor:[0,0] });
+    pkmAmidLabelMarker = L.marker(mid, { icon, interactive:false, zIndexOffset:500 }).addTo(pkmMap);
+    // Actualitza també el panell sidebar (ara secundari)
     document.getElementById('pkmAmidDistText').textContent = label;
     document.getElementById('pkmAmidDistSub').textContent = `${pkmAmidPunts.length} punts`;
-    res.classList.add('show');
+    document.getElementById('pkmAmidResult').classList.add('show');
 }
 function pkmRenderAmidPts() {
     const el = document.getElementById('pkmFreePtsList');
@@ -10082,6 +10100,7 @@ function pkmEsborrarAmidament(silent) {
     pkmAmidMarkers.forEach(m => m.remove());
     pkmAmidMarkers = []; pkmAmidPunts = [];
     if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    if (typeof pkmAmidLabelMarker !== 'undefined' && pkmAmidLabelMarker) { pkmAmidLabelMarker.remove(); pkmAmidLabelMarker = null; }
     document.getElementById('pkmFreePtsList').innerHTML = '';
     document.getElementById('pkmAmidResult').classList.remove('show');
     if (!silent) showToast('Mesurament esborrat', 'ok', 1500);
@@ -10135,10 +10154,18 @@ function pkmEsborrarPuntArea(i) {
     pkmAreaMarkers[i].remove(); pkmAreaMarkers.splice(i,1); pkmAreaPunts.splice(i,1);
     pkmRedrawArea(); pkmRenderAreaPts();
 }
+let pkmAreaLabelMarker = null;
 function pkmTancarPoligon() {
     if (pkmAreaPunts.length < 3) { showToast('Necessites almenys 3 punts', 'warn'); return; }
     const area = pkmCalcArea(pkmAreaPunts);
     const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
+    // Etiqueta flotant al centroide del polígon
+    if (pkmAreaLabelMarker) { pkmAreaLabelMarker.remove(); pkmAreaLabelMarker = null; }
+    const latC = pkmAreaPunts.reduce((s,p)=>s+p.lat,0)/pkmAreaPunts.length;
+    const lngC = pkmAreaPunts.reduce((s,p)=>s+p.lng,0)/pkmAreaPunts.length;
+    const icon = L.divIcon({ className:'', html:`<div class="pkm-map-label area">${label}</div>`, iconSize:null, iconAnchor:[0,0] });
+    pkmAreaLabelMarker = L.marker([latC,lngC], { icon, interactive:false, zIndexOffset:500 }).addTo(pkmMap);
+    // Panell sidebar
     document.getElementById('pkmAreaValText').textContent = label;
     document.getElementById('pkmAreaSubText').textContent = `${pkmAreaPunts.length} vèrtexs`;
     document.getElementById('pkmAreaResult').classList.add('show');
@@ -10147,6 +10174,7 @@ function pkmEsborrarArea(silent) {
     pkmAreaMarkers.forEach(m => m.remove());
     pkmAreaMarkers = []; pkmAreaPunts = [];
     if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
+    if (typeof pkmAreaLabelMarker !== 'undefined' && pkmAreaLabelMarker) { pkmAreaLabelMarker.remove(); pkmAreaLabelMarker = null; }
     document.getElementById('pkmAreaPtsList').innerHTML = '';
     document.getElementById('pkmAreaResult').classList.remove('show');
     if (!silent) showToast('Àrea esborrada', 'ok', 1500);
