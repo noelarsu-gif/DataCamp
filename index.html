@@ -407,13 +407,12 @@ html, body {
 .pk-widget-btn-sm:hover { background: rgba(255,255,255,0.14); color: white; }
 .pk-chips-label {
     font-size: 0.68rem;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.4);
     margin-bottom: 10px;
 }
-/* Chips en fondo oscuro (widget dashboard) */
 .pk-chips-row {
     display: flex;
     flex-wrap: wrap;
@@ -424,76 +423,43 @@ html, body {
     flex-direction: column;
     align-items: flex-start;
     gap: 1px;
-    background: rgba(255,255,255,0.10);
-    border: 2px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.12);
     border-radius: 10px;
-    padding: 10px 16px;
+    padding: 8px 14px;
     cursor: pointer;
     transition: var(--transition);
-    min-width: 100px;
+    min-width: 90px;
 }
 .pk-chip:hover, .pk-chip:focus {
-    background: rgba(198,12,48,0.25);
+    background: rgba(198,12,48,0.2);
     border-color: var(--primary);
     outline: none;
 }
 .pk-chip.selected {
-    background: rgba(198,12,48,0.35);
+    background: rgba(198,12,48,0.25);
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(198,12,48,0.35);
+    box-shadow: 0 0 0 2px rgba(198,12,48,0.3);
 }
 .pk-chip-road {
     font-family: var(--font-cond);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 800;
-    color: #ff8fa3;
+    color: var(--primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-.pk-chip.selected .pk-chip-road {
-    color: #ffb3c1;
-}
 .pk-chip-pk {
     font-family: var(--font-cond);
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 900;
     color: white;
     line-height: 1.1;
 }
 .pk-chip-dist {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.5);
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.35);
     margin-top: 2px;
-}
-
-/* Chips en fondo BLANC (formulari / foto ràpida) */
-.pk-chips-row.light-bg .pk-chip {
-    background: #f0f0f0;
-    border: 2px solid #bdbdbd;
-}
-.pk-chips-row.light-bg .pk-chip:hover,
-.pk-chips-row.light-bg .pk-chip:focus {
-    background: #fde8ec;
-    border-color: var(--primary);
-}
-.pk-chips-row.light-bg .pk-chip.selected {
-    background: #fde8ec;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(198,12,48,0.2);
-}
-.pk-chips-row.light-bg .pk-chip-road {
-    color: var(--primary);
-}
-.pk-chips-row.light-bg .pk-chip-pk {
-    color: #111827;
-}
-.pk-chips-row.light-bg .pk-chip-dist {
-    color: #6b7280;
-}
-/* Label en contexto claro */
-.pk-chips-area-light .pk-chips-label {
-    color: #6b7280;
 }
 .pk-widget-msg {
     display: flex;
@@ -504,64 +470,6 @@ html, body {
     color: rgba(255,255,255,0.6);
 }
 .pk-widget-msg span:first-child { font-size: 1.1rem; flex-shrink: 0; }
-
-/* Widget: resultat principal + chips alternatius petits */
-.pk-widget-result-plus {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-.pk-widget-result-plus .pk-widget-result {
-    display: flex !important;
-}
-.pk-widget-alts-label {
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(255,255,255,0.38);
-    margin-bottom: 6px;
-}
-.pk-widget-alts-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-.pk-chip-mini {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.07);
-    border: 1.5px solid rgba(255,255,255,0.18);
-    border-radius: 20px;
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: var(--transition);
-    white-space: nowrap;
-}
-.pk-chip-mini:hover, .pk-chip-mini:focus {
-    background: rgba(198,12,48,0.25);
-    border-color: var(--primary);
-    outline: none;
-}
-.pk-chip-mini-road {
-    font-family: var(--font-cond);
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: #ff8fa3;
-    text-transform: uppercase;
-}
-.pk-chip-mini-pk {
-    font-family: var(--font-cond);
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: white;
-}
-.pk-chip-mini-dist {
-    font-size: 0.6rem;
-    color: rgba(255,255,255,0.4);
-}
 
 /* ============================================================
    BLACKLIST DE CARRETERES — Configuració
@@ -2510,18 +2418,18 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* ============================================================
    GALERIA DE FOTOS RÀPIDES
    ============================================================ */
-/* Toolbar de la galeria */
+/* ── Toolbar nova galeria ── */
 .galeria-toolbar {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    margin-bottom: 0;
+    padding-bottom: 10px;
 }
 .galeria-toolbar-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin-left: auto;
 }
 .galeria-count-badge {
@@ -2559,6 +2467,135 @@ input:checked + .slider:before { transform: translateX(20px); }
 .galeria-btn.danger:hover { background: #ffe4e6; }
 .galeria-btn.blue  { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
 .galeria-btn.blue:hover  { background: #1e40af; }
+
+/* Botó 3 punts */
+.galeria-menu-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    flex-shrink: 0;
+}
+.galeria-menu-btn:hover { background: var(--bg-alt); }
+.galeria-menu-btn:active { transform: scale(0.92); }
+
+/* Menú desplegable */
+.galeria-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    min-width: 210px;
+    z-index: 999;
+    overflow: hidden;
+    transform-origin: top right;
+    transform: scale(0.92);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.18s cubic-bezier(.4,0,.2,1), opacity 0.15s;
+}
+.galeria-dropdown.open {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+.galeria-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.12s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+.galeria-dropdown-item:hover { background: var(--bg-alt); }
+.galeria-dropdown-item:active { background: var(--border); }
+.galeria-dropdown-item .ddi-icon { font-size: 1.15rem; width: 22px; text-align: center; }
+.galeria-dropdown-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+}
+.galeria-dropdown-item.danger { color: #dc2626; }
+.galeria-dropdown-item.danger:hover { background: #fff1f2; }
+
+/* Capa per tancar el menú en clicar fora */
+.galeria-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+}
+.galeria-overlay.open { display: block; }
+
+/* ── Barra de filtres ── */
+.galeria-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+.galeria-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.galeria-filter-row::-webkit-scrollbar { display: none; }
+.galeria-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    font-family: var(--font-cond);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.galeria-filter-chip:hover { background: var(--bg-alt); border-color: var(--text-muted); }
+.galeria-filter-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.galeria-filter-chip.blue.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+.galeria-filter-sep {
+    width: 1px; height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+.galeria-filters-empty { display: none; }
 
 /* Selecció mode */
 .galeria-select-bar {
@@ -4285,21 +4322,23 @@ input:checked + .slider:before { transform: translateX(20px); }
                         </button>
                     </div>
 
-                    <!-- Resultat principal (sempre la més propera en gran) -->
-                    <div class="pk-widget-result-plus" id="pkWidgetResultPlus" style="display:none;">
-                        <div class="pk-widget-result" id="pkWidgetResult">
-                            <div class="pk-result-road" id="pkResultRoad">—</div>
-                            <div class="pk-result-pk" id="pkResultPK">PK —</div>
-                            <div class="pk-result-meta" id="pkResultMeta"></div>
-                            <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
-                                🔄 Actualitzar
-                            </button>
-                        </div>
-                        <!-- Chips alternatius petits (només si n>1) -->
-                        <div id="pkWidgetAlts" style="display:none;">
-                            <div class="pk-widget-alts-label">Altres carreteres properes:</div>
-                            <div class="pk-widget-alts-row" id="pkWidgetAltsRow"></div>
-                        </div>
+                    <!-- Resultat: una carretera o cap -->
+                    <div class="pk-widget-result" id="pkWidgetResult" style="display:none;">
+                        <div class="pk-result-road" id="pkResultRoad">—</div>
+                        <div class="pk-result-pk" id="pkResultPK">PK —</div>
+                        <div class="pk-result-meta" id="pkResultMeta"></div>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
+                            🔄 Actualitzar
+                        </button>
+                    </div>
+
+                    <!-- Chips: múltiples carreteres properes -->
+                    <div class="pk-chips-area" id="pkChipsArea" style="display:none;">
+                        <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+                        <div class="pk-chips-row" id="pkChipsRow"></div>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()" style="margin-top:8px;">
+                            🔄 Actualitzar
+                        </button>
                     </div>
 
                     <!-- Missatge d'error / advertència -->
@@ -4396,9 +4435,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </button>
 
                 <!-- Chips carreteres properes (inventari) -->
-                <div id="autopkChipsArea" class="pk-chips-area-light" style="display:none; margin-bottom:14px;">
+                <div id="autopkChipsArea" style="display:none; margin-bottom:14px;">
                     <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
-                    <div class="pk-chips-row light-bg" id="autopkChipsRow"></div>
+                    <div class="pk-chips-row" id="autopkChipsRow"></div>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
@@ -4767,18 +4806,54 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <h3>🖼️ Galeria de Fotos</h3>
                 </div>
 
+                <!-- Capa fora per tancar menú -->
+                <div class="galeria-overlay" id="galeriaOverlay" onclick="galeriaMenuTancar()"></div>
+
                 <!-- Toolbar principal -->
                 <div class="galeria-toolbar" id="galeriaToolbar">
                     <span class="galeria-count-badge" id="galeriaBadge">0 fotos</span>
-                    <button class="galeria-btn" onclick="toggleSelectMode()" id="btnSelectMode">Seleccionar</button>
                     <div class="galeria-toolbar-right">
-                        <button class="galeria-btn blue" onclick="modeFotoDirecta()" title="Fer foto nova">
-                            📷 Foto
-                        </button>
-                        <button class="galeria-btn blue" onclick="carregarFotoDispositiu()" title="Carregar foto des del dispositiu">
-                            📂 Carregar
-                        </button>
-                        <input type="file" id="galeriaLoadInput" multiple accept="image/*" hidden onchange="galeriaCarregarFotos(this)">
+                        <!-- Botó 3 punts -->
+                        <div style="position:relative;">
+                            <button class="galeria-menu-btn" onclick="galeriaMenuToggle()" title="Més opcions" id="galeriaMenuBtn">⋮</button>
+                            <div class="galeria-dropdown" id="galeriaDropdown">
+                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('foto')">
+                                    <span class="ddi-icon">📷</span> Fer foto nova
+                                </button>
+                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('carregar')">
+                                    <span class="ddi-icon">📂</span> Carregar del dispositiu
+                                </button>
+                                <div class="galeria-dropdown-sep"></div>
+                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('seleccionar')" id="ddSeleccionar">
+                                    <span class="ddi-icon">☑️</span> Seleccionar fotos
+                                </button>
+                                <div class="galeria-dropdown-sep"></div>
+                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('recents')">
+                                    <span class="ddi-icon">🕐</span> Recents primer
+                                </button>
+                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('antics')">
+                                    <span class="ddi-icon">📅</span> Antics primer
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="galeriaLoadInput" multiple accept="image/*" hidden onchange="galeriaCarregarFotos(this)">
+                </div>
+
+                <!-- Barra de filtres -->
+                <div class="galeria-filters" id="galeriaFilters">
+                    <!-- Fila 1: ordre + carreteres -->
+                    <div class="galeria-filter-row" id="galeriaFilterCarr">
+                        <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Carretera:</span>
+                        <button class="galeria-filter-chip active" data-carr="TOTES" onclick="galeriaFiltrarCarr('TOTES')">Totes</button>
+                        <!-- poblat per JS -->
+                    </div>
+                    <!-- Fila 2: data -->
+                    <div class="galeria-filter-row">
+                        <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Ordre:</span>
+                        <button class="galeria-filter-chip active" id="fOrdreRecents" onclick="galeriaSetOrdre('desc')">🕐 Recents</button>
+                        <button class="galeria-filter-chip" id="fOrdreAntics" onclick="galeriaSetOrdre('asc')">📅 Antics</button>
                     </div>
                 </div>
 
@@ -7228,6 +7303,7 @@ function volGuardarAlDispositiu() {
 // IndexedDB store "galeriaFotos": { id, imgData, carr, pk, marge, ts, coordStr }
 
 let galeriaSelectMode = false;
+let _fdLastLat = null, _fdLastLon = null; // coords GPS última foto directa
 const galeriaSeleccio = new Set();
 let galeriaItems = [];      // cache local
 let visorCurrentId = null;  // id de la foto al visor
@@ -7282,9 +7358,15 @@ function galeriaLlegirTotes(callback) {
 }
 
 /* Renderitza el grid */
+/* ── Estat filtres galeria ── */
+let galeriaOrdre   = 'desc';  // 'desc' recents primer | 'asc' antics primer
+let galeriaFCarr   = 'TOTES'; // filtre carretera actiu
+
 function renderGaleria() {
     galeriaLlegirTotes(items => {
-        galeriaItems = items.sort((a,b) => b.ts - a.ts);
+        // Guardar tots per filtres
+        galeriaItems = items;
+
         const grid  = document.getElementById('galeriaGrid');
         const empty = document.getElementById('galeriaEmpty');
         const badge = document.getElementById('galeriaBadge');
@@ -7292,17 +7374,36 @@ function renderGaleria() {
 
         badge.textContent = `${items.length} foto${items.length !== 1 ? 's' : ''}`;
 
-        if (items.length === 0) {
+        // Actualitzar chips de carreteres
+        _galeriaActualitzarChipsCarr(items);
+
+        // Aplicar filtres
+        let filtered = items.slice();
+        if (galeriaFCarr !== 'TOTES') {
+            filtered = filtered.filter(i => (i.carr || '—') === galeriaFCarr);
+        }
+        // Ordre
+        filtered.sort((a, b) => galeriaOrdre === 'desc' ? b.ts - a.ts : a.ts - b.ts);
+
+        if (filtered.length === 0 && items.length === 0) {
             grid.innerHTML = '';
             if (empty) empty.style.display = 'block';
+            document.getElementById('galeriaFilters').style.display = 'none';
             return;
         }
         if (empty) empty.style.display = 'none';
+        document.getElementById('galeriaFilters').style.display = items.length > 0 ? 'flex' : 'none';
 
-        grid.innerHTML = items.map(item => {
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:0.88rem;">Cap foto amb aquest filtre</div>`;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(item => {
             const roadLabel = item.carr || '—';
             const pkLabel   = item.pk   ? `PK ${item.pk}` : '';
             const sel       = galeriaSeleccio.has(item.id) ? 'selected' : '';
+            const dateStr   = item.ts ? new Date(item.ts).toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit'}) : '';
             return `
             <div class="galeria-thumb ${sel}" data-id="${item.id}" onclick="galeriaThumbnailClick('${item.id}')">
                 <img src="${item.imgData}" loading="lazy" alt="${roadLabel}">
@@ -7310,10 +7411,79 @@ function renderGaleria() {
                 <div class="galeria-thumb-info">
                     <div class="galeria-thumb-road">${roadLabel}</div>
                     ${pkLabel ? `<div class="galeria-thumb-pk">${pkLabel}</div>` : ''}
+                    ${dateStr ? `<div class="galeria-thumb-pk" style="opacity:0.6;">${dateStr}</div>` : ''}
                 </div>
             </div>`;
         }).join('');
     });
+}
+
+function _galeriaActualitzarChipsCarr(items) {
+    const row = document.getElementById('galeriaFilterCarr');
+    if (!row) return;
+    // Carreteres úniques presents
+    const carrs = [...new Set(items.map(i => i.carr || '—'))].sort();
+    // Mantenir chip "Totes" + afegir les carreteres
+    const existing = Array.from(row.querySelectorAll('[data-carr]'));
+    const existingCarrs = existing.filter(e => e.dataset.carr !== 'TOTES').map(e => e.dataset.carr);
+    // Netejar i reconstruir si ha canviat
+    if (JSON.stringify(existingCarrs) !== JSON.stringify(carrs)) {
+        // Eliminar els chips de carretera (no el de "Totes")
+        existing.filter(e => e.dataset.carr !== 'TOTES').forEach(e => e.remove());
+        carrs.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'galeria-filter-chip' + (galeriaFCarr === c ? ' active' : '');
+            btn.dataset.carr = c;
+            btn.textContent = c;
+            btn.onclick = () => galeriaFiltrarCarr(c);
+            row.appendChild(btn);
+        });
+    }
+    // Sincronitzar active
+    row.querySelectorAll('[data-carr]').forEach(b => {
+        b.classList.toggle('active', b.dataset.carr === galeriaFCarr);
+    });
+}
+
+function galeriaFiltrarCarr(carr) {
+    galeriaFCarr = carr;
+    renderGaleria();
+}
+
+function galeriaSetOrdre(ordre) {
+    galeriaOrdre = ordre;
+    document.getElementById('fOrdreRecents')?.classList.toggle('active', ordre === 'desc');
+    document.getElementById('fOrdreAntics')?.classList.toggle('active', ordre === 'asc');
+    renderGaleria();
+}
+
+/* ── Menú 3 punts ── */
+function galeriaMenuToggle() {
+    const dd  = document.getElementById('galeriaDropdown');
+    const ov  = document.getElementById('galeriaOverlay');
+    const open = dd.classList.toggle('open');
+    ov.classList.toggle('open', open);
+}
+function galeriaMenuTancar() {
+    document.getElementById('galeriaDropdown')?.classList.remove('open');
+    document.getElementById('galeriaOverlay')?.classList.remove('open');
+}
+function galeriaMenuAccio(accio) {
+    galeriaMenuTancar();
+    switch(accio) {
+        case 'foto':        modeFotoDirecta(); break;
+        case 'carregar':    carregarFotoDispositiu(); break;
+        case 'seleccionar': toggleSelectMode(); break;
+        case 'recents':     galeriaSetOrdre('desc'); break;
+        case 'antics':      galeriaSetOrdre('asc'); break;
+        case 'eliminarTot':
+            if (galeriaItems.length === 0) { showToast('La galeria ja és buida'); return; }
+            if (!confirm(`Eliminar totes les ${galeriaItems.length} fotos? Aquesta acció no es pot desfer.`)) return;
+            const tx = db.transaction('galeriaFotos','readwrite');
+            tx.objectStore('galeriaFotos').clear();
+            tx.oncomplete = () => { renderGaleria(); showToast('🗑️ Galeria buidada'); };
+            break;
+    }
 }
 
 /* Click en miniatura: si mode selecció → toggle; si no → obre visor */
@@ -7384,6 +7554,29 @@ function galeriaEliminarSeleccio() {
     };
 }
 
+/* Genera el text automàtic per compartir fotos (format WhatsApp / camp) */
+function _galeriaTextCompartir(item) {
+    const lines = [];
+    if (item.carr) lines.push(`🛣️ Carretera: ${item.carr}`);
+    if (item.pk)   lines.push(`📍 PK: ${item.pk}${item.marge ? ' · ' + item.marge : ''}`);
+    if (item.lat && item.lon) {
+        const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
+        lines.push(`🌐 Ubicació: ${url}`);
+    } else if (item.coordStr) {
+        const [la, lo] = item.coordStr.split(',').map(s => parseFloat(s.trim()));
+        if (!isNaN(la) && !isNaN(lo)) {
+            lines.push(`🌐 Ubicació: http://maps.google.com/maps?q=${la.toFixed(7)},${lo.toFixed(7)}`);
+        }
+    }
+    if (item.ts) {
+        const d = new Date(item.ts);
+        const dateStr = d.toLocaleDateString('ca-ES', { day:'2-digit', month:'2-digit', year:'numeric' });
+        const timeStr = d.toLocaleTimeString('ca-ES', { hour:'2-digit', minute:'2-digit' });
+        lines.push(`🕐 Data: ${dateStr} ${timeStr}`);
+    }
+    return lines.join('\n');
+}
+
 /* Compartir fotos seleccionades */
 async function galeriaCompartirSeleccio() {
     if (galeriaSeleccio.size === 0) { showToast('Cap foto seleccionada'); return; }
@@ -7398,8 +7591,14 @@ async function galeriaCompartirSeleccio() {
                 : `foto_rapida_${idx+1}.jpg`;
             return new File([blob], name, { type: 'image/jpeg' });
         }));
+
+        // Text automàtic: un bloc per foto si n=1, resum si n>1
+        const text = items.length === 1
+            ? _galeriaTextCompartir(items[0])
+            : items.map((it, i) => `[Foto ${i+1}]\n${_galeriaTextCompartir(it)}`).join('\n\n');
+
         if (navigator.canShare && navigator.canShare({ files })) {
-            await navigator.share({ files, title: 'Fotos Ràpides DATACAMP' });
+            await navigator.share({ files, title: 'Fotos DATACAMP', text });
         } else {
             // Fallback: descarregar totes
             files.forEach(f => {
@@ -7450,8 +7649,9 @@ async function visorCompartir() {
             ? `${item.carr}_PK${item.pk}_${item.marge || ''}.jpg`.replace(/[^a-z0-9_.-]/gi,'_')
             : 'foto_rapida.jpg';
         const file = new File([blob], name, { type: 'image/jpeg' });
+        const text = _galeriaTextCompartir(item);
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: name });
+            await navigator.share({ files: [file], title: name, text });
         } else {
             visorDescarregar();
         }
@@ -7546,9 +7746,9 @@ function obrirEditorFotoDirecta(imgData) {
         </button>
 
         <!-- Chips carreteres properes -->
-        <div id="fdChipsArea" class="pk-chips-area-light" style="display:none; margin-bottom:14px;">
+        <div id="fdChipsArea" style="display:none; margin-bottom:14px;">
             <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
-            <div class="pk-chips-row light-bg" id="fdChipsRow"></div>
+            <div class="pk-chips-row" id="fdChipsRow"></div>
         </div>
 
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:18px;">
@@ -7618,6 +7818,7 @@ function obrirEditorFotoDirecta(imgData) {
     if (btnAutoPKFoto) {
         // Resultats locals per poder aplicar el chip seleccionat
         let _fdResultats = [];
+        _fdLastLat = null; _fdLastLon = null; // GPS coords de l'última detecció
 
         function fdAplicarResultat(r) {
             const msStr    = String(r.m).padStart(3, '0');
@@ -7666,6 +7867,7 @@ function obrirEditorFotoDirecta(imgData) {
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+                    _fdLastLat = lat; _fdLastLon = lon;
                     fdAutopkMostrarEstat('', '🗺️', `GPS OK (±${Math.round(accuracy)}m) — Cercant carreteres properes...`);
                     try {
                         let punts = [];
@@ -7784,7 +7986,9 @@ async function guardarFotoDirecta(imgData) {
         imgData:  finalImg,
         carr, pk, marge,
         ts:       ara.getTime(),
-        coordStr: ''
+        coordStr: '',
+        lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
+        lon: (typeof _fdLastLon !== 'undefined' ? _fdLastLon : null),
     };
 
     const navegarAGaleria = () => {
@@ -9290,9 +9494,10 @@ let _pkWidgetResultats = []; // tots els resultats per carretera
 let _pkWidgetSelected = null; // resultat seleccionat
 
 function pkWidgetReset() {
-    document.getElementById('pkWidgetIdle').style.display       = 'flex';
-    document.getElementById('pkWidgetResultPlus').style.display = 'none';
-    document.getElementById('pkWidgetMsg').style.display        = 'none';
+    document.getElementById('pkWidgetIdle').style.display = 'flex';
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
 }
 
 function pkWidgetSetLoading(actiu) {
@@ -9306,69 +9511,52 @@ function pkWidgetSetLoading(actiu) {
     if (txt)   txt.textContent     = actiu ? 'DETECTANT...' : '🔍 DETECTAR';
 }
 
-function _pkWidgetMostrarPrincipal(resultat) {
+function pkWidgetMostrarResultat(resultat) {
+    // Amagar la resta
+    document.getElementById('pkWidgetIdle').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
+    // Mostrar resultat principal
     const msStr = String(resultat.m).padStart(3, '0');
     document.getElementById('pkResultRoad').textContent = resultat.carretera;
     document.getElementById('pkResultPK').textContent   = `PK ${resultat.km}+${msStr}`;
     document.getElementById('pkResultMeta').textContent = `±${Math.round(resultat.dist)}m de la calçada`;
+    document.getElementById('pkWidgetResult').style.display = 'flex';
     _pkWidgetSelected = resultat;
 }
 
-function pkWidgetMostrarResultat(resultat) {
-    document.getElementById('pkWidgetIdle').style.display    = 'none';
-    document.getElementById('pkWidgetMsg').style.display     = 'none';
-    document.getElementById('pkWidgetAlts').style.display    = 'none';
-    _pkWidgetMostrarPrincipal(resultat);
-    document.getElementById('pkWidgetResultPlus').style.display = 'flex';
-}
-
 function pkWidgetMostrarChips(resultats) {
+    // Amagar la resta
     document.getElementById('pkWidgetIdle').style.display = 'none';
-    document.getElementById('pkWidgetMsg').style.display  = 'none';
-
-    // Sempre mostrar la primera (la més propera) en gran
-    _pkWidgetMostrarPrincipal(resultats[0]);
-    document.getElementById('pkWidgetResultPlus').style.display = 'flex';
-
-    // Si hi ha més d'una, mostrar les altres com a chips mini a sota
-    if (resultats.length > 1) {
-        const altsRow = document.getElementById('pkWidgetAltsRow');
-        altsRow.innerHTML = resultats.slice(1).map((r, i) => {
-            const msStr = String(r.m).padStart(3, '0');
-            return `<button class="pk-chip-mini" onclick="pkWidgetSeleccionarChip(${i + 1})" data-chip="${i + 1}">
-                <span class="pk-chip-mini-road">${r.carretera}</span>
-                <span class="pk-chip-mini-pk">PK ${r.km}+${msStr}</span>
-                <span class="pk-chip-mini-dist">±${Math.round(r.dist)}m</span>
-            </button>`;
-        }).join('');
-        document.getElementById('pkWidgetAlts').style.display = 'block';
-    } else {
-        document.getElementById('pkWidgetAlts').style.display = 'none';
-    }
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkWidgetMsg').style.display = 'none';
+    // Construir chips
+    const row = document.getElementById('pkChipsRow');
+    row.innerHTML = resultats.map((r, i) => {
+        const msStr = String(r.m).padStart(3, '0');
+        return `<button class="pk-chip${i === 0 ? ' selected' : ''}" onclick="pkWidgetSeleccionarChip(${i})" data-chip="${i}">
+            <span class="pk-chip-road">${r.carretera}</span>
+            <span class="pk-chip-pk">PK ${r.km}+${msStr}</span>
+            <span class="pk-chip-dist">±${Math.round(r.dist)}m</span>
+        </button>`;
+    }).join('');
+    document.getElementById('pkChipsArea').style.display = 'block';
+    // Seleccionar el primer per defecte
+    pkWidgetSeleccionarChip(0);
 }
 
 function pkWidgetSeleccionarChip(idx) {
-    const r = _pkWidgetResultats[idx];
-    if (!r) return;
-    // Mostrar la seleccionada en gran i les altres com a chips mini
-    const tots = _pkWidgetResultats;
-    _pkWidgetMostrarPrincipal(r);
-    // Reconstruir alts sense la seleccionada
-    const altsRow = document.getElementById('pkWidgetAltsRow');
-    altsRow.innerHTML = tots.filter((_, i) => i !== idx).map((alt, j) => {
-        const origIdx = tots.indexOf(alt);
-        const msStr = String(alt.m).padStart(3, '0');
-        return `<button class="pk-chip-mini" onclick="pkWidgetSeleccionarChip(${origIdx})" data-chip="${origIdx}">
-            <span class="pk-chip-mini-road">${alt.carretera}</span>
-            <span class="pk-chip-mini-pk">PK ${alt.km}+${msStr}</span>
-            <span class="pk-chip-mini-dist">±${Math.round(alt.dist)}m</span>
-        </button>`;
-    }).join('');
+    _pkWidgetSelected = _pkWidgetResultats[idx];
+    // Actualitzar visual
+    document.querySelectorAll('#pkChipsRow .pk-chip').forEach((el, i) => {
+        el.classList.toggle('selected', i === idx);
+    });
 }
 
 function pkWidgetMostrarError(icon, text) {
-    document.getElementById('pkWidgetIdle').style.display        = 'none';
-    document.getElementById('pkWidgetResultPlus').style.display  = 'none';
+    document.getElementById('pkWidgetIdle').style.display = 'none';
+    document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
     document.getElementById('pkWidgetMsgIcon').textContent = icon;
     document.getElementById('pkWidgetMsgTxt').textContent  = text;
     document.getElementById('pkWidgetMsg').style.display   = 'flex';
