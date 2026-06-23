@@ -9851,8 +9851,9 @@ function pkmSearchInput(val) {
     const drop = document.getElementById('pkmTopDrop');
     if (!val.trim()) { drop.classList.remove('open'); return; }
 
-    // PK format: C-14 120+200
-    const pkMatch = val.match(/([A-Za-z][A-Za-z0-9-]*)\s+(\d+)(?:\+(\d+))?/);
+    // PK format: C-14 120+200 o C-14 120 — NOMÉS si hi ha número complet (km real, no 1 sola xifra mentre s'escriu)
+    // Exigim almenys 2 dígits al km per evitar falsos positius mentre es tecla "C-14 1"
+    const pkMatch = val.match(/^([A-Za-z][A-Za-z0-9-]*)\s+(\d{2,})(?:\+(\d+))?$/);
     if (pkMatch) {
         const road = pkMatch[1].toUpperCase(), km = parseInt(pkMatch[2]), m = parseInt(pkMatch[3]||0);
         drop.innerHTML = `<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${road}',${km},${m})">🛣️ ${road} PK ${km}+${String(m).padStart(3,'0')} — Tocar per anar-hi</div>`;
@@ -9862,14 +9863,18 @@ function pkmSearchInput(val) {
 
     pkmSearchTimeout = setTimeout(async () => {
         const q = val.toUpperCase().trim();
-        // Cerca local en cache PKs
+        // Cerca local en cache PKs — normalitzar a majúscules en inserir
         const cache = typeof pkCache !== 'undefined' && pkCache ? pkCache : [];
-        cache.forEach(p => { if (p.carretera && !pkmSearchCache.find(c=>c.nom===p.carretera)) pkmSearchCache.push({nom:p.carretera}); });
+        cache.forEach(p => {
+            const nom = (p.carretera||'').trim().toUpperCase();
+            if (nom && !pkmSearchCache.find(c=>c.nom===nom)) pkmSearchCache.push({nom});
+        });
         let res = pkmSearchCache.filter(c=>c.nom.includes(q)).slice(0,5);
+
         // Si poc, consulta ArcGIS
         if (res.length < 3) {
             try {
-                const params = new URLSearchParams({ where:`UPPER(nombre) LIKE '${q}%'`, outFields:'nombre,numero', returnGeometry:true, outSR:'4326', f:'json', resultRecordCount:100 });
+                const params = new URLSearchParams({ where:`UPPER(nombre) LIKE '${q}%'`, outFields:'nombre,numero', returnGeometry:false, outSR:'4326', f:'json', resultRecordCount:100 });
                 const r = await fetch(`${PKM_ARCGIS}?${params}`, {signal:AbortSignal.timeout(6000)});
                 const d = await r.json();
                 (d.features||[]).forEach(f => {
@@ -9879,21 +9884,20 @@ function pkmSearchInput(val) {
                 res = pkmSearchCache.filter(c=>c.nom.includes(q)).slice(0,5);
             } catch {}
         }
-        // Nominatim municipis
+
+        // Nominatim municipis — sempre en paral·lel, independentment de si hi ha carreteres
+        let munis = [];
         try {
             const nr = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=es&limit=5&format=json&addressdetails=1`, {headers:{'Accept-Language':'ca,es'},signal:AbortSignal.timeout(5000)});
             const nj = await nr.json();
-            const munis = nj.map(r => ({ nom: r.display_name.split(',')[0], lat: parseFloat(r.lat), lon: parseFloat(r.lon) }));
-            const carritems = res.map(c => `<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${c.nom}',0,0)">🛣️ ${c.nom}</div>`).join('');
-            const muniitems = munis.map(m => `<div class="pkm-drop-item" onclick="pkmGoToLatLon(${m.lat},${m.lon})">📍 ${m.nom}</div>`).join('');
-            const combined = carritems + muniitems;
-            if (!combined) { drop.classList.remove('open'); return; }
-            drop.innerHTML = combined;
-            drop.classList.add('open');
-            return;
+            munis = nj.map(r => ({ nom: r.display_name.split(',')[0], lat: parseFloat(r.lat), lon: parseFloat(r.lon) }));
         } catch {}
-        if (!res.length) { drop.classList.remove('open'); return; }
-        drop.innerHTML = res.map(c=>`<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${c.nom}',0,0)">🛣️ ${c.nom}</div>`).join('');
+
+        const carritems = res.map(c => `<div class="pkm-drop-item" onclick="pkmGoToRoadPK('${c.nom}',0,0)">🛣️ ${c.nom}</div>`).join('');
+        const muniitems = munis.map(m => `<div class="pkm-drop-item" onclick="pkmGoToLatLon(${m.lat},${m.lon})">📍 ${m.nom}</div>`).join('');
+        const combined = carritems + muniitems;
+        if (!combined) { drop.classList.remove('open'); return; }
+        drop.innerHTML = combined;
         drop.classList.add('open');
     }, 350);
 }
