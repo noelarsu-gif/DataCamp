@@ -9,7 +9,7 @@
                  si tampoc hi ha xarxa, fallback offline.html
    ================================================================ */
 
-const CACHE_NAME    = 'datacamp-v2';
+const CACHE_NAME    = 'datacamp-v3';
 const BASE          = '/DataCamp/';        // GitHub Pages subfolder — no canviar
 const OFFLINE_URL   = BASE + 'offline.html';
 
@@ -23,6 +23,9 @@ const APP_SHELL = [
     BASE + 'manifest.json',
     BASE + 'offline.html',
     BASE,                                  // captura també la URL arrel del subfolder
+
+    /* ── Seed PKs offline ────────────────────────────── */
+    BASE + 'pk_seed.js',
 
     /* ── Icones PWA ──────────────────────────────────── */
     BASE + 'icon-192.png',

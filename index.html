@@ -4048,6 +4048,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 </style>
+    <!-- Preload del seed PKs offline (no bloqueja el render) -->
+    <link rel="preload" href="/DataCamp/pk_seed.js" as="script">
 </head>
 <body>
 
@@ -4555,21 +4557,30 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <!-- SINCRO PKS ARCGIS ──────────────────────────── -->
                 <div class="settings-section">
-                    <div class="settings-section-title">📡 Dades PKs ArcGIS (Offline)</div>
+                    <div class="settings-section-title">📡 Dades PKs (Offline)</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
-                        Descarrega els Punts Kilométrics oficials de la xarxa de carreteres de Catalunya per poder usar la detecció automàtica de posició (<b>ON ESTIC ARA?</b>) sense connexió a Internet.
+                        La detecció automàtica de posició (<b>ON ESTIC ARA?</b>) funciona <b>offline de forma automàtica</b> gràcies al seed integrat (169.643 punts de tota Espanya). Per a Catalunya, pots descarregar les dades oficials ArcGIS per a major precisió.
                     </p>
+                    <!-- Seed status -->
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:8px 12px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border);">
+                        <span style="font-size:1.1rem;">🌱</span>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">SEED OFFLINE</div>
+                            <div id="seedStatusText" style="font-size:0.78rem; color:var(--text-muted);">Carregant...</div>
+                        </div>
+                        <span id="seedStatusBadge" style="font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; background:#16a34a22; color:#16a34a;">✅ ACTIU</span>
+                    </div>
                     <div id="syncroStatus" style="margin-bottom:14px;">
-                        <span id="syncroStatusBadge" class="syncro-pk-badge pend">⏳ Sense dades</span>
+                        <span id="syncroStatusBadge" class="syncro-pk-badge pend">⏳ Sense dades ArcGIS</span>
                     </div>
                     <div class="syncro-pk-info" id="syncroInfoText">
-                        Prem el botó per descarregar les dades. Pot trigar uns 20-40 segons.
+                        Opcional: descarrega les dades ArcGIS per a Catalunya amb major resolució.
                     </div>
                     <button class="btn btn-secondary" id="btnSyncroPKs" onclick="sincronitzarPKsArcGIS()" style="margin-top:14px;">
-                        🔄 SINCRO PKS ARCGIS
+                        🔄 SINCRO PKS ARCGIS (OPCIONAL)
                     </button>
                     <button class="btn btn-danger" onclick="esborrarCachePKs()" style="margin-top:8px;">
-                        🗑️ ESBORRAR CACHE PKS
+                        🗑️ ESBORRAR CACHE ARCGIS
                     </button>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
@@ -4671,6 +4682,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="galeria-count-badge" id="galeriaBadge">0 fotos</span>
                     <button class="galeria-btn" onclick="toggleSelectMode()" id="btnSelectMode">Seleccionar</button>
                     <div class="galeria-toolbar-right">
+                        <button class="galeria-btn blue" onclick="modeFotoDirecta()" title="Fer foto nova">
+                            📷 Foto
+                        </button>
                         <button class="galeria-btn blue" onclick="carregarFotoDispositiu()" title="Carregar foto des del dispositiu">
                             📂 Carregar
                         </button>
@@ -7138,7 +7152,9 @@ function carregarFotoDispositiu() {
     document.getElementById('galeriaLoadInput').click();
 }
 
-/* Processa fitxers carregats manualment */
+/* Processa fitxers carregats manualment — passa per l'editor Foto Ràpida */
+let _galeriaImgQueue = [];
+
 function galeriaCarregarFotos(input) {
     const files = Array.from(input.files);
     if (!files.length) return;
@@ -7148,22 +7164,24 @@ function galeriaCarregarFotos(input) {
         reader.readAsDataURL(f);
     }));
     Promise.all(promises).then(imgs => {
-        const tx = db.transaction("galeriaFotos","readwrite");
-        const store = tx.objectStore("galeriaFotos");
-        imgs.forEach(imgData => {
-            store.put({
-                id: 'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-                imgData,
-                carr: '',
-                pk: '',
-                marge: '',
-                ts: Date.now(),
-                coordStr: ''
-            });
-        });
-        tx.oncomplete = () => { renderGaleria(); showToast(`📂 ${imgs.length} foto(es) carregada(es)`); };
+        _galeriaImgQueue = imgs.slice(1);   // les que vindran després
+        // La primera obri l'editor immediatament
+        obrirEditorFotoDirecta(imgs[0]);
+        // Injectem un callback post-desament per processar la cua
+        _galeriaQueueActiu = true;
     });
     input.value = '';
+}
+
+/* Crida al final de guardarFotoDirecta si venim de cua de galeria */
+let _galeriaQueueActiu = false;
+function _galeriaQueueSeguent() {
+    if (!_galeriaQueueActiu || _galeriaImgQueue.length === 0) {
+        _galeriaQueueActiu = false;
+        return;
+    }
+    const nextImg = _galeriaImgQueue.shift();
+    obrirEditorFotoDirecta(nextImg);
 }
 
 /* Llegeix totes les fotos de la galeria */
@@ -7411,13 +7429,13 @@ function obrirEditorFotoDirecta(imgData) {
 
     screen.innerHTML = `
         <div class="screen-header">
-            <button class="btn-back" onclick="this.closest('.screen').remove(); ir('home')">←</button>
+            <button class="btn-back" onclick="_galeriaImgQueue=[]; _galeriaQueueActiu=false; this.closest('.screen').remove(); ir('galeriaFotos')">←</button>
             <h3>📸 Foto Ràpida</h3>
         </div>
 
         <div class="foto-preview-wrap" style="position:relative; border-radius:var(--radius-sm); overflow:hidden; margin-bottom:18px; border:2px solid var(--border);">
             <img src="${imgData}" style="width:100%; display:block;">
-            <button onclick="this.closest('.screen').remove(); modeFotoDirecta();"
+            <button onclick="_galeriaImgQueue=[]; _galeriaQueueActiu=false; this.closest('.screen').remove(); modeFotoDirecta();"
                     style="position:absolute; top:10px; right:10px; background:rgba(198,12,48,0.9); color:white; border:none; border-radius:50%; width:38px; height:38px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                 ✕
             </button>
@@ -7471,8 +7489,14 @@ function obrirEditorFotoDirecta(imgData) {
             </label>
         </div>
 
+        ${_galeriaQueueActiu || _galeriaImgQueue.length > 0 ? `
+        <div style="background:var(--accent-blue-lt); border:1px solid var(--cat-inventari-bd); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:0.82rem; color:var(--accent-blue); display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1rem;">📂</span>
+            <span>Foto <strong>${_galeriaImgQueue.length > 0 ? (_galeriaImgQueue.length === 0 ? 1 : 1) : 1}</strong> de <strong>${_galeriaImgQueue.length + 1}</strong> seleccionades · Omple les dades i desa</span>
+        </div>` : ''}
+
         <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}')">
-            🖼️ GUARDAR A GALERIA
+            ${_galeriaImgQueue.length > 0 ? `🖼️ GUARDAR I SEGUENT (${_galeriaImgQueue.length} restant${_galeriaImgQueue.length !== 1 ? 's' : ''})` : '🖼️ GUARDAR A GALERIA'}
         </button>
     `;
 
@@ -7607,7 +7631,7 @@ function obrirEditorFotoDirecta(imgData) {
                             }
                         } else {
                             fdAutopkMostrarEstat('error', '🔴', `Error de connexió ArcGIS: ${err.message}.`);
-                            showToast('🔴 Error ArcGIS. Sincronitza les dades offline des de Configuració.');
+                            showToast('🔴 Error ArcGIS. Usant dades offline del seed.');
                         }
                     }
                     fdAutopkSetLoading(false);
@@ -7689,8 +7713,17 @@ async function guardarFotoDirecta(imgData) {
         }
 
         document.getElementById('screen-foto-directa')?.remove();
-        ir('galeriaFotos');
-        showToast(volGuardarAlDispositiu() ? `📸 Guardada a l'app i al dispositiu` : `📸 Foto guardada a la galeria`);
+
+        // Si venim d'una càrrega múltiple de galeria, obri la següent foto
+        if (_galeriaQueueActiu && _galeriaImgQueue.length > 0) {
+            const restants = _galeriaImgQueue.length;
+            showToast(`📸 Foto guardada · ${restants} pendent${restants !== 1 ? 's' : ''}`);
+            _galeriaQueueSeguent();
+        } else {
+            _galeriaQueueActiu = false;
+            ir('galeriaFotos');
+            showToast(volGuardarAlDispositiu() ? `📸 Guardada a l'app i al dispositiu` : `📸 Foto guardada a la galeria`);
+        }
     };
 
     if (db && db.objectStoreNames.contains("galeriaFotos")) {
@@ -8810,6 +8843,127 @@ const AUTOPK_CONFIG = {
 let _autopkRunning = false;
 
 /* ============================================================
+   PK_SEED — Càrrega lazy del seed offline des de GitHub Pages
+   S'executa en background després del primer load.
+   Si ja hi ha dades a localStorage (sincro ArcGIS), no sobreescriu.
+   Format seed: { "A-7": [[pk_decimal, lat, lng], ...], ... }
+   Format cache: [{ carretera, pk, lat, lon }, ...]
+   ============================================================ */
+
+/** Converteix el PK_SEED al format de cache intern i el desa a localStorage.
+ *  Només actua si la cache és buida. */
+function autopkPrecarregarSeed() {
+    if (typeof PK_SEED === 'undefined') return;
+
+    /* Si ja hi ha dades (sincro ArcGIS prèvia), no sobreescrivim — ArcGIS té més resolució */
+    const existing = localStorage.getItem(AUTOPK_CONFIG.LS_KEY);
+    if (existing) {
+        /* Però sí que actualitzem la UI si no tenia meta */
+        autopkActualizarUIinici();
+        return;
+    }
+
+    try {
+        const punts = [];
+        for (const [carretera, nodes] of Object.entries(PK_SEED)) {
+            for (const node of nodes) {
+                /* node = [pk_decimal, lat, lng] */
+                const [pk, lat, lng] = node;
+                if (typeof pk === 'number' && typeof lat === 'number' && typeof lng === 'number') {
+                    punts.push({ carretera, pk, lat, lon: lng });
+                }
+            }
+        }
+
+        if (punts.length === 0) return;
+
+        localStorage.setItem(AUTOPK_CONFIG.LS_KEY, JSON.stringify(punts));
+        const meta = {
+            data: new Date().toLocaleString('ca-ES'),
+            total: punts.length,
+            font: 'seed_offline',  // marca que ve del seed, no d'ArcGIS
+        };
+        localStorage.setItem(AUTOPK_CONFIG.LS_META_KEY, JSON.stringify(meta));
+
+        console.log(`[PK_SEED] Carregat: ${punts.length} punts offline`);
+        autopkActualizarUIinici();
+        _actualitzarSeedBadge(punts.length, 'localStorage');
+
+    } catch (err) {
+        /* localStorage pot estar ple (quota exceeded) — és silenciós, el seed en memòria
+           seguirà funcionant via cercarEnSeed() */
+        console.warn('[PK_SEED] No s\'ha pogut desar a localStorage:', err.message);
+    }
+}
+
+/** Cerca en el PK_SEED directament en memòria (fallback si localStorage és ple).
+ *  Retorna array de punts en el mateix format que cercarEnCache(). */
+let _pkSeedMemoria = null;
+function cercarEnSeed(lat, lon, bufferGraus = 0.10) {
+    if (typeof PK_SEED === 'undefined') return [];
+
+    /* Construir índex en memòria la primera vegada (lazy, un cop per sessió) */
+    if (!_pkSeedMemoria) {
+        _pkSeedMemoria = [];
+        for (const [carretera, nodes] of Object.entries(PK_SEED)) {
+            for (const [pk, la, ln] of nodes) {
+                _pkSeedMemoria.push({ carretera, pk, lat: la, lon: ln });
+            }
+        }
+        console.log(`[PK_SEED] Índex en memòria: ${_pkSeedMemoria.length} punts`);
+    }
+
+    return _pkSeedMemoria.filter(p =>
+        p.lat >= lat - bufferGraus && p.lat <= lat + bufferGraus &&
+        p.lon >= lon - bufferGraus && p.lon <= lon + bufferGraus
+    );
+}
+
+/** Actualitza el badge de seed al panell de Configuració */
+function _actualitzarSeedBadge(total, font) {
+    const badge = document.getElementById('seedStatusBadge');
+    const text  = document.getElementById('seedStatusText');
+    if (!badge || !text) return;
+
+    if (font === 'error') {
+        badge.style.background = '#dc262622';
+        badge.style.color = '#dc2626';
+        badge.textContent = '❌ ERROR';
+        text.textContent = 'No s\'ha pogut carregar el seed (sense connexió).';
+    } else {
+        const nPunts = total || (typeof PK_SEED !== 'undefined'
+            ? Object.values(PK_SEED).reduce((s, v) => s + v.length, 0)
+            : 0);
+        badge.style.background = '#16a34a22';
+        badge.style.color = '#16a34a';
+        badge.textContent = '✅ ACTIU';
+        text.textContent = `${nPunts.toLocaleString('ca-ES')} punts · Espanya · ${font === 'localStorage' ? 'desat offline' : 'en memòria'}`;
+    }
+}
+
+/** Carrega pk_seed.js des de GitHub Pages en background (lazy, no bloqueja). */
+function _carregarPKSeedLazy() {
+    if (typeof PK_SEED !== 'undefined') {
+        /* Ja carregat — potser cachejat pel SW */
+        autopkPrecarregarSeed();
+        return;
+    }
+    const script = document.createElement('script');
+    script.src = '/DataCamp/pk_seed.js';
+    script.async = true;
+    script.onload = () => {
+        console.log('[PK_SEED] Script carregat des de GitHub Pages');
+        autopkPrecarregarSeed();
+        _actualitzarSeedBadge(null, 'carregat');
+    };
+    script.onerror = () => {
+        console.warn('[PK_SEED] No s\'ha pogut carregar pk_seed.js (sense connexió i sense SW cache?)');
+        _actualitzarSeedBadge(0, 'error');
+    };
+    document.head.appendChild(script);
+}
+
+/* ============================================================
    HAVERSINE — distància en metres entre dos punts (lat/lng)
    ============================================================ */
 function haversineM(lat1, lon1, lat2, lon2) {
@@ -8972,11 +9126,16 @@ function autopkMeta() {
    ============================================================ */
 function cercarEnCache(lat, lon, bufferGraus = 0.05) {
     const cache = autopkCarregarCache();
-    if (!cache || !Array.isArray(cache)) return [];
-    return cache.filter(p =>
-        p.lat >= lat - bufferGraus && p.lat <= lat + bufferGraus &&
-        p.lon >= lon - bufferGraus && p.lon <= lon + bufferGraus
-    );
+    if (cache && Array.isArray(cache) && cache.length > 0) {
+        return cache.filter(p =>
+            p.lat >= lat - bufferGraus && p.lat <= lat + bufferGraus &&
+            p.lon >= lon - bufferGraus && p.lon <= lon + bufferGraus
+        );
+    }
+    /* Fallback: cerca directament en el PK_SEED en memòria (si localStorage és ple
+       o la sincro ArcGIS no s'ha fet mai). Buffer lleugerament més gran per compensar
+       la menor resolució del seed (0.5 km). */
+    return cercarEnSeed(lat, lon, Math.max(bufferGraus, 0.10));
 }
 
 /* ============================================================
@@ -9192,7 +9351,7 @@ async function executarAutoPKWidget() {
                         pkWidgetMostrarError('📴', 'Mode offline. No hi ha dades de cache per a aquesta zona.');
                     }
                 } else {
-                    pkWidgetMostrarError('🔴', 'Error de connexió. Ves a Configuració → Sincro PKs per activar el mode offline.');
+                    pkWidgetMostrarError('🔴', 'Error de connexió. Les dades offline del seed haurien de carregar automàticament.');
                 }
             }
             pkWidgetSetLoading(false);
@@ -9339,8 +9498,8 @@ async function executarAutoPK() {
                     }
                 } else {
                     autopkMostrarEstat('error', '🔴',
-                        `Error de connexió ArcGIS: ${err.message}. Ves a Configuració → Sincro PKs per descarregar dades offline.`);
-                    showToast('🔴 Error ArcGIS. Sincronitza les dades offline des de Configuració.');
+                        `Error de connexió ArcGIS: ${err.message}. Usant dades offline automàtiques (seed).`);
+                    showToast('🔴 Error ArcGIS — mode seed offline actiu.');
                 }
             }
 
@@ -9478,18 +9637,28 @@ function esborrarCachePKs() {
 
 /* Actualitzar UI del panell de Configuració en iniciar l'app */
 function autopkActualizarUIinici() {
-    const meta = autopkMeta();
+    const meta  = autopkMeta();
     const badge = document.getElementById('syncroStatusBadge');
     const info  = document.getElementById('syncroInfoText');
     if (!badge) return;
+
     if (meta && meta.total) {
-        badge.className = 'syncro-pk-badge ok';
-        badge.textContent = `✅ ${meta.total} PKs`;
-        if (info) info.textContent = `Dades descarregades. Última sync: ${meta.data}`;
+        const esSeed = meta.font === 'seed_offline';
+        if (esSeed) {
+            /* Dades del seed — ja OK però indiquem que ArcGIS és opcional */
+            badge.className = 'syncro-pk-badge ok';
+            badge.textContent = `🌱 ${meta.total.toLocaleString('ca-ES')} PKs (seed)`;
+            if (info) info.textContent = `Seed offline actiu. Prem per descarregar ArcGIS Catalunya (més resolució).`;
+        } else {
+            /* Dades d'ArcGIS — màxima qualitat */
+            badge.className = 'syncro-pk-badge ok';
+            badge.textContent = `✅ ${meta.total.toLocaleString('ca-ES')} PKs (ArcGIS)`;
+            if (info) info.textContent = `Dades ArcGIS descarregades. Última sync: ${meta.data}`;
+        }
     } else {
         badge.className = 'syncro-pk-badge pend';
-        badge.textContent = '⏳ Sense dades';
-        if (info) info.textContent = 'Prem el botó per descarregar les dades. Pot trigar uns 20-40 segons.';
+        badge.textContent = '⏳ Sense dades ArcGIS';
+        if (info) info.textContent = 'Opcional: descarrega les dades ArcGIS per a Catalunya amb major resolució.';
     }
 }
 
@@ -9504,6 +9673,15 @@ function autopkActualizarUIinici() {
         setTimeout(ready, 300);
     } else {
         document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 300));
+    }
+
+    /* Càrrega lazy del seed en background (no bloqueja l'app).
+       Esperem 2s per donar prioritat al render inicial. */
+    const loadSeed = () => setTimeout(_carregarPKSeedLazy, 2000);
+    if (document.readyState === 'complete') {
+        loadSeed();
+    } else {
+        window.addEventListener('load', loadSeed);
     }
 })();
 
