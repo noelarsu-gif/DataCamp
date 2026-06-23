@@ -2418,6 +2418,81 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* ============================================================
    GALERIA DE FOTOS RÀPIDES
    ============================================================ */
+/* ── Picker carretera (bottom sheet custom) ── */
+.carr-picker-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1100;
+    align-items: flex-end;
+}
+.carr-picker-backdrop.open { display: flex; }
+.carr-picker-sheet {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 env(safe-area-inset-bottom,12px);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+.carr-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.carr-picker-title {
+    font-family: var(--font-cond);
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+}
+.carr-picker-close {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-alt);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+}
+.carr-picker-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 6px 0;
+    -webkit-overflow-scrolling: touch;
+}
+.carr-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    font-family: var(--font-cond);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.1s;
+}
+.carr-picker-item:hover, .carr-picker-item:active { background: var(--bg-alt); }
+.carr-picker-item.active { color: var(--primary); }
+.carr-picker-item .carr-check { font-size: 1rem; color: var(--primary); }
+
 /* ── Toolbar nova galeria ── */
 .galeria-toolbar {
     display: flex;
@@ -4827,13 +4902,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('seleccionar')" id="ddSeleccionar">
                                     <span class="ddi-icon">☑️</span> Seleccionar fotos
                                 </button>
-                                <div class="galeria-dropdown-sep"></div>
-                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('recents')">
-                                    <span class="ddi-icon">🕐</span> Recents primer
-                                </button>
-                                <button class="galeria-dropdown-item" onclick="galeriaMenuAccio('antics')">
-                                    <span class="ddi-icon">📅</span> Antics primer
-                                </button>
 
                             </div>
                         </div>
@@ -4846,9 +4914,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <!-- Fila 1: carretera dropdown -->
                     <div class="galeria-filter-row">
                         <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Carretera:</span>
-                        <select id="galeriaSelectCarr" onchange="galeriaFiltrarCarr(this.value)" style="flex:1;min-width:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border-dark);background:var(--surface);color:var(--text);font-family:var(--font-cond);font-size:0.76rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;outline:none;appearance:auto;height:32px;">
-                            <option value="TOTES">Totes</option>
-                        </select>
+                        <button class="galeria-filter-chip active" id="galeriaCarrBtn" onclick="galeriaAbrirPickerCarr()" style="max-width:160px;">
+                            <span id="galeriaCarrLabel">Totes</span><span style="opacity:0.5;font-size:0.8rem;margin-left:4px;">▾</span>
+                        </button>
                     </div>
                     <!-- Fila 2: data -->
                     <div class="galeria-filter-row">
@@ -5094,6 +5162,17 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ============================================================
      VISOR FOTO RÀPIDA (modal pantalla completa)
      ============================================================ -->
+<!-- Picker carretera bottom sheet -->
+<div class="carr-picker-backdrop" id="carrPickerBackdrop" onclick="galeriaPickerCarrTancar()">
+    <div class="carr-picker-sheet" onclick="event.stopPropagation()">
+        <div class="carr-picker-header">
+            <span class="carr-picker-title">Filtra per carretera</span>
+            <button class="carr-picker-close" onclick="galeriaPickerCarrTancar()">✕</button>
+        </div>
+        <div class="carr-picker-list" id="carrPickerList"></div>
+    </div>
+</div>
+
 <div id="galeriaVisor">
     <div class="visor-topbar">
         <div class="visor-title" id="visorTitle">Foto Ràpida</div>
@@ -7420,13 +7499,42 @@ function renderGaleria() {
 }
 
 function _galeriaActualitzarChipsCarr(items) {
-    const sel = document.getElementById('galeriaSelectCarr');
-    if (!sel) return;
-    const carrs = [...new Set(items.map(i => i.carr || '—'))].sort();
-    // Reconstruir options
-    sel.innerHTML = '<option value="TOTES">Totes les carreteres</option>' +
-        carrs.map(c => `<option value="${c}"${galeriaFCarr === c ? ' selected' : ''}>${c}</option>`).join('');
-    sel.value = galeriaFCarr;
+    _galeriaCarrOptions = ['TOTES', ...[...new Set(items.map(i => i.carr || '—'))].sort()];
+    _galeriaActualitzarCarrBtn();
+}
+
+function _galeriaActualitzarCarrBtn() {
+    const btn   = document.getElementById('galeriaCarrBtn');
+    const label = document.getElementById('galeriaCarrLabel');
+    if (!label) return;
+    const txt = galeriaFCarr === 'TOTES' ? 'Totes' : galeriaFCarr;
+    label.textContent = txt;
+    btn?.classList.toggle('active', true); // sempre actiu visualment
+}
+
+let _galeriaCarrOptions = ['TOTES'];
+
+function galeriaAbrirPickerCarr() {
+    const list = document.getElementById('carrPickerList');
+    if (!list) return;
+    list.innerHTML = _galeriaCarrOptions.map(c => {
+        const label  = c === 'TOTES' ? 'Totes les carreteres' : c;
+        const active = c === galeriaFCarr;
+        return `<button class="carr-picker-item${active ? ' active' : ''}" onclick="galeriaPickerCarrSeleccionar('${c}')">
+            <span>${label}</span>
+            ${active ? '<span class="carr-check">✓</span>' : ''}
+        </button>`;
+    }).join('');
+    document.getElementById('carrPickerBackdrop').classList.add('open');
+}
+
+function galeriaPickerCarrTancar() {
+    document.getElementById('carrPickerBackdrop').classList.remove('open');
+}
+
+function galeriaPickerCarrSeleccionar(carr) {
+    galeriaPickerCarrTancar();
+    galeriaFiltrarCarr(carr);
 }
 
 function galeriaFiltrarCarr(carr) {
