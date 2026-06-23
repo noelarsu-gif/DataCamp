@@ -4256,6 +4256,70 @@ input:checked + .slider:before { transform: translateX(20px); }
     <link rel="preload" href="/pk_seed.js" as="script">
 </head>
 <body>
+<!-- ══ SPLASH SCREEN ══════════════════════════════════════════ -->
+<div id="splashScreen" style="
+    position:fixed;inset:0;z-index:9999;
+    background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:0;
+    transition:opacity 0.5s ease, visibility 0.5s ease;
+">
+    <!-- Salutació -->
+    <div id="splashGreeting" style="
+        font-family:'Barlow Condensed',Barlow,sans-serif;
+        font-size:2.2rem;font-weight:800;
+        text-transform:uppercase;letter-spacing:2px;
+        color:#1a1a1a;
+        opacity:0;
+        transform:translateY(-10px);
+        transition:opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+    "></div>
+
+    <!-- Línia divisòria suau -->
+    <div style="
+        width:48px;height:2px;
+        background:linear-gradient(90deg,transparent,#c60c30,transparent);
+        margin:28px 0 24px;
+        opacity:0;
+        transition:opacity 0.5s ease 0.25s;
+    " id="splashDivider"></div>
+
+    <!-- Subtítol -->
+    <div id="splashSub" style="
+        text-align:center;
+        opacity:0;
+        transform:translateY(8px);
+        transition:opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+    ">
+        <div style="font-family:'Barlow Condensed',Barlow,sans-serif;font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#1a1a1a;margin-bottom:6px;">Benvingut a DATACAMP</div>
+        <div style="font-family:'Barlow Condensed',Barlow,sans-serif;font-size:0.85rem;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:#888;">Eina de recollida de dades en camp</div>
+    </div>
+</div>
+
+<script>
+(function(){
+    const h = new Date().getHours();
+    const salut = h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
+    document.getElementById('splashGreeting').textContent = salut;
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.getElementById('splashGreeting').style.opacity = '1';
+            document.getElementById('splashGreeting').style.transform = 'translateY(0)';
+            document.getElementById('splashDivider').style.opacity = '1';
+            document.getElementById('splashSub').style.opacity = '1';
+            document.getElementById('splashSub').style.transform = 'translateY(0)';
+        });
+    });
+
+    setTimeout(() => {
+        const s = document.getElementById('splashScreen');
+        s.style.opacity = '0';
+        s.style.visibility = 'hidden';
+        setTimeout(() => s.remove(), 500);
+    }, 2000);
+})();
+</script>
 
 <!-- ============================================================
      SPINNER
