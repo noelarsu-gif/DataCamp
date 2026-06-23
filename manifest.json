@@ -2,7 +2,7 @@
   "name": "DATACAMP Inventari",
   "short_name": "DataCamp",
   "description": "Eina de recollida de dades en camp",
-  "start_url": "datacamp.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#c60c30",
