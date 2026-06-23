@@ -4049,7 +4049,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
-    <link rel="preload" href="/DataCamp/pk_seed.js" as="script">
+    <link rel="preload" href="/pk_seed.js" as="script">
 </head>
 <body>
 
@@ -8941,7 +8941,7 @@ function _actualitzarSeedBadge(total, font) {
     }
 }
 
-/** Carrega pk_seed.js des de GitHub Pages en background (lazy, no bloqueja). */
+/** Carrega pk_seed.js en background (lazy, no bloqueja). */
 function _carregarPKSeedLazy() {
     if (typeof PK_SEED !== 'undefined') {
         /* Ja carregat — potser cachejat pel SW */
@@ -8949,7 +8949,7 @@ function _carregarPKSeedLazy() {
         return;
     }
     const script = document.createElement('script');
-    script.src = '/DataCamp/pk_seed.js';
+    script.src = '/pk_seed.js';
     script.async = true;
     script.onload = () => {
         console.log('[PK_SEED] Script carregat des de GitHub Pages');
@@ -9691,7 +9691,7 @@ function autopkActualizarUIinici() {
    ============================================================ */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/DataCamp/sw.js', { scope: '/DataCamp/' })
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(reg => {
                 console.log('[App] SW registrat. Scope:', reg.scope);
                 /* Avisa quan hi ha una nova versió de l'app disponible */
