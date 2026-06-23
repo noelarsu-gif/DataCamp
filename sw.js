@@ -19,7 +19,7 @@ const OFFLINE_URL   = BASE + 'offline.html';
    ──────────────────────────────────────────────────────────────── */
 const APP_SHELL = [
     /* ── Fitxers principals ──────────────────────────── */
-    BASE + 'datacamp.html',
+    BASE + 'index.html',
     BASE + 'manifest.json',
     BASE + 'offline.html',
     BASE,                                  // captura també la URL arrel del subfolder
