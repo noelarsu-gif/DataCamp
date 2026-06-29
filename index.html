@@ -2121,6 +2121,15 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-weight: 900;
     color: var(--primary);
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.mobile-brand-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.92;
 }
 .hamburger {
     display: flex;
@@ -4327,6 +4336,19 @@ input:checked + .slider:before { transform: translateX(20px); }
     gap:0;
     transition:opacity 0.5s ease, visibility 0.5s ease;
 ">
+    <!-- Logo Generalitat -->
+    <img id="splashLogo"
+         src="https://raw.githubusercontent.com/noelarsu-gif/DataCamp/main/territori_h3.png"
+         alt="Generalitat de Catalunya — Departament de Territori"
+         onerror="this.style.display='none'"
+         style="
+             max-width:260px;width:80%;height:auto;
+             margin-bottom:32px;
+             opacity:0;
+             transform:translateY(-8px);
+             transition:opacity 0.5s ease 0s, transform 0.5s ease 0s;
+         ">
+
     <!-- Salutació -->
     <div id="splashGreeting" style="
         font-family:'Barlow Condensed',Barlow,sans-serif;
@@ -4367,6 +4389,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+            const logo = document.getElementById('splashLogo');
+            if (logo) { logo.style.opacity = '1'; logo.style.transform = 'translateY(0)'; }
             document.getElementById('splashGreeting').style.opacity = '1';
             document.getElementById('splashGreeting').style.transform = 'translateY(0)';
             document.getElementById('splashDivider').style.opacity = '1';
@@ -4485,7 +4509,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 
         <!-- MOBILE HEADER -->
         <header class="mobile-header">
-            <div class="mobile-brand">DATACAMP</div>
+            <div class="mobile-brand">
+                DATACAMP
+                <img src="https://raw.githubusercontent.com/noelarsu-gif/DataCamp/main/territori_h3.png"
+                     alt="Generalitat de Catalunya"
+                     class="mobile-brand-logo"
+                     onerror="this.style.display='none'">
+            </div>
             <button class="hamburger" onclick="openMobileNav()">
                 <span></span><span></span><span></span>
             </button>
