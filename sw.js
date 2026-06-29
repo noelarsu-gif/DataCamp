@@ -3,7 +3,7 @@
    BASE: arrel '/' — Vercel serveix des de l'arrel, no /DataCamp/
    ================================================================ */
 
-const CACHE_NAME    = 'datacamp-v4';
+const CACHE_NAME    = 'datacamp-v5';
 const BASE          = '/';
 const OFFLINE_URL   = BASE + 'offline.html';
 
@@ -45,6 +45,9 @@ const APP_SHELL = [
 
     /* ── SortableJS ──────────────────────────────────── */
     BASE + 'lib/sortable/Sortable.min.js',
+
+    /* ── Logo Generalitat (GitHub raw — precachejat per offline) ── */
+    'https://raw.githubusercontent.com/noelarsu-gif/DataCamp/main/territori_h3.png',
 
     /* ── Fonts locals ────────────────────────────────── */
     BASE + 'fonts/barlow.css',
@@ -120,6 +123,12 @@ self.addEventListener('fetch', event => {
     /* Tiles OSM — Network First */
     if (url.hostname.includes('tile.openstreetmap.org')) {
         event.respondWith(networkFirstWithCache(request, 'osm-tiles-v1'));
+        return;
+    }
+
+    /* GitHub raw (logo Generalitat i altres assets externs precachejats) — Cache First */
+    if (url.hostname === 'raw.githubusercontent.com') {
+        event.respondWith(cacheFirstWithNetworkFallback(request));
         return;
     }
 
