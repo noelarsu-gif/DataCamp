@@ -4982,6 +4982,18 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <span id="galeriaCarrLabel">Totes</span><span style="opacity:0.5;font-size:0.8rem;margin-left:4px;">▾</span>
                         </button>
                     </div>
+                    <!-- Fila 1b: incidència dropdown -->
+                    <div class="galeria-filter-row">
+                        <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Incidència:</span>
+                        <select id="galeriaFiltreIncidencia" onchange="galeriaFiltrarIncidencia(this.value)" style="font-size:0.8rem;padding:5px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;min-width:160px;">
+                            <option value="">Totes</option>
+                            <option value="Animal">🐾 Animal</option>
+                            <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
+                            <option value="Sot/Esquerda">🕳️ Sot/Esquerda</option>
+                            <option value="Accident/Averiat">🚗 Accident/Averiat</option>
+                            <option value="Incidència indefinida">❓ Incidència indefinida</option>
+                        </select>
+                    </div>
                     <!-- Fila 2: data -->
                     <div class="galeria-filter-row">
                         <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Ordre:</span>
@@ -7505,6 +7517,7 @@ function galeriaLlegirTotes(callback) {
 /* ── Estat filtres galeria ── */
 let galeriaOrdre   = 'desc';  // 'desc' recents primer | 'asc' antics primer
 let galeriaFCarr   = 'TOTES'; // filtre carretera actiu
+let galeriaFIncidencia = '';   // filtre tipus incidència ('' = totes)
 
 function renderGaleria() {
     galeriaLlegirTotes(items => {
@@ -7525,6 +7538,9 @@ function renderGaleria() {
         let filtered = items.slice();
         if (galeriaFCarr !== 'TOTES') {
             filtered = filtered.filter(i => (i.carr || '—') === galeriaFCarr);
+        }
+        if (galeriaFIncidencia) {
+            filtered = filtered.filter(i => (i.tipusIncidencia || '') === galeriaFIncidencia);
         }
         // Ordre
         filtered.sort((a, b) => galeriaOrdre === 'desc' ? b.ts - a.ts : a.ts - b.ts);
@@ -7610,6 +7626,11 @@ function galeriaSetOrdre(ordre) {
     galeriaOrdre = ordre;
     document.getElementById('fOrdreRecents')?.classList.toggle('active', ordre === 'desc');
     document.getElementById('fOrdreAntics')?.classList.toggle('active', ordre === 'asc');
+    renderGaleria();
+}
+
+function galeriaFiltrarIncidencia(tipus) {
+    galeriaFIncidencia = tipus;
     renderGaleria();
 }
 
@@ -7715,6 +7736,7 @@ function _galeriaTextCompartir(item) {
     const lines = [];
     if (item.carr) lines.push(`🛣️ Carretera: ${item.carr}`);
     if (item.pk)   lines.push(`📍 PK: ${item.pk}${item.marge ? ' · ' + item.marge : ''}`);
+    if (item.tipusIncidencia) lines.push(`⚠️ Incidència: ${item.tipusIncidencia}`);
     if (item.lat && item.lon) {
         const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
         lines.push(`🌐 Ubicació: ${url}`);
@@ -7922,7 +7944,7 @@ function obrirEditorFotoDirecta(imgData) {
             </div>
         </div>
 
-        <div class="watermark-row" style="margin-bottom:18px;">
+        <div class="watermark-row" style="margin-bottom:10px;">
             <div class="watermark-row-info">
                 <span class="watermark-row-icon">📝</span>
                 <div class="watermark-row-text">
@@ -7935,15 +7957,44 @@ function obrirEditorFotoDirecta(imgData) {
             </label>
         </div>
 
+        <div class="watermark-row" style="margin-bottom:18px;">
+            <div class="watermark-row-info">
+                <span class="watermark-row-icon">🕐</span>
+                <div class="watermark-row-text">
+                    <div class="wm-title">Incrustar data i hora al peu</div>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="fd_datetime" ${localStorage.getItem('fd_datetime_pref') !== 'false' ? 'checked' : ''}>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="form-group" style="margin-bottom:18px;">
+            <label style="display:flex;align-items:center;gap:6px;">⚠️ Tipus d'incidència</label>
+            <select id="fd_tipus_incidencia" style="width:100%;">
+                <option value="">— Ninguna —</option>
+                <option value="Animal">🐾 Animal</option>
+                <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
+                <option value="Sot/Esquerda">🕳️ Sot/Esquerda</option>
+                <option value="Accident/Averiat">🚗 Accident/Averiat</option>
+                <option value="Incidència indefinida">❓ Incidència indefinida</option>
+            </select>
+        </div>
+
         ${_galeriaQueueActiu || _galeriaImgQueue.length > 0 ? `
         <div style="background:var(--accent-blue-lt); border:1px solid var(--cat-inventari-bd); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:0.82rem; color:var(--accent-blue); display:flex; align-items:center; gap:8px;">
             <span style="font-size:1rem;">📂</span>
             <span>Foto <strong>${_galeriaImgQueue.length > 0 ? (_galeriaImgQueue.length === 0 ? 1 : 1) : 1}</strong> de <strong>${_galeriaImgQueue.length + 1}</strong> seleccionades · Omple les dades i desa</span>
         </div>` : ''}
 
-        <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}')">
+        <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}', false)">
             ${_galeriaImgQueue.length > 0 ? `🖼️ GUARDAR I SEGUENT (${_galeriaImgQueue.length} restant${_galeriaImgQueue.length !== 1 ? 's' : ''})` : '🖼️ GUARDAR A GALERIA'}
         </button>
+        ${_galeriaImgQueue.length === 0 ? `
+        <button class="btn" style="background:var(--accent-blue);color:white;border-color:var(--accent-blue);margin-top:10px;" onclick="guardarFotoDirecta('${imgData}', true)">
+            💬 COMPARTIR I GUARDAR
+        </button>` : ''}
     `;
 
     document.querySelector('.page-content').appendChild(screen);
@@ -8108,11 +8159,16 @@ function obrirEditorFotoDirecta(imgData) {
         });
     }
 }
-async function guardarFotoDirecta(imgData) {
+async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     const carr  = document.getElementById('fd_carretera').value || "SC";
     const pk    = document.getElementById('fd_pk').value || "0";
     const marge = document.getElementById('fd_marge').value;
     const wm    = document.getElementById('fd_watermark').checked;
+    const incDatetime = document.getElementById('fd_datetime')?.checked ?? true;
+    const tipusIncidencia = document.getElementById('fd_tipus_incidencia')?.value || '';
+
+    // Desar preferència data/hora
+    try { localStorage.setItem('fd_datetime_pref', incDatetime ? 'true' : 'false'); } catch(e) {}
 
     showSpinner('GENERANT FOTO...');
 
@@ -8127,8 +8183,10 @@ async function guardarFotoDirecta(imgData) {
 
     let finalImg = imgData;
     if (wm) {
-        const text = `${carr} \u2022 PK ${pk} \u2022 ${marge} \u2022 ${ara.toLocaleDateString('ca-ES')} ${horaStr}`;
-        finalImg = await aplicarMarcaAigua(imgData, text);
+        let wmParts = [`${carr} \u2022 PK ${pk} \u2022 ${marge}`];
+        if (incDatetime) wmParts.push(`${ara.toLocaleDateString('ca-ES')} ${horaStr}`);
+        if (tipusIncidencia) wmParts.push(tipusIncidencia);
+        finalImg = await aplicarMarcaAigua(imgData, wmParts.join(' \u2022 '));
     }
 
     const nomBase = `${carr}_PK${pk}_${marge}_${fechaFormat}_${horaFormat}`.replace(/[^a-z0-9]/gi, '_');
@@ -8141,13 +8199,14 @@ async function guardarFotoDirecta(imgData) {
         id:       'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
         imgData:  finalImg,
         carr, pk, marge,
+        tipusIncidencia,
         ts:       ara.getTime(),
         coordStr: '',
         lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
         lon: (typeof _fdLastLon !== 'undefined' ? _fdLastLon : null),
     };
 
-    const navegarAGaleria = () => {
+    const navegarAGaleria = async () => {
         hideSpinner();
 
         // Descarregar al dispositiu si la preferència és activa
@@ -8173,6 +8232,22 @@ async function guardarFotoDirecta(imgData) {
             _galeriaQueueActiu = false;
             ir('galeriaFotos');
             showToast(volGuardarAlDispositiu() ? `📸 Guardada a l'app i al dispositiu` : `📸 Foto guardada a la galeria`);
+
+            // Compartir si s'ha demanat
+            if (compartirDesprés) {
+                try {
+                    const file = new File([currentBlob], currentFileName, { type: 'image/jpeg' });
+                    const text = _galeriaTextCompartir(galeriaItem);
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], title: currentFileName, text });
+                    } else {
+                        // Fallback: compartir només text
+                        await navigator.share({ title: currentFileName, text });
+                    }
+                } catch(e) {
+                    if (e.name !== 'AbortError') showToast('❌ Error en compartir');
+                }
+            }
         }
     };
 
