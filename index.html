@@ -5065,14 +5065,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <!-- Fila 1b: incidència dropdown -->
                     <div class="galeria-filter-row">
                         <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Incidència:</span>
-                        <select id="galeriaFiltreIncidencia" onchange="galeriaFiltrarIncidencia(this.value)" style="font-size:0.8rem;padding:5px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;min-width:160px;">
-                            <option value="">Totes</option>
-                            <option value="Animal">🐾 Animal</option>
-                            <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
-                            <option value="Sot/Esquerda">🕳️ Sot/Esquerda</option>
-                            <option value="Accident/Averiat">🚗 Accident/Averiat</option>
-                            <option value="Incidència indefinida">❓ Incidència indefinida</option>
-                        </select>
+                        <button class="galeria-filter-chip active" id="galeriaIncBtn" onclick="galeriaAbrirPickerInc()" style="max-width:200px;">
+                            <span id="galeriaIncLabel">Totes</span><span style="opacity:0.5;font-size:0.8rem;margin-left:4px;">▾</span>
+                        </button>
                     </div>
                     <!-- Fila 2: data -->
                     <div class="galeria-filter-row">
@@ -5326,6 +5321,16 @@ input:checked + .slider:before { transform: translateX(20px); }
             <button class="carr-picker-close" onclick="galeriaPickerCarrTancar()">✕</button>
         </div>
         <div class="carr-picker-list" id="carrPickerList"></div>
+    </div>
+</div>
+
+<div class="carr-picker-backdrop" id="incPickerBackdrop" onclick="galeriaPickerIncTancar()">
+    <div class="carr-picker-sheet" onclick="event.stopPropagation()">
+        <div class="carr-picker-header">
+            <span class="carr-picker-title">Filtra per incidència</span>
+            <button class="carr-picker-close" onclick="galeriaPickerIncTancar()">✕</button>
+        </div>
+        <div class="carr-picker-list" id="incPickerList"></div>
     </div>
 </div>
 
@@ -7711,7 +7716,52 @@ function galeriaSetOrdre(ordre) {
 
 function galeriaFiltrarIncidencia(tipus) {
     galeriaFIncidencia = tipus;
+    // Actualitzar label del botó
+    const incOpts = [
+        { value: '', label: 'Totes' },
+        { value: 'Animal', label: '🐾 Animal' },
+        { value: 'Senyalització malmesa', label: '🚧 Senyalització malmesa' },
+        { value: 'Sot/Esquerda', label: '🕳️ Sot/Esquerda' },
+        { value: 'Accident/Averiat', label: '🚗 Accident/Averiat' },
+        { value: 'Incidència indefinida', label: '❓ Incidència indefinida' },
+    ];
+    const opt = incOpts.find(o => o.value === tipus) || incOpts[0];
+    const btn = document.getElementById('galeriaIncBtn');
+    const lbl = document.getElementById('galeriaIncLabel');
+    if (lbl) lbl.textContent = opt.label;
+    if (btn) btn.classList.toggle('active', true);
     renderGaleria();
+}
+
+const _galeriaIncOptions = [
+    { value: '', label: 'Totes les incidències' },
+    { value: 'Animal', label: '🐾 Animal' },
+    { value: 'Senyalització malmesa', label: '🚧 Senyalització malmesa' },
+    { value: 'Sot/Esquerda', label: '🕳️ Sot/Esquerda' },
+    { value: 'Accident/Averiat', label: '🚗 Accident/Averiat' },
+    { value: 'Incidència indefinida', label: '❓ Incidència indefinida' },
+];
+
+function galeriaAbrirPickerInc() {
+    const list = document.getElementById('incPickerList');
+    if (!list) return;
+    list.innerHTML = _galeriaIncOptions.map(o => {
+        const active = o.value === galeriaFIncidencia;
+        return `<button class="carr-picker-item${active ? ' active' : ''}" onclick="galeriaPickerIncSeleccionar('${o.value.replace(/'/g,"\\'")}')">
+            <span>${o.label}</span>
+            ${active ? '<span class="carr-check">✓</span>' : ''}
+        </button>`;
+    }).join('');
+    document.getElementById('incPickerBackdrop').classList.add('open');
+}
+
+function galeriaPickerIncTancar() {
+    document.getElementById('incPickerBackdrop').classList.remove('open');
+}
+
+function galeriaPickerIncSeleccionar(tipus) {
+    galeriaPickerIncTancar();
+    galeriaFiltrarIncidencia(tipus);
 }
 
 /* ── Menú 3 punts ── */
@@ -8055,7 +8105,7 @@ function obrirEditorFotoDirecta(imgData) {
         <div class="form-group" style="margin-bottom:18px;">
             <label style="display:flex;align-items:center;gap:6px;">⚠️ Tipus d'incidència</label>
             <select id="fd_tipus_incidencia" style="width:100%;">
-                <option value="">— Ninguna —</option>
+                <option value="">— Cap —</option>
                 <option value="Animal">🐾 Animal</option>
                 <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
                 <option value="Sot/Esquerda">🕳️ Sot/Esquerda</option>
