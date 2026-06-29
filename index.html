@@ -866,6 +866,69 @@ input:focus, select:focus, textarea:focus {
 .autopk-status.success { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
 .autopk-status-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
 
+/* Dark wrapper per a chips de carretera en formularis (fons blanc) */
+.form-chips-dark {
+    background: #1a1f2e;
+    border-radius: var(--radius);
+    padding: 14px 14px 12px;
+    margin-bottom: 14px;
+}
+
+/* Home widget — múltiples carreteres: principal gran + chips secundaris */
+.pk-multi-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+.pk-multi-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.pk-multi-secondary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pk-multi-secondary-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
+.pk-chip-mini {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-cond);
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.pk-chip-mini:hover, .pk-chip-mini:focus {
+    background: rgba(198,12,48,0.25);
+    border-color: var(--primary);
+    color: white;
+    outline: none;
+}
+.pk-chip-mini.selected {
+    background: rgba(198,12,48,0.3);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 2px rgba(198,12,48,0.25);
+}
+
 /* Sincronització PKs — settings card */
 .syncro-pk-info {
     font-size: 0.8rem;
@@ -4480,6 +4543,21 @@ input:checked + .slider:before { transform: translateX(20px); }
                         </button>
                     </div>
 
+                    <!-- NOVA VISTA múltiples: principal gran + chips mini secundaris -->
+                    <div class="pk-chips-area" id="pkMultiArea" style="display:none;">
+                        <div class="pk-multi-area">
+                            <div class="pk-multi-main">
+                                <div class="pk-result-road" id="pkMultiRoad">—</div>
+                                <div class="pk-result-pk" id="pkMultiPK">PK —</div>
+                                <div class="pk-result-meta" id="pkMultiMeta"></div>
+                            </div>
+                            <div class="pk-multi-secondary" id="pkMultiSecondary"></div>
+                        </div>
+                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()" style="margin-top:8px;">
+                            🔄 Actualitzar
+                        </button>
+                    </div>
+
                     <!-- Missatge d'error / advertència -->
                     <div class="pk-widget-msg" id="pkWidgetMsg" style="display:none;">
                         <span id="pkWidgetMsgIcon">⚠️</span>
@@ -4574,9 +4652,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </button>
 
                 <!-- Chips carreteres properes (inventari) -->
-                <div id="autopkChipsArea" style="display:none; margin-bottom:14px;">
-                    <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
-                    <div class="pk-chips-row" id="autopkChipsRow"></div>
+                <div id="autopkChipsArea" style="display:none;">
+                    <div class="form-chips-dark">
+                        <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+                        <div class="pk-chips-row" id="autopkChipsRow"></div>
+                    </div>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
@@ -7924,9 +8004,11 @@ function obrirEditorFotoDirecta(imgData) {
         </button>
 
         <!-- Chips carreteres properes -->
-        <div id="fdChipsArea" style="display:none; margin-bottom:14px;">
-            <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
-            <div class="pk-chips-row" id="fdChipsRow"></div>
+        <div id="fdChipsArea" style="display:none;">
+            <div class="form-chips-dark">
+                <div class="pk-chips-label">Carreteres properes — tria la que correspon:</div>
+                <div class="pk-chips-row" id="fdChipsRow"></div>
+            </div>
         </div>
 
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:18px;">
@@ -9728,6 +9810,7 @@ function pkWidgetReset() {
     document.getElementById('pkWidgetIdle').style.display = 'flex';
     document.getElementById('pkWidgetResult').style.display = 'none';
     document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkMultiArea').style.display = 'none';
     document.getElementById('pkWidgetMsg').style.display = 'none';
 }
 
@@ -9746,6 +9829,7 @@ function pkWidgetMostrarResultat(resultat) {
     // Amagar la resta
     document.getElementById('pkWidgetIdle').style.display = 'none';
     document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkMultiArea').style.display = 'none';
     document.getElementById('pkWidgetMsg').style.display = 'none';
     // Mostrar resultat principal
     const msStr = String(resultat.m).padStart(3, '0');
@@ -9760,20 +9844,66 @@ function pkWidgetMostrarChips(resultats) {
     // Amagar la resta
     document.getElementById('pkWidgetIdle').style.display = 'none';
     document.getElementById('pkWidgetResult').style.display = 'none';
+    document.getElementById('pkChipsArea').style.display = 'none';
     document.getElementById('pkWidgetMsg').style.display = 'none';
-    // Construir chips
-    const row = document.getElementById('pkChipsRow');
-    row.innerHTML = resultats.map((r, i) => {
+
+    // Ordenar per distància (la més propera primer)
+    resultats.sort((a, b) => a.dist - b.dist);
+    _pkWidgetResultats = resultats;
+
+    // Mostrar la primera en gran
+    function renderPrincipal(idx) {
+        const r = resultats[idx];
         const msStr = String(r.m).padStart(3, '0');
-        return `<button class="pk-chip${i === 0 ? ' selected' : ''}" onclick="pkWidgetSeleccionarChip(${i})" data-chip="${i}">
-            <span class="pk-chip-road">${r.carretera}</span>
-            <span class="pk-chip-pk">PK ${r.km}+${msStr}</span>
-            <span class="pk-chip-dist">±${Math.round(r.dist)}m</span>
-        </button>`;
-    }).join('');
-    document.getElementById('pkChipsArea').style.display = 'block';
-    // Seleccionar el primer per defecte
-    pkWidgetSeleccionarChip(0);
+        document.getElementById('pkMultiRoad').textContent = r.carretera;
+        document.getElementById('pkMultiPK').textContent   = `PK ${r.km}+${msStr}`;
+        document.getElementById('pkMultiMeta').textContent = `±${Math.round(r.dist)}m`;
+        _pkWidgetSelected = r;
+        // Actualitzar estat seleccionat als chips mini
+        document.querySelectorAll('#pkMultiSecondary .pk-chip-mini').forEach((el, i) => {
+            el.classList.toggle('selected', i === idx - 1);
+        });
+    }
+
+    // Chips mini per a les altres carreteres (índex 1..n)
+    const secondary = document.getElementById('pkMultiSecondary');
+    if (resultats.length > 1) {
+        secondary.innerHTML = '<span class="pk-multi-secondary-label">Altres:</span>' +
+            resultats.slice(1).map((r, i) =>
+                `<button class="pk-chip-mini" onclick="pkWidgetSeleccionarMini(${i+1})" data-mini="${i}">${r.carretera}</button>`
+            ).join('');
+    } else {
+        secondary.innerHTML = '';
+    }
+
+    document.getElementById('pkMultiArea').style.display = 'block';
+    renderPrincipal(0);
+
+    // Exposa renderPrincipal globalment per als chips mini
+    window._pkWidgetRenderPrincipal = renderPrincipal;
+}
+
+function pkWidgetSeleccionarMini(idx) {
+    // Reordena: posa la seleccionada com a principal, les altres com a mini
+    const resultats = _pkWidgetResultats;
+    const selected  = resultats[idx];
+
+    // Mou la seleccionada al principi (sense modificar l'array original)
+    const reordered = [selected, ...resultats.filter((_, i) => i !== idx)];
+
+    const msStr = String(selected.m).padStart(3, '0');
+    document.getElementById('pkMultiRoad').textContent = selected.carretera;
+    document.getElementById('pkMultiPK').textContent   = `PK ${selected.km}+${msStr}`;
+    document.getElementById('pkMultiMeta').textContent = `±${Math.round(selected.dist)}m`;
+    _pkWidgetSelected = selected;
+
+    // Actualitzar chips mini (tots els que no són la principal)
+    const secondary = document.getElementById('pkMultiSecondary');
+    secondary.innerHTML = '<span class="pk-multi-secondary-label">Altres:</span>' +
+        reordered.slice(1).map((r, i) => {
+            const origIdx = resultats.indexOf(r);
+            return `<button class="pk-chip-mini" onclick="pkWidgetSeleccionarMini(${origIdx})" data-mini="${i}">${r.carretera}</button>`;
+        }).join('');
 }
 
 function pkWidgetSeleccionarChip(idx) {
@@ -9788,6 +9918,7 @@ function pkWidgetMostrarError(icon, text) {
     document.getElementById('pkWidgetIdle').style.display = 'none';
     document.getElementById('pkWidgetResult').style.display = 'none';
     document.getElementById('pkChipsArea').style.display = 'none';
+    document.getElementById('pkMultiArea').style.display = 'none';
     document.getElementById('pkWidgetMsgIcon').textContent = icon;
     document.getElementById('pkWidgetMsgTxt').textContent  = text;
     document.getElementById('pkWidgetMsg').style.display   = 'flex';
