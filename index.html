@@ -4888,27 +4888,60 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <h3>&#128229; Desc&#224;rregues</h3>
                 </div>
 
-                <!-- Search + stats row -->
-                <div class="dl-topbar">
-                    <div class="dl-search-wrap">
-                        <span class="dl-search-icon">&#128269;</span>
-                        <input type="text" id="dlSearch" class="dl-search"
-                               placeholder="Cerca per obra o carretera..."
-                               oninput="carregarLlistaDescargues()">
+                <!-- Tabs: Inventaris / Incidències -->
+                <div class="dl-tabs" style="display:flex; gap:8px; margin-bottom:14px;">
+                    <button id="dlTabInventaris" class="dl-tab-btn dl-tab-active" onclick="dlCanviarTab('inventaris')"
+                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:var(--primary); color:#fff; font-weight:700; font-size:0.82rem; cursor:pointer;">
+                        📦 Inventaris
+                    </button>
+                    <button id="dlTabIncidencies" class="dl-tab-btn" onclick="dlCanviarTab('incidencies')"
+                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; font-size:0.82rem; cursor:pointer;">
+                        🚧 Incidències
+                    </button>
+                </div>
+
+                <!-- ===== TAB: INVENTARIS (contingut existent) ===== -->
+                <div id="dlPanellInventaris">
+                    <!-- Search + stats row -->
+                    <div class="dl-topbar">
+                        <div class="dl-search-wrap">
+                            <span class="dl-search-icon">&#128269;</span>
+                            <input type="text" id="dlSearch" class="dl-search"
+                                   placeholder="Cerca per obra o carretera..."
+                                   oninput="carregarLlistaDescargues()">
+                        </div>
+                        <div class="dl-count" id="dlCount"></div>
                     </div>
-                    <div class="dl-count" id="dlCount"></div>
+
+                    <!-- Legend -->
+                    <div class="dl-legend">
+                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe PDF</span>
+                        <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel / CSV</span>
+                        <span class="dl-legend-item"><span class="dl-icon zip">&#128452;&#65039;</span> ZIP Fotos</span>
+                        <span class="dl-legend-item"><span class="dl-icon bak">&#128190;</span> Backup</span>
+                    </div>
+
+                    <!-- Table (desktop) / Cards (mobile) -->
+                    <div id="listaDescargas"></div>
                 </div>
 
-                <!-- Legend -->
-                <div class="dl-legend">
-                    <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe PDF</span>
-                    <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel / CSV</span>
-                    <span class="dl-legend-item"><span class="dl-icon zip">&#128452;&#65039;</span> ZIP Fotos</span>
-                    <span class="dl-legend-item"><span class="dl-icon bak">&#128190;</span> Backup</span>
+                <!-- ===== TAB: INCIDÈNCIES (nou) ===== -->
+                <div id="dlPanellIncidencies" style="display:none;">
+                    <div class="dl-topbar">
+                        <div class="dl-search-wrap">
+                            <span class="dl-search-icon">&#128269;</span>
+                            <input type="text" id="dlSearchInc" class="dl-search"
+                                   placeholder="Cerca per carretera o PK..."
+                                   oninput="carregarVistaIncidencies()">
+                        </div>
+                        <div class="dl-count" id="dlCountInc"></div>
+                    </div>
+                    <div class="dl-legend">
+                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Fitxa / Taula PDF</span>
+                        <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel</span>
+                    </div>
+                    <div id="listaIncidencies"></div>
                 </div>
-
-                <!-- Table (desktop) / Cards (mobile) -->
-                <div id="listaDescargas"></div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
             </div>
@@ -7132,6 +7165,187 @@ function carregarLlistaDescargues() {
             </div>`;
         }
     }
+}
+
+/* ============================================================
+   DESCÀRREGUES — Pestanya INCIDÈNCIES
+   Reutilitza generarBlobPDF / generarBlobExcel construint un
+   "projecte virtual" a partir de galeriaFotos, mateix format
+   que els informes d'inventaris (Fitxa / Taula).
+   ============================================================ */
+const INC_TIPUS_ICONS = {
+    'Animal': '🐾',
+    'Senyalització malmesa': '🚧',
+    'Sot/Esquerda': '🕳️',
+    'Accident/Averiat': '🚗',
+    'Incidència indefinida': '❓'
+};
+
+function dlCanviarTab(tab) {
+    const btnInv = document.getElementById('dlTabInventaris');
+    const btnInc = document.getElementById('dlTabIncidencies');
+    const panInv = document.getElementById('dlPanellInventaris');
+    const panInc = document.getElementById('dlPanellIncidencies');
+    if (!btnInv || !btnInc || !panInv || !panInc) return;
+    const actiu = tab === 'incidencies';
+    panInv.style.display = actiu ? 'none' : 'block';
+    panInc.style.display = actiu ? 'block' : 'none';
+    btnInv.style.background = actiu ? '#fff' : 'var(--primary)';
+    btnInv.style.color = actiu ? 'var(--primary)' : '#fff';
+    btnInc.style.background = actiu ? 'var(--primary)' : '#fff';
+    btnInc.style.color = actiu ? '#fff' : 'var(--primary)';
+    if (actiu) carregarVistaIncidencies();
+}
+
+/* Llegeix galeriaFotos i agrupa per tipus d'incidència */
+function carregarVistaIncidencies() {
+    const container = document.getElementById('listaIncidencies');
+    if (!container || !db) { if (!db) setTimeout(carregarVistaIncidencies, 300); return; }
+
+    const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
+
+    galeriaLlegirTotes(items => {
+        let incidencies = (items || []).filter(it => it.tipusIncidencia);
+        if (q) {
+            incidencies = incidencies.filter(it =>
+                (it.carr || '').toLowerCase().includes(q) ||
+                (it.pk   || '').toLowerCase().includes(q));
+        }
+
+        const countEl = document.getElementById('dlCountInc');
+        if (countEl) countEl.textContent = `${incidencies.length} incidènci${incidencies.length !== 1 ? 'es' : 'a'}`;
+
+        if (incidencies.length === 0) {
+            container.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
+                <div style='font-size:2.5rem;margin-bottom:12px;'>🚧</div>
+                <div style='font-weight:600;'>Cap incidència trobada</div>
+                <div style='font-size:0.82rem;margin-top:6px;'>Les fotos amb "Tipus d'incidència" marcat a Foto Ràpida apareixeran aquí</div>
+            </div>`;
+            return;
+        }
+
+        // Agrupar per tipus
+        const grups = {};
+        incidencies.forEach(it => {
+            const t = it.tipusIncidencia;
+            (grups[t] = grups[t] || []).push(it);
+        });
+
+        let html = `<div class="dl-card" style="margin-bottom:12px;">
+            <div class="dl-card-header">
+                <div style="min-width:0;flex:1;">
+                    <div class="dl-card-title">📋 Totes les incidències</div>
+                    <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} amb incidència registrada</div>
+                </div>
+            </div>
+            <div class="dl-actions" style="margin-top:8px;">
+                ${_incActionBtns('')}
+            </div>
+        </div>`;
+
+        Object.keys(grups).sort().forEach(tipus => {
+            const arr = grups[tipus];
+            const icon = INC_TIPUS_ICONS[tipus] || '⚠️';
+            html += `<div class="dl-card" style="margin-bottom:10px;">
+                <div class="dl-card-header">
+                    <div style="min-width:0;flex:1;">
+                        <div class="dl-card-title">${icon} ${tipus}</div>
+                        <div class="dl-card-meta">${arr.length} foto${arr.length !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+                <div class="dl-actions" style="margin-top:8px;">
+                    ${_incActionBtns(tipus)}
+                </div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+    });
+}
+
+function _incActionBtns(tipusFiltre) {
+    const arg = tipusFiltre ? `'${tipusFiltre.replace(/'/g, "\\'")}'` : `''`;
+    return `<button class="dl-btn dl-btn-pdf" title="PDF detallat amb fotos" onclick="exportarIncidenciesPDF(${arg},'Fitxa')">&#128196; Fitxa</button>
+            <button class="dl-btn dl-btn-pdf" style="background:#fdf2f8;color:#86198f;border-color:#e879f9;" title="PDF resum en taula" onclick="exportarIncidenciesPDF(${arg},'Taula')">&#128202; Taula</button>
+            <button class="dl-btn dl-btn-xls" title="Exportar a Excel" onclick="exportarIncidenciesPDF(${arg},'excel')">&#128202; Excel</button>`;
+}
+
+/* Construeix un "projecte virtual" compatible amb generarBlobPDF / generarBlobExcel */
+function _buildProjecteVirtualIncidencies(items, titol) {
+    const fields = [
+        { label: 'Carretera' }, { label: 'PK' }, { label: 'Marge' }, { label: 'Data' },
+        { label: "Tipus d'incidència" }, { label: 'Codi senyal' }, { label: 'Estat senyal' }
+    ];
+    const registros = items
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+        .map(it => {
+            const d = it.ts ? new Date(it.ts) : null;
+            const dataStr = d ? `${d.toLocaleDateString('ca-ES')} ${d.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}` : '—';
+            return {
+                values: [
+                    { label: 'Carretera', val: it.carr || '—' },
+                    { label: 'PK', val: it.pk || '—' },
+                    { label: 'Marge', val: it.marge || '—' },
+                    { label: 'Data', val: dataStr },
+                    { label: "Tipus d'incidència", val: it.tipusIncidencia || '—' },
+                    { label: 'Codi senyal', val: it.senyalCodi ? `${it.senyalCodi}${it.senyalNom ? ' · ' + it.senyalNom : ''}` : '—' },
+                    { label: 'Estat senyal', val: it.senyalEstat || '—' }
+                ],
+                fotos: it.imgData ? [it.imgData] : []
+            };
+        });
+    return { titulo: titol, fields, registros };
+}
+
+async function exportarIncidenciesPDF(tipusFiltre, format) {
+    const cleanType = format === 'excel' ? 'EXCEL' : format.toUpperCase();
+    showSpinner(`GENERANT ${cleanType}...`);
+    galeriaLlegirTotes(async (items) => {
+        try {
+            let incidencies = (items || []).filter(it => it.tipusIncidencia);
+            if (tipusFiltre) incidencies = incidencies.filter(it => it.tipusIncidencia === tipusFiltre);
+
+            if (incidencies.length === 0) {
+                hideSpinner();
+                alert('No hi ha incidències per generar l\'informe.');
+                return;
+            }
+
+            const titol = tipusFiltre ? `Incidències — ${tipusFiltre}` : 'Incidències — Totes';
+            const p = _buildProjecteVirtualIncidencies(incidencies, titol);
+            const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+            const date = new Date().toISOString().slice(0, 10);
+
+            if (format === 'excel') {
+                currentBlob = generarBlobExcel(p);
+                currentFileName = `Incidencies_${slug}_${date}.xlsx`;
+            } else {
+                currentBlob = await generarBlobPDF(p, format);
+                currentFileName = `${format}_Incidencies_${slug}_${date}.pdf`;
+            }
+
+            document.getElementById('exportTitle').innerText = cleanType;
+            document.getElementById('exportName').innerText = currentFileName;
+            document.getElementById('btnShare').onclick = () => {
+                const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+                if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+                else alert('El teu navegador no permet compartir directament.');
+                closeExportModal();
+            };
+            document.getElementById('btnDownload').onclick = () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(currentBlob);
+                a.download = currentFileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                closeExportModal();
+            };
+            hideSpinner();
+            document.getElementById('exportModal').style.display = 'flex';
+        } catch (err) {
+            hideSpinner();
+            alert('Error generant l\'informe: ' + err.message);
+        }
+    });
 }
 
 function _projMeta(p) {
