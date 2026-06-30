@@ -8874,14 +8874,31 @@ function generarBlobExcel(p) {
    ============================================================ */
 function exportarBackup() {
     if (!db) return alert("Base de dades no disponible");
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        const blob = new Blob([JSON.stringify(e.target.result)], { type: "application/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `backup_datacamp_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        showToast("📤 Backup exportat");
-    };
+    const stores = ["projects", "galeriaFotos", "animalsIncidencies", "itcInformes"].filter(s => db.objectStoreNames.contains(s));
+    const tx = db.transaction(stores, "readonly");
+    const result = {};
+    let pending = stores.length;
+    stores.forEach(s => {
+        tx.objectStore(s).getAll().onsuccess = e => {
+            result[s] = e.target.result || [];
+            pending--;
+            if (pending === 0) {
+                const payload = {
+                    __datacampBackup: true,
+                    version: 2,
+                    exportedAt: new Date().toISOString(),
+                    stores: result
+                };
+                const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `backup_datacamp_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                const totalFotosGaleria = (result.galeriaFotos || []).length;
+                showToast(`📤 Backup complet exportat (projectes + ${totalFotosGaleria} fotos galeria + fitxes)`);
+            }
+        };
+    });
 }
 
 function importarBackup(input) {
@@ -8889,17 +8906,59 @@ function importarBackup(input) {
     fr.onload = e => {
         showSpinner('IMPORTANT...');
         try {
-            const tx = db.transaction("projects", "readwrite");
-            const items = JSON.parse(e.target.result);
-            items.forEach(item => tx.objectStore("projects").put(item));
+            const parsed = JSON.parse(e.target.result);
+
+            // Format nou (v2): { __datacampBackup:true, stores:{ projects:[...], galeriaFotos:[...], ... } }
+            // Format antic: array pla només amb projectes (sense galeria/fitxes)
+            const storesData = (parsed && parsed.__datacampBackup && parsed.stores)
+                ? parsed.stores
+                : { projects: Array.isArray(parsed) ? parsed : [] };
+
+            const storeNames = Object.keys(storesData).filter(s => db.objectStoreNames.contains(s) && Array.isArray(storesData[s]));
+            if (storeNames.length === 0) throw new Error("El fitxer no conté cap magatzem reconegut.");
+
+            let nFotosGaleria = 0, nProjectesNets = 0;
+            const tx = db.transaction(storeNames, "readwrite");
+            storeNames.forEach(s => {
+                storesData[s].forEach(item => {
+                    if (!item) return; // ignora entrades corruptes/nul·les
+                    if (s === 'projects' && Array.isArray(item.registros)) {
+                        const abans = item.registros.length;
+                        item.registros = item.registros.filter(r => r); // neteja registros nuls
+                        if (item.registros.length !== abans) nProjectesNets++;
+                    }
+                    if (s === 'galeriaFotos') nFotosGaleria++;
+                    tx.objectStore(s).put(item);
+                });
+            });
             tx.oncomplete = () => {
                 hideSpinner();
-                // Re-load all projects into cache then re-render list
-                db.transaction("projects").objectStore("projects").getAll().onsuccess = ev => {
-                    allProjectsCache = ev.target.result || [];
-                    historial();
+                // Repara també projectes que ja estaven a la BD (no només els acabats d'importar)
+                const txRep = db.transaction("projects", "readwrite");
+                const store = txRep.objectStore("projects");
+                store.getAll().onsuccess = ev => {
+                    (ev.target.result || []).forEach(p => {
+                        if (Array.isArray(p.registros) && p.registros.some(r => !r)) {
+                            p.registros = p.registros.filter(r => r);
+                            store.put(p);
+                        }
+                    });
                 };
-                showToast("Backup importat correctament");
+                txRep.oncomplete = () => {
+                    db.transaction("projects").objectStore("projects").getAll().onsuccess = ev2 => {
+                        allProjectsCache = ev2.target.result || [];
+                        historial();
+                    };
+                };
+                if (typeof renderGaleria === 'function') renderGaleria();
+                const avis = !storesData.galeriaFotos
+                    ? " (Avís: aquest backup no incloïa fotos de la galeria ràpida — és d'un format antic)"
+                    : "";
+                showToast("Backup importat correctament" + avis, avis ? 'warn' : 'ok', avis ? 4500 : 2000);
+            };
+            tx.onerror = () => {
+                hideSpinner();
+                alert("Error important el backup: " + (tx.error?.message || "error desconegut a la transacció"));
             };
         } catch (err) {
             hideSpinner();
