@@ -4984,12 +4984,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
                 <div id="regList"></div>
                 <div class="scroll-btns">
-                    <button class="btn-scroll" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
-                    <button class="btn-scroll" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
+                    <button class="btn-scroll" onclick="(document.scrollingElement||document.documentElement).scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+                    <button class="btn-scroll" onclick="(document.scrollingElement||document.documentElement).scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;padding-bottom:100px;width:100%;box-sizing:border-box;">
-                    <button class="btn btn-ghost" onclick="goBackFromPunts()">&#8592; Tornar al detall</button>
-                    <button class="btn btn-primary" onclick="ir('form')">&#9998; Editar formulari</button>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-bottom:100px;width:100%;box-sizing:border-box;">
+                    <button class="btn btn-primary" onclick="ir('form')" style="width:100%;">&#9998; Editar formulari</button>
+                    <button class="btn btn-ghost" onclick="goBackFromPunts()" style="width:100%;">&#8592; Tornar al detall</button>
                 </div>
             </div>
 
@@ -6061,7 +6061,7 @@ function ir(id) {
         else fab.classList.remove('visible');
     }
 
-    window.scrollTo(0, 0);
+    (document.scrollingElement || document.documentElement).scrollTo(0, 0);
 }
 
 function openProjectModal() { document.getElementById('projectModal').style.display = 'flex'; }
