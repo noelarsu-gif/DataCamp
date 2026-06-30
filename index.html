@@ -2965,9 +2965,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     position: absolute;
     bottom: 0; left: 0; right: 0;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     padding: 16px;
     background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
 }
@@ -5411,6 +5412,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="visor-bottombar">
         <button class="visor-btn primary" onclick="visorCompartir()">📲 Compartir</button>
         <button class="visor-btn" onclick="visorDescarregar()">💾 Guardar</button>
+        <button class="visor-btn" onclick="visorGenerarInformePDF()">📄 Informe PDF</button>
     </div>
 </div>
 
@@ -8285,6 +8287,45 @@ function visorDescarregar() {
     a.download = name;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     showToast(`💾 ${name}`);
+}
+
+/* Genera un informe PDF (Fitxa) d'una sola foto, des del visor a pantalla completa */
+async function visorGenerarInformePDF() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    showSpinner('GENERANT INFORME PDF...');
+    try {
+        const titol = item.tipusIncidencia
+            ? `Incidència — ${item.tipusIncidencia}`
+            : `Foto — ${item.carr || 'Sense carretera'}`;
+        const p = _buildProjecteVirtualIncidencies([item], titol);
+        const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+        const date = new Date().toISOString().slice(0, 10);
+
+        currentBlob = await generarBlobPDF(p, 'Fitxa');
+        currentFileName = `Fitxa_${slug}_${date}.pdf`;
+
+        document.getElementById('exportTitle').innerText = 'INFORME PDF';
+        document.getElementById('exportName').innerText = currentFileName;
+        document.getElementById('btnShare').onclick = () => {
+            const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+            if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+            else alert('El teu navegador no permet compartir directament.');
+            closeExportModal();
+        };
+        document.getElementById('btnDownload').onclick = () => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(currentBlob);
+            a.download = currentFileName;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            closeExportModal();
+        };
+        hideSpinner();
+        document.getElementById('exportModal').style.display = 'flex';
+    } catch (err) {
+        hideSpinner();
+        alert('Error generant l\'informe: ' + err.message);
+    }
 }
 
 /* Tancar visor amb Escape */
