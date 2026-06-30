@@ -4327,6 +4327,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
+    <link rel="preload" href="/senales_catalogo.js" as="script">
 </head>
 <body>
 <!-- ══ SPLASH SCREEN ══════════════════════════════════════════ -->
@@ -5458,6 +5459,63 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
 </div>
 
+<!-- CATÀLEG DE SENYALITZACIÓ MODAL -->
+<div id="modalCatalegSenyals" class="modal" onclick="tancarCatalegSenyals()">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:480px; max-height:88vh; overflow-y:auto; text-align:left;">
+        <div class="modal-title" style="color:var(--primary);">🚧 Catàleg de senyals</div>
+        <div class="modal-sub" id="catSenyalsSub">Cerca i selecciona la senyal afectada</div>
+
+        <div id="catSenyalsCercaWrap" style="display:flex; gap:8px; margin-bottom:10px;">
+            <input type="text" id="catSenyalsCerca" placeholder="Codi o nom (ex. R-2, stop...)"
+                   style="flex:1; padding:9px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.85rem;"
+                   oninput="renderCatalegSenyals()">
+            <select id="catSenyalsCategoria" onchange="renderCatalegSenyals()"
+                    style="padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.8rem;">
+                <option value="">Totes</option>
+                <option value="prioritat">Prioritat</option>
+                <option value="perill">Perill</option>
+                <option value="prohibicio">Prohibició</option>
+                <option value="obligacio">Obligació</option>
+                <option value="indicacions">Indicació</option>
+            </select>
+        </div>
+
+        <div id="catSenyalsGrid"
+             style="display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; max-height:42vh; overflow-y:auto; padding:6px; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--surface-alt,#fafafa);">
+        </div>
+
+        <div id="catSenyalsCarregant" style="text-align:center; padding:14px; font-size:0.8rem; color:var(--text-muted);">
+            Carregant catàleg…
+        </div>
+
+        <div id="catSenyalsPanell" style="display:none; margin-top:12px; padding:12px; background:var(--surface-alt,#f4f4f4); border-radius:var(--radius-sm);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <div id="catSenyalsPanellImg" style="width:48px; height:auto; flex-shrink:0;"></div>
+                <div>
+                    <div id="catSenyalsPanellNom" style="font-weight:700; font-size:0.85rem;"></div>
+                    <div id="catSenyalsPanellCodi" style="font-size:0.75rem; color:var(--text-muted);"></div>
+                </div>
+            </div>
+            <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Estat de la senyal</label>
+            <select id="catSenyalsEstat" style="width:100%; padding:8px; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.85rem; margin-bottom:10px;">
+                <option>Trencada</option>
+                <option>Caiguda / despresa</option>
+                <option>Doblegada / girada</option>
+                <option>Vandalitzada</option>
+                <option>Tapada per vegetació</option>
+                <option>Descolorida / desgastada</option>
+                <option>Reflectant defectuós</option>
+                <option>Bruta</option>
+                <option>Desapareguda</option>
+                <option>Mal ubicada</option>
+            </select>
+            <button class="btn btn-primary" style="margin:0;" onclick="confirmarSenyalCataleg()">✔️ Confirmar senyal</button>
+        </div>
+
+        <button class="btn btn-ghost" style="font-size:0.85rem; margin:10px 0 0;" onclick="tancarCatalegSenyals()">Tancar</button>
+    </div>
+</div>
+
 <!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
@@ -5471,6 +5529,7 @@ let currentFileName = "";
 let db, curId = "", regs = [], fields = [], tmpFotos = [], editIdx = -1;
 let logoCorporativo = null;
 let isFotoDirecta = false;
+
 
 /* ============================================================
    DB INIT
@@ -7899,6 +7958,7 @@ function _galeriaTextCompartir(item) {
     if (item.carr) lines.push(`🛣️ Carretera: ${item.carr}`);
     if (item.pk)   lines.push(`📍 PK: ${item.pk}${item.marge ? ' · ' + item.marge : ''}`);
     if (item.tipusIncidencia) lines.push(`⚠️ Incidència: ${item.tipusIncidencia}`);
+    if (item.senyalCodi) lines.push(`🚧 Senyal: ${item.senyalCodi} ${item.senyalNom ? '· ' + item.senyalNom : ''} ${item.senyalEstat ? '(' + item.senyalEstat + ')' : ''}`);
     if (item.lat && item.lon) {
         const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
         lines.push(`🌐 Ubicació: ${url}`);
@@ -8136,7 +8196,7 @@ function obrirEditorFotoDirecta(imgData) {
 
         <div class="form-group" style="margin-bottom:18px;">
             <label style="display:flex;align-items:center;gap:6px;">⚠️ Tipus d'incidència</label>
-            <select id="fd_tipus_incidencia" style="width:100%;">
+            <select id="fd_tipus_incidencia" style="width:100%;" onchange="document.getElementById('fdBtnSenyal').style.display = (this.value === 'Senyalització malmesa') ? 'flex' : 'none'; if(this.value !== 'Senyalització malmesa') eliminarSenyalChip();">
                 <option value="">— Cap —</option>
                 <option value="Animal">🐾 Animal</option>
                 <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
@@ -8144,6 +8204,16 @@ function obrirEditorFotoDirecta(imgData) {
                 <option value="Accident/Averiat">🚗 Accident/Averiat</option>
                 <option value="Incidència indefinida">❓ Incidència indefinida</option>
             </select>
+
+            <button type="button" id="fdBtnSenyal" onclick="obrirCatalegSenyals()"
+                    style="display:none; align-items:center; gap:6px; width:100%; margin-top:8px; padding:9px 12px; border-radius:var(--radius-sm); border:1px dashed var(--primary); background:#fff; color:var(--primary); font-size:0.82rem; font-weight:600; cursor:pointer;">
+                🚧 Seleccionar senyal del catàleg
+            </button>
+
+            <div id="fdSenyalChip" style="display:none; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; padding:8px 10px; background:var(--accent-blue-lt); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--accent-blue);">
+                <span class="fd-senyal-chip-text" style="flex:1;"></span>
+                <span onclick="eliminarSenyalChip()" style="cursor:pointer; font-weight:700; padding:0 4px;">✕</span>
+            </div>
         </div>
 
         ${_galeriaQueueActiu || _galeriaImgQueue.length > 0 ? `
@@ -8350,6 +8420,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         let wmParts = [`${carr} \u2022 PK ${pk} \u2022 ${marge}`];
         if (incDatetime) wmParts.push(`${ara.toLocaleDateString('ca-ES')} ${horaStr}`);
         if (tipusIncidencia) wmParts.push(tipusIncidencia);
+        if (_senyalSeleccionada) wmParts.push(`${_senyalSeleccionada.codi} ${_senyalSeleccionada.estat}`);
         finalImg = await aplicarMarcaAigua(imgData, wmParts.join(' \u2022 '));
     }
 
@@ -8364,11 +8435,15 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         imgData:  finalImg,
         carr, pk, marge,
         tipusIncidencia,
+        senyalCodi:  _senyalSeleccionada ? _senyalSeleccionada.codi : '',
+        senyalNom:   _senyalSeleccionada ? _senyalSeleccionada.nom : '',
+        senyalEstat: _senyalSeleccionada ? _senyalSeleccionada.estat : '',
         ts:       ara.getTime(),
         coordStr: '',
         lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
         lon: (typeof _fdLastLon !== 'undefined' ? _fdLastLon : null),
     };
+    eliminarSenyalChip(); // neteja la selecció per a la propera foto
 
     const navegarAGaleria = async () => {
         hideSpinner();
@@ -9630,6 +9705,94 @@ function _actualitzarSeedBadge(total, font) {
     }
 }
 
+/** Carrega senales_catalogo.js en background (lazy, no bloqueja). */
+function _carregarSenyalsCatalegLazy() {
+    if (typeof SENYALS_CATALEG !== 'undefined') return;
+    const script = document.createElement('script');
+    script.src = '/senales_catalogo.js';
+    script.async = true;
+    script.onload = () => {
+        console.log('[SENYALS] Catàleg carregat:', (typeof SENYALS_CATALEG !== 'undefined' ? SENYALS_CATALEG.length : 0), 'senyals');
+    };
+    script.onerror = () => {
+        console.warn('[SENYALS] No s\'ha pogut carregar senales_catalogo.js (sense connexió i sense SW cache?)');
+    };
+    document.head.appendChild(script);
+}
+
+/* ============================================================
+   CATÀLEG DE SENYALITZACIÓ — selector visual
+   ============================================================ */
+let _senyalSeleccionada = null; // {codi, nom, estat}
+
+function obrirCatalegSenyals() {
+    _carregarSenyalsCatalegLazy();
+    document.getElementById('modalCatalegSenyals').style.display = 'flex';
+    document.getElementById('catSenyalsPanell').style.display = 'none';
+    const intentaRender = () => {
+        if (typeof SENYALS_CATALEG !== 'undefined') {
+            document.getElementById('catSenyalsCarregant').style.display = 'none';
+            renderCatalegSenyals();
+        } else {
+            document.getElementById('catSenyalsCarregant').style.display = 'block';
+            setTimeout(intentaRender, 300);
+        }
+    };
+    intentaRender();
+}
+
+function tancarCatalegSenyals() {
+    document.getElementById('modalCatalegSenyals').style.display = 'none';
+}
+
+function renderCatalegSenyals() {
+    if (typeof SENYALS_CATALEG === 'undefined') return;
+    const q = (document.getElementById('catSenyalsCerca').value || '').toLowerCase().trim();
+    const cat = document.getElementById('catSenyalsCategoria').value;
+    const grid = document.getElementById('catSenyalsGrid');
+    grid.innerHTML = '';
+    let items = SENYALS_CATALEG.filter(s => (!cat || s.s === cat) &&
+        (!q || s.c.toLowerCase().includes(q) || s.n.toLowerCase().includes(q)));
+    if (items.length > 300) items = items.slice(0, 300); // evitar pintar massa cops de cop
+    items.forEach(s => {
+        const cell = document.createElement('div');
+        cell.style.cssText = 'cursor:pointer;text-align:center;padding:4px;border-radius:6px;border:1px solid var(--border-color);background:#fff;';
+        cell.innerHTML = `<img src="data:image/png;base64,${s.img}" style="width:100%;height:auto;display:block;margin:0 auto;" loading="lazy">
+                           <div style="font-size:0.62rem;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.c}</div>`;
+        cell.onclick = () => seleccionarSenyalCataleg(s);
+        grid.appendChild(cell);
+    });
+    if (items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:0.8rem;padding:14px;">Sense resultats</div>';
+    }
+}
+
+function seleccionarSenyalCataleg(s) {
+    _senyalSeleccionada = { codi: s.c, nom: s.n, img: s.img, estat: '' };
+    document.getElementById('catSenyalsPanellImg').innerHTML = `<img src="data:image/png;base64,${s.img}" style="width:100%;height:auto;display:block;">`;
+    document.getElementById('catSenyalsPanellNom').textContent = s.n;
+    document.getElementById('catSenyalsPanellCodi').textContent = s.c;
+    document.getElementById('catSenyalsPanell').style.display = 'block';
+}
+
+function confirmarSenyalCataleg() {
+    if (!_senyalSeleccionada) return;
+    _senyalSeleccionada.estat = document.getElementById('catSenyalsEstat').value;
+    const chip = document.getElementById('fdSenyalChip');
+    if (chip) {
+        chip.style.display = 'flex';
+        chip.querySelector('.fd-senyal-chip-text').textContent =
+            `${_senyalSeleccionada.codi} · ${_senyalSeleccionada.nom} — ${_senyalSeleccionada.estat}`;
+    }
+    tancarCatalegSenyals();
+}
+
+function eliminarSenyalChip() {
+    _senyalSeleccionada = null;
+    const chip = document.getElementById('fdSenyalChip');
+    if (chip) chip.style.display = 'none';
+}
+
 /** Carrega pk_seed.js en background (lazy, no bloqueja). */
 function _carregarPKSeedLazy() {
     if (typeof PK_SEED !== 'undefined') {
@@ -10416,10 +10579,13 @@ function autopkActualizarUIinici() {
     /* Càrrega lazy del seed en background (no bloqueja l'app).
        Esperem 2s per donar prioritat al render inicial. */
     const loadSeed = () => setTimeout(_carregarPKSeedLazy, 2000);
+    const loadSenyals = () => setTimeout(_carregarSenyalsCatalegLazy, 2500);
     if (document.readyState === 'complete') {
         loadSeed();
+        loadSenyals();
     } else {
         window.addEventListener('load', loadSeed);
+        window.addEventListener('load', loadSenyals);
     }
 })();
 
