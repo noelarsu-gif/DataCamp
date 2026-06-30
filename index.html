@@ -1932,6 +1932,92 @@ input:checked + .slider:before { transform: translateX(20px); }
     word-break: break-all;
 }
 
+/* ============================================================
+   NORMATIVA DE CARRETERES — cercador
+   ============================================================ */
+.norm-doc-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.norm-doc-tab {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.norm-doc-tab.active {
+    background: #7c3aed;
+    border-color: #7c3aed;
+    color: #fff;
+}
+.norm-doc-tab-badge {
+    font-size: 0.68rem;
+    opacity: 0.75;
+    font-weight: 600;
+}
+.norm-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+.norm-item:hover { border-color: #7c3aed; box-shadow: var(--shadow-md); }
+.norm-item-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.norm-item-art {
+    font-family: var(--font-cond);
+    font-weight: 700;
+    color: #7c3aed;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.norm-item-nom {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--dark);
+}
+.norm-item-ubicacio {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.norm-item-resum {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.norm-empty-state {
+    text-align: center;
+    padding: 32px 18px;
+    color: var(--text-muted);
+}
+.norm-empty-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.norm-empty-title { font-weight: 700; color: var(--dark); margin-bottom: 8px; font-size: 0.95rem; }
+.norm-empty-text { font-size: 0.84rem; line-height: 1.5; margin-bottom: 16px; }
+
 /* Full image modal */
 .full-img-modal {
     position: fixed; top: 0; left: 0;
@@ -4661,7 +4747,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 (function(){
     const h = new Date().getHours();
-    let salut = h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
+    let salut = h < 6 ? 'Bona nit' : h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
     try {
         const raw = localStorage.getItem('tecnic_dades');
         const nomComplet = raw ? (JSON.parse(raw).nom || '').trim() : '';
@@ -4921,6 +5007,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-label">PK Mapa</div>
                         <div class="action-desc">Consulta PKs sobre satèl·lit, mesures i Street View</div>
                     </div>
+                    <div class="action-card" onclick="ir('normativa')" style="border-left:3px solid #7c3aed;">
+                        <div class="action-icon">⚖️</div>
+                        <div class="action-label">Normativa</div>
+                        <div class="action-desc">Cerca articles de la Llei i el Reglament de carreteres</div>
+                    </div>
                 </div>
 
                 <!-- RECENT PROJECTS SECTION -->
@@ -4934,6 +5025,64 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="recents-empty-icon">📋</div>
                         <div>Encara no hi ha treballs recents</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- ================================================
+                 NORMATIVA DE CARRETERES (cercador)
+                 ================================================ -->
+            <div id="normativa" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('home')">←</button>
+                    <h3>⚖️ Normativa de Carreteres</h3>
+                </div>
+
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <span class="dl-search-icon">🔍</span>
+                        <input type="text" id="normativaSearch" class="dl-search"
+                               placeholder="Cerca: zona de servitud, PK, publicitat, sanció..."
+                               oninput="normativaRenderResultats()">
+                    </div>
+                    <div class="dl-count" id="normativaCount"></div>
+                </div>
+
+                <div class="norm-doc-tabs">
+                    <button class="norm-doc-tab active" id="normTabLlei" onclick="normativaCanviarDoc('llei')">
+                        📘 Llei de carreteres <span class="norm-doc-tab-badge">2009</span>
+                    </button>
+                    <button class="norm-doc-tab" id="normTabReglament" onclick="normativaCanviarDoc('reglament')">
+                        📙 Reglament <span class="norm-doc-tab-badge">2003</span>
+                    </button>
+                </div>
+
+                <div id="normativaResultats"></div>
+
+                <!-- Avís: Reglament encara no indexat completament -->
+                <div id="normativaReglamentAvis" class="norm-empty-state" style="display:none;">
+                    <div class="norm-empty-icon">📙</div>
+                    <div class="norm-empty-title">Reglament general de carreteres (2003)</div>
+                    <div class="norm-empty-text">
+                        Encara no tinc el text complet i verificat dels 175 articles per fer-los cercables offline
+                        (la font oficial bloqueja l'accés automàtic). Si tens el PDF oficial, puja'l aquí i
+                        l'indexem sencer. Mentrestant, pots consultar-lo directament:
+                    </div>
+                    <a href="https://portaljuridic.gencat.cat/ca/document-del-pjur/?documentId=312160"
+                       target="_blank" class="btn btn-ghost" style="text-decoration:none; display:inline-block;">
+                        📄 Obrir al Portal Jurídic
+                    </a>
+                </div>
+            </div>
+
+            <!-- Detall d'article (modal) -->
+            <div id="normativaDetallModal" class="modal" onclick="normativaTancarDetall()">
+                <div class="modal-box" onclick="event.stopPropagation()" style="text-align:left; max-width:480px;">
+                    <div class="modal-title" id="normDetallTitol" style="color:var(--primary);"></div>
+                    <div class="modal-sub" id="normDetallUbicacio"></div>
+                    <p id="normDetallResum" style="font-size:0.92rem; line-height:1.55; color:#333; margin:14px 0 18px;"></p>
+                    <a id="normDetallLink" href="#" target="_blank" class="btn btn-ghost"
+                       style="display:block; text-align:center; text-decoration:none; box-sizing:border-box;">📄 Veure text oficial complet</a>
+                    <button class="btn btn-ghost" onclick="normativaTancarDetall()">TANCAR</button>
                 </div>
             </div>
 
@@ -6070,7 +6219,8 @@ const screenTitles = {
     'projectDetail': 'Detall del Projecte',
     'mapScreen':     'Mapa de Registres',
     'galeriaFotos':  'Galeria de Fotos',
-    'pkMapaScreen':  'PK Mapa'
+    'pkMapaScreen':  'PK Mapa',
+    'normativa':     'Normativa de Carreteres'
 };
 
 // Show FAB on initial load (home is active by default)
@@ -6106,6 +6256,7 @@ function ir(id) {
     if (id === 'downloads') carregarLlistaDescargues();
     if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); _omplirCampsTecnicAjustos(); }
     if (id === 'galeriaFotos') renderGaleria();
+    if (id === 'normativa') normativaRenderResultats();
     if (id === 'pkMapaScreen') {
         // Forçar invalidateSize de Leaflet després que la pantalla sigui visible i fixed
         setTimeout(() => { if (pkmMap) pkmMap.invalidateSize(); pkmSyncPeek(); }, 120);
@@ -9997,6 +10148,160 @@ document.addEventListener('keydown', e => {
         if (visor?.classList.contains('open')) tancarVisor();
     }
 });
+
+/* ============================================================
+   NORMATIVA DE CARRETERES — cercador offline
+   Font: Decret Legislatiu 2/2009 (Llei de carreteres), text consolidat
+   oficial BOE-A-2009-17315 (https://www.boe.es/buscar/act.php?id=BOE-A-2009-17315),
+   última modificació recollida: 31/12/2025. Resums fets en català, no
+   són transcripció literal: per al text legal exacte, consulta l'enllaç
+   oficial de cada fitxa.
+   ============================================================ */
+const NORMATIVA_LLEI_URL = 'https://portaljuridic.gencat.cat/ca/document-del-pjur/?documentId=480379';
+const NORMATIVA_REGLAMENT_URL = 'https://portaljuridic.gencat.cat/ca/document-del-pjur/?documentId=312160';
+
+const NORMATIVA_LLEI = [
+{t:'TÍTOL I', tn:'Disposicions generals', n:'1', nom:'Objecte', r:'Regula les carreteres de Catalunya no reservades a l\'Estat, establint els instruments per garantir-ne l\'ordenació, funcionalitat i protecció.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'2', nom:'Àmbit d\'aplicació', r:'Defineix què es considera carretera i n\'exclou les vies municipals, pistes forestals, camins de servei privats i noves vies executades pels ajuntaments.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'3', nom:'Conceptes tècnics', r:'Defineix termes tècnics com àrees de servei, aresta exterior de calçada/explanació i element funcional de la carretera.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'4', nom:'Classificació funcional', r:'Classifica les carreteres en xarxa bàsica, comarcal i local segons la funció que fan.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'5', nom:'Classificació tècnica', r:'Classifica les carreteres en autopistes, vies preferents i carreteres convencionals segons les seves característiques tècniques.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'6', nom:'Titularitat de les carreteres', r:'Atribueix la titularitat de la xarxa bàsica i comarcal a la Generalitat, i de la xarxa local a les diputacions de Barcelona, Tarragona, Lleida i Girona.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'7', nom:'Catàleg de carreteres', r:'Regula el Catàleg de carreteres, que ha de mantenir-se actualitzat i publicar-se al web del departament competent.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'8', nom:'Règim jurídic', r:'Les carreteres regulades per la Llei són de domini públic; les administracions titulars en gestionen execució, gestió i conservació.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'9', nom:'Normes complementàries', r:'Habilita el Govern a establir normes i criteris tècnics de disseny, servei i seguretat viària de les carreteres.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'10', nom:'Seguretat viària', r:'Obliga a prioritzar les actuacions de millora de seguretat i a elaborar plans per als trams amb alta concentració d\'accidents (inclosos els d\'ungulats).'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'11', nom:'Coordinació', r:'Estableix els principis de coordinació entre administracions i l\'informe previ de l\'Estat sobre els seus projectes a Catalunya.'},
+{t:'TÍTOL I', tn:'Disposicions generals', n:'12', nom:'Canvi de titularitat entre administracions catalanes', r:'Regula el procediment per canviar la titularitat d\'una carretera entre administracions catalanes mitjançant expedient i acord.'},
+
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL I — Planificació', n:'13', nom:'El Pla d\'infraestructures del transport de Catalunya', r:'El sistema viari s\'ordena mitjançant aquest Pla, que té caràcter de pla territorial sectorial i s\'ha de revisar com a mínim cada cinc anys.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL I — Planificació', n:'14', nom:'Coordinació amb el planejament urbanístic', r:'Els instruments de planejament urbanístic s\'han d\'enviar a la direcció general de carreteres perquè n\'informi, amb un mes mínim de termini.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'15', nom:'Tipologia', r:'Defineix els tres documents previs a una obra: estudi informatiu previ, projecte de traçat i projecte de construcció.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'16', nom:'Contingut', r:'Estableix els documents que han de contenir els estudis i projectes, incloent l\'estudi d\'impacte ambiental quan calgui.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'17', nom:'Procediment', r:'Regula la informació pública de trenta dies hàbils i l\'informe preceptiu de les administracions locals afectades.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'18', nom:'Protecció del medi', r:'Determina quan els projectes s\'han de sotmetre a avaluació d\'impacte ambiental i a auditoria de seguretat viària.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'19', nom:'Aprovació i efectes', r:'L\'aprovació d\'un projecte de carreteres implica la declaració d\'utilitat pública i la necessitat d\'ocupació als efectes d\'expropiació forçosa.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL II — Estudis i projectes', n:'20', nom:'Execució', r:'Els projectes de carreteres són immediatament executius des de la seva aprovació i no estan sotmesos a llicència municipal.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'21', nom:'Gestió de carreteres en règim de concessió d\'obra pública', r:'Permet a la Generalitat construir, explotar i gestionar carreteres mitjançant el contracte de concessió d\'obra pública.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'22', nom:'Estudi de viabilitat', r:'Exigeix un estudi de viabilitat previ que valori factors econòmics, socials i ambientals abans d\'optar per una concessió.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'23', nom:'Informació pública', r:'L\'estudi de viabilitat se sotmet a informació pública de trenta dies hàbils, prorrogables fins a quinze dies més.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'24', nom:'Avaluació d\'impacte ambiental', r:'L\'estudi de viabilitat se sotmet a avaluació d\'impacte ambiental quan la normativa sectorial ho exigeixi.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'25', nom:'Aprovació', r:'L\'estudi de viabilitat (o el de viabilitat economicofinancera) l\'aprova el titular del departament competent en carreteres.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'26', nom:'Avantprojecte de construcció i explotació', r:'Un cop aprovat l\'estudi de viabilitat, cal redactar l\'avantprojecte amb memòria, plànols de traçat i pressupost.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'27', nom:'Informació pública', r:'L\'avantprojecte de construcció i explotació se sotmet també a informació pública de trenta dies hàbils.'},
+{t:'TÍTOL II', tn:'Planificació i projectes', c:'CAPÍTOL III — Concessió d\'obra pública', n:'28', nom:'Aprovació', r:'Correspon al titular del departament competent en carreteres aprovar l\'avantprojecte de construcció i explotació.'},
+
+{t:'TÍTOL III', tn:'Finançament i explotació', c:'CAPÍTOL I — Finançament', n:'29', nom:'Modalitats de finançament', r:'Enumera les vies de finançament: pressupost públic, peatge o concessió, contribucions especials i taxa per ús de la carretera.'},
+{t:'TÍTOL III', tn:'Finançament i explotació', c:'CAPÍTOL I — Finançament', n:'30', nom:'Contribucions especials', r:'Permet imposar contribucions especials quan una obra beneficia especialment finques o establiments confrontants amb la via.'},
+{t:'TÍTOL III', tn:'Finançament i explotació', c:'CAPÍTOL I — Finançament', n:'30 bis', nom:'Taxa per l\'ús de les carreteres per part dels vehicles', r:'Regula la taxa pel pas de vehicles per certes carreteres i l\'obligació d\'inscriure\'s al registre de vehicles usuaris.'},
+{t:'TÍTOL III', tn:'Finançament i explotació', c:'CAPÍTOL II — Explotació', n:'31', nom:'Principis generals', r:'L\'explotació inclou conservació, manteniment, senyalització i ordenació d\'accessos; la Generalitat l\'exerceix directament o indirectament.'},
+{t:'TÍTOL III', tn:'Finançament i explotació', c:'CAPÍTOL II — Explotació', n:'32', nom:'Àrees i instal·lacions de servei', r:'Regula la dotació mínima de serveis sanitaris i telèfons a les àrees de servei i les condicions de les estacions de servei.'},
+
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'33', nom:'Tipologia', r:'Estableix les tres zones de protecció (domini públic, servitud, afectació) i la línia d\'edificació, mesurades perpendicularment a l\'eix de la via.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'34', nom:'Zona de domini públic', r:'Franja de 8 m d\'amplada en autopistes/vies preferents i 3 m en carreteres convencionals, des de l\'aresta exterior de l\'explanació.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'35', nom:'Utilització de la zona de domini públic', r:'Només s\'hi permeten obres directament vinculades a la via; el subsòl es pot autoritzar per a infraestructures de serveis essencials.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'36', nom:'Zona de servitud', r:'Franja de 25 m en autopistes/vies preferents i 8 m a la resta de carreteres, delimitada des de la zona de domini públic.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'37', nom:'Utilització de la zona de servitud', r:'Només s\'hi permeten usos prèviament autoritzats i compatibles amb la seguretat viària; es poden autoritzar tancaments diàfans o aparcaments.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'38', nom:'Zona d\'afectació', r:'Franja de 100 m en autopistes/vies preferents, 50 m en convencionals de la xarxa bàsica i 30 m a la resta de carreteres.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'39', nom:'Utilització de la zona d\'afectació', r:'Qualsevol obra, canvi d\'ús o tala d\'arbres a la zona d\'afectació requereix autorització prèvia del departament de carreteres.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'40', nom:'Línia d\'edificació', r:'Prohibeix construir entre la línia d\'edificació i la carretera; se situa a 50 m (autopistes/vies preferents) o 25 m (resta) de la calçada.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'41', nom:'Supòsits especials de la línia d\'edificació', r:'Permet reduir la distància de la línia d\'edificació en sòl urbà o per raons geogràfiques, amb informe favorable previ.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'42', nom:'Publicitat i rètols informatius i indicatius', r:'Prohibeix la publicitat visible en una franja de 100 m des de la calçada, amb excepcions en sòls urbans i per a rètols informatius.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL I — Domini públic viari i zones de protecció', n:'43', nom:'Autorització administrativa', r:'El departament competent en carreteres atorga les autoritzacions d\'obres i activitats regulades en aquest capítol.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL II — Funcionalitat de la via i accessos', n:'44', nom:'Funcionalitat de la via', r:'Permet limitar temporalment o permanentment la circulació i establir estacions de pesatge i recompte de trànsit.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL II — Funcionalitat de la via i accessos', n:'45', nom:'Accessos', r:'El departament de carreteres pot limitar i ordenar els accessos a la carretera; calen autorització i consulta prèvia als ajuntaments afectats.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL III — Trams urbans i travessies', n:'46', nom:'Concepte i règim jurídic', r:'Defineix tram urbà (per sòl classificat com a urbà) i travessia (amb edificació consolidada i entramat de carrers).'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL III — Trams urbans i travessies', n:'47', nom:'Autoritzacions', r:'Els ajuntaments autoritzen obres a la zona de domini públic en trams urbans i travessies, amb informe previ favorable de carreteres.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL III — Trams urbans i travessies', n:'48', nom:'Traspàs de vies', r:'Regula el traspàs de titularitat de carreteres entre la Generalitat i els ajuntaments, sempre per acord entre administracions.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL IV — Preservació del domini públic viari', n:'49', nom:'Règim general', r:'Les limitacions d\'ús imposades per la Llei formen part del contingut ordinari de la propietat i no generen dret a indemnització.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL IV — Preservació del domini públic viari', n:'50', nom:'Afectacions singulars', r:'L\'ocupació de la zona de servitud o d\'afectació i els danys que se\'n derivin sí que són indemnitzables, segons la legislació general.'},
+{t:'TÍTOL IV', tn:'Règim d\'ús i de protecció', c:'CAPÍTOL IV — Preservació del domini públic viari', n:'51', nom:'Conservació d\'immobles', r:'Obliga els propietaris a mantenir els immobles en condicions de seguretat; preveu mesures cautelars en cas de ruïna que afecti la via.'},
+
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL I — Mesures de protecció', n:'52', nom:'Mesures cautelars', r:'El departament de carreteres pot ordenar la paralització immediata d\'obres i la suspensió d\'usos sense autorització, amb precintatge si cal.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL I — Mesures de protecció', n:'53', nom:'Suspensió dels efectes de les autoritzacions i les llicències', r:'Si una autorització o llicència constitueix una infracció notòria i greu, se\'n suspenen els efectes i es paralitzen les obres iniciades.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL I — Mesures de protecció', n:'54', nom:'Nul·litat d\'autoritzacions i llicències', r:'Són nul·les de ple dret les autoritzacions administratives i llicències atorgades contravenint el que estableix la Llei.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL I — Mesures de protecció', n:'55', nom:'Danys al domini públic viari', r:'Els danys causats a una carretera originen un expedient per determinar la indemnització corresponent, exigible per via d\'apremi.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL II — Infraccions', n:'56', nom:'Tipificació', r:'Classifica les infraccions en lleus, greus i molt greus: obres sense autorització, danys a elements de la via, publicitat il·legal, etc.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL II — Infraccions', n:'57', nom:'Prescripció', r:'Les infraccions greus i molt greus prescriuen als quatre anys i les lleus a l\'any, comptats des de la comissió del fet.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL III — Procediment sancionador', n:'58', nom:'Responsabilitat', r:'Són responsables de la infracció el promotor, l\'empresari que executa l\'obra i el tècnic o tècnica director/a.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL III — Procediment sancionador', n:'59', nom:'Tramitació', r:'El procediment sancionador es regeix per la normativa reglamentària específica i per la normativa general de procediment administratiu.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL IV — Sancions', n:'60', nom:'Graduació', r:'Fixa multes de fins a 6.010,12 € (lleus), 30.050,61 € (greus) i 300.506,05 € (molt greus), incrementables fins al benefici obtingut.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL IV — Sancions', n:'61', nom:'Exigibilitat', r:'L\'import de les multes i de les despeses d\'execució subsidiària es pot exigir per via administrativa d\'apremi.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL IV — Sancions', n:'62', nom:'Multes coercitives', r:'Permet imposar multes coercitives reiterables de fins a 601,01 € cadascuna per fer complir actes administratius.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL IV — Sancions', n:'63', nom:'Restitució del medi a l\'estat anterior', r:'La sanció és independent de l\'obligació de restituir el medi físic a l\'estat anterior i d\'indemnitzar els danys ocasionats.'},
+{t:'TÍTOL V', tn:'Protecció de la legalitat i règim sancionador', c:'CAPÍTOL V — Mesures específiques', n:'63 bis', nom:'Mesures específiques', r:'Permet als agents de l\'autoritat aturar i immobilitzar vehicles que hagin incomplert la taxa per ús de carreteres.'},
+];
+
+let normativaDocActiu = 'llei';
+
+function _normativaSenseAccents(s) {
+    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function normativaCanviarDoc(doc) {
+    normativaDocActiu = doc;
+    document.getElementById('normTabLlei')?.classList.toggle('active', doc === 'llei');
+    document.getElementById('normTabReglament')?.classList.toggle('active', doc === 'reglament');
+    normativaRenderResultats();
+}
+
+function normativaRenderResultats() {
+    const cont = document.getElementById('normativaResultats');
+    const avis = document.getElementById('normativaReglamentAvis');
+    const count = document.getElementById('normativaCount');
+    if (!cont) return;
+
+    if (normativaDocActiu === 'reglament') {
+        cont.innerHTML = '';
+        if (avis) avis.style.display = 'block';
+        if (count) count.textContent = '';
+        return;
+    }
+    if (avis) avis.style.display = 'none';
+
+    const q = _normativaSenseAccents(document.getElementById('normativaSearch')?.value || '').trim();
+    let resultats = NORMATIVA_LLEI;
+    if (q) {
+        resultats = NORMATIVA_LLEI.filter(it => {
+            const blob = _normativaSenseAccents(`${it.n} ${it.nom} ${it.r} ${it.t} ${it.tn} ${it.c || ''}`);
+            return blob.includes(q);
+        });
+    }
+
+    if (count) count.textContent = `${resultats.length} article${resultats.length !== 1 ? 's' : ''}`;
+
+    if (resultats.length === 0) {
+        cont.innerHTML = `<div class="norm-empty-state"><div class="norm-empty-icon">🔍</div><div class="norm-empty-text">Cap article coincideix amb la cerca.</div></div>`;
+        return;
+    }
+
+    cont.innerHTML = resultats.map(it => {
+        const idx = NORMATIVA_LLEI.indexOf(it);
+        return `
+        <div class="norm-item" onclick="normativaObrirDetall(${idx})">
+            <div class="norm-item-top">
+                <span class="norm-item-art">Art. ${it.n}</span>
+                <span class="norm-item-nom">${it.nom}</span>
+            </div>
+            <div class="norm-item-ubicacio">${it.t}${it.c ? ' · ' + it.c : ''}</div>
+            <div class="norm-item-resum">${it.r}</div>
+        </div>`;
+    }).join('');
+}
+
+function normativaObrirDetall(idx) {
+    const it = NORMATIVA_LLEI[idx];
+    if (!it) return;
+    document.getElementById('normDetallTitol').textContent = `Art. ${it.n}. ${it.nom}`;
+    document.getElementById('normDetallUbicacio').textContent = `Llei de carreteres (DL 2/2009) · ${it.t}${it.c ? ' · ' + it.c : ''}`;
+    document.getElementById('normDetallResum').textContent = it.r;
+    document.getElementById('normDetallLink').href = NORMATIVA_LLEI_URL;
+    document.getElementById('normativaDetallModal').style.display = 'flex';
+}
+
+function normativaTancarDetall() {
+    document.getElementById('normativaDetallModal').style.display = 'none';
+}
 
 /* ============================================================
    FOTO DIRECTA
