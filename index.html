@@ -8321,6 +8321,7 @@ async function visorGenerarInformePDF() {
             closeExportModal();
         };
         hideSpinner();
+        tancarVisor();
         document.getElementById('exportModal').style.display = 'flex';
     } catch (err) {
         hideSpinner();
