@@ -2980,6 +2980,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     z-index: 1;
 }
 .visor-title {
+    flex: 1;
+    text-align: center;
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-family: var(--font-cond);
     font-size: 0.88rem;
     font-weight: 700;
@@ -3000,7 +3006,55 @@ input:checked + .slider:before { transform: translateX(20px); }
     max-height: calc(100vh - 90px);
     object-fit: contain;
     border-radius: var(--radius-sm);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    touch-action: pan-y;
 }
+.visor-img-wrap img.visor-img-swiping {
+    transition: none;
+}
+.visor-nav-dots {
+    position: absolute;
+    top: 54px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    z-index: 1;
+    pointer-events: none;
+    padding: 0 16px;
+    flex-wrap: wrap;
+}
+.visor-nav-dots .vnd-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    flex-shrink: 0;
+}
+.visor-nav-dots .vnd-dot.active {
+    background: rgba(255,255,255,0.95);
+}
+.visor-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1;
+}
+.visor-nav-arrow:hover { background: rgba(255,255,255,0.22); }
+.visor-nav-arrow.prev { left: 10px; }
+.visor-nav-arrow.next { right: 10px; }
+.visor-nav-arrow[disabled] { opacity: 0.25; pointer-events: none; }
 .visor-bottombar {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -5731,6 +5785,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 <div id="galeriaVisor">
     <div class="visor-topbar">
+        <button class="visor-close" onclick="tancarVisor()" title="Tancar">✕</button>
         <div class="visor-title" id="visorTitle">Foto Ràpida</div>
         <div class="visor-topbar-actions">
             <button class="visor-menu-btn" onclick="visorMenuToggle()" title="Més opcions">⋮</button>
@@ -5741,12 +5796,14 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <button class="visor-menu-item" id="visorBtnFitxaAnimal" style="display:none;" onclick="visorMenuToggle(); visorFitxaAnimal()">🐾📋 Omplir fitxa completa d'animal</button>
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorGenerarInformePDF()">📄 Informe PDF</button>
             </div>
-            <button class="visor-close" onclick="tancarVisor()">✕</button>
         </div>
     </div>
-    <div class="visor-img-wrap">
+    <div class="visor-img-wrap" id="visorImgWrap">
+        <button class="visor-nav-arrow prev" id="visorBtnPrev" onclick="visorNavegar(-1)" title="Anterior">‹</button>
         <img id="visorImg" src="" alt="">
+        <button class="visor-nav-arrow next" id="visorBtnNext" onclick="visorNavegar(1)" title="Següent">›</button>
     </div>
+    <div class="visor-nav-dots" id="visorNavDots"></div>
 </div>
 
 <!-- ============================================================
@@ -9380,6 +9437,7 @@ function galeriaLlegirTotes(callback) {
 /* ── Estat filtres galeria ── */
 let galeriaOrdre   = 'desc';  // 'desc' recents primer | 'asc' antics primer
 let galeriaFCarr   = 'TOTES'; // filtre carretera actiu
+let galeriaFiltratsActuals = []; // llista filtrada+ordenada actual (per swipe al visor)
 let galeriaFIncidencia = '';   // filtre tipus incidència ('' = totes)
 
 function renderGaleria() {
@@ -9407,6 +9465,7 @@ function renderGaleria() {
         }
         // Ordre
         filtered.sort((a, b) => galeriaOrdre === 'desc' ? b.ts - a.ts : a.ts - b.ts);
+        galeriaFiltratsActuals = filtered;
 
         if (filtered.length === 0 && items.length === 0) {
             grid.innerHTML = '';
@@ -9723,7 +9782,92 @@ function galeriaObrirVisor(id) {
         btnAnimal.style.display = (item.tipusIncidencia === 'Animal') ? 'flex' : 'none';
         btnAnimal.textContent = item.animalFitxaId ? '🐾✏️ Editar fitxa d\'animal' : '🐾📋 Omplir fitxa completa d\'animal';
     }
+    visorActualitzarNav();
 }
+
+/* Navega a la foto anterior (-1) o següent (+1) dins de la llista actualment
+   filtrada/ordenada a la galeria. Si no hi ha filtre actiu, recorre totes
+   les fotos segons l'ordre establert. */
+function visorNavegar(delta) {
+    const llista = galeriaFiltratsActuals.length ? galeriaFiltratsActuals : galeriaItems;
+    const idx = llista.findIndex(i => i.id === visorCurrentId);
+    if (idx === -1) return;
+    const nouIdx = idx + delta;
+    if (nouIdx < 0 || nouIdx >= llista.length) return;
+    document.getElementById('visorMenuDropdown')?.classList.remove('open');
+    galeriaObrirVisor(llista[nouIdx].id);
+}
+
+function visorActualitzarNav() {
+    const llista = galeriaFiltratsActuals.length ? galeriaFiltratsActuals : galeriaItems;
+    const idx = llista.findIndex(i => i.id === visorCurrentId);
+    const btnPrev = document.getElementById('visorBtnPrev');
+    const btnNext = document.getElementById('visorBtnNext');
+    const dotsWrap = document.getElementById('visorNavDots');
+    if (btnPrev) btnPrev.disabled = idx <= 0;
+    if (btnNext) btnNext.disabled = idx === -1 || idx >= llista.length - 1;
+    if (btnPrev) btnPrev.style.display = llista.length > 1 ? 'flex' : 'none';
+    if (btnNext) btnNext.style.display = llista.length > 1 ? 'flex' : 'none';
+    if (dotsWrap) {
+        if (llista.length > 1 && llista.length <= 12) {
+            dotsWrap.innerHTML = llista.map((it, i) =>
+                `<div class="vnd-dot${i === idx ? ' active' : ''}"></div>`).join('');
+        } else {
+            dotsWrap.innerHTML = '';
+        }
+    }
+}
+
+/* Swipe tàctil sobre la imatge per canviar de foto, respectant el filtre actiu */
+(function initVisorSwipe() {
+    const wrap = document.getElementById('visorImgWrap');
+    if (!wrap) return;
+    let startX = 0, startY = 0, dragging = false;
+    const img = () => document.getElementById('visorImg');
+
+    wrap.addEventListener('touchstart', e => {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        dragging = true;
+        img()?.classList.add('visor-img-swiping');
+    }, { passive: true });
+
+    wrap.addEventListener('touchmove', e => {
+        if (!dragging || e.touches.length !== 1) return;
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        if (Math.abs(dx) > Math.abs(dy)) {
+            const el = img();
+            if (el) el.style.transform = `translateX(${dx}px)`;
+        }
+    }, { passive: true });
+
+    wrap.addEventListener('touchend', e => {
+        if (!dragging) return;
+        dragging = false;
+        const dx = (e.changedTouches[0]?.clientX || startX) - startX;
+        const dy = (e.changedTouches[0]?.clientY || startY) - startY;
+        const el = img();
+        if (el) {
+            el.classList.remove('visor-img-swiping');
+            el.style.transform = '';
+        }
+        const THRESHOLD = 55;
+        if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+            if (dx < 0) visorNavegar(1);   // arrossega cap a l'esquerra → següent
+            else        visorNavegar(-1);  // arrossega cap a la dreta → anterior
+        }
+    });
+})();
+
+/* Navegació amb fletxes de teclat quan el visor està obert */
+document.addEventListener('keydown', e => {
+    const visor = document.getElementById('galeriaVisor');
+    if (!visor?.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') visorNavegar(1);
+    if (e.key === 'ArrowLeft')  visorNavegar(-1);
+});
 
 function tancarVisor() {
     document.getElementById('galeriaVisor').classList.remove('open');
