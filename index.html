@@ -2141,8 +2141,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     height: 60px;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 200;
     box-shadow: var(--shadow-sm);
 }
@@ -2217,7 +2219,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 @media (max-width: 768px) {
     /* === LAYOUT === */
     .sidebar       { display: none !important; }
-    .main-content  { margin-left: 0 !important; width: 100% !important; }
+    .main-content  { margin-left: 0 !important; width: 100% !important; margin-top: 60px; }
     .topbar        { display: none !important; }
     .mobile-header { display: flex !important; }
 
