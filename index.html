@@ -4330,6 +4330,23 @@ input:checked + .slider:before { transform: translateX(20px); }
 .pkm-pin-popup { padding: 12px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
 .pkm-pp-road { font-family: var(--font-cond); font-size: .68rem; font-weight: 700; color: #9ca3af; letter-spacing: 1.5px; text-transform: uppercase; }
 .pkm-pp-pk   { font-family: monospace; font-size: 1.4rem; font-weight: 700; color: #c60c30; line-height: 1; }
+.pkm-chip-label {
+    background: #1f2937 !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    border-radius: 999px !important;
+    color: #f9fafb !important;
+    font-family: 'SF Mono', 'Consolas', monospace !important;
+    font-size: .64rem !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.45) !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
+    letter-spacing: .2px;
+}
+.pkm-chip-label.pkm-chip-amid { border-color: rgba(245,166,35,.55) !important; color: #f59e0b !important; }
+.pkm-chip-label.pkm-chip-area { border-color: rgba(192,132,252,.55) !important; color: #c084fc !important; }
+.pkm-chip-label::before { display: none !important; }
 .pkm-screen .leaflet-popup-content-wrapper {
     background: rgba(17,24,39,.95) !important; border: 1px solid rgba(198,12,48,.3) !important;
     border-radius: 12px !important; box-shadow: 0 8px 32px rgba(0,0,0,.6) !important;
@@ -12595,6 +12612,8 @@ let pkmAreaPunts = [];
 let pkmAreaLayer = null;
 let pkmAreaMarkers = [];
 let pkmAmidMarkers = [];
+let pkmAmidChips = [];
+let pkmAreaChips = [];
 let pkmSheetPos = 1;          // 1=peek (default), 0=obert
 const PKM_ARCGIS = (typeof AUTOPK_CONFIG !== 'undefined' && AUTOPK_CONFIG.ARCGIS_URL)
     ? AUTOPK_CONFIG.ARCGIS_URL
@@ -13103,6 +13122,27 @@ function pkmToggleAmidament() {
     if (!pkmAmidamentActiu) pkmEsborrarAmidament(true);
     pkmSyncBtnSortir();
 }
+/* ── Chips de mesura: sempre al costat de la línia, mai a sobre ── */
+function pkmCrearChipSegment(p1, p2, text, claseCss) {
+    // Punt mig en coordenades de mapa
+    const mid = L.latLng((p1.lat + p2.lat) / 2, (p1.lng + p2.lng) / 2);
+    // Vector del segment en píxels de pantalla per calcular la perpendicular
+    const pp1 = pkmMap.latLngToLayerPoint(p1);
+    const pp2 = pkmMap.latLngToLayerPoint(p2);
+    let dx = pp2.x - pp1.x, dy = pp2.y - pp1.y;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    // Perpendicular unitària, sempre cap al mateix costat (amunt de la línia)
+    let perpX = -dy, perpY = dx;
+    if (perpY > 0) { perpX = -perpX; perpY = -perpY; } // preferim que el chip quedi per sobre
+    const dist = 20; // separació en px respecte la línia, evita solapar-se
+    const offset = [perpX * dist, perpY * dist];
+    const mk = L.marker(mid, { icon: L.divIcon({ className:'', html:'', iconSize:[0,0] }), interactive:false, keyboard:false })
+        .addTo(pkmMap)
+        .bindTooltip(text, { permanent:true, direction:'center', offset, className:'pkm-chip-label ' + claseCss });
+    mk.openTooltip();
+    return mk;
+}
 function pkmAfegirPuntLliure() {
     if (!pkmMap) return;
     const c = pkmMap.getCenter();
@@ -13122,10 +13162,18 @@ function pkmAfegirPuntLliureAt(latlng) {
 function pkmRedrawAmid() {
     pkmAmidPunts = pkmAmidMarkers.map(mk => mk.getLatLng());
     if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    pkmAmidChips.forEach(c => c.remove());
+    pkmAmidChips = [];
     if (pkmAmidPunts.length < 2) return;
     pkmAmidLayer = L.polyline(pkmAmidPunts, { color:'#f59e0b', weight:3, dashArray:'8,5' }).addTo(pkmMap);
     let dist = 0;
-    for (let i=1; i<pkmAmidPunts.length; i++) dist += pkmAmidPunts[i-1].distanceTo(pkmAmidPunts[i]);
+    for (let i=1; i<pkmAmidPunts.length; i++) {
+        const p1 = pkmAmidPunts[i-1], p2 = pkmAmidPunts[i];
+        const segDist = p1.distanceTo(p2);
+        dist += segDist;
+        const segLabel = segDist >= 1000 ? `${(segDist/1000).toFixed(2)} km` : `${Math.round(segDist)} m`;
+        pkmAmidChips.push(pkmCrearChipSegment(p1, p2, segLabel, 'pkm-chip-amid'));
+    }
     const label = dist >= 1000 ? `${(dist/1000).toFixed(3)} km` : `${Math.round(dist)} m`;
     const res = document.getElementById('pkmAmidResult');
     document.getElementById('pkmAmidDistText').textContent = label;
@@ -13151,6 +13199,8 @@ function pkmEsborrarAmidament(silent) {
     pkmAmidMarkers.forEach(m => m.remove());
     pkmAmidMarkers = []; pkmAmidPunts = [];
     if (pkmAmidLayer) { pkmAmidLayer.remove(); pkmAmidLayer = null; }
+    pkmAmidChips.forEach(c => c.remove());
+    pkmAmidChips = [];
     document.getElementById('pkmFreePtsList').innerHTML = '';
     document.getElementById('pkmAmidResult').classList.remove('show');
     if (!silent) showToast('Mesurament esborrat', 'ok', 1500);
@@ -13186,11 +13236,20 @@ function pkmAfegirPuntArea(latlng) {
 function pkmRedrawArea() {
     pkmAreaPunts = pkmAreaMarkers.map(mk => mk.getLatLng());
     if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
+    pkmAreaChips.forEach(c => c.remove());
+    pkmAreaChips = [];
     if (pkmAreaPunts.length < 2) return;
     const style = pkmAreaPunts.length >= 3
         ? { color:'#c084fc', fillColor:'#c084fc', fillOpacity:.13, weight:2 }
         : { color:'#c084fc', weight:2, fill: false };
     pkmAreaLayer = (pkmAreaPunts.length >= 3 ? L.polygon : L.polyline)(pkmAreaPunts, style).addTo(pkmMap);
+    const nEdges = pkmAreaPunts.length >= 3 ? pkmAreaPunts.length : pkmAreaPunts.length - 1;
+    for (let i=0; i<nEdges; i++) {
+        const p1 = pkmAreaPunts[i], p2 = pkmAreaPunts[(i+1) % pkmAreaPunts.length];
+        const segDist = p1.distanceTo(p2);
+        const segLabel = segDist >= 1000 ? `${(segDist/1000).toFixed(2)} km` : `${Math.round(segDist)} m`;
+        pkmAreaChips.push(pkmCrearChipSegment(p1, p2, segLabel, 'pkm-chip-area'));
+    }
 }
 function pkmRenderAreaPts() {
     const el = document.getElementById('pkmAreaPtsList');
@@ -13216,6 +13275,8 @@ function pkmEsborrarArea(silent) {
     pkmAreaMarkers.forEach(m => m.remove());
     pkmAreaMarkers = []; pkmAreaPunts = [];
     if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
+    pkmAreaChips.forEach(c => c.remove());
+    pkmAreaChips = [];
     document.getElementById('pkmAreaPtsList').innerHTML = '';
     document.getElementById('pkmAreaResult').classList.remove('show');
     if (!silent) showToast('Àrea esborrada', 'ok', 1500);
