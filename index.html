@@ -1179,6 +1179,37 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .reg-item:hover { box-shadow: var(--shadow); border-color: var(--border-dark); }
 
+/* ── Drag ghost effect ─────────────────────────────────────── */
+.reg-sortable-ghost {
+    opacity: 0.22;
+    background: var(--primary-light) !important;
+    border: 2.5px dashed var(--primary) !important;
+    box-shadow: none !important;
+}
+.reg-sortable-ghost * { visibility: hidden; }
+
+.reg-sortable-drag {
+    box-shadow: 0 20px 48px rgba(0,0,0,0.22), 0 6px 16px rgba(0,0,0,0.14) !important;
+    transform: rotate(1.2deg) scale(1.025) !important;
+    border-color: var(--primary) !important;
+    background: var(--surface) !important;
+    opacity: 1 !important;
+    cursor: grabbing !important;
+    z-index: 9999 !important;
+}
+
+/* ── Chip botó annex al header ─────────────────────────────── */
+.annex-chip-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #fdf4ff; color: #7e22ce;
+    border: 1.5px solid #d8b4fe; border-radius: 20px;
+    padding: 5px 11px; font-size: 0.78rem; font-weight: 700;
+    font-family: var(--font); cursor: pointer; white-space: nowrap;
+    transition: all 0.18s; flex-shrink: 0;
+}
+.annex-chip-btn:hover { background: #ede9fe; border-color: #a855f7; }
+.annex-chip-btn:active { transform: scale(0.96); }
+
 .drag-handle {
     cursor: grab;
     color: var(--text-light);
@@ -4940,13 +4971,14 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div class="screen-header">
                     <button class="btn-back" onclick="goBackFromPunts()">&#8592;</button>
                     <h3>&#128205; Punts Recollits</h3>
+                    <button class="annex-chip-btn" onclick="obrirGestorAnnexos(curId)">📝 ＋ Annex</button>
                 </div>
                 <div id="regList"></div>
                 <div class="scroll-btns">
                     <button class="btn-scroll" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
                     <button class="btn-scroll" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;padding-bottom:100px;">
                     <button class="btn btn-ghost" onclick="goBackFromPunts()">&#8592; Tornar al detall</button>
                     <button class="btn btn-primary" onclick="ir('form')">&#9998; Editar formulari</button>
                 </div>
@@ -5935,8 +5967,12 @@ window.onload = () => {
     const regListEl = document.getElementById('regList');
     if (regListEl) {
         Sortable.create(regListEl, {
-            animation: 150,
+            animation: 200,
             handle: '.drag-handle',
+            ghostClass:    'reg-sortable-ghost',
+            dragClass:     'reg-sortable-drag',
+            forceFallback: true,
+            fallbackTolerance: 4,
             onEnd: function() {
                 let nousRegs = [];
                 document.querySelectorAll('#regList .reg-item').forEach(el => {
@@ -8633,7 +8669,6 @@ function _actionBtns(id, tipus) {
         ${pdfBtns}
         <button class="dl-btn dl-btn-xls" title="Exportar registres a Excel" onclick="exportarICompartir('${id}','excel')">&#128202; Excel</button>
         <button class="dl-btn dl-btn-zip" title="ZIP amb totes les fotos" onclick="descarregarTotesFotos('${id}')">&#128452;&#65039; ZIP</button>
-        ${!isObra ? `<button class="dl-btn" style="background:#fdf4ff;color:#7e22ce;border-color:#d8b4fe;" title="Gestionar annexos al document" onclick="obrirGestorAnnexos('${id}')">&#128203; Annex</button>` : ''}
         <button class="dl-btn dl-btn-bak" title="Backup JSON d'aquest projecte" onclick="exportarICompartir('${id}','backup')">&#128190; Bak</button>`;
 }
 
