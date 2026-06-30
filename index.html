@@ -8175,13 +8175,15 @@ function generarBlobPDFInformeITC(informes) {
         doc.setFontSize(9);
         doc.setTextColor(...BLACK);
         doc.text(label, x, y);
+        const labelW = doc.getTextWidth(label) + 3;
         doc.setDrawColor(150, 150, 150);
         doc.setLineWidth(0.2);
         doc.line(x, y + 1.5, x + w, y + 1.5);
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
-        const txt = doc.splitTextToSize(val(value), w);
-        doc.text(txt[0] || '', x, y + 0.5);
+        const availW = Math.max(w - labelW - 1, 10);
+        const txt = doc.splitTextToSize(val(value), availW);
+        doc.text(txt[0] || '', x + labelW, y);
     };
 
     const checkSq = (x, y, label, checked) => {
