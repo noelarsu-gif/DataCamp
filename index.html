@@ -4960,6 +4960,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                             style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; font-size:0.82rem; cursor:pointer;">
                         🚧 Incidències
                     </button>
+                    <button id="dlTabITC" class="dl-tab-btn" onclick="dlCanviarTab('itc')"
+                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; font-size:0.82rem; cursor:pointer;">
+                        📝 ITC
+                    </button>
                 </div>
 
                 <!-- ===== TAB: INVENTARIS (contingut existent) ===== -->
@@ -5022,6 +5026,23 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                     <div style="font-weight:700; font-size:0.85rem; margin:18px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
                     <div id="animalFitxesWrap"></div>
+                </div>
+
+                <!-- ===== TAB: ITC (nou) ===== -->
+                <div id="dlPanellITC" style="display:none;">
+                    <div class="dl-topbar">
+                        <div class="dl-search-wrap">
+                            <span class="dl-search-icon">&#128269;</span>
+                            <input type="text" id="dlSearchITC" class="dl-search"
+                                   placeholder="Cerca per expedient, carretera o petitionari..."
+                                   oninput="carregarVistaITC()">
+                        </div>
+                        <div class="dl-count" id="dlCountITC"></div>
+                    </div>
+                    <div class="dl-legend">
+                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe ITC PDF</span>
+                    </div>
+                    <div id="listaITC"></div>
                 </div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
@@ -5568,6 +5589,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="btn btn-primary" onclick="closeModal(); obrirFitxaAnimal(null, null, null)" style="background:#b45309;">
             &#128062; Fitxa Animal
         </button>
+        <button class="btn btn-primary" onclick="closeModal(); obrirInformeITC(null, null)" style="background:#7c3aed;">
+            &#128221; Informe ITC
+        </button>
         <button class="btn btn-ghost" onclick="closeModal()">Cancel&middot;lar</button>
     </div>
 </div>
@@ -5706,7 +5730,7 @@ let isFotoDirecta = false;
 /* ============================================================
    DB INIT
    ============================================================ */
-const req = indexedDB.open("GencatDinaV5", 3);
+const req = indexedDB.open("GencatDinaV5", 4);
 req.onupgradeneeded = e => {
     const d = e.target.result;
     if (!d.objectStoreNames.contains("projects")) {
@@ -5717,6 +5741,9 @@ req.onupgradeneeded = e => {
     }
     if (!d.objectStoreNames.contains("animalsIncidencies")) {
         d.createObjectStore("animalsIncidencies", { keyPath: "id" });
+    }
+    if (!d.objectStoreNames.contains("itcInformes")) {
+        d.createObjectStore("itcInformes", { keyPath: "id" });
     }
 };
 req.onsuccess = e => {
@@ -7363,17 +7390,24 @@ function dlIncSetOrdre(ordre) {
 function dlCanviarTab(tab) {
     const btnInv = document.getElementById('dlTabInventaris');
     const btnInc = document.getElementById('dlTabIncidencies');
+    const btnITC = document.getElementById('dlTabITC');
     const panInv = document.getElementById('dlPanellInventaris');
     const panInc = document.getElementById('dlPanellIncidencies');
+    const panITC = document.getElementById('dlPanellITC');
     if (!btnInv || !btnInc || !panInv || !panInc) return;
-    const actiu = tab === 'incidencies';
-    panInv.style.display = actiu ? 'none' : 'block';
-    panInc.style.display = actiu ? 'block' : 'none';
-    btnInv.style.background = actiu ? '#fff' : 'var(--primary)';
-    btnInv.style.color = actiu ? 'var(--primary)' : '#fff';
-    btnInc.style.background = actiu ? 'var(--primary)' : '#fff';
-    btnInc.style.color = actiu ? '#fff' : 'var(--primary)';
-    if (actiu) carregarVistaIncidencies();
+    panInv.style.display = tab === 'inventaris' ? 'block' : 'none';
+    panInc.style.display = tab === 'incidencies' ? 'block' : 'none';
+    if (panITC) panITC.style.display = tab === 'itc' ? 'block' : 'none';
+
+    [[btnInv,'inventaris'], [btnInc,'incidencies'], [btnITC,'itc']].forEach(([btn, key]) => {
+        if (!btn) return;
+        const actiu = key === tab;
+        btn.style.background = actiu ? 'var(--primary)' : '#fff';
+        btn.style.color = actiu ? '#fff' : 'var(--primary)';
+    });
+
+    if (tab === 'incidencies') carregarVistaIncidencies();
+    if (tab === 'itc') carregarVistaITC();
 }
 
 /* Llegeix galeriaFotos i agrupa per tipus d'incidència */
@@ -7808,6 +7842,534 @@ async function exportarFitxaAnimalIndividual(id) {
         if (!f) { hideSpinner(); return; }
         try { await _exportarAnimalsHelper([f], `Animal — ${f.carretera || ''} PK ${f.pk || ''}`, 'Fitxa'); }
         catch (err) { hideSpinner(); alert('Error generant l\'informe: ' + err.message); }
+    };
+}
+
+/* ============================================================
+   INFORME ITC — rèplica fidel del formulari "ITC_MODEL"
+   (Generalitat de Catalunya · Departament de Territori i
+   Sostenibilitat · Serveis Territorials a Lleida · Servei
+   Territorial de Carreteres)
+   ============================================================ */
+let _itcEditId = null;
+let _itcFitxaOriginal = null;
+let _itcFotos = [];
+let _itcSignaturaDataURL = '';
+let _itcPadCtx = null, _itcPadDrawing = false, _itcPadHasInk = false;
+
+function obrirInformeITC(imgDataInicial, registreExistent) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const oldScreen = document.getElementById('screen-informe-itc');
+    if (oldScreen) oldScreen.remove();
+
+    _itcEditId = registreExistent ? registreExistent.id : null;
+    _itcFotos = registreExistent ? [...(registreExistent.fotos || [])] : (imgDataInicial ? [imgDataInicial] : []);
+    _itcSignaturaDataURL = registreExistent ? (registreExistent.signatura || '') : '';
+
+    const r = registreExistent || {};
+    const tecnic = _carregarDadesTecnic();
+    const vigilantDefault = r.vigilant || tecnic.nom || '';
+    const ara = new Date();
+    const dataDefault = r.data || `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`;
+
+    const chk = (id, label, checked) => `
+        <label style="display:flex; align-items:center; gap:6px; font-size:0.82rem; padding:6px 0; border-bottom:1px solid var(--border);">
+            <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} style="width:16px; height:16px;">
+            ${label}
+        </label>`;
+
+    const screen = document.createElement('div');
+    screen.id = 'screen-informe-itc';
+    screen.className = 'screen active';
+    screen.innerHTML = `
+        <div class="screen-header">
+            <button class="btn-back" onclick="_itcEditId=null; _itcFitxaOriginal=null; _itcFotos=[]; _itcSignaturaDataURL=''; this.closest('.screen').remove(); ir('home')">←</button>
+            <h3>📝 ${_itcEditId ? 'Editar' : 'Nou'} Informe ITC</h3>
+        </div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin-bottom:10px; font-size:0.85rem;">Dades de l'expedient</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Expedient</label><input type="text" id="itc_expedient" value="${r.expedient || ''}" placeholder="Ex: CAL2018XXXX"></div>
+            <div class="form-group" style="margin:0"><label>Data</label><input type="text" id="itc_data" value="${dataDefault}" placeholder="DD-MM-AAAA"></div>
+        </div>
+        <div class="form-group"><label>Vigilant</label><input type="text" id="itc_vigilant" value="${vigilantDefault}"></div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Dades de l'obra</div>
+        <div class="form-group"><label>Peticionari</label><input type="text" id="itc_peticionari" value="${r.peticionari || ''}"></div>
+        <div class="form-group"><label>Telèfon contacte</label><input type="text" id="itc_telefon" value="${r.telefon || ''}"></div>
+        <div class="form-group"><label>Carretera</label><input type="text" id="itc_carretera" value="${r.carretera || ''}" placeholder="Ex: C-14"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>PK inici</label><input type="text" id="itc_pkInici" value="${r.pkInici || ''}" placeholder="0+000"></div>
+            <div class="form-group" style="margin:0"><label>PK final</label><input type="text" id="itc_pkFinal" value="${r.pkFinal || ''}" placeholder="0+000"></div>
+        </div>
+        <div class="form-group"><label>Marge</label>
+            <select id="itc_marge" style="width:100%;">
+                <option value="" ${!r.marge ? 'selected' : ''}>—</option>
+                <option value="ME" ${r.marge === 'ME' ? 'selected' : ''}>ME</option>
+                <option value="MD" ${r.marge === 'MD' ? 'selected' : ''}>MD</option>
+                <option value="Ambdós" ${r.marge === 'Ambdós' ? 'selected' : ''}>Ambdós</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Terme municipal</label><input type="text" id="itc_termeMunicipal" value="${r.termeMunicipal || ''}"></div>
+        <div class="form-group"><label>Títol de l'obra</label><input type="text" id="itc_titolObra" value="${r.titolObra || ''}"></div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Localització de l'obra</div>
+        ${chk('itc_travessera', 'Travessera', r.travessera)}
+        ${chk('itc_tramUrba', 'Tram Urbà', r.tramUrba)}
+        ${chk('itc_solUrba', 'Sòl Urbà', r.solUrba)}
+        ${chk('itc_tramNoUrba', 'Tram NO Urbà', r.tramNoUrba)}
+        ${chk('itc_solNoUrba', 'Sòl NO Urbà', r.solNoUrba)}
+        ${chk('itc_me', 'ME', r.me)}
+        ${chk('itc_md', 'MD', r.md)}
+
+        <div class="form-group" style="margin-top:10px;"><label>Franja de protecció</label><input type="text" id="itc_franjaProteccio" value="${r.franjaProteccio || ''}" placeholder="Ex: Servitud"></div>
+        <div class="form-group"><label>Distància de l'obra</label><input type="text" id="itc_distanciaObra" value="${r.distanciaObra || ''}"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Respecte l'A.E.E.</label><input type="text" id="itc_respecteAEE" value="${r.respecteAEE || ''}"></div>
+            <div class="form-group" style="margin:0"><label>Respecte l'A.E.C.</label><input type="text" id="itc_respecteAEC" value="${r.respecteAEC || ''}"></div>
+        </div>
+
+        <div class="form-group"><label>Antecedents (Informes, Denúncies o Projectes relacionats)</label><textarea id="itc_antecedents" rows="3" style="width:100%;">${r.antecedents || ''}</textarea></div>
+        <div class="form-group"><label>Descripció de l'obra</label><textarea id="itc_descripcio" rows="4" style="width:100%;">${r.descripcio || ''}</textarea></div>
+        <div class="form-group"><label>Incidències o afectacions importants</label><textarea id="itc_incidencies" rows="4" style="width:100%;">${r.incidencies || ''}</textarea></div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Fotografies (opcional, màx. 3)</div>
+        <div id="itcFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('itcFotoInputCamera').click()">📷 Càmera</button>
+            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('itcFotoInputGaleria').click()">🖼️ Galeria</button>
+        </div>
+        <input type="file" id="itcFotoInputCamera" accept="image/*" capture="environment" multiple hidden onchange="_itcAfegirFotos(this.files); this.value='';">
+        <input type="file" id="itcFotoInputGaleria" accept="image/*" multiple hidden onchange="_itcAfegirFotos(this.files); this.value='';">
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Signatura electrònica del document</div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; background:#fff;">
+            <canvas id="itcSignaturePad" width="335" height="150" style="width:100%; height:150px; touch-action:none; display:block;"></canvas>
+        </div>
+        <button type="button" class="btn btn-ghost" style="margin-top:6px;" onclick="_itcPadClear()">🧹 Esborrar signatura</button>
+
+        <button class="btn btn-primary" onclick="guardarInformeITC()" style="margin-top:14px; background:#7c3aed;">💾 ${_itcEditId ? 'DESAR CANVIS' : 'DESAR INFORME'}</button>
+    `;
+
+    document.querySelector('.page-content').appendChild(screen);
+    _itcRenderFotosGrid();
+    _itcPadInit(r.signatura || '');
+}
+
+function _itcRenderFotosGrid() {
+    const grid = document.getElementById('itcFotosGrid');
+    if (!grid) return;
+    grid.innerHTML = _itcFotos.map((f, i) => `
+        <div style="position:relative; border-radius:6px; overflow:hidden; border:1px solid var(--border); aspect-ratio:1;">
+            <img src="${f}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            <span onclick="_itcEliminarFoto(${i})" style="position:absolute; top:3px; right:3px; background:rgba(198,12,48,0.9); color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; cursor:pointer;">✕</span>
+        </div>`).join('');
+}
+
+function _itcAfegirFotos(files) {
+    const restant = 3 - _itcFotos.length;
+    if (restant <= 0) { showToast('⚠️ Màxim 3 fotos per informe'); return; }
+    const arr = Array.from(files).slice(0, restant);
+    Promise.all(arr.map(f => new Promise(res => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.readAsDataURL(f);
+    }))).then(imgs => {
+        _itcFotos.push(...imgs);
+        _itcRenderFotosGrid();
+    });
+}
+
+function _itcEliminarFoto(idx) {
+    _itcFotos.splice(idx, 1);
+    _itcRenderFotosGrid();
+}
+
+/* — Pad de signatura tàctil/ratolí — */
+function _itcPadInit(existingDataURL) {
+    const canvas = document.getElementById('itcSignaturePad');
+    if (!canvas) return;
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = (rect.width || 335) * ratio;
+    canvas.height = (rect.height || 150) * ratio;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#1a1a1a';
+    _itcPadCtx = ctx;
+    _itcPadHasInk = false;
+
+    const pos = e => {
+        const r = canvas.getBoundingClientRect();
+        const p = e.touches ? e.touches[0] : e;
+        return { x: p.clientX - r.left, y: p.clientY - r.top };
+    };
+    const start = e => { e.preventDefault(); _itcPadDrawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+    const move = e => { if (!_itcPadDrawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); _itcPadHasInk = true; };
+    const end = () => { _itcPadDrawing = false; };
+
+    canvas.onmousedown = start; canvas.onmousemove = move; canvas.onmouseup = end; canvas.onmouseleave = end;
+    canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = end;
+
+    if (existingDataURL) {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, rect.width || 335, rect.height || 150);
+        img.src = existingDataURL;
+        _itcPadHasInk = true;
+    }
+}
+
+function _itcPadClear() {
+    const canvas = document.getElementById('itcSignaturePad');
+    if (!canvas || !_itcPadCtx) return;
+    _itcPadCtx.clearRect(0, 0, canvas.width, canvas.height);
+    _itcPadHasInk = false;
+}
+
+function _itcPadGetDataURL() {
+    const canvas = document.getElementById('itcSignaturePad');
+    if (!canvas || !_itcPadHasInk) return '';
+    try { return canvas.toDataURL('image/png'); } catch (e) { return ''; }
+}
+
+async function guardarInformeITC() {
+    const v = id => document.getElementById(id)?.value || '';
+    const c = id => document.getElementById(id)?.checked || false;
+
+    const registre = {
+        id: _itcEditId || ('itc_' + Date.now() + '_' + Math.random().toString(36).slice(2,6)),
+        ts: _itcEditId ? (_itcFitxaOriginal?.ts || Date.now()) : Date.now(),
+        fotos: [..._itcFotos],
+        signatura: _itcPadGetDataURL() || _itcSignaturaDataURL || '',
+        expedient: v('itc_expedient'), data: v('itc_data'), vigilant: v('itc_vigilant'),
+        peticionari: v('itc_peticionari'), telefon: v('itc_telefon'),
+        carretera: v('itc_carretera'), pkInici: v('itc_pkInici'), pkFinal: v('itc_pkFinal'),
+        marge: v('itc_marge'), termeMunicipal: v('itc_termeMunicipal'), titolObra: v('itc_titolObra'),
+        travessera: c('itc_travessera'), tramUrba: c('itc_tramUrba'), solUrba: c('itc_solUrba'),
+        tramNoUrba: c('itc_tramNoUrba'), solNoUrba: c('itc_solNoUrba'), me: c('itc_me'), md: c('itc_md'),
+        franjaProteccio: v('itc_franjaProteccio'), distanciaObra: v('itc_distanciaObra'),
+        respecteAEE: v('itc_respecteAEE'), respecteAEC: v('itc_respecteAEC'),
+        antecedents: v('itc_antecedents'), descripcio: v('itc_descripcio'), incidencies: v('itc_incidencies'),
+    };
+
+    if (!registre.expedient && !registre.titolObra) {
+        if (!confirm("No has emplenat l'expedient ni el títol de l'obra. Vols desar-lo igualment?")) return;
+    }
+
+    showSpinner('DESANT INFORME...');
+    try {
+        const tx = db.transaction('itcInformes', 'readwrite');
+        tx.objectStore('itcInformes').put(registre);
+        tx.oncomplete = () => {
+            hideSpinner();
+            _itcEditId = null;
+            _itcFitxaOriginal = null;
+            _itcFotos = [];
+            _itcSignaturaDataURL = '';
+            document.getElementById('screen-informe-itc')?.remove();
+            ir('home');
+            showToast('✅ Informe ITC desat');
+        };
+        tx.onerror = e => { hideSpinner(); alert('Error desant l\'informe: ' + e.target.error); };
+    } catch (err) {
+        hideSpinner();
+        alert('Error desant l\'informe: ' + err.message);
+    }
+}
+
+function editarInformeITC(id) {
+    const tx = db.transaction('itcInformes').objectStore('itcInformes').get(id);
+    tx.onsuccess = e => {
+        const reg = e.target.result;
+        if (!reg) return;
+        _itcFitxaOriginal = reg;
+        obrirInformeITC(null, reg);
+    };
+}
+
+function eliminarInformeITC(id) {
+    if (!confirm("Vols eliminar aquest informe ITC? Aquesta acció no es pot desfer.")) return;
+    const tx = db.transaction('itcInformes', 'readwrite');
+    tx.objectStore('itcInformes').delete(id);
+    tx.oncomplete = () => { showToast('🗑️ Informe ITC eliminat'); carregarVistaITC(); };
+}
+
+/* — Llistat a la pestanya Descàrregues — */
+function carregarVistaITC() {
+    const wrap = document.getElementById('listaITC');
+    if (!wrap || !db) { if (!db) setTimeout(carregarVistaITC, 300); return; }
+
+    const q = (document.getElementById('dlSearchITC')?.value || '').toLowerCase().trim();
+
+    db.transaction('itcInformes').objectStore('itcInformes').getAll().onsuccess = e => {
+        let informes = e.target.result || [];
+        if (q) {
+            informes = informes.filter(it =>
+                (it.expedient || '').toLowerCase().includes(q) ||
+                (it.carretera || '').toLowerCase().includes(q) ||
+                (it.peticionari || '').toLowerCase().includes(q));
+        }
+        informes.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+        const countEl = document.getElementById('dlCountITC');
+        if (countEl) countEl.textContent = `${informes.length} informe${informes.length !== 1 ? 's' : ''}`;
+
+        if (informes.length === 0) {
+            wrap.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
+                <div style='font-size:2.5rem;margin-bottom:12px;'>📝</div>
+                <div style='font-weight:600;'>Cap informe ITC encara</div>
+                <div style='font-size:0.82rem;margin-top:6px;'>Crea&apos;n un des de "Nou Projecte" → "Informe ITC"</div>
+            </div>`;
+            return;
+        }
+
+        wrap.innerHTML = informes.map(f => `
+            <div class="dl-card" style="margin-bottom:8px;">
+                <div class="dl-card-header">
+                    <div style="min-width:0;flex:1;">
+                        <div class="dl-card-title">📝 ${f.expedient || 'Sense expedient'} — ${f.carretera || '—'}</div>
+                        <div class="dl-card-meta">${f.data || '—'} · ${f.titolObra || 'Sense títol'}</div>
+                    </div>
+                </div>
+                <div class="dl-actions" style="margin-top:8px;">
+                    <button class="dl-btn dl-btn-pdf" title="PDF d'aquest informe" onclick="exportarInformeITCIndividual('${f.id}')">&#128196; PDF</button>
+                    <button class="dl-btn" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;" title="Editar informe" onclick="editarInformeITC('${f.id}')">✏️ Editar</button>
+                    <button class="dl-btn dl-btn-zip" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;" title="Eliminar informe" onclick="eliminarInformeITC('${f.id}')">🗑️ Eliminar</button>
+                </div>
+            </div>`).join('');
+    };
+}
+
+/* — Generació del PDF, rèplica fidel del model ITC oficial — */
+function generarBlobPDFInformeITC(informes) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+    const ML = 12, MR = 198;
+    const BLACK = [20, 20, 20];
+    const GRAY = [90, 90, 90];
+
+    const val = v => (v === undefined || v === null || v === '') ? '' : String(v);
+
+    const drawHeader = () => {
+        try {
+            const props = doc.getImageProperties(ANIMAL_LOGO_B64);
+            const hMax = 11, wMax = 58;
+            const r = Math.min(wMax / props.width, hMax / props.height);
+            doc.addImage(ANIMAL_LOGO_B64, 'PNG', ML, 10, props.width * r, props.height * r);
+        } catch (e) { console.error('Logo Generalitat:', e); }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...BLACK);
+        doc.text('Serveis Territorials a Lleida', MR, 13, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(...GRAY);
+        doc.text('Servei Territorial de Carreteres', MR, 17, { align: 'right' });
+    };
+
+    const labelLine = (x, y, label, value, w) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(...BLACK);
+        doc.text(label, x, y);
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineWidth(0.2);
+        doc.line(x, y + 1.5, x + w, y + 1.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const txt = doc.splitTextToSize(val(value), w);
+        doc.text(txt[0] || '', x, y + 0.5);
+    };
+
+    const checkSq = (x, y, label, checked) => {
+        doc.setDrawColor(...BLACK);
+        doc.setLineWidth(0.3);
+        doc.rect(x, y - 3.2, 3.5, 3.5, 'S');
+        if (checked) {
+            doc.setLineWidth(0.5);
+            doc.line(x, y - 3.2, x + 3.5, y + 0.3);
+            doc.line(x, y + 0.3, x + 3.5, y - 3.2);
+        }
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...BLACK);
+        doc.text(label, x + 5, y);
+    };
+
+    const sectionTitle = (y, text) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(...BLACK);
+        doc.text(text, ML, y);
+        doc.setDrawColor(...BLACK);
+        doc.setLineWidth(0.5);
+        doc.line(ML, y + 1.5, MR, y + 1.5);
+    };
+
+    informes.forEach((f, idx) => {
+        if (idx > 0) doc.addPage();
+        drawHeader();
+
+        // Títol principal
+        let y = 24;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...BLACK);
+        doc.text('Expedient:', ML, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(val(f.expedient), ML + 18, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Data:', 100, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(val(f.data), 112, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Vigilant:', 150, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(val(f.vigilant), 167, y);
+
+        y = 32;
+        sectionTitle(y, "Dades de l'obra");
+        y += 8;
+        labelLine(ML, y, 'Peticionari', f.peticionari, MR - ML); y += 8;
+        labelLine(ML, y, 'Telèfon contacte', f.telefon, 80); y += 8;
+        labelLine(ML, y, 'Carretera', f.carretera, 55);
+        labelLine(ML + 60, y, 'PK inici', f.pkInici, 35);
+        labelLine(ML + 100, y, 'PK final', f.pkFinal, 35);
+        labelLine(ML + 140, y, 'Marge', f.marge, 46); y += 8;
+        labelLine(ML, y, 'Terme municipal', f.termeMunicipal, MR - ML); y += 8;
+        labelLine(ML, y, "Títol de l'obra", f.titolObra, MR - ML); y += 10;
+
+        sectionTitle(y, "Localització de l'obra"); y += 7;
+        checkSq(ML, y, 'Travessera', f.travessera);
+        checkSq(ML + 60, y, 'Sòl Urbà', f.solUrba); y += 6;
+        checkSq(ML, y, 'Tram Urbà', f.tramUrba);
+        checkSq(ML + 60, y, 'Sòl NO Urbà', f.solNoUrba);
+        checkSq(ML + 120, y, 'ME', f.me);
+        checkSq(ML + 145, y, 'MD', f.md); y += 6;
+        checkSq(ML, y, 'Tram NO Urbà', f.tramNoUrba); y += 9;
+
+        labelLine(ML, y, 'Franja de protecció', f.franjaProteccio, MR - ML); y += 8;
+        labelLine(ML, y, "Distància de l'obra", f.distanciaObra, 60);
+        labelLine(ML + 65, y, "Respecte l'A.E.E.", f.respecteAEE, 60);
+        labelLine(ML + 132, y, "Respecte l'A.E.C.", f.respecteAEC, 54); y += 10;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('Antecedents (Informes, Denúncies o Projectes relacionats):', ML, y); y += 2;
+        doc.setDrawColor(...BLACK); doc.setLineWidth(0.3);
+        doc.rect(ML, y, MR - ML, 16, 'S');
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+        doc.text(doc.splitTextToSize(val(f.antecedents), MR - ML - 4), ML + 2, y + 5);
+        y += 22;
+
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+        doc.text("Descripció de l'obra:", ML, y); y += 2;
+        doc.rect(ML, y, MR - ML, 28, 'S');
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+        doc.text(doc.splitTextToSize(val(f.descripcio), MR - ML - 4), ML + 2, y + 5);
+        y += 34;
+
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+        doc.text('Incidències o afectacions importants:', ML, y); y += 2;
+        doc.rect(ML, y, MR - ML, 28, 'S');
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+        doc.text(doc.splitTextToSize(val(f.incidencies), MR - ML - 4), ML + 2, y + 5);
+
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.3);
+        doc.line(ML, 285, MR, 285);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...GRAY);
+        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
+
+        // — Pàgina 2: Fotografies + Signatura —
+        doc.addPage();
+        drawHeader();
+        sectionTitle(30, 'Fotografies');
+
+        const photos = f.fotos || [];
+        const boxW = 91, boxH = 58, gapX = 4, gapY = 4;
+        const startY = 38;
+        for (let i = 0; i < 3; i++) {
+            const bx = ML + (i % 2) * (boxW + gapX);
+            const by = startY + Math.floor(i / 2) * (boxH + gapY);
+            doc.setDrawColor(...BLACK);
+            doc.setLineWidth(0.3);
+            doc.rect(bx, by, boxW, boxH, 'S');
+            const fotoSrc = photos[i];
+            if (fotoSrc) {
+                try {
+                    const props = doc.getImageProperties(fotoSrc);
+                    const pad = 2;
+                    const cW = boxW - pad * 2, cH = boxH - pad * 2;
+                    const ratio = Math.min(cW / props.width, cH / props.height);
+                    const fw = props.width * ratio, fh = props.height * ratio;
+                    doc.addImage(fotoSrc, 'JPEG', bx + (boxW - fw) / 2, by + (boxH - fh) / 2, fw, fh);
+                } catch (e) { console.error('Error foto informe ITC:', e); }
+            }
+        }
+
+        let sigY = startY + 2 * (boxH + gapY) + 10;
+        sectionTitle(sigY, 'Signatura electrònica del document');
+        sigY += 6;
+        doc.setDrawColor(...BLACK);
+        doc.setLineWidth(0.3);
+        doc.rect(ML, sigY, 80, 35, 'S');
+        if (f.signatura) {
+            try {
+                const props = doc.getImageProperties(f.signatura);
+                const pad = 2;
+                const cW = 80 - pad * 2, cH = 35 - pad * 2;
+                const ratio = Math.min(cW / props.width, cH / props.height);
+                const fw = props.width * ratio, fh = props.height * ratio;
+                doc.addImage(f.signatura, 'PNG', ML + (80 - fw) / 2, sigY + (35 - fh) / 2, fw, fh);
+            } catch (e) { console.error('Error signatura informe ITC:', e); }
+        }
+
+        doc.setDrawColor(220, 220, 220);
+        doc.line(ML, 285, MR, 285);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...GRAY);
+        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
+    });
+
+    return doc.output('blob');
+}
+
+async function exportarInformeITCIndividual(id) {
+    showSpinner('GENERANT PDF...');
+    db.transaction('itcInformes').objectStore('itcInformes').get(id).onsuccess = e => {
+        const f = e.target.result;
+        if (!f) { hideSpinner(); return; }
+        try {
+            const blob = generarBlobPDFInformeITC([f]);
+            const slug = (f.expedient || 'ITC').replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+            const date = new Date().toISOString().slice(0, 10);
+            currentBlob = blob;
+            currentFileName = `ITC_${slug}_${date}.pdf`;
+            document.getElementById('exportTitle').innerText = 'PDF';
+            document.getElementById('exportName').innerText = currentFileName;
+            document.getElementById('btnShare').onclick = () => {
+                const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+                if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+                else alert('El teu navegador no permet compartir directament.');
+                closeExportModal();
+            };
+            document.getElementById('btnDownload').onclick = () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(currentBlob);
+                a.download = currentFileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                closeExportModal();
+            };
+            hideSpinner();
+            document.getElementById('exportModal').style.display = 'flex';
+        } catch (err) { hideSpinner(); alert("Error generant l'informe: " + err.message); }
     };
 }
 
