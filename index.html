@@ -5466,6 +5466,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorCompartir()">📲 Compartir</button>
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorDescarregar()">💾 Guardar</button>
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorEditarDades()">✏️ Editar dades</button>
+                <button class="visor-menu-item" id="visorBtnFitxaAnimal" style="display:none;" onclick="visorMenuToggle(); visorFitxaAnimal()">🐾📋 Omplir fitxa completa d'animal</button>
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorGenerarInformePDF()">📄 Informe PDF</button>
             </div>
             <button class="visor-close" onclick="tancarVisor()">✕</button>
@@ -8444,6 +8445,12 @@ function galeriaObrirVisor(id) {
     title.textContent = t;
     visor.classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    const btnAnimal = document.getElementById('visorBtnFitxaAnimal');
+    if (btnAnimal) {
+        btnAnimal.style.display = (item.tipusIncidencia === 'Animal') ? 'flex' : 'none';
+        btnAnimal.textContent = item.animalFitxaId ? '🐾✏️ Editar fitxa d\'animal' : '🐾📋 Omplir fitxa completa d\'animal';
+    }
 }
 
 function tancarVisor() {
@@ -8473,6 +8480,24 @@ function visorEditarDades() {
     _fdEditOriginal = { ...item };
     tancarVisor();
     obrirEditorFotoDirecta(item.imgData);
+}
+
+function visorFitxaAnimal() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    tancarVisor();
+    if (item.animalFitxaId) {
+        editarFitxaAnimal(item.animalFitxaId);
+        return;
+    }
+    // Nova fitxa, vinculada a aquesta foto de galeria
+    _animalLinkGaleriaId = item.id;
+    obrirFitxaAnimal(item.imgData, null, {
+        carretera: item.carr || '',
+        pk: item.pk || '',
+        data: item.ts ? new Date(item.ts).toLocaleDateString('ca-ES') : '',
+        hora: item.ts ? new Date(item.ts).toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' }) : '',
+    });
 }
 
 async function visorCompartir() {
@@ -10380,6 +10405,7 @@ function eliminarSenyalChip() {
    ============================================================ */
 let _animalEditId = null;
 let _animalFotos = [];      // dataURLs de les fotos d'aquesta fitxa (màx. 6)
+let _animalLinkGaleriaId = null; // id de galeriaFotos a vincular quan es desi una fitxa nova
 
 const ANIMAL_OPTS = {
     sentit: ['Ascendent', 'Descendent'],
@@ -10396,7 +10422,7 @@ function _animalSelect(id, opcions, valorActual) {
     </select>`;
 }
 
-function obrirFitxaAnimal(imgDataInicial, registreExistent) {
+function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const oldScreen = document.getElementById('screen-fitxa-animal');
     if (oldScreen) oldScreen.remove();
@@ -10404,7 +10430,7 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent) {
     _animalEditId = registreExistent ? registreExistent.id : null;
     _animalFotos = registreExistent ? [...(registreExistent.fotos || [])] : (imgDataInicial ? [imgDataInicial] : []);
 
-    const r = registreExistent || {};
+    const r = registreExistent || prefill || {};
     const ara = new Date();
     const dataDefault = r.data || `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`;
     const horaDefault = r.hora || `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`;
@@ -10414,7 +10440,7 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent) {
     screen.className = 'screen active';
     screen.innerHTML = `
         <div class="screen-header">
-            <button class="btn-back" onclick="_animalEditId=null; _animalFitxaOriginal=null; _animalFotos=[]; this.closest('.screen').remove(); ir('home')">←</button>
+            <button class="btn-back" onclick="_animalEditId=null; _animalFitxaOriginal=null; _animalFotos=[]; _animalLinkGaleriaId=null; this.closest('.screen').remove(); ir('home')">←</button>
             <h3>🐾 ${_animalEditId ? 'Editar fitxa' : 'Fitxa'} d'incidència animal</h3>
         </div>
 
@@ -10547,6 +10573,16 @@ async function guardarFitxaAnimal() {
         const tx = db.transaction('animalsIncidencies', 'readwrite');
         tx.objectStore('animalsIncidencies').put(registre);
         tx.oncomplete = () => {
+            // Vincula la foto de galeria d'origen amb aquesta fitxa (si ve del visor)
+            if (_animalLinkGaleriaId) {
+                const txg = db.transaction('galeriaFotos', 'readwrite');
+                const store = txg.objectStore('galeriaFotos');
+                store.get(_animalLinkGaleriaId).onsuccess = e => {
+                    const it = e.target.result;
+                    if (it) { it.animalFitxaId = registre.id; store.put(it); }
+                };
+                _animalLinkGaleriaId = null;
+            }
             hideSpinner();
             _animalEditId = null;
             _animalFitxaOriginal = null;
