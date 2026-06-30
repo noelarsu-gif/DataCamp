@@ -4355,7 +4355,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     .pkm-sheet-grab { cursor: default; }
     #pkmTopBar { left: 390px; right: 10px; }
     #pkmBtnCentrar { bottom: 24px; }
-    #pkmBtnStreetView { bottom: 24px; }
+    #pkmBtnStreetView { bottom: 100px; left: auto; right: 6px; }
     #pkmBtnSortirMesura { display: none !important; }
 }
 
@@ -4671,7 +4671,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="action-card blue" onclick="abrirGaleria()">
                         <div class="action-icon">🖼️</div>
                         <div class="action-label">Galeria</div>
-                        <div class="action-desc">Fotos ràpides capturades al camp</div>
+                        <div class="action-desc">Fotos ràpides capturades a camp</div>
                     </div>
                     <div class="action-card" onclick="historial()">
                         <div class="action-icon">📂</div>
@@ -13006,8 +13006,13 @@ function pkmInitSheet() {
         scr.style.setProperty('--pkm-peek', hPx + 'px');
         const btn1 = document.getElementById('pkmBtnCentrar');
         const btn2 = document.getElementById('pkmBtnStreetView');
-        if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
-        if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+        if (window.innerWidth >= 900) {
+            if (btn1) btn1.style.bottom = '';
+            if (btn2) btn2.style.bottom = '';
+        } else {
+            if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
+            if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+        }
     };
     if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncPeek).observe(peek);
     window.addEventListener('resize', syncPeek);
@@ -13058,8 +13063,13 @@ function pkmSyncPeek() {
     scr.style.setProperty('--pkm-peek', hPx + 'px');
     const btn1 = document.getElementById('pkmBtnCentrar');
     const btn2 = document.getElementById('pkmBtnStreetView');
-    if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
-    if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+    if (window.innerWidth >= 900) {
+        if (btn1) btn1.style.bottom = '';
+        if (btn2) btn2.style.bottom = '';
+    } else {
+        if (btn1) btn1.style.bottom = (hPx + 14) + 'px';
+        if (btn2) btn2.style.bottom = (hPx + 14) + 'px';
+    }
 }
 function pkmObrirSheet() {
     const sh = document.getElementById('pkmSidebar');
