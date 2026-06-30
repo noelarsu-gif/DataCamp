@@ -9069,7 +9069,7 @@ function obrirEditorFotoDirecta(imgData) {
                 <span onclick="eliminarSenyalChip()" style="cursor:pointer; font-weight:700; padding:0 4px;">✕</span>
             </div>
 
-            <button type="button" id="fdBtnAnimal" onclick="obrirFitxaAnimal(document.querySelector('#screen-foto-directa img').src)"
+            <button type="button" id="fdBtnAnimal" onclick="_fdObrirFitxaAnimal()"
                     style="display:none; align-items:center; gap:6px; width:100%; margin-top:8px; padding:9px 12px; border-radius:var(--radius-sm); border:1px dashed var(--primary); background:#fff; color:var(--primary); font-size:0.82rem; font-weight:600; cursor:pointer;">
                 🐾📋 Omplir fitxa completa d'animal
             </button>
@@ -9112,6 +9112,8 @@ function obrirEditorFotoDirecta(imgData) {
         if (elTipus) elTipus.value = o.tipusIncidencia || '';
         const btnSenyal = document.getElementById('fdBtnSenyal');
         if (btnSenyal) btnSenyal.style.display = (o.tipusIncidencia === 'Senyalització malmesa') ? 'flex' : 'none';
+        const btnAnimal = document.getElementById('fdBtnAnimal');
+        if (btnAnimal) btnAnimal.style.display = (o.tipusIncidencia === 'Animal') ? 'flex' : 'none';
         if (o.senyalCodi) {
             _senyalSeleccionada = { codi: o.senyalCodi, nom: o.senyalNom || '', estat: o.senyalEstat || '' };
             const chip = document.getElementById('fdSenyalChip');
@@ -10767,6 +10769,29 @@ function _animalSelect(id, opcions, valorActual) {
         <option value="">—</option>
         ${opcions.map(o => `<option value="${o}" ${valorActual === o ? 'selected' : ''}>${o}</option>`).join('')}
     </select>`;
+}
+
+function _fdObrirFitxaAnimal() {
+    const imgSrc = document.querySelector('#screen-foto-directa img')?.src;
+    const carretera = document.getElementById('fd_carretera')?.value || '';
+    const pk = document.getElementById('fd_pk')?.value || '';
+
+    if (_fdEditId && _fdEditOriginal) {
+        // Editant una foto existent de la galeria: vincula la fitxa a aquest registre
+        if (_fdEditOriginal.animalFitxaId) {
+            editarFitxaAnimal(_fdEditOriginal.animalFitxaId);
+            return;
+        }
+        _animalLinkGaleriaId = _fdEditId;
+        const ara = new Date();
+        obrirFitxaAnimal(imgSrc, null, {
+            carretera, pk,
+            data: `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`,
+            hora: `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`,
+        });
+    } else {
+        obrirFitxaAnimal(imgSrc, null, { carretera, pk });
+    }
 }
 
 function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
