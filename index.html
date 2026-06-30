@@ -4346,6 +4346,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .pkm-chip-label.pkm-chip-amid { border-color: rgba(245,166,35,.55) !important; color: #f59e0b !important; }
 .pkm-chip-label.pkm-chip-area { border-color: rgba(192,132,252,.55) !important; color: #c084fc !important; }
+.pkm-chip-label.pkm-chip-area-total {
+    border-color: rgba(192,132,252,.7) !important;
+    color: #f9fafb !important;
+    background: rgba(192,132,252,.18) !important;
+    font-size: .74rem !important;
+    padding: 4px 10px !important;
+}
 .pkm-chip-label::before { display: none !important; }
 .pkm-screen .leaflet-popup-content-wrapper {
     background: rgba(17,24,39,.95) !important; border: 1px solid rgba(198,12,48,.3) !important;
@@ -13233,11 +13240,13 @@ function pkmAfegirPuntArea(latlng) {
     const hint = document.getElementById('pkmAreaHint');
     if (hint) hint.textContent = pkmAreaPunts.length >= 3 ? 'Afegeix més punts o tanca el polígon' : 'Clica al mapa per afegir vèrtexs';
 }
+let pkmAreaCentroidChip = null;
 function pkmRedrawArea() {
     pkmAreaPunts = pkmAreaMarkers.map(mk => mk.getLatLng());
     if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
     pkmAreaChips.forEach(c => c.remove());
     pkmAreaChips = [];
+    if (pkmAreaCentroidChip) { pkmAreaCentroidChip.remove(); pkmAreaCentroidChip = null; }
     if (pkmAreaPunts.length < 2) return;
     const style = pkmAreaPunts.length >= 3
         ? { color:'#c084fc', fillColor:'#c084fc', fillOpacity:.13, weight:2 }
@@ -13249,6 +13258,22 @@ function pkmRedrawArea() {
         const segDist = p1.distanceTo(p2);
         const segLabel = segDist >= 1000 ? `${(segDist/1000).toFixed(2)} km` : `${Math.round(segDist)} m`;
         pkmAreaChips.push(pkmCrearChipSegment(p1, p2, segLabel, 'pkm-chip-area'));
+    }
+    // Si ja és un polígon (≥3 vèrtexs), mostrem la superfície (m²/ha) al centre, en viu
+    if (pkmAreaPunts.length >= 3) {
+        const area = pkmCalcArea(pkmAreaPunts);
+        const label = area >= 10000 ? `${(area/10000).toFixed(2)} ha` : `${Math.round(area)} m²`;
+        let cLat = 0, cLng = 0;
+        pkmAreaPunts.forEach(p => { cLat += p.lat; cLng += p.lng; });
+        const centroid = L.latLng(cLat / pkmAreaPunts.length, cLng / pkmAreaPunts.length);
+        pkmAreaCentroidChip = L.marker(centroid, { icon: L.divIcon({ className:'', html:'', iconSize:[0,0] }), interactive:false, keyboard:false })
+            .addTo(pkmMap)
+            .bindTooltip(label, { permanent:true, direction:'center', className:'pkm-chip-label pkm-chip-area-total' });
+        pkmAreaCentroidChip.openTooltip();
+        // Resultat sempre actualitzat en viu, no cal tancar el polígon manualment
+        document.getElementById('pkmAreaValText').textContent = label;
+        document.getElementById('pkmAreaSubText').textContent = `${pkmAreaPunts.length} vèrtexs`;
+        document.getElementById('pkmAreaResult').classList.add('show');
     }
 }
 function pkmRenderAreaPts() {
@@ -13277,6 +13302,7 @@ function pkmEsborrarArea(silent) {
     if (pkmAreaLayer) { pkmAreaLayer.remove(); pkmAreaLayer = null; }
     pkmAreaChips.forEach(c => c.remove());
     pkmAreaChips = [];
+    if (pkmAreaCentroidChip) { pkmAreaCentroidChip.remove(); pkmAreaCentroidChip = null; }
     document.getElementById('pkmAreaPtsList').innerHTML = '';
     document.getElementById('pkmAreaResult').classList.remove('show');
     if (!silent) showToast('Àrea esborrada', 'ok', 1500);
