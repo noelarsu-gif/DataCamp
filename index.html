@@ -8419,8 +8419,6 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     if (wm) {
         let wmParts = [`${carr} \u2022 PK ${pk} \u2022 ${marge}`];
         if (incDatetime) wmParts.push(`${ara.toLocaleDateString('ca-ES')} ${horaStr}`);
-        if (tipusIncidencia) wmParts.push(tipusIncidencia);
-        if (_senyalSeleccionada) wmParts.push(`${_senyalSeleccionada.codi} ${_senyalSeleccionada.estat}`);
         finalImg = await aplicarMarcaAigua(imgData, wmParts.join(' \u2022 '));
     }
 
