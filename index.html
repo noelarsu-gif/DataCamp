@@ -4421,7 +4421,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 (function(){
     const h = new Date().getHours();
-    const salut = h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
+    let salut = h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
+    try {
+        const raw = localStorage.getItem('tecnic_dades');
+        const nomComplet = raw ? (JSON.parse(raw).nom || '').trim() : '';
+        if (nomComplet) salut += ', ' + nomComplet.split(' ')[0];
+    } catch (e) {}
     document.getElementById('splashGreeting').textContent = salut;
 
     requestAnimationFrame(() => {
