@@ -4395,6 +4395,13 @@ input:checked + .slider:before { transform: translateX(20px); }
         opacity:0;
         transform:translateY(-10px);
         transition:opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+        text-align:center;
+        max-width:88vw;
+        width:100%;
+        padding:0 12px;
+        box-sizing:border-box;
+        word-break:break-word;
+        line-height:1.15;
     "></div>
 
     <!-- Línia divisòria suau -->
@@ -4428,6 +4435,21 @@ input:checked + .slider:before { transform: translateX(20px); }
         if (nomComplet) salut += ', ' + nomComplet.split(' ')[0];
     } catch (e) {}
     document.getElementById('splashGreeting').textContent = salut;
+
+    // Ajusta la mida de la lletra perquè noms llargs sempre quedin centrats i ben encaixats
+    (function ajustarMidaSalutacio(){
+        const el = document.getElementById('splashGreeting');
+        if (!el) return;
+        const len = salut.length;
+        let mida;
+        if (len <= 14) mida = 2.2;
+        else if (len <= 20) mida = 1.8;
+        else if (len <= 28) mida = 1.45;
+        else if (len <= 36) mida = 1.2;
+        else mida = 1.0;
+        el.style.fontSize = mida + 'rem';
+        el.style.letterSpacing = (len > 20 ? 1 : 2) + 'px';
+    })();
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
