@@ -4993,6 +4993,24 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <h3>⚙️ Configuració</h3>
                 </div>
 
+                <!-- DADES DEL TÈCNIC ──────────────────────────── -->
+                <div class="settings-section">
+                    <div class="settings-section-title">👤 Dades del Tècnic</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                        Aquestes dades es recordaran al dispositiu i s'utilitzaran per emplenar automàticament el teu nom i PARC als informes i fitxes (com la Fitxa d'Incidència Animal).
+                    </p>
+                    <div class="form-group">
+                        <label>Nom del tècnic</label>
+                        <input type="text" id="tecnicNom" placeholder="Ex: Noel Arroyo">
+                    </div>
+                    <div class="form-group">
+                        <label>PARC</label>
+                        <input type="text" id="tecnicParc" placeholder="Ex: Tremp">
+                    </div>
+                    <button class="btn btn-secondary" onclick="desarDadesTecnic()">💾 DESAR DADES</button>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
                 <div class="settings-section">
                     <div class="settings-section-title">🏢 Logo Corporatiu</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
@@ -5765,7 +5783,7 @@ function ir(id) {
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'downloads') carregarLlistaDescargues();
-    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); }
+    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); _omplirCampsTecnicAjustos(); }
     if (id === 'galeriaFotos') renderGaleria();
     if (id === 'pkMapaScreen') {
         // Forçar invalidateSize de Leaflet després que la pantalla sigui visible i fixed
@@ -10663,6 +10681,9 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
     _animalFotos = registreExistent ? [...(registreExistent.fotos || [])] : (imgDataInicial ? [imgDataInicial] : []);
 
     const r = registreExistent || prefill || {};
+    const tecnic = _carregarDadesTecnic();
+    const autorDefault = r.autor || tecnic.nom || '';
+    const parcDefault = r.parc || tecnic.parc || '';
     const ara = new Date();
     const dataDefault = r.data || `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`;
     const horaDefault = r.hora || `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`;
@@ -10679,12 +10700,16 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
         <div class="form-group">
             <label>Fotos (màx. 6)</label>
             <div id="animalFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
-            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInput').click()">📷 Afegir foto</button>
-            <input type="file" id="animalFotoInput" accept="image/*" capture="environment" multiple hidden onchange="_animalAfegirFotos(this.files)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputCamera').click()">📷 Càmera</button>
+                <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputGaleria').click()">🖼️ Galeria</button>
+            </div>
+            <input type="file" id="animalFotoInputCamera" accept="image/*" capture="environment" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
+            <input type="file" id="animalFotoInputGaleria" accept="image/*" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
         </div>
 
-        <div class="form-group"><label>PARC</label><input type="text" id="an_parc" value="${r.parc || ''}"></div>
-        <div class="form-group"><label>Autor/a informe</label><input type="text" id="an_autor" value="${r.autor || ''}"></div>
+        <div class="form-group"><label>PARC</label><input type="text" id="an_parc" value="${parcDefault}"></div>
+        <div class="form-group"><label>Autor/a informe</label><input type="text" id="an_autor" value="${autorDefault}"></div>
 
         <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">1. Localització</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -10767,7 +10792,6 @@ function _animalAfegirFotos(files) {
         _animalFotos.push(...imgs);
         _animalRenderFotosGrid();
     });
-    document.getElementById('animalFotoInput').value = '';
 }
 
 function _animalEliminarFoto(idx) {
@@ -10854,6 +10878,33 @@ function eliminarFitxaAnimal(id) {
    TRAMS P-24 (senyalització de fauna) — cerca de PK inici/fi
    Carrega un fitxer .xlsx/.csv amb columnes Carretera, PK inici, PK fi
    ============================================================ */
+/* ============================================================
+   DADES DEL TÈCNIC (nom + PARC, recordats al dispositiu)
+   ============================================================ */
+function _carregarDadesTecnic() {
+    try {
+        const raw = localStorage.getItem('tecnic_dades');
+        return raw ? JSON.parse(raw) : { nom: '', parc: '' };
+    } catch (e) { return { nom: '', parc: '' }; }
+}
+
+function _omplirCampsTecnicAjustos() {
+    const d = _carregarDadesTecnic();
+    const nomEl = document.getElementById('tecnicNom');
+    const parcEl = document.getElementById('tecnicParc');
+    if (nomEl) nomEl.value = d.nom || '';
+    if (parcEl) parcEl.value = d.parc || '';
+}
+
+function desarDadesTecnic() {
+    const nom = document.getElementById('tecnicNom')?.value.trim() || '';
+    const parc = document.getElementById('tecnicParc')?.value.trim() || '';
+    try {
+        localStorage.setItem('tecnic_dades', JSON.stringify({ nom, parc }));
+        showToast('✅ Dades del tècnic desades');
+    } catch (e) { alert('Error desant les dades: ' + e.message); }
+}
+
 let P24_TRAMS = null; // [{carretera, pkInici, pkFi}]
 
 function _pkANumero(pk) {
