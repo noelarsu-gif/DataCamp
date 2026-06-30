@@ -4976,6 +4976,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel</span>
                     </div>
                     <div id="listaIncidencies"></div>
+
+                    <div style="font-weight:700; font-size:0.85rem; margin:18px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
+                    <div id="animalFitxesWrap"></div>
                 </div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
@@ -5031,6 +5034,25 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <button class="btn btn-danger" onclick="esborrarCachePKs()" style="margin-top:8px;">
                         🗑️ ESBORRAR CACHE ARCGIS
                     </button>
+                </div>
+                <!-- ─────────────────────────────────────────────── -->
+
+                <!-- TRAMS P-24 (FAUNA) ──────────────────────────── -->
+                <div class="settings-section">
+                    <div class="settings-section-title">🦌 Trams Senyalització P-24 (Fauna)</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                        Puja el fitxer Excel/CSV amb els cartells P-24 (pas de fauna) de la teva zona: una fila per cada cartell, amb columnes "Carretera", "PK", "Marge" i "Llegenda caixetí" (la distància que avisa el cartell, ex. "1 km", "500 m"). S'usarà per emplenar automàticament el PK inici/fi a les fitxes d'incidència animal quan el PK quedi dins l'abast d'algun cartell.
+                    </p>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:8px 12px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border);">
+                        <span style="font-size:1.1rem;">🗂️</span>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">FITXER DE TRAMS</div>
+                            <div id="p24ConfigStatus" style="font-size:0.78rem; color:var(--text-muted);">⏳ Cap fitxer carregat</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="document.getElementById('p24Input').click()">📂 PUJAR FITXER DE TRAMS</button>
+                    <input type="file" id="p24Input" accept=".xlsx,.xls,.csv" hidden onchange="pujarTramsP24(this)">
+                    <button class="btn btn-danger" onclick="eliminarTramsP24()" style="margin-top:8px;">🗑️ ELIMINAR TRAMS</button>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
@@ -5609,7 +5631,7 @@ let isFotoDirecta = false;
 /* ============================================================
    DB INIT
    ============================================================ */
-const req = indexedDB.open("GencatDinaV5", 2);
+const req = indexedDB.open("GencatDinaV5", 3);
 req.onupgradeneeded = e => {
     const d = e.target.result;
     if (!d.objectStoreNames.contains("projects")) {
@@ -5617,6 +5639,9 @@ req.onupgradeneeded = e => {
     }
     if (!d.objectStoreNames.contains("galeriaFotos")) {
         d.createObjectStore("galeriaFotos", { keyPath: "id" });
+    }
+    if (!d.objectStoreNames.contains("animalsIncidencies")) {
+        d.createObjectStore("animalsIncidencies", { keyPath: "id" });
     }
 };
 req.onsuccess = e => {
@@ -5736,7 +5761,7 @@ function ir(id) {
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'downloads') carregarLlistaDescargues();
-    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); }
+    if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); }
     if (id === 'galeriaFotos') renderGaleria();
     if (id === 'pkMapaScreen') {
         // Forçar invalidateSize de Leaflet després que la pantalla sigui visible i fixed
@@ -7302,7 +7327,140 @@ function carregarVistaIncidencies() {
         });
 
         container.innerHTML = html;
+        _renderFitxesAnimals(q);
     });
+}
+
+/* ── Fitxes completes d'animal (formulari complet, fins a 6 fotos) ── */
+function _renderFitxesAnimals(q) {
+    const wrap = document.getElementById('animalFitxesWrap');
+    if (!wrap || !db) return;
+    if (!db.objectStoreNames.contains('animalsIncidencies')) return;
+
+    db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
+        let fitxes = e.target.result || [];
+        if (q) {
+            fitxes = fitxes.filter(f =>
+                (f.carretera || '').toLowerCase().includes(q) ||
+                (f.pk || '').toLowerCase().includes(q));
+        }
+        fitxes.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+        if (fitxes.length === 0) {
+            wrap.innerHTML = `<div style="text-align:center;padding:24px 10px;color:var(--text-muted);font-size:0.82rem;">
+                Cap fitxa completa d'animal encara. Es creen des de "🐾📋 Omplir fitxa completa d'animal" a Foto Ràpida.
+            </div>`;
+            return;
+        }
+
+        let html = `<div class="dl-card" style="margin-bottom:10px;">
+            <div class="dl-card-header">
+                <div style="min-width:0;flex:1;">
+                    <div class="dl-card-title">📋 Totes les fitxes d'animal</div>
+                    <div class="dl-card-meta">${fitxes.length} fitxa${fitxes.length !== 1 ? 's' : ''} completa${fitxes.length !== 1 ? 's' : ''}</div>
+                </div>
+            </div>
+            <div class="dl-actions" style="margin-top:8px;">${_animalActionBtns('')}</div>
+        </div>`;
+
+        fitxes.forEach(f => {
+            const animal = f.domestic || f.llibertat || '—';
+            html += `<div class="dl-card" style="margin-bottom:8px;">
+                <div class="dl-card-header">
+                    <div style="min-width:0;flex:1;">
+                        <div class="dl-card-title">🐾 ${animal} — ${f.carretera || '—'} PK ${f.pk || '—'}</div>
+                        <div class="dl-card-meta">${f.data || '—'} · ${f.fotos?.length || 0} foto${(f.fotos?.length || 0) !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+                <div class="dl-actions" style="margin-top:8px;">
+                    <button class="dl-btn dl-btn-pdf" title="PDF d'aquesta fitxa" onclick="exportarFitxaAnimalIndividual('${f.id}')">&#128196; PDF</button>
+                    <button class="dl-btn" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;" title="Editar fitxa" onclick="editarFitxaAnimal('${f.id}')">✏️ Editar</button>
+                    <button class="dl-btn dl-btn-zip" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;" title="Eliminar fitxa" onclick="eliminarFitxaAnimal('${f.id}')">🗑️ Eliminar</button>
+                </div>
+            </div>`;
+        });
+
+        wrap.innerHTML = html;
+    };
+}
+
+function _animalActionBtns() {
+    return `<button class="dl-btn dl-btn-pdf" title="PDF detallat amb totes les fotos" onclick="exportarFitxesAnimalsPDF('Fitxa')">&#128196; Fitxa</button>
+            <button class="dl-btn dl-btn-pdf" style="background:#fdf2f8;color:#86198f;border-color:#e879f9;" title="PDF resum en taula" onclick="exportarFitxesAnimalsPDF('Taula')">&#128202; Taula</button>
+            <button class="dl-btn dl-btn-xls" title="Exportar a Excel" onclick="exportarFitxesAnimalsPDF('excel')">&#128202; Excel</button>`;
+}
+
+const ANIMAL_FIELDS_LABELS = [
+    ['parc','PARC'], ['autor','Autor/a informe'], ['data','Data'], ['hora','Hora'], ['carretera','Carretera'],
+    ['pk','PK'], ['sentit','Sentit'], ['ubicacio','Ubicació'],
+    ['avisCcct', 'Avís de CCCT'], ['numIncidencia','Núm. incidència'],
+    ['domestic','Domèstic'], ['llibertat','Llibertat'], ['estat','Estat'], ['tamany','Tamany'],
+    ['mesuresCorrectores','Mesures correctores'], ['tipologia','Tipologia (entorn)'], ['estatEntorn','Estat (entorn)'],
+    ['senyalitzacio','Senyalització P-24'], ['pkInici','PK inici'], ['pkFi','PK fi'],
+    ['vehicleImplicat','Vehicle implicat'], ['matricula','Matrícula'], ['observacions','Observacions'],
+];
+
+function _buildProjecteVirtualAnimals(fitxes, titol) {
+    const fields = ANIMAL_FIELDS_LABELS.map(([,label]) => ({ label }));
+    const registros = fitxes.map(f => ({
+        values: ANIMAL_FIELDS_LABELS.map(([key,label]) => {
+            let val = f[key];
+            if (typeof val === 'boolean') val = val ? 'Sí' : 'No';
+            return { label, val: val || '—' };
+        }),
+        fotos: f.fotos || [],
+    }));
+    return { titulo: titol, fields, registros };
+}
+
+async function _exportarAnimalsHelper(fitxes, titol, format) {
+    const p = _buildProjecteVirtualAnimals(fitxes, titol);
+    const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+    const date = new Date().toISOString().slice(0, 10);
+    if (format === 'excel') {
+        currentBlob = generarBlobExcel(p);
+        currentFileName = `Animals_${slug}_${date}.xlsx`;
+    } else {
+        currentBlob = await generarBlobPDF(p, format);
+        currentFileName = `${format}_Animals_${slug}_${date}.pdf`;
+    }
+    document.getElementById('exportTitle').innerText = format === 'excel' ? 'EXCEL' : format.toUpperCase();
+    document.getElementById('exportName').innerText = currentFileName;
+    document.getElementById('btnShare').onclick = () => {
+        const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+        if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+        else alert('El teu navegador no permet compartir directament.');
+        closeExportModal();
+    };
+    document.getElementById('btnDownload').onclick = () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(currentBlob);
+        a.download = currentFileName;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        closeExportModal();
+    };
+    hideSpinner();
+    document.getElementById('exportModal').style.display = 'flex';
+}
+
+async function exportarFitxesAnimalsPDF(format) {
+    showSpinner(`GENERANT ${format === 'excel' ? 'EXCEL' : format.toUpperCase()}...`);
+    db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = async e => {
+        const fitxes = e.target.result || [];
+        if (fitxes.length === 0) { hideSpinner(); alert('No hi ha fitxes d\'animal per exportar.'); return; }
+        try { await _exportarAnimalsHelper(fitxes, 'Incidències — Animals (fitxa completa)', format); }
+        catch (err) { hideSpinner(); alert('Error generant l\'informe: ' + err.message); }
+    };
+}
+
+async function exportarFitxaAnimalIndividual(id) {
+    showSpinner('GENERANT PDF...');
+    db.transaction('animalsIncidencies').objectStore('animalsIncidencies').get(id).onsuccess = async e => {
+        const f = e.target.result;
+        if (!f) { hideSpinner(); return; }
+        try { await _exportarAnimalsHelper([f], `Animal — ${f.carretera || ''} PK ${f.pk || ''}`, 'Fitxa'); }
+        catch (err) { hideSpinner(); alert('Error generant l\'informe: ' + err.message); }
+    };
 }
 
 function _incActionBtns(tipusFiltre) {
@@ -8516,7 +8674,11 @@ function obrirEditorFotoDirecta(imgData) {
 
         <div class="form-group" style="margin-bottom:18px;">
             <label style="display:flex;align-items:center;gap:6px;">⚠️ Tipus d'incidència</label>
-            <select id="fd_tipus_incidencia" style="width:100%;" onchange="document.getElementById('fdBtnSenyal').style.display = (this.value === 'Senyalització malmesa') ? 'flex' : 'none'; if(this.value !== 'Senyalització malmesa') eliminarSenyalChip();">
+            <select id="fd_tipus_incidencia" style="width:100%;" onchange="
+                document.getElementById('fdBtnSenyal').style.display = (this.value === 'Senyalització malmesa') ? 'flex' : 'none';
+                if(this.value !== 'Senyalització malmesa') eliminarSenyalChip();
+                document.getElementById('fdBtnAnimal').style.display = (this.value === 'Animal') ? 'flex' : 'none';
+            ">
                 <option value="">— Cap —</option>
                 <option value="Animal">🐾 Animal</option>
                 <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
@@ -8534,6 +8696,11 @@ function obrirEditorFotoDirecta(imgData) {
                 <span class="fd-senyal-chip-text" style="flex:1;"></span>
                 <span onclick="eliminarSenyalChip()" style="cursor:pointer; font-weight:700; padding:0 4px;">✕</span>
             </div>
+
+            <button type="button" id="fdBtnAnimal" onclick="obrirFitxaAnimal(document.querySelector('#screen-foto-directa img').src)"
+                    style="display:none; align-items:center; gap:6px; width:100%; margin-top:8px; padding:9px 12px; border-radius:var(--radius-sm); border:1px dashed var(--primary); background:#fff; color:var(--primary); font-size:0.82rem; font-weight:600; cursor:pointer;">
+                🐾📋 Omplir fitxa completa d'animal
+            </button>
         </div>
 
         ${(!_fdEditId && (_galeriaQueueActiu || _galeriaImgQueue.length > 0)) ? `
@@ -10203,6 +10370,360 @@ function eliminarSenyalChip() {
     const chip = document.getElementById('fdSenyalChip');
     if (chip) chip.style.display = 'none';
 }
+
+/* ============================================================
+   FITXA COMPLETA D'INCIDÈNCIA ANIMAL
+   Pantalla tipus formulari d'inventari, amb els mateixos camps
+   que el full oficial "Incidències provocades per animals morts".
+   Desa a IndexedDB store "animalsIncidencies" i exporta PDF amb
+   el mateix generador (Fitxa/Taula) que la resta de l'app.
+   ============================================================ */
+let _animalEditId = null;
+let _animalFotos = [];      // dataURLs de les fotos d'aquesta fitxa (màx. 6)
+
+const ANIMAL_OPTS = {
+    sentit: ['Ascendent', 'Descendent'],
+    ubicacio: ['No trobat', 'Calçada', 'Voral', 'Cuneta', 'Marge', 'Camp'],
+    domestic: ['Gat', 'Gos', 'Vaca', 'Cavall', 'Burro', 'Ovella', 'Cabra', 'Au', 'Altres'],
+    llibertat: ['Senglar', 'Cabirol', 'Cérvol', 'Daina', 'Teixó', 'Guilla', 'Geneta', 'Altres'],
+    estat: ['Sencer', 'Aixafat'],
+};
+
+function _animalSelect(id, opcions, valorActual) {
+    return `<select id="${id}" style="width:100%;">
+        <option value="">—</option>
+        ${opcions.map(o => `<option value="${o}" ${valorActual === o ? 'selected' : ''}>${o}</option>`).join('')}
+    </select>`;
+}
+
+function obrirFitxaAnimal(imgDataInicial, registreExistent) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const oldScreen = document.getElementById('screen-fitxa-animal');
+    if (oldScreen) oldScreen.remove();
+
+    _animalEditId = registreExistent ? registreExistent.id : null;
+    _animalFotos = registreExistent ? [...(registreExistent.fotos || [])] : (imgDataInicial ? [imgDataInicial] : []);
+
+    const r = registreExistent || {};
+    const ara = new Date();
+    const dataDefault = r.data || `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`;
+    const horaDefault = r.hora || `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`;
+
+    const screen = document.createElement('div');
+    screen.id = 'screen-fitxa-animal';
+    screen.className = 'screen active';
+    screen.innerHTML = `
+        <div class="screen-header">
+            <button class="btn-back" onclick="_animalEditId=null; _animalFitxaOriginal=null; _animalFotos=[]; this.closest('.screen').remove(); ir('home')">←</button>
+            <h3>🐾 ${_animalEditId ? 'Editar fitxa' : 'Fitxa'} d'incidència animal</h3>
+        </div>
+
+        <div class="form-group">
+            <label>Fotos (màx. 6)</label>
+            <div id="animalFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
+            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInput').click()">📷 Afegir foto</button>
+            <input type="file" id="animalFotoInput" accept="image/*" capture="environment" multiple hidden onchange="_animalAfegirFotos(this.files)">
+        </div>
+
+        <div class="form-group"><label>PARC</label><input type="text" id="an_parc" value="${r.parc || ''}"></div>
+        <div class="form-group"><label>Autor/a informe</label><input type="text" id="an_autor" value="${r.autor || ''}"></div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">1. Localització</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Data</label><input type="text" id="an_data" value="${dataDefault}" placeholder="DD-MM-AAAA"></div>
+            <div class="form-group" style="margin:0"><label>Hora</label><input type="text" id="an_hora" value="${horaDefault}" placeholder="HH:MM"></div>
+        </div>
+        <div class="form-group"><label>Carretera</label><input type="text" id="an_carretera" value="${r.carretera || ''}" placeholder="Ex: C-14"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>PK</label><input type="text" id="an_pk" value="${r.pk || ''}" placeholder="0+000" onchange="_animalBuscarTram()"></div>
+            <div class="form-group" style="margin:0"><label>Sentit</label>${_animalSelect('an_sentit', ANIMAL_OPTS.sentit, r.sentit)}</div>
+        </div>
+        <div class="form-group"><label>Ubicació</label>${_animalSelect('an_ubicacio', ANIMAL_OPTS.ubicacio, r.ubicacio)}</div>
+
+        <div class="watermark-row" style="margin-bottom:10px;">
+            <div class="watermark-row-info"><span class="wm-title">Avís de CCCT</span></div>
+            <label class="switch"><input type="checkbox" id="an_avisCcct" ${r.avisCcct ? 'checked' : ''}><span class="slider"></span></label>
+        </div>
+        <div class="form-group"><label>Núm. incidència</label><input type="text" id="an_numIncidencia" value="${r.numIncidencia || ''}"></div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">2. Tipologia, estat i entorn</div>
+        <div class="form-group"><label>Domèstic</label>${_animalSelect('an_domestic', ANIMAL_OPTS.domestic, r.domestic)}</div>
+        <div class="form-group"><label>Llibertat (animal salvatge)</label>${_animalSelect('an_llibertat', ANIMAL_OPTS.llibertat, r.llibertat)}</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Estat</label>${_animalSelect('an_estat', ANIMAL_OPTS.estat, r.estat)}</div>
+            <div class="form-group" style="margin:0"><label>Tamany</label><input type="text" id="an_tamany" value="${r.tamany || ''}"></div>
+        </div>
+        <div class="watermark-row" style="margin-bottom:10px;">
+            <div class="watermark-row-info"><span class="wm-title">Mesures correctores</span></div>
+            <label class="switch"><input type="checkbox" id="an_mesuresCorrectores" ${r.mesuresCorrectores ? 'checked' : ''}><span class="slider"></span></label>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Tipologia (entorn)</label><input type="text" id="an_tipologia" value="${r.tipologia || ''}"></div>
+            <div class="form-group" style="margin:0"><label>Estat (entorn)</label>${_animalSelect('an_estatEntorn', ANIMAL_OPTS.estat, r.estatEntorn)}</div>
+        </div>
+
+        <div class="watermark-row" style="margin-bottom:4px;">
+            <div class="watermark-row-info"><span class="wm-title">Senyalització (P-24)</span></div>
+            <label class="switch"><input type="checkbox" id="an_senyalitzacio" ${r.senyalitzacio ? 'checked' : ''} onchange="_animalBuscarTram()"><span class="slider"></span></label>
+        </div>
+        <div id="animalTramStatus" style="font-size:0.76rem; color:var(--text-muted); margin-bottom:10px;"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;">
+            <div class="form-group" style="margin:0"><label>PK inici</label><input type="text" id="an_pkInici" value="${r.pkInici || ''}"></div>
+            <div class="form-group" style="margin:0"><label>PK fi</label><input type="text" id="an_pkFi" value="${r.pkFi || ''}"></div>
+        </div>
+
+        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">3. Altres consideracions</div>
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:12px;">
+            <div class="form-group" style="margin:0"><label>Vehicle implicat</label><input type="text" id="an_vehicleImplicat" value="${r.vehicleImplicat || ''}"></div>
+            <div class="form-group" style="margin:0"><label>Matrícula</label><input type="text" id="an_matricula" value="${r.matricula || ''}"></div>
+        </div>
+        <div class="form-group"><label>Observacions</label><textarea id="an_observacions" rows="4" style="width:100%;">${r.observacions || ''}</textarea></div>
+
+        <button class="btn btn-primary" onclick="guardarFitxaAnimal()" style="margin-top:6px;">💾 ${_animalEditId ? 'DESAR CANVIS' : 'DESAR FITXA'}</button>
+    `;
+
+    document.querySelector('.page-content').appendChild(screen);
+    _animalRenderFotosGrid();
+    if (r.senyalitzacio) _animalBuscarTram();
+}
+
+function _animalRenderFotosGrid() {
+    const grid = document.getElementById('animalFotosGrid');
+    if (!grid) return;
+    grid.innerHTML = _animalFotos.map((f, i) => `
+        <div style="position:relative; border-radius:6px; overflow:hidden; border:1px solid var(--border); aspect-ratio:1;">
+            <img src="${f}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            <span onclick="_animalEliminarFoto(${i})" style="position:absolute; top:3px; right:3px; background:rgba(198,12,48,0.9); color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; cursor:pointer;">✕</span>
+        </div>`).join('');
+}
+
+function _animalAfegirFotos(files) {
+    const restant = 6 - _animalFotos.length;
+    if (restant <= 0) { showToast('⚠️ Màxim 6 fotos per fitxa'); return; }
+    const arr = Array.from(files).slice(0, restant);
+    Promise.all(arr.map(f => new Promise(res => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.readAsDataURL(f);
+    }))).then(imgs => {
+        _animalFotos.push(...imgs);
+        _animalRenderFotosGrid();
+    });
+    document.getElementById('animalFotoInput').value = '';
+}
+
+function _animalEliminarFoto(idx) {
+    _animalFotos.splice(idx, 1);
+    _animalRenderFotosGrid();
+}
+
+async function guardarFitxaAnimal() {
+    const v = id => document.getElementById(id)?.value || '';
+    const c = id => document.getElementById(id)?.checked || false;
+
+    if (_animalFotos.length === 0) {
+        if (!confirm('No has afegit cap foto a la fitxa. Vols desar-la igualment?')) return;
+    }
+
+    const registre = {
+        id: _animalEditId || ('an_' + Date.now() + '_' + Math.random().toString(36).slice(2,6)),
+        ts: _animalEditId ? (_animalFitxaOriginal?.ts || Date.now()) : Date.now(),
+        fotos: [..._animalFotos],
+        parc: v('an_parc'), autor: v('an_autor'),
+        data: v('an_data'), hora: v('an_hora'), carretera: v('an_carretera'),
+        pk: v('an_pk'), sentit: v('an_sentit'), ubicacio: v('an_ubicacio'),
+        avisCcct: c('an_avisCcct'), numIncidencia: v('an_numIncidencia'),
+        domestic: v('an_domestic'), llibertat: v('an_llibertat'),
+        estat: v('an_estat'), tamany: v('an_tamany'),
+        mesuresCorrectores: c('an_mesuresCorrectores'),
+        tipologia: v('an_tipologia'), estatEntorn: v('an_estatEntorn'),
+        senyalitzacio: c('an_senyalitzacio'), pkInici: v('an_pkInici'), pkFi: v('an_pkFi'),
+        vehicleImplicat: v('an_vehicleImplicat'), matricula: v('an_matricula'),
+        observacions: v('an_observacions'),
+    };
+
+    showSpinner('DESANT FITXA...');
+    try {
+        const tx = db.transaction('animalsIncidencies', 'readwrite');
+        tx.objectStore('animalsIncidencies').put(registre);
+        tx.oncomplete = () => {
+            hideSpinner();
+            _animalEditId = null;
+            _animalFitxaOriginal = null;
+            _animalFotos = [];
+            document.getElementById('screen-fitxa-animal')?.remove();
+            document.getElementById('screen-foto-directa')?.remove();
+            ir('home');
+            showToast('✅ Fitxa d\'animal desada');
+        };
+        tx.onerror = e => { hideSpinner(); alert('Error desant la fitxa: ' + e.target.error); };
+    } catch (err) {
+        hideSpinner();
+        alert('Error desant la fitxa: ' + err.message);
+    }
+}
+
+let _animalFitxaOriginal = null;
+
+function editarFitxaAnimal(id) {
+    const tx = db.transaction('animalsIncidencies').objectStore('animalsIncidencies').get(id);
+    tx.onsuccess = e => {
+        const reg = e.target.result;
+        if (!reg) return;
+        _animalFitxaOriginal = reg;
+        obrirFitxaAnimal(null, reg);
+    };
+}
+
+function eliminarFitxaAnimal(id) {
+    if (!confirm('Vols eliminar aquesta fitxa d\'animal? Aquesta acció no es pot desfer.')) return;
+    const tx = db.transaction('animalsIncidencies', 'readwrite');
+    tx.objectStore('animalsIncidencies').delete(id);
+    tx.oncomplete = () => { showToast('🗑️ Fitxa eliminada'); carregarVistaIncidencies(); };
+}
+
+/* ============================================================
+   TRAMS P-24 (senyalització de fauna) — cerca de PK inici/fi
+   Carrega un fitxer .xlsx/.csv amb columnes Carretera, PK inici, PK fi
+   ============================================================ */
+let P24_TRAMS = null; // [{carretera, pkInici, pkFi}]
+
+function _pkANumero(pk) {
+    if (!pk) return null;
+    const m = String(pk).match(/(\d+)\s*\+\s*(\d+)/);
+    if (m) return parseInt(m[1]) * 1000 + parseInt(m[2]);
+    const n = parseFloat(pk);
+    return isNaN(n) ? null : n * 1000;
+}
+
+function _carregarP24DesDeLocalStorage() {
+    try {
+        const raw = localStorage.getItem('p24_trams');
+        if (raw) { P24_TRAMS = JSON.parse(raw); return true; }
+    } catch(e) {}
+    return false;
+}
+
+function _carregarP24Lazy() {
+    if (P24_TRAMS) return;
+    if (_carregarP24DesDeLocalStorage()) return;
+    fetch('/p24_tramos.xlsx').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+        .then(buf => {
+            const wb = XLSX.read(buf, { type: 'array' });
+            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            _processarP24Json(json, false);
+        })
+        .catch(() => { console.log('[P24] Sense fitxer per defecte a /p24_tramos.xlsx'); });
+}
+
+function _distanciaATexte(text) {
+    if (!text) return null;
+    const t = String(text).trim().toLowerCase();
+    if (!t || t.includes('recordi')) return null; // cartell "recordi" = repetidor, sense nova distància
+    const m = t.match(/([\d]+(?:[.,]\d+)?)\s*(km|m|mts)?/);
+    if (!m) return null;
+    const num = parseFloat(m[1].replace(',', '.'));
+    if (isNaN(num)) return null;
+    const unitat = m[2] || 'm';
+    return unitat === 'km' ? num * 1000 : num; // sempre retorna metres
+}
+
+function _processarP24Json(json, desarConfig) {
+    const norm = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+    const trams = json.map(row => {
+        let carretera = null, pk = null, marge = null, llegenda = null, parc = null;
+        for (const k in row) {
+            const nk = norm(k);
+            if (nk === 'carretera') carretera = row[k];
+            else if (nk === 'pk') pk = row[k];
+            else if (nk === 'marge') marge = row[k];
+            else if (nk.includes('llegenda') || nk.includes('caixeti')) llegenda = row[k];
+            else if (nk === 'parc') parc = row[k];
+        }
+        const distanciaM = _distanciaATexte(llegenda);
+        return {
+            carretera: String(carretera || '').trim().toUpperCase(),
+            pk: _pkANumero(pk),
+            marge: String(marge || '').trim(),
+            distanciaM,
+            parc: parc || '',
+        };
+    }).filter(t => t.carretera && t.pk !== null);
+    P24_TRAMS = trams;
+    if (desarConfig) {
+        try { localStorage.setItem('p24_trams', JSON.stringify(trams)); } catch(e) {}
+    }
+}
+
+function pujarTramsP24(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const wb = XLSX.read(e.target.result, { type: 'array' });
+            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            _processarP24Json(json, true);
+            showToast(`✅ ${P24_TRAMS.length} trams P-24 carregats`);
+            _actualitzarEstatP24Config();
+        } catch (err) {
+            alert('Error llegint el fitxer de trams: ' + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+    input.value = '';
+}
+
+function eliminarTramsP24() {
+    try { localStorage.removeItem('p24_trams'); } catch(e) {}
+    P24_TRAMS = null;
+    showToast('🗑️ Trams P-24 eliminats');
+    _actualitzarEstatP24Config();
+}
+
+function _actualitzarEstatP24Config() {
+    const el = document.getElementById('p24ConfigStatus');
+    if (!el) return;
+    el.textContent = P24_TRAMS ? `✅ ${P24_TRAMS.length} trams carregats` : '⏳ Cap fitxer carregat';
+}
+
+function _animalBuscarTram() {
+    const status = document.getElementById('animalTramStatus');
+    const checked = document.getElementById('an_senyalitzacio')?.checked;
+    if (!checked) { if (status) status.textContent = ''; return; }
+    if (!P24_TRAMS) { _carregarP24Lazy(); if (status) status.textContent = '⏳ Carregant trams P-24...'; setTimeout(_animalBuscarTram, 500); return; }
+
+    const carretera = (document.getElementById('an_carretera')?.value || '').trim().toUpperCase();
+    const pkNum = _pkANumero(document.getElementById('an_pk')?.value);
+    if (!carretera || pkNum === null) { if (status) status.textContent = 'Introdueix carretera i PK per cercar el tram.'; return; }
+
+    const fmtPk = n => `${Math.floor(n/1000)}+${String(Math.round(n%1000)).padStart(3,'0')}`;
+    const candidats = P24_TRAMS.filter(t => t.carretera === carretera && t.distanciaM !== null);
+
+    let millor = null, millorMarge = Infinity;
+    candidats.forEach(t => {
+        // Convenció incerta de sentit del marge: comprovem cobertura en ambdues direccions
+        // des del cartell (PK, PK+dist) i (PK-dist, PK), i ens quedem amb la més ajustada.
+        [[t.pk, t.pk + t.distanciaM], [t.pk - t.distanciaM, t.pk]].forEach(([ini, fi]) => {
+            if (pkNum >= ini && pkNum <= fi) {
+                const marge = Math.min(pkNum - ini, fi - pkNum);
+                if (marge < millorMarge) { millorMarge = marge; millor = { ini, fi, t }; }
+            }
+        });
+    });
+
+    if (millor) {
+        document.getElementById('an_pkInici').value = fmtPk(millor.ini);
+        document.getElementById('an_pkFi').value = fmtPk(millor.fi);
+        if (status) status.textContent = `✅ Dins de tram senyalitzat (cartell PK ${fmtPk(millor.t.pk)}${millor.t.marge ? ', marge ' + millor.t.marge : ''}). Verifica el resultat.`;
+    } else {
+        if (status) status.textContent = '⚠️ No s\'ha trobat cap cartell P-24 que cobreixi aquest PK. Omple\'l manualment.';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(_carregarP24Lazy, 2600));
+
+
 
 /** Carrega pk_seed.js en background (lazy, no bloqueja). */
 function _carregarPKSeedLazy() {
