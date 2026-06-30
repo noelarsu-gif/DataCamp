@@ -4998,6 +4998,22 @@ input:checked + .slider:before { transform: translateX(20px); }
                         </div>
                         <div class="dl-count" id="dlCountInc"></div>
                     </div>
+
+                    <!-- Barra de filtres (mateix estil que la Galeria) -->
+                    <div class="galeria-filters" style="position:static; padding:0 0 10px;">
+                        <div class="galeria-filter-row">
+                            <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Incidència:</span>
+                            <button class="galeria-filter-chip active" id="dlIncFiltreBtn" onclick="dlIncAbrirPicker()" style="max-width:220px;">
+                                <span id="dlIncFiltreLabel">Totes</span><span style="opacity:0.5;font-size:0.8rem;margin-left:4px;">▾</span>
+                            </button>
+                        </div>
+                        <div class="galeria-filter-row">
+                            <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Ordre:</span>
+                            <button class="galeria-filter-chip active" id="dlIncOrdreRecents" onclick="dlIncSetOrdre('desc')">🕐 Recents</button>
+                            <button class="galeria-filter-chip" id="dlIncOrdreAntics" onclick="dlIncSetOrdre('asc')">📅 Antics</button>
+                        </div>
+                    </div>
+
                     <div class="dl-legend">
                         <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Fitxa / Taula PDF</span>
                         <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel</span>
@@ -5499,6 +5515,16 @@ input:checked + .slider:before { transform: translateX(20px); }
             <button class="carr-picker-close" onclick="galeriaPickerIncTancar()">✕</button>
         </div>
         <div class="carr-picker-list" id="incPickerList"></div>
+    </div>
+</div>
+
+<div class="carr-picker-backdrop" id="dlIncPickerBackdrop" onclick="dlIncPickerTancar()">
+    <div class="carr-picker-sheet" onclick="event.stopPropagation()">
+        <div class="carr-picker-header">
+            <span class="carr-picker-title">Filtra per incidència</span>
+            <button class="carr-picker-close" onclick="dlIncPickerTancar()">✕</button>
+        </div>
+        <div class="carr-picker-list" id="dlIncPickerList"></div>
     </div>
 </div>
 
@@ -7297,6 +7323,43 @@ const INC_TIPUS_ICONS = {
     'Incidència indefinida': '❓'
 };
 
+/* ── Filtre i ordre de la pestanya Incidències (Descàrregues) ── */
+let dlIncFiltreTipus = '';   // '' = totes
+let dlIncOrdre = 'desc';     // 'desc' recents primer | 'asc' antics primer
+
+function dlIncAbrirPicker() {
+    const list = document.getElementById('dlIncPickerList');
+    if (!list) return;
+    list.innerHTML = _galeriaIncOptions.map(o => {
+        const active = o.value === dlIncFiltreTipus;
+        return `<button class="carr-picker-item${active ? ' active' : ''}" onclick="dlIncPickerSeleccionar('${o.value.replace(/'/g,"\\'")}')">
+            <span>${o.label}</span>
+            ${active ? '<span class="carr-check">✓</span>' : ''}
+        </button>`;
+    }).join('');
+    document.getElementById('dlIncPickerBackdrop').classList.add('open');
+}
+
+function dlIncPickerTancar() {
+    document.getElementById('dlIncPickerBackdrop')?.classList.remove('open');
+}
+
+function dlIncPickerSeleccionar(tipus) {
+    dlIncPickerTancar();
+    dlIncFiltreTipus = tipus;
+    const opt = _galeriaIncOptions.find(o => o.value === tipus) || _galeriaIncOptions[0];
+    const lbl = document.getElementById('dlIncFiltreLabel');
+    if (lbl) lbl.textContent = tipus === '' ? 'Totes' : opt.label;
+    carregarVistaIncidencies();
+}
+
+function dlIncSetOrdre(ordre) {
+    dlIncOrdre = ordre;
+    document.getElementById('dlIncOrdreRecents')?.classList.toggle('active', ordre === 'desc');
+    document.getElementById('dlIncOrdreAntics')?.classList.toggle('active', ordre === 'asc');
+    carregarVistaIncidencies();
+}
+
 function dlCanviarTab(tab) {
     const btnInv = document.getElementById('dlTabInventaris');
     const btnInc = document.getElementById('dlTabIncidencies');
@@ -7327,6 +7390,10 @@ function carregarVistaIncidencies() {
                 (it.carr || '').toLowerCase().includes(q) ||
                 (it.pk   || '').toLowerCase().includes(q));
         }
+        if (dlIncFiltreTipus) {
+            incidencies = incidencies.filter(it => it.tipusIncidencia === dlIncFiltreTipus);
+        }
+        incidencies.sort((a, b) => dlIncOrdre === 'desc' ? (b.ts || 0) - (a.ts || 0) : (a.ts || 0) - (b.ts || 0));
 
         const countEl = document.getElementById('dlCountInc');
         if (countEl) countEl.textContent = `${incidencies.length} incidènci${incidencies.length !== 1 ? 'es' : 'a'}`;
@@ -7337,43 +7404,40 @@ function carregarVistaIncidencies() {
                 <div style='font-weight:600;'>Cap incidència trobada</div>
                 <div style='font-size:0.82rem;margin-top:6px;'>Les fotos amb "Tipus d'incidència" marcat a Foto Ràpida apareixeran aquí</div>
             </div>`;
+            _renderFitxesAnimals(q);
             return;
         }
 
-        // Agrupar per tipus
-        const grups = {};
-        incidencies.forEach(it => {
-            const t = it.tipusIncidencia;
-            (grups[t] = grups[t] || []).push(it);
-        });
+        let html = '';
 
-        let html = `<div class="dl-card" style="margin-bottom:12px;">
-            <div class="dl-card-header">
-                <div style="min-width:0;flex:1;">
-                    <div class="dl-card-title">📋 Totes les incidències</div>
-                    <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} amb incidència registrada</div>
-                </div>
-            </div>
-            <div class="dl-actions" style="margin-top:8px;">
-                ${_incActionBtns('')}
-            </div>
-        </div>`;
-
-        Object.keys(grups).sort().forEach(tipus => {
-            const arr = grups[tipus];
-            const icon = INC_TIPUS_ICONS[tipus] || '⚠️';
-            html += `<div class="dl-card" style="margin-bottom:10px;">
+        if (!dlIncFiltreTipus) {
+            // "Totes" seleccionat: una única targeta amb totes les incidències, ja ordenades
+            html += `<div class="dl-card" style="margin-bottom:12px;">
                 <div class="dl-card-header">
                     <div style="min-width:0;flex:1;">
-                        <div class="dl-card-title">${icon} ${tipus}</div>
-                        <div class="dl-card-meta">${arr.length} foto${arr.length !== 1 ? 's' : ''}</div>
+                        <div class="dl-card-title">📋 Totes les incidències</div>
+                        <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} amb incidència registrada · ${dlIncOrdre === 'desc' ? 'més recents primer' : 'més antigues primer'}</div>
                     </div>
                 </div>
                 <div class="dl-actions" style="margin-top:8px;">
-                    ${_incActionBtns(tipus)}
+                    ${_incActionBtns('')}
                 </div>
             </div>`;
-        });
+        } else {
+            // Tipus concret seleccionat: una sola targeta amb només aquest tipus
+            const icon = INC_TIPUS_ICONS[dlIncFiltreTipus] || '⚠️';
+            html += `<div class="dl-card" style="margin-bottom:12px;">
+                <div class="dl-card-header">
+                    <div style="min-width:0;flex:1;">
+                        <div class="dl-card-title">${icon} ${dlIncFiltreTipus}</div>
+                        <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} · ${dlIncOrdre === 'desc' ? 'més recents primer' : 'més antigues primer'}</div>
+                    </div>
+                </div>
+                <div class="dl-actions" style="margin-top:8px;">
+                    ${_incActionBtns(dlIncFiltreTipus)}
+                </div>
+            </div>`;
+        }
 
         container.innerHTML = html;
         _renderFitxesAnimals(q);
@@ -7386,6 +7450,12 @@ function _renderFitxesAnimals(q) {
     if (!wrap || !db) return;
     if (!db.objectStoreNames.contains('animalsIncidencies')) return;
 
+    // Si hi ha un filtre de tipus actiu i no és "Animal" ni "Totes", amaguem aquest bloc
+    if (dlIncFiltreTipus && dlIncFiltreTipus !== 'Animal') {
+        wrap.innerHTML = '';
+        return;
+    }
+
     db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
         let fitxes = e.target.result || [];
         if (q) {
@@ -7393,7 +7463,7 @@ function _renderFitxesAnimals(q) {
                 (f.carretera || '').toLowerCase().includes(q) ||
                 (f.pk || '').toLowerCase().includes(q));
         }
-        fitxes.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        fitxes.sort((a, b) => dlIncOrdre === 'desc' ? (b.ts || 0) - (a.ts || 0) : (a.ts || 0) - (b.ts || 0));
 
         if (fitxes.length === 0) {
             wrap.innerHTML = `<div style="text-align:center;padding:24px 10px;color:var(--text-muted);font-size:0.82rem;">
@@ -7406,7 +7476,7 @@ function _renderFitxesAnimals(q) {
             <div class="dl-card-header">
                 <div style="min-width:0;flex:1;">
                     <div class="dl-card-title">📋 Totes les fitxes d'animal</div>
-                    <div class="dl-card-meta">${fitxes.length} fitxa${fitxes.length !== 1 ? 's' : ''} completa${fitxes.length !== 1 ? 's' : ''}</div>
+                    <div class="dl-card-meta">${fitxes.length} fitxa${fitxes.length !== 1 ? 's' : ''} completa${fitxes.length !== 1 ? 's' : ''} · ${dlIncOrdre === 'desc' ? 'més recents primer' : 'més antigues primer'}</div>
                 </div>
             </div>
             <div class="dl-actions" style="margin-top:8px;">${_animalActionBtns('')}</div>
