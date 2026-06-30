@@ -2953,11 +2953,11 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 70px 0;
+    padding: 70px 0 20px;
 }
 .visor-img-wrap img {
     max-width: 100vw;
-    max-height: calc(100vh - 140px);
+    max-height: calc(100vh - 90px);
     object-fit: contain;
     border-radius: var(--radius-sm);
 }
@@ -2993,7 +2993,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .visor-btn:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.4); }
 .visor-btn.primary { background: var(--accent-blue); border-color: var(--accent-blue); }
 .visor-btn.primary:hover { background: #1e40af; }
-.visor-close {
+.visor-close, .visor-menu-btn {
     background: rgba(255,255,255,0.12);
     border: none;
     color: white;
@@ -3005,7 +3005,41 @@ input:checked + .slider:before { transform: translateX(20px); }
     transition: var(--transition);
     backdrop-filter: blur(8px);
 }
-.visor-close:hover { background: rgba(255,255,255,0.22); }
+.visor-close:hover, .visor-menu-btn:hover { background: rgba(255,255,255,0.22); }
+.visor-topbar-actions { display: flex; align-items: center; gap: 8px; position: relative; }
+.visor-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: 46px; right: 0;
+    background: rgba(28,28,30,0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    min-width: 200px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 2;
+}
+.visor-menu-dropdown.open { display: block; }
+.visor-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    color: white;
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.visor-menu-item:hover { background: rgba(255,255,255,0.1); }
+.visor-menu-item + .visor-menu-item { border-top: 1px solid rgba(255,255,255,0.08); }
 
 /* ============================================================
    NOTIFICACION TOAST
@@ -5404,15 +5438,19 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div id="galeriaVisor">
     <div class="visor-topbar">
         <div class="visor-title" id="visorTitle">Foto Ràpida</div>
-        <button class="visor-close" onclick="tancarVisor()">✕</button>
+        <div class="visor-topbar-actions">
+            <button class="visor-menu-btn" onclick="visorMenuToggle()" title="Més opcions">⋮</button>
+            <div id="visorMenuDropdown" class="visor-menu-dropdown">
+                <button class="visor-menu-item" onclick="visorMenuToggle(); visorCompartir()">📲 Compartir</button>
+                <button class="visor-menu-item" onclick="visorMenuToggle(); visorDescarregar()">💾 Guardar</button>
+                <button class="visor-menu-item" onclick="visorMenuToggle(); visorEditarDades()">✏️ Editar dades</button>
+                <button class="visor-menu-item" onclick="visorMenuToggle(); visorGenerarInformePDF()">📄 Informe PDF</button>
+            </div>
+            <button class="visor-close" onclick="tancarVisor()">✕</button>
+        </div>
     </div>
     <div class="visor-img-wrap">
         <img id="visorImg" src="" alt="">
-    </div>
-    <div class="visor-bottombar">
-        <button class="visor-btn primary" onclick="visorCompartir()">📲 Compartir</button>
-        <button class="visor-btn" onclick="visorDescarregar()">💾 Guardar</button>
-        <button class="visor-btn" onclick="visorGenerarInformePDF()">📄 Informe PDF</button>
     </div>
 </div>
 
@@ -5561,6 +5599,8 @@ input:checked + .slider:before { transform: translateX(20px); }
    ============================================================ */
 let currentBlob = null;
 let currentFileName = "";
+let _fdEditId = null;        // id de galeriaFotos en edició (null = nova captura)
+let _fdEditOriginal = null;  // item original que s'està editant
 let db, curId = "", regs = [], fields = [], tmpFotos = [], editIdx = -1;
 let logoCorporativo = null;
 let isFotoDirecta = false;
@@ -8253,6 +8293,28 @@ function tancarVisor() {
     document.getElementById('visorImg').src = '';
     document.body.style.overflow = '';
     visorCurrentId = null;
+    document.getElementById('visorMenuDropdown')?.classList.remove('open');
+}
+
+function visorMenuToggle() {
+    const dd = document.getElementById('visorMenuDropdown');
+    if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+    const dd = document.getElementById('visorMenuDropdown');
+    const btn = e.target.closest?.('.visor-menu-btn');
+    if (dd && dd.classList.contains('open') && !dd.contains(e.target) && !btn) {
+        dd.classList.remove('open');
+    }
+});
+
+function visorEditarDades() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    _fdEditId = item.id;
+    _fdEditOriginal = { ...item };
+    tancarVisor();
+    obrirEditorFotoDirecta(item.imgData);
 }
 
 async function visorCompartir() {
@@ -8375,16 +8437,17 @@ function obrirEditorFotoDirecta(imgData) {
 
     screen.innerHTML = `
         <div class="screen-header">
-            <button class="btn-back" onclick="_galeriaImgQueue=[]; _galeriaQueueActiu=false; this.closest('.screen').remove(); ir('galeriaFotos')">←</button>
-            <h3>📸 Foto Ràpida</h3>
+            <button class="btn-back" onclick="_galeriaImgQueue=[]; _galeriaQueueActiu=false; _fdEditId=null; _fdEditOriginal=null; this.closest('.screen').remove(); ir('galeriaFotos')">←</button>
+            <h3>${_fdEditId ? '✏️ Editar dades' : '📸 Foto Ràpida'}</h3>
         </div>
 
         <div class="foto-preview-wrap" style="position:relative; border-radius:var(--radius-sm); overflow:hidden; margin-bottom:18px; border:2px solid var(--border);">
             <img src="${imgData}" style="width:100%; display:block;">
+            ${_fdEditId ? '' : `
             <button onclick="_galeriaImgQueue=[]; _galeriaQueueActiu=false; this.closest('.screen').remove(); modeFotoDirecta();"
                     style="position:absolute; top:10px; right:10px; background:rgba(198,12,48,0.9); color:white; border:none; border-radius:50%; width:38px; height:38px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                 ✕
-            </button>
+            </button>`}
         </div>
 
         <div class="form-group">
@@ -8424,6 +8487,7 @@ function obrirEditorFotoDirecta(imgData) {
             </div>
         </div>
 
+        ${_fdEditId ? '' : `
         <div class="watermark-row" style="margin-bottom:10px;">
             <div class="watermark-row-info">
                 <span class="watermark-row-icon">📝</span>
@@ -8448,7 +8512,7 @@ function obrirEditorFotoDirecta(imgData) {
                 <input type="checkbox" id="fd_datetime" ${localStorage.getItem('fd_datetime_pref') !== 'false' ? 'checked' : ''}>
                 <span class="slider"></span>
             </label>
-        </div>
+        </div>`}
 
         <div class="form-group" style="margin-bottom:18px;">
             <label style="display:flex;align-items:center;gap:6px;">⚠️ Tipus d'incidència</label>
@@ -8472,22 +8536,53 @@ function obrirEditorFotoDirecta(imgData) {
             </div>
         </div>
 
-        ${_galeriaQueueActiu || _galeriaImgQueue.length > 0 ? `
+        ${(!_fdEditId && (_galeriaQueueActiu || _galeriaImgQueue.length > 0)) ? `
         <div style="background:var(--accent-blue-lt); border:1px solid var(--cat-inventari-bd); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:0.82rem; color:var(--accent-blue); display:flex; align-items:center; gap:8px;">
             <span style="font-size:1rem;">📂</span>
             <span>Foto <strong>${_galeriaImgQueue.length > 0 ? (_galeriaImgQueue.length === 0 ? 1 : 1) : 1}</strong> de <strong>${_galeriaImgQueue.length + 1}</strong> seleccionades · Omple les dades i desa</span>
         </div>` : ''}
 
+        ${_fdEditId ? `
+        <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}', false)">
+            💾 DESAR CANVIS
+        </button>
+        <button class="btn btn-ghost" style="margin-top:10px;" onclick="_fdEditId=null; _fdEditOriginal=null; document.getElementById('screen-foto-directa').remove(); ir('galeriaFotos')">
+            Cancel·lar
+        </button>` : `
         <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}', false)">
             ${_galeriaImgQueue.length > 0 ? `🖼️ GUARDAR I SEGUENT (${_galeriaImgQueue.length} restant${_galeriaImgQueue.length !== 1 ? 's' : ''})` : '🖼️ GUARDAR A GALERIA'}
         </button>
         ${_galeriaImgQueue.length === 0 ? `
         <button class="btn" style="background:var(--accent-blue);color:white;border-color:var(--accent-blue);margin-top:10px;" onclick="guardarFotoDirecta('${imgData}', true)">
             💬 COMPARTIR I GUARDAR
-        </button>` : ''}
+        </button>` : ''}`}
     `;
 
     document.querySelector('.page-content').appendChild(screen);
+
+    // ── Mode edició: precarregar dades de l'ítem existent ──────────
+    if (_fdEditId && _fdEditOriginal) {
+        const o = _fdEditOriginal;
+        const elCarr = document.getElementById('fd_carretera');
+        const elPk   = document.getElementById('fd_pk');
+        const elMarge = document.getElementById('fd_marge');
+        const elTipus = document.getElementById('fd_tipus_incidencia');
+        if (elCarr) elCarr.value = o.carr || '';
+        if (elPk)   elPk.value   = o.pk || '';
+        if (elMarge && o.marge) elMarge.value = o.marge;
+        if (elTipus) elTipus.value = o.tipusIncidencia || '';
+        const btnSenyal = document.getElementById('fdBtnSenyal');
+        if (btnSenyal) btnSenyal.style.display = (o.tipusIncidencia === 'Senyalització malmesa') ? 'flex' : 'none';
+        if (o.senyalCodi) {
+            _senyalSeleccionada = { codi: o.senyalCodi, nom: o.senyalNom || '', estat: o.senyalEstat || '' };
+            const chip = document.getElementById('fdSenyalChip');
+            if (chip) {
+                chip.style.display = 'flex';
+                chip.querySelector('.fd-senyal-chip-text').textContent =
+                    `${o.senyalCodi}${o.senyalNom ? ' · ' + o.senyalNom : ''}${o.senyalEstat ? ' — ' + o.senyalEstat : ''}`;
+            }
+        }
+    }
 
     // ── Connectar el botó Auto-PK de Foto Ràpida ──────────────────
     const btnAutoPKFoto = document.getElementById('btn-autopk-foto');
@@ -8650,6 +8745,65 @@ function obrirEditorFotoDirecta(imgData) {
     }
 }
 async function guardarFotoDirecta(imgData, compartirDesprés = false) {
+    // ── MODE EDICIÓ: actualitza un registre existent, no en crea un de nou ──
+    if (_fdEditId && _fdEditOriginal) {
+        const carrE  = document.getElementById('fd_carretera').value || "SC";
+        const pkE    = document.getElementById('fd_pk').value || "0";
+        const margeE = document.getElementById('fd_marge').value;
+        const tipusE = document.getElementById('fd_tipus_incidencia')?.value || '';
+
+        showSpinner('DESANT CANVIS...');
+        const itemActualitzat = {
+            ..._fdEditOriginal,
+            carr: carrE,
+            pk: pkE,
+            marge: margeE,
+            tipusIncidencia: tipusE,
+            senyalCodi:  (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.codi  : '',
+            senyalNom:   (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.nom   : '',
+            senyalEstat: (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.estat : '',
+        };
+
+        let peuRegenerat = false;
+        if (_fdEditOriginal.wmAplicat && _fdEditOriginal.imgRaw) {
+            try {
+                let wmParts = [`${carrE} \u2022 PK ${pkE} \u2022 ${margeE}`];
+                if (_fdEditOriginal.wmDatetime && _fdEditOriginal.ts) {
+                    const d = new Date(_fdEditOriginal.ts);
+                    const horaStrE = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                    wmParts.push(`${d.toLocaleDateString('ca-ES')} ${horaStrE}`);
+                }
+                itemActualitzat.imgData = await aplicarMarcaAigua(_fdEditOriginal.imgRaw, wmParts.join(' \u2022 '));
+                peuRegenerat = true;
+            } catch (e) {
+                console.error('Error regenerant peu de foto:', e);
+            }
+        }
+
+        try {
+            const teniaWm = !!_fdEditOriginal.wmAplicat;
+            const tx = db.transaction("galeriaFotos", "readwrite");
+            tx.objectStore("galeriaFotos").put(itemActualitzat);
+            tx.oncomplete = () => {
+                hideSpinner();
+                _fdEditId = null;
+                _fdEditOriginal = null;
+                eliminarSenyalChip();
+                document.getElementById('screen-foto-directa')?.remove();
+                ir('galeriaFotos');
+                renderGaleria();
+                showToast(peuRegenerat
+                    ? '✅ Dades i peu de foto actualitzats'
+                    : (teniaWm ? '✅ Dades actualitzades (peu de foto no regenerable — foto antiga)' : '✅ Dades actualitzades'));
+            };
+            tx.onerror = (e) => { hideSpinner(); alert('Error desant els canvis: ' + e.target.error); };
+        } catch (err) {
+            hideSpinner();
+            alert('Error desant els canvis: ' + err.message);
+        }
+        return;
+    }
+
     const carr  = document.getElementById('fd_carretera').value || "SC";
     const pk    = document.getElementById('fd_pk').value || "0";
     const marge = document.getElementById('fd_marge').value;
@@ -8687,6 +8841,9 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     const galeriaItem = {
         id:       'gal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
         imgData:  finalImg,
+        imgRaw:   imgData,        // foto original SENSE marca d'aigua (per poder regenerar el peu en editar)
+        wmAplicat: wm,            // si es va incrustar peu de foto a la captura
+        wmDatetime: incDatetime,  // si el peu incloïa data/hora
         carr, pk, marge,
         tipusIncidencia,
         senyalCodi:  _senyalSeleccionada ? _senyalSeleccionada.codi : '',
