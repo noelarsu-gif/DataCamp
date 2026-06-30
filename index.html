@@ -8805,6 +8805,7 @@ async function generarBlobPDF(p, tipus) {
 
         doc.autoTable({
             startY: 30,
+            margin: { top: 30 },
             head: [headers],
             body: localRegs.map(r => [...r.values.map(v => v.val || "—"), ""]),
             theme: 'grid',
