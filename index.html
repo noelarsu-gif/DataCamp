@@ -4980,7 +4980,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div class="screen-header">
                     <button class="btn-back" onclick="goBackFromPunts()">&#8592;</button>
                     <h3>&#128205; Punts Recollits</h3>
-                    <button class="annex-chip-btn" onclick="obrirGestorAnnexos(curId)">📝 ＋ Annex</button>
+                    <button class="annex-chip-btn" onclick="obrirEditorAnnex(curId)">📝 ＋ Annex</button>
                 </div>
                 <div id="regList"></div>
                 <div class="scroll-btns">
@@ -6447,6 +6447,25 @@ function renderRegs() {
     }
 
     list.innerHTML = regs.map((r, i) => {
+        // ── ANNEX ────────────────────────────────────────────────
+        if (r.tipus === 'annex') {
+            const nBlocs = (r.contingut||[]).length;
+            return `
+            <div class="reg-item" data-idx="${i}" style="border-color:#d8b4fe;background:#fdf4ff;">
+                <div class="drag-handle">≡</div>
+                <div class="thumb-placeholder" style="background:#ede9fe;font-size:1.5rem;">📝</div>
+                <div class="reg-info">
+                    <div class="reg-title" style="color:#7e22ce;">${r.titol || 'Annex sense títol'}</div>
+                    <div class="reg-sub">${nBlocs} bloc${nBlocs!==1?'s':''}</div>
+                    <div class="reg-badge" style="background:#ede9fe;color:#7e22ce;border-color:#d8b4fe;">📝 Annex</div>
+                </div>
+                <div class="actions">
+                    <button onclick="editarAnnexFromList(${i})" title="Editar">✏️</button>
+                    <button onclick="eliminarPunt(${i})" title="Eliminar">🗑️</button>
+                </div>
+            </div>`;
+        }
+        // ── PUNT NORMAL ──────────────────────────────────────────
         const carreteraVal = r.values.find(v => v.label.toLowerCase().includes('carretera'))?.val || "—";
         const pkVal        = r.values.find(v => v.label.toLowerCase().includes('pk'))?.val || "—";
         const margeVal     = r.values.find(v => v.label.toLowerCase().includes('marge'))?.val || "";
@@ -6470,6 +6489,10 @@ function renderRegs() {
             </div>
         </div>`;
     }).join('');
+}
+
+function editarAnnexFromList(i) {
+    obrirEditorAnnex(curId, regs[i].id);
 }
 
 function eliminarPunt(i) {
@@ -13629,8 +13652,12 @@ async function eliminarAnnexConf(projectId, annexId) {
 
 /* ── Editor d'annex ──────────────────────────────────────── */
 async function obrirEditorAnnex(projectId, annexId = null) {
-    const p = await _annexGetDB(projectId);
-    let annex = annexId ? (p.registros||[]).find(r => r.id === annexId) : null;
+    // Busca en memòria primer, DB com a fallback
+    let annex = annexId ? regs.find(r => r.id === annexId) : null;
+    if (!annex && annexId) {
+        const p = await _annexGetDB(projectId);
+        annex = (p.registros||[]).find(r => r.id === annexId);
+    }
 
     if (!annex) {
         annex = {
@@ -13648,7 +13675,6 @@ async function obrirEditorAnnex(projectId, annexId = null) {
         <div class="screen-header">
             <button class="btn-back" onclick="tancarEditorAnnex()">←</button>
             <h3>${annexId ? '✏️ Editar annex' : '📝 Nou annex'}</h3>
-            <button class="btn btn-primary btn-sm" onclick="desarEditorAnnex('${projectId}')">💾 Desar</button>
         </div>
         <div class="annex-editor-body">
             <input type="text" id="annexTitol" class="annex-titol-input"
@@ -13659,6 +13685,7 @@ async function obrirEditorAnnex(projectId, annexId = null) {
                 <button class="btn btn-ghost btn-sm" onclick="_annexAfegirBloc('p')">＋ Paràgraf</button>
                 <button class="btn btn-ghost btn-sm" onclick="_annexAfegirBloc('table')">＋ Taula</button>
             </div>
+            <button class="btn btn-primary" style="margin-top:16px;width:100%;" onclick="desarEditorAnnex('${projectId}')">💾 Desar annex</button>
         </div>`;
 
     document.body.appendChild(screen);
@@ -13887,29 +13914,23 @@ async function desarEditorAnnex(projectId) {
     _annexSyncAllFromDOM();
     const titol = document.getElementById('annexTitol')?.value?.trim() || '';
     if (!titol) { showToast("Cal posar un títol a l'annex",'warn'); return; }
-    showSpinner('DESANT ANNEX...');
-    try {
-        const p = await _annexGetDB(projectId);
-        if (!p.registros) p.registros = [];
-        const ctx = window._annexCtx;
-        const annexData = { id: ctx.id, tipus:'annex', titol, contingut: ctx.blocs };
-        if (ctx.isNew) {
-            p.registros.push(annexData);
-        } else {
-            const idx = p.registros.findIndex(r => r.id === ctx.id);
-            if (idx >= 0) p.registros[idx] = annexData; else p.registros.push(annexData);
-        }
-        await _annexPutDB(p);
-        hideSpinner();
-        tancarEditorAnnex();
-        showToast('Annex desat ✓','ok');
-        // Refrescar el gestor si és obert
-        if (document.getElementById('screen-gestor-annexos')) obrirGestorAnnexos(projectId);
-        renderDownloadList?.();
-    } catch(err) {
-        hideSpinner();
-        alert('Error desant l\'annex: ' + err.message);
+
+    const ctx = window._annexCtx;
+    const annexData = { id: ctx.id, tipus:'annex', titol, contingut: ctx.blocs };
+
+    if (ctx.isNew) {
+        regs.push(annexData);
+    } else {
+        const idx = regs.findIndex(r => r.id === ctx.id);
+        if (idx >= 0) regs[idx] = annexData; else regs.push(annexData);
     }
+
+    const titolProj = document.getElementById('titulo')?.value || '';
+    if (titolProj) actualizarDB(titolProj);
+
+    tancarEditorAnnex();
+    showToast('Annex desat ✓', 'ok');
+    renderRegs();
 }
 
 
