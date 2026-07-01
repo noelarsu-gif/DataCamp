@@ -2165,6 +2165,200 @@ input:checked + .slider:before { transform: translateX(20px); }
     margin-bottom: 24px;
 }
 
+/* ── Field Editor Bottom Sheet ──────────────────────────── */
+.fe-sheet-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.fe-sheet-overlay.open { display: flex; }
+.fe-sheet {
+    background: var(--surface);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 8px 20px 36px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUpFe 0.24s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUpFe {
+    from { transform: translateY(100%); opacity:0; }
+    to   { transform: translateY(0);    opacity:1; }
+}
+.fe-sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border-dark);
+    border-radius: 2px;
+    margin: 12px auto 20px;
+}
+.fe-sheet h4 {
+    font-family: var(--font-cond);
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dark);
+    margin-bottom: 14px;
+}
+.fe-label-row { margin-bottom: 14px; }
+.fe-label-row label,
+.fe-options-row label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.fe-label-row input {
+    width: 100%;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--surface-2);
+    outline: none;
+    transition: border-color 0.18s;
+}
+.fe-label-row input:focus { border-color: var(--primary); background: #fff; }
+.fe-type-section { margin-bottom: 14px; }
+.fe-type-section label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+.fe-type-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+.fe-type-pill {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+}
+.fe-type-pill.active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.fe-options-row {
+    margin-bottom: 14px;
+    display: none;
+}
+.fe-options-row.visible { display: block; }
+.fe-options-row textarea {
+    width: 100%;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--surface-2);
+    resize: none;
+    min-height: 72px;
+    outline: none;
+    transition: border-color 0.18s;
+}
+.fe-options-row textarea:focus { border-color: var(--primary); background:#fff; }
+.fe-options-hint {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+.fe-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+/* ── Checkbox toggle field ──────────────────────────────── */
+.checkbox-field-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.18s;
+}
+.checkbox-field-group:hover { border-color: var(--primary); }
+.checkbox-field-group input[type=checkbox] { display:none; }
+.checkbox-toggle {
+    width: 46px; height: 26px;
+    background: var(--border-dark);
+    border-radius: 13px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.22s;
+}
+.checkbox-toggle::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.22s;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.22);
+}
+.checkbox-field-group.checked .checkbox-toggle { background: var(--primary); }
+.checkbox-field-group.checked .checkbox-toggle::after { transform: translateX(20px); }
+.checkbox-field-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+}
+.checkbox-field-value {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-light);
+    transition: color 0.18s;
+}
+.checkbox-field-group.checked .checkbox-field-value { color: var(--primary); }
+
+/* ── Field-tag edit actions ─────────────────────────────── */
+.field-tag-info { display:flex; align-items:center; gap:9px; flex:1; min-width:0; }
+.field-tag-type-icon { font-size:1rem; flex-shrink:0; }
+.field-tag-text { font-size:0.88rem; line-height:1.3; }
+.field-tag-text b { color: var(--primary); }
+.field-tag-text small { display:block; color:var(--text-muted); font-size:0.75rem; margin-top:1px; }
+.field-tag-actions { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+.field-tag .btn-edit-field {
+    width: 32px !important; min-width: 32px !important;
+    height: 32px !important; padding: 0 !important; margin: 0 !important;
+    flex-shrink: 0 !important; border-radius: 6px !important;
+    background: #eff6ff !important; color: #1d4ed8 !important;
+    border: 1px solid #bfdbfe !important; font-size: 0.82rem !important;
+    display: flex !important; align-items: center !important;
+    justify-content: center !important; box-shadow: none !important; cursor: pointer !important;
+}
+
 /* ============================================================
    SCROLL BUTTONS
    ============================================================ */
@@ -5091,22 +5285,25 @@ input:checked + .slider:before { transform: translateX(20px); }
                  ================================================ -->
             <div id="config" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>🛠️ Disseny del Formulari</h3>
+                    <button class="btn-back" id="configBackBtn" onclick="configTornar()">←</button>
+                    <h3>🛠️ <span id="configTitolH">Disseny del Formulari</span></h3>
                 </div>
 
                 <div id="fieldList"><p style="color:var(--text-light);text-align:center;padding:12px;">Formulari buit — afegeix camps</p></div>
 
-                <div class="section-title">Tipus de camp</div>
+                <div class="section-title">Afegir camp</div>
                 <div class="field-type-grid">
-                    <button class="btn btn-ghost" onclick="addField('text')">+ Text lliure</button>
-                    <button class="btn btn-ghost" onclick="addField('carretera','Carretera')">+ Carretera</button>
-                    <button class="btn btn-ghost" onclick="addField('pk','PK')">+ Bloc PK</button>
-                    <button class="btn btn-ghost" onclick="addField('marge','Marge')">+ Marge</button>
-                    <button class="btn btn-ghost" onclick="addField('obs','Observacions')">+ Observacions</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'text')">📝 Text lliure</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'carretera')">🛣️ Carretera</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'pk')">📍 Bloc PK</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'marge')">↔️ Marge</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'obs')">💬 Observacions</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'select')">🔽 Desplegable</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'numero')">🔢 Número</button>
+                    <button class="btn btn-ghost" onclick="obrirFeSheet(-1,'checkbox')">☑️ Casella Sí/No</button>
                 </div>
-                <button class="btn btn-primary" onclick="finalitzarConfig()">CREAR / ACTUALITZAR FORMULARI 🚀</button>
-                <button class="btn btn-ghost" onclick="ir('home')">TORNAR</button>
+                <button class="btn btn-primary" onclick="finalitzarConfig()">DESAR I TORNAR AL FORMULARI 🚀</button>
+                <button class="btn btn-ghost" onclick="configTornar()">TORNAR SENSE CANVIS</button>
             </div>
 
             <!-- ================================================
@@ -5127,6 +5324,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="autopk-pulse" id="autopkPulse" style="display:none;"></span>
                     🔍 ON ESTIC ARA? (Auto-PK)
                 </button>
+                <button class="btn btn-ghost" onclick="obrirConfigDesdeProjecte()" style="margin-bottom:4px;font-size:0.82rem;padding:8px 14px;color:var(--text-muted);border-color:var(--border-dark);">⚙️ Afegir / modificar camps del formulari</button>
 
                 <!-- Chips carreteres properes (inventari) -->
                 <div id="autopkChipsArea" style="display:none;">
@@ -5191,7 +5389,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <button class="btn-scroll" onclick="(document.scrollingElement||document.documentElement).scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">&#8595;</button>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-bottom:100px;width:100%;box-sizing:border-box;">
-                    <button class="btn btn-primary" onclick="ir('form')" style="width:100%;">&#9998; Editar formulari</button>
+                    <button class="btn btn-primary" onclick="ir('form')" style="width:100%;">&#9998; Afegir nou registre</button>
+                    <button class="btn btn-ghost" onclick="obrirConfigDesdeProjecte()" style="width:100%;">⚙️ Editar camps del formulari</button>
                     <button class="btn btn-ghost" onclick="goBackFromPunts()" style="width:100%;">&#8592; Tornar al detall</button>
                 </div>
             </div>
@@ -6453,28 +6652,166 @@ function irConfigurador() {
 }
 
 function addField(type, label = "") {
-    let fl = label || prompt("Nom del camp:");
-    if (fl) { fields.push({ type, label: fl }); renderConfig(); }
+    // Legacy shim — redirect to sheet
+    obrirFeSheet(-1, type, label);
+}
+
+/* ── feSheet state ──────────────────────────────────────── */
+let _feEditIdx = -1;      // -1 = nou camp, ≥0 = editar camp existent
+let _feTipusActual = 'text';
+
+const FE_TYPE_META = {
+    text:      { icon:'📝', label:'Text lliure' },
+    obs:       { icon:'💬', label:'Àrea de text' },
+    numero:    { icon:'🔢', label:'Número' },
+    select:    { icon:'🔽', label:'Desplegable' },
+    checkbox:  { icon:'☑️', label:'Sí / No' },
+    carretera: { icon:'🛣️', label:'Carretera' },
+    pk:        { icon:'📍', label:'Bloc PK' },
+    marge:     { icon:'↔️', label:'Marge' },
+};
+
+function obrirFeSheet(editIdx, tipusDefecte, labelDefecte) {
+    _feEditIdx = (editIdx === undefined || editIdx === null) ? -1 : editIdx;
+    const overlay = document.getElementById('feSheetOverlay');
+    const titol   = document.getElementById('feSheetTitol');
+
+    if (_feEditIdx >= 0) {
+        // Editar camp existent
+        const f = fields[_feEditIdx];
+        titol.textContent = 'Editar camp';
+        document.getElementById('feLabel').value = f.label || '';
+        feSetTipus(f.type || 'text', true);
+        if (f.type === 'select' && f.options) {
+            document.getElementById('feOptions').value = f.options.join(', ');
+        } else {
+            document.getElementById('feOptions').value = '';
+        }
+    } else {
+        // Nou camp
+        titol.textContent = 'Nou camp';
+        const tipusDef = tipusDefecte || 'text';
+        const defaults = { carretera:'Carretera', pk:'PK', marge:'Marge', obs:'Observacions' };
+        document.getElementById('feLabel').value = labelDefecte || defaults[tipusDef] || '';
+        feSetTipus(tipusDef, true);
+        document.getElementById('feOptions').value = '';
+    }
+
+    overlay.classList.add('open');
+    setTimeout(() => document.getElementById('feLabel').focus(), 120);
+}
+
+function feTancarSiOverlay(e) {
+    if (e.target === document.getElementById('feSheetOverlay')) feTancar();
+}
+
+function feTancar() {
+    document.getElementById('feSheetOverlay').classList.remove('open');
+}
+
+function feSetTipus(tipus, silent) {
+    _feTipusActual = tipus;
+    // Update pills
+    document.querySelectorAll('#feTypePills .fe-type-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === tipus);
+    });
+    // Show/hide options row
+    const optRow = document.getElementById('feOptionsRow');
+    optRow.classList.toggle('visible', tipus === 'select');
+}
+
+function feGuardar() {
+    const label = document.getElementById('feLabel').value.trim();
+    if (!label) { showToast('Cal posar un nom al camp', 'warn'); return; }
+
+    const tipus = _feTipusActual;
+    const nou = { type: tipus, label };
+
+    if (tipus === 'select') {
+        const raw = document.getElementById('feOptions').value.trim();
+        if (!raw) { showToast('Cal afegir almenys una opció', 'warn'); return; }
+        nou.options = raw.split(',').map(o => o.trim()).filter(Boolean);
+    }
+
+    if (_feEditIdx >= 0) {
+        // Preservem les dades antigues: si el label canvia, actualitzem tots els registres
+        const oldLabel = fields[_feEditIdx].label;
+        if (oldLabel !== label) {
+            regs.forEach(r => {
+                if (r.values) {
+                    const v = r.values.find(v => v.label.toLowerCase() === oldLabel.toLowerCase());
+                    if (v) v.label = label;
+                }
+            });
+        }
+        fields[_feEditIdx] = nou;
+        showToast('Camp actualitzat ✓', 'ok');
+    } else {
+        fields.push(nou);
+        showToast('Camp afegit ✓', 'ok');
+    }
+
+    feTancar();
+    renderConfig();
 }
 
 function renderConfig() {
     const l = document.getElementById('fieldList');
-    l.innerHTML = fields.length === 0
-        ? "<p style='color:var(--text-light);text-align:center;padding:12px;'>Formulari buit — afegeix camps</p>"
-        : fields.map((f, i) => `
-            <div class="field-tag">
-                <span><b>${f.type.toUpperCase()}</b> — ${f.label}</span>
-                <button class="btn btn-danger btn-sm" onclick="fields.splice(${i},1);renderConfig()">✕</button>
-            </div>`).join('');
+    if (fields.length === 0) {
+        l.innerHTML = "<p style='color:var(--text-light);text-align:center;padding:20px 12px;'>Formulari buit — afegeix camps amb els botons de sota</p>";
+        return;
+    }
+    l.innerHTML = fields.map((f, i) => {
+        const meta = FE_TYPE_META[f.type] || { icon:'📄', label: f.type };
+        const extra = f.type === 'select' && f.options?.length
+            ? `<small>Opcions: ${f.options.join(' · ')}</small>` : '';
+        return `
+        <div class="field-tag">
+            <div class="field-tag-info">
+                <span class="field-tag-type-icon">${meta.icon}</span>
+                <div class="field-tag-text">
+                    <b>${meta.label}</b> — ${f.label}
+                    ${extra}
+                </div>
+            </div>
+            <div class="field-tag-actions">
+                <button class="btn btn-edit-field" onclick="obrirFeSheet(${i})" title="Editar camp">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarCamp(${i})" title="Eliminar">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* destí de tornar des de config (home o form/puntsLlistat si prové d'un projecte actiu) */
+let _configBack = 'home';
+
+function obrirConfigDesdeProjecte() {
+    _configBack = 'form'; // tornarem al formulari actiu
+    document.getElementById('configTitolH').textContent = 'Editar camps del formulari';
+    renderConfig();
+    ir('config');
+}
+
+function configTornar() {
+    ir(_configBack === 'form' ? 'puntsLlistat' : 'home');
+    _configBack = 'home';
+}
+
+function eliminarCamp(i) {
+    if (!confirm(`Eliminar el camp "${fields[i].label}"?\n\nEls registres ja guardats conserven les dades d'aquest camp.`)) return;
+    fields.splice(i, 1);
+    renderConfig();
 }
 
 function finalitzarConfig() {
-    if (fields.length === 0) return alert("Afegeix algun camp primer.");
+    if (fields.length === 0) { showToast('Afegeix almenys un camp primer', 'warn'); return; }
     const t = document.getElementById('titulo').value || "Sense títol";
     actualizarDB(t);
     renderForm();
     renderRegs();
+    showToast('Formulari actualitzat ✓', 'ok');
     ir('form');
+    _configBack = 'home';
 }
 
 function crearProyecto(tipo, tipusEntrada = 'inventari') {
@@ -6492,12 +6829,23 @@ function crearProyecto(tipo, tipusEntrada = 'inventari') {
             { type: 'marge',     label: 'Marge' },
             { type: 'obs',       label: 'Observacions' }
         ];
+    } else {
+        fields = [];
     }
     // Store the tipusEntrada for when actualizarDB is called
     window._pendingTipus = tipusEntrada;
-    renderForm();
-    renderRegs();
-    ir('form');
+
+    if (tipo === 'custom') {
+        // Go to config builder first
+        _configBack = 'form';
+        document.getElementById('configTitolH').textContent = 'Disseny del Formulari';
+        renderConfig();
+        ir('config');
+    } else {
+        renderForm();
+        renderRegs();
+        ir('form');
+    }
 }
 
 function renderForm() {
@@ -6505,8 +6853,33 @@ function renderForm() {
         if (f.type === 'carretera') return `<div class="form-group"><label>${f.label}</label><input type="text" class="dyn-input" data-idx="${i}"></div>`;
         if (f.type === 'pk')        return `<div class="form-group"><label>${f.label}</label><div class="pk-row"><input type="number" class="pk-km" data-idx="${i}" placeholder="Km"> <b>+</b> <input type="number" class="pk-m" data-idx="${i}" placeholder="m" onblur="if(this.value!='')this.value=this.value.padStart(3,'0')"></div></div>`;
         if (f.type === 'marge')     return `<div class="form-group"><label>${f.label}</label><select class="dyn-marge" data-idx="${i}"><option>MD</option><option>ME</option><option>Eix</option></select></div>`;
-        if (f.type === 'text' || f.type === 'obs') return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-input dyn-obs" data-idx="${i}" rows="2" style="font-family:var(--font)"></textarea></div>`;
+        if (f.type === 'text')      return `<div class="form-group"><label>${f.label}</label><input type="text" class="dyn-input" data-idx="${i}" placeholder=""></div>`;
+        if (f.type === 'obs')       return `<div class="form-group"><label>${f.label}</label><textarea class="dyn-input dyn-obs" data-idx="${i}" rows="2" style="font-family:var(--font)"></textarea></div>`;
+        if (f.type === 'numero')    return `<div class="form-group"><label>${f.label}</label><input type="number" class="dyn-input dyn-numero" data-idx="${i}" placeholder="0" inputmode="decimal"></div>`;
+        if (f.type === 'select') {
+            const opts = (f.options || []).map(o => `<option value="${o}">${o}</option>`).join('');
+            return `<div class="form-group"><label>${f.label}</label><select class="dyn-select" data-idx="${i}"><option value="">— Tria una opció —</option>${opts}</select></div>`;
+        }
+        if (f.type === 'checkbox') {
+            return `<div class="checkbox-field-group" id="chk_group_${i}" onclick="feToggleCheck(${i})">
+                <input type="checkbox" class="dyn-checkbox" data-idx="${i}" id="chk_${i}">
+                <div class="checkbox-toggle"></div>
+                <span class="checkbox-field-label">${f.label}</span>
+                <span class="checkbox-field-value" id="chk_val_${i}">No</span>
+            </div>`;
+        }
+        return '';
     }).join('');
+}
+
+function feToggleCheck(i) {
+    const input = document.getElementById(`chk_${i}`);
+    const group = document.getElementById(`chk_group_${i}`);
+    const valEl = document.getElementById(`chk_val_${i}`);
+    if (!input) return;
+    input.checked = !input.checked;
+    group.classList.toggle('checked', input.checked);
+    valEl.textContent = input.checked ? 'Sí' : 'No';
 }
 
 /* ============================================================
@@ -6522,8 +6895,13 @@ async function saveReg() {
     fields.forEach((f, i) => {
         let val = "";
         const el = document.querySelector(`[data-idx="${i}"]`);
-        if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs') {
+        if (f.type === 'text' || f.type === 'carretera' || f.type === 'marge' || f.type === 'obs' || f.type === 'numero') {
             val = el ? el.value : "";
+        } else if (f.type === 'select') {
+            val = el ? el.value : "";
+        } else if (f.type === 'checkbox') {
+            const cb = document.querySelector(`.dyn-checkbox[data-idx="${i}"]`);
+            val = cb?.checked ? 'Sí' : 'No';
         } else if (f.type === 'pk') {
             const kms = document.querySelector(`.pk-km[data-idx="${i}"]`)?.value || "0";
             const ms  = document.querySelector(`.pk-m[data-idx="${i}"]`)?.value || "000";
@@ -6724,6 +7102,10 @@ function loadE(i) {
             const el = document.querySelector(`.dyn-input[data-idx="${fIdx}"]`);
             if (el) el.value = item.val;
         }
+        if (f.type === 'numero') {
+            const el = document.querySelector(`.dyn-numero[data-idx="${fIdx}"]`);
+            if (el) el.value = item.val;
+        }
         if (f.type === 'pk') {
             const p = item.val.split('+');
             document.querySelectorAll(`.pk-km[data-idx="${fIdx}"]`)[0].value = p[0];
@@ -6731,6 +7113,19 @@ function loadE(i) {
         }
         if (f.type === 'marge') document.querySelector(`.dyn-marge[data-idx="${fIdx}"]`).value = item.val;
         if (f.type === 'obs')   document.querySelector(`.dyn-obs[data-idx="${fIdx}"]`).value = item.val;
+        if (f.type === 'select') {
+            const el = document.querySelector(`.dyn-select[data-idx="${fIdx}"]`);
+            if (el) el.value = item.val;
+        }
+        if (f.type === 'checkbox') {
+            const cb    = document.querySelector(`.dyn-checkbox[data-idx="${fIdx}"]`);
+            const group = document.getElementById(`chk_group_${fIdx}`);
+            const valEl = document.getElementById(`chk_val_${fIdx}`);
+            const checked = item.val === 'Sí';
+            if (cb) cb.checked = checked;
+            if (group) group.classList.toggle('checked', checked);
+            if (valEl) valEl.textContent = checked ? 'Sí' : 'No';
+        }
     });
     tmpFotos = [...r.fotos];
     renderPreview();
@@ -6830,6 +7225,16 @@ function clearInputs() {
     document.querySelectorAll('.pk-m').forEach(el => el.value = '');
     document.querySelectorAll('.dyn-marge').forEach(el => el.selectedIndex = 0);
     document.querySelectorAll('.dyn-obs').forEach(el => el.value = '');
+    document.querySelectorAll('.dyn-numero').forEach(el => el.value = '');
+    document.querySelectorAll('.dyn-select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('.dyn-checkbox').forEach((cb, idx) => {
+        cb.checked = false;
+        const dataIdx = cb.dataset.idx;
+        const group = document.getElementById(`chk_group_${dataIdx}`);
+        const valEl = document.getElementById(`chk_val_${dataIdx}`);
+        if (group) group.classList.remove('checked');
+        if (valEl) valEl.textContent = 'No';
+    });
     tmpFotos = [];
     renderPreview();
     editIdx = -1;
@@ -14539,4 +14944,42 @@ function pkmBack() {
 
 
 </script>
+<!-- ── FIELD EDITOR BOTTOM SHEET ─────────────────────────────── -->
+<div class="fe-sheet-overlay" id="feSheetOverlay" onclick="feTancarSiOverlay(event)">
+    <div class="fe-sheet" id="feSheet">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="feSheetTitol">Nou camp</h4>
+
+        <div class="fe-label-row">
+            <label>Nom del camp</label>
+            <input type="text" id="feLabel" placeholder="Ex: Estat de la calçada, Observació..." autocomplete="off">
+        </div>
+
+        <div class="fe-type-section">
+            <label>Tipus de camp</label>
+            <div class="fe-type-pills" id="feTypePills">
+                <button class="fe-type-pill" data-type="text"     onclick="feSetTipus('text')">📝 Text</button>
+                <button class="fe-type-pill" data-type="obs"      onclick="feSetTipus('obs')">💬 Àrea text</button>
+                <button class="fe-type-pill" data-type="numero"   onclick="feSetTipus('numero')">🔢 Número</button>
+                <button class="fe-type-pill" data-type="select"   onclick="feSetTipus('select')">🔽 Desplegable</button>
+                <button class="fe-type-pill" data-type="checkbox" onclick="feSetTipus('checkbox')">☑️ Sí/No</button>
+                <button class="fe-type-pill" data-type="carretera" onclick="feSetTipus('carretera')">🛣️ Carretera</button>
+                <button class="fe-type-pill" data-type="pk"       onclick="feSetTipus('pk')">📍 Bloc PK</button>
+                <button class="fe-type-pill" data-type="marge"    onclick="feSetTipus('marge')">↔️ Marge</button>
+            </div>
+        </div>
+
+        <div class="fe-options-row" id="feOptionsRow">
+            <label>Opcions del desplegable</label>
+            <textarea id="feOptions" placeholder="Ex: Bon estat, Fisurada, Enfonsada, Pendent revisió" rows="3"></textarea>
+            <div class="fe-options-hint">✏️ Escriu les opcions separades per comes</div>
+        </div>
+
+        <div class="fe-actions">
+            <button class="btn btn-primary" onclick="feGuardar()" style="margin:0;">💾 Guardar camp</button>
+            <button class="btn btn-ghost" onclick="feTancar()" style="margin:0;">Cancel·lar</button>
+        </div>
+    </div>
+</div>
+
 </html>
