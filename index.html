@@ -9889,7 +9889,7 @@ function closeExportModal() {
 async function generarBlobPDF(p, tipus) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const RED = [198, 12, 48];
+    const HEADER_COLOR = [21, 61, 139];  // blau fosc (abans vermell) — estil PK-GEOLOC
     const DARK = [30, 30, 30];
     const GRAY = [110, 110, 110];
     const LGRAY = [220, 220, 220];
@@ -9938,7 +9938,7 @@ async function generarBlobPDF(p, tipus) {
         drawHeader(doc, p.titulo);
         let y = 32;
         // Bandeja títol
-        doc.setFillColor(...RED);
+        doc.setFillColor(...HEADER_COLOR);
         doc.rect(12, y, 186, 8, 'F');
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
@@ -10112,7 +10112,7 @@ async function generarBlobPDF(p, tipus) {
             body: normalRegs.map(r => [...(r.values||[]).map(v => v.val || "—"), ""]),
             theme: 'grid',
             headStyles: {
-                fillColor: RED,
+                fillColor: HEADER_COLOR,
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
                 fontSize: 8,
