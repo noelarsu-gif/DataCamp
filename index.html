@@ -3216,6 +3216,24 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: white;
 }
 
+/* Badge "Reparada" — sempre visible, cantonada superior esquerra (s'amaga en mode selecció) */
+.galeria-thumb-reparada {
+    position: absolute;
+    top: 6px; left: 6px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #16a34a;
+    border: 2px solid rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+.galeria-select-mode .galeria-thumb-reparada { display: none; }
+
 /* Estat buit */
 .galeria-empty {
     text-align: center;
@@ -3685,6 +3703,170 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* Responsive switch */
 .dl-table-wrap { display: block; }  /* shown on desktop */
 .dl-cards-wrap { display: none; }   /* shown on mobile */
+
+/* ============================================================
+   INCIDÈNCIES — nou panell d'exportació (estil "assistent")
+   ============================================================ */
+.dl-sec {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 14px 16px;
+    margin-bottom: 12px;
+}
+.dl-sec-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+.dl-pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.dl-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    color: var(--dark);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.dl-pill:hover { background: var(--bg-alt); }
+.dl-pill.active {
+    background: var(--primary-glow);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.dl-seg {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.dl-seg-btn {
+    flex: 1 1 0;
+    min-width: 110px;
+    text-align: center;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    color: var(--dark);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.dl-seg-btn:hover { background: var(--bg-alt); }
+.dl-seg-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.dl-radio-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 8px;
+}
+.dl-radio-card:last-child { margin-bottom: 0; }
+.dl-radio-card:hover { background: var(--bg-alt); }
+.dl-radio-card.active {
+    background: var(--primary-glow);
+    border-color: var(--primary);
+}
+.dl-radio-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-dark);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+}
+.dl-radio-card.active .dl-radio-dot { border-color: var(--primary); }
+.dl-radio-dot::after {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: none;
+}
+.dl-radio-card.active .dl-radio-dot::after { display: block; }
+.dl-radio-text .dl-radio-title { font-weight: 700; font-size: 0.88rem; color: var(--dark); }
+.dl-radio-text .dl-radio-sub { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+.dl-date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+.dl-date-row input[type="date"] {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-dark);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+.dl-match-count {
+    text-align: center;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #86efac;
+    background: #f0fdf4;
+    color: #15803d;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+.dl-generate-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--primary);
+    background: var(--surface);
+    color: var(--primary);
+    font-family: var(--font-cond);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.dl-generate-btn:hover { background: var(--primary-glow); }
+.dl-inc-check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+}
+.dl-inc-check-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
 
 @media (max-width: 768px) {
     .dl-table-wrap { display: none; }
@@ -5573,7 +5755,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div id="listaDescargas"></div>
                 </div>
 
-                <!-- ===== TAB: INCIDÈNCIES (nou) ===== -->
+                <!-- ===== TAB: INCIDÈNCIES (nou disseny estil assistent) ===== -->
                 <div id="dlPanellIncidencies" style="display:none;">
                     <div class="dl-topbar">
                         <div class="dl-search-wrap">
@@ -5582,29 +5764,120 @@ input:checked + .slider:before { transform: translateX(20px); }
                                    placeholder="Cerca per carretera o PK..."
                                    oninput="carregarVistaIncidencies()">
                         </div>
-                        <div class="dl-count" id="dlCountInc"></div>
                     </div>
 
-                    <!-- Barra de filtres (mateix estil que la Galeria) -->
-                    <div class="galeria-filters" style="position:static; padding:0 0 10px;">
-                        <div class="galeria-filter-row">
-                            <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Incidència:</span>
-                            <button class="galeria-filter-chip active" id="dlIncFiltreBtn" onclick="dlIncAbrirPicker()" style="max-width:220px;">
-                                <span id="dlIncFiltreLabel">Totes</span><span style="opacity:0.5;font-size:0.8rem;margin-left:4px;">▾</span>
-                            </button>
-                        </div>
-                        <div class="galeria-filter-row">
-                            <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;">Ordre:</span>
-                            <button class="galeria-filter-chip active" id="dlIncOrdreRecents" onclick="dlIncSetOrdre('desc')">🕐 Recents</button>
-                            <button class="galeria-filter-chip" id="dlIncOrdreAntics" onclick="dlIncSetOrdre('asc')">📅 Antics</button>
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">📋 Tipus d'incidència</div>
+                        <div class="dl-pill-grid" id="dlIncPillGrid">
+                            <button type="button" class="dl-pill active" data-val="" onclick="dlIncSetTipus('')">Totes</button>
+                            <button type="button" class="dl-pill" data-val="Animal" onclick="dlIncSetTipus('Animal')">🐾 Animal</button>
+                            <button type="button" class="dl-pill" data-val="Senyalització malmesa" onclick="dlIncSetTipus('Senyalització malmesa')">🚧 Senyalització</button>
+                            <button type="button" class="dl-pill" data-val="Accident/Averiat" onclick="dlIncSetTipus('Accident/Averiat')">🚗 Avaria / Accident</button>
+                            <button type="button" class="dl-pill" data-val="Biona" onclick="dlIncSetTipus('Biona')">🛡️ Biona</button>
+                            <button type="button" class="dl-pill" data-val="Sot/Esquerda" onclick="dlIncSetTipus('Sot/Esquerda')">🕳️ Sot / Esquerda</button>
+                            <button type="button" class="dl-pill" data-val="Incidència indefinida" onclick="dlIncSetTipus('Incidència indefinida')">⚠️ Altres</button>
                         </div>
                     </div>
 
-                    <div class="dl-legend">
-                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Fitxa / Taula PDF</span>
-                        <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel</span>
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">🎯 Abast</div>
+                        <div class="dl-seg">
+                            <button type="button" class="dl-seg-btn active" id="dlIncAbastTotes" onclick="dlIncSetAlcance('totes')">Totes del tipus</button>
+                            <button type="button" class="dl-seg-btn" id="dlIncAbastAlgunes" onclick="dlIncSetAlcance('algunes')">Triar-ne algunes</button>
+                        </div>
                     </div>
+
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">✅ Estat de reparació</div>
+                        <div class="dl-seg">
+                            <button type="button" class="dl-seg-btn active" id="dlIncEstatTotes" onclick="dlIncSetEstat('totes')">Totes</button>
+                            <button type="button" class="dl-seg-btn" id="dlIncEstatPendents" onclick="dlIncSetEstat('pendents')">⏳ Pendents</button>
+                            <button type="button" class="dl-seg-btn" id="dlIncEstatReparades" onclick="dlIncSetEstat('reparades')">✅ Reparades</button>
+                        </div>
+                    </div>
+
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">↕️ Ordenar per</div>
+                        <select id="dlIncOrdreCampSelect" onchange="dlIncSetOrdreCamp(this.value)"
+                                style="width:100%; padding:10px; border-radius:var(--radius-sm); border:1.5px solid var(--border-dark); font-family:var(--font); font-size:0.85rem; margin-bottom:10px;">
+                            <option value="carrPk">Carretera + PK</option>
+                            <option value="data">Data</option>
+                            <option value="tipus">Tipus d'incidència</option>
+                        </select>
+                        <div class="dl-seg">
+                            <button type="button" class="dl-seg-btn" id="dlIncOrdreAsc" onclick="dlIncSetOrdre('asc')">↑ Ascendent</button>
+                            <button type="button" class="dl-seg-btn active" id="dlIncOrdreDesc" onclick="dlIncSetOrdre('desc')">↓ Descendent</button>
+                        </div>
+                    </div>
+
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">📅 Rang de dates</div>
+                        <div class="dl-seg">
+                            <button type="button" class="dl-seg-btn active" id="dlIncDataTotes" onclick="dlIncSetDataMode('totes')">Totes</button>
+                            <button type="button" class="dl-seg-btn" id="dlIncDataUnDia" onclick="dlIncSetDataMode('undia')">Un dia</button>
+                            <button type="button" class="dl-seg-btn" id="dlIncDataRang" onclick="dlIncSetDataMode('rang')">Rang</button>
+                        </div>
+                        <div id="dlIncDataUnWrap" style="display:none; margin-top:10px;">
+                            <input type="date" id="dlIncDataUnInput" onchange="dlIncDataUn=this.value; carregarVistaIncidencies();" style="width:100%;">
+                        </div>
+                        <div id="dlIncDataRangWrap" class="dl-date-row" style="display:none;">
+                            <input type="date" id="dlIncDataDesdeInput" onchange="dlIncDataDesde=this.value; carregarVistaIncidencies();">
+                            <input type="date" id="dlIncDataFinsInput" onchange="dlIncDataFins=this.value; carregarVistaIncidencies();">
+                        </div>
+                    </div>
+
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">📄 Format de l'informe</div>
+                        <div class="dl-radio-card active" id="dlIncFormatFitxa" onclick="dlIncSetFormat('Fitxa')">
+                            <div class="dl-radio-dot"></div>
+                            <div class="dl-radio-text">
+                                <div class="dl-radio-title">Fitxa detallada</div>
+                                <div class="dl-radio-sub">Un bloc per incidència, amb foto gran</div>
+                            </div>
+                        </div>
+                        <div class="dl-radio-card" id="dlIncFormatTaula" onclick="dlIncSetFormat('Taula')">
+                            <div class="dl-radio-dot"></div>
+                            <div class="dl-radio-text">
+                                <div class="dl-radio-title">Taula resum</div>
+                                <div class="dl-radio-sub">Una fila per incidència — ideal per llistats llargs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-sec">
+                        <div class="dl-sec-label">📦 Exportar també</div>
+                        <div class="watermark-row" style="margin-bottom:10px;">
+                            <div class="watermark-row-info">
+                                <span class="watermark-row-icon">📦</span>
+                                <div class="watermark-row-text">
+                                    <div class="wm-title">ZIP de fotos</div>
+                                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Anomenades Carretera_PK+metres_data.jpg</div>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="dlIncToggleZip" onchange="dlIncExportZip=this.checked">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="watermark-row">
+                            <div class="watermark-row-info">
+                                <span class="watermark-row-icon">📊</span>
+                                <div class="watermark-row-text">
+                                    <div class="wm-title">Excel de dades</div>
+                                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Totes les columnes, una fila per incidència</div>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="dlIncToggleExcel" onchange="dlIncExportExcel=this.checked">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div id="listaIncidencies"></div>
+
+                    <div class="dl-match-count" id="dlMatchCountInc">Coincideixen amb els filtres: 0 incidències</div>
+                    <button type="button" class="dl-generate-btn" onclick="dlIncGenerarInforme()">📄 Generar informe</button>
 
                     <div style="font-weight:700; font-size:0.85rem; margin:18px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
                     <div id="animalFitxesWrap"></div>
@@ -6118,16 +6391,6 @@ input:checked + .slider:before { transform: translateX(20px); }
             <button class="carr-picker-close" onclick="galeriaPickerIncTancar()">✕</button>
         </div>
         <div class="carr-picker-list" id="incPickerList"></div>
-    </div>
-</div>
-
-<div class="carr-picker-backdrop" id="dlIncPickerBackdrop" onclick="dlIncPickerTancar()">
-    <div class="carr-picker-sheet" onclick="event.stopPropagation()">
-        <div class="carr-picker-header">
-            <span class="carr-picker-title">Filtra per incidència</span>
-            <button class="carr-picker-close" onclick="dlIncPickerTancar()">✕</button>
-        </div>
-        <div class="carr-picker-list" id="dlIncPickerList"></div>
     </div>
 </div>
 
@@ -8176,46 +8439,83 @@ function carregarLlistaDescargues() {
 const INC_TIPUS_ICONS = {
     'Animal': '🐾',
     'Senyalització malmesa': '🚧',
+    'Biona': '🛡️',
     'Sot/Esquerda': '🕳️',
     'Accident/Averiat': '🚗',
     'Incidència indefinida': '❓'
 };
 
-/* ── Filtre i ordre de la pestanya Incidències (Descàrregues) ── */
-let dlIncFiltreTipus = '';   // '' = totes
-let dlIncOrdre = 'desc';     // 'desc' recents primer | 'asc' antics primer
+/* ── Estat del panell d'exportació d'Incidències (Descàrregues) ── */
+let dlIncFiltreTipus = '';      // '' = totes
+let dlIncOrdre = 'desc';        // 'desc' recents primer | 'asc' antics primer
+let dlIncOrdreCamp = 'carrPk';  // 'carrPk' | 'data' | 'tipus'
+let dlIncAlcance = 'totes';     // 'totes' | 'algunes'
+let dlIncSeleccioIds = new Set();
+let dlIncEstatFiltre = 'totes'; // 'totes' | 'pendents' | 'reparades'
+let dlIncDataMode = 'totes';    // 'totes' | 'undia' | 'rang'
+let dlIncDataUn = '';
+let dlIncDataDesde = '';
+let dlIncDataFins = '';
+let dlIncFormat = 'Fitxa';      // 'Fitxa' | 'Taula'
+let dlIncExportZip = false;
+let dlIncExportExcel = false;
 
-function dlIncAbrirPicker() {
-    const list = document.getElementById('dlIncPickerList');
-    if (!list) return;
-    list.innerHTML = _galeriaIncOptions.map(o => {
-        const active = o.value === dlIncFiltreTipus;
-        return `<button class="carr-picker-item${active ? ' active' : ''}" onclick="dlIncPickerSeleccionar('${o.value.replace(/'/g,"\\'")}')">
-            <span>${o.label}</span>
-            ${active ? '<span class="carr-check">✓</span>' : ''}
-        </button>`;
-    }).join('');
-    document.getElementById('dlIncPickerBackdrop').classList.add('open');
-}
-
-function dlIncPickerTancar() {
-    document.getElementById('dlIncPickerBackdrop')?.classList.remove('open');
-}
-
-function dlIncPickerSeleccionar(tipus) {
-    dlIncPickerTancar();
+function dlIncSetTipus(tipus) {
     dlIncFiltreTipus = tipus;
-    const opt = _galeriaIncOptions.find(o => o.value === tipus) || _galeriaIncOptions[0];
-    const lbl = document.getElementById('dlIncFiltreLabel');
-    if (lbl) lbl.textContent = tipus === '' ? 'Totes' : opt.label;
+    document.querySelectorAll('#dlIncPillGrid .dl-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.val === tipus);
+    });
+    carregarVistaIncidencies();
+}
+
+function dlIncSetAlcance(mode) {
+    dlIncAlcance = mode;
+    if (mode === 'totes') dlIncSeleccioIds.clear();
+    document.getElementById('dlIncAbastTotes')?.classList.toggle('active', mode === 'totes');
+    document.getElementById('dlIncAbastAlgunes')?.classList.toggle('active', mode === 'algunes');
+    carregarVistaIncidencies();
+}
+
+function dlIncSetEstat(mode) {
+    dlIncEstatFiltre = mode;
+    document.getElementById('dlIncEstatTotes')?.classList.toggle('active', mode === 'totes');
+    document.getElementById('dlIncEstatPendents')?.classList.toggle('active', mode === 'pendents');
+    document.getElementById('dlIncEstatReparades')?.classList.toggle('active', mode === 'reparades');
+    carregarVistaIncidencies();
+}
+
+function dlIncSetOrdreCamp(camp) {
+    dlIncOrdreCamp = camp;
     carregarVistaIncidencies();
 }
 
 function dlIncSetOrdre(ordre) {
     dlIncOrdre = ordre;
-    document.getElementById('dlIncOrdreRecents')?.classList.toggle('active', ordre === 'desc');
-    document.getElementById('dlIncOrdreAntics')?.classList.toggle('active', ordre === 'asc');
+    document.getElementById('dlIncOrdreAsc')?.classList.toggle('active', ordre === 'asc');
+    document.getElementById('dlIncOrdreDesc')?.classList.toggle('active', ordre === 'desc');
     carregarVistaIncidencies();
+}
+
+function dlIncSetDataMode(mode) {
+    dlIncDataMode = mode;
+    document.getElementById('dlIncDataTotes')?.classList.toggle('active', mode === 'totes');
+    document.getElementById('dlIncDataUnDia')?.classList.toggle('active', mode === 'undia');
+    document.getElementById('dlIncDataRang')?.classList.toggle('active', mode === 'rang');
+    const wrapUn = document.getElementById('dlIncDataUnWrap');
+    const wrapRang = document.getElementById('dlIncDataRangWrap');
+    if (wrapUn) wrapUn.style.display = mode === 'undia' ? 'block' : 'none';
+    if (wrapRang) wrapRang.style.display = mode === 'rang' ? 'grid' : 'none';
+    carregarVistaIncidencies();
+}
+
+function dlIncSetFormat(format) {
+    dlIncFormat = format;
+    document.getElementById('dlIncFormatFitxa')?.classList.toggle('active', format === 'Fitxa');
+    document.getElementById('dlIncFormatTaula')?.classList.toggle('active', format === 'Taula');
+}
+
+function dlIncToggleSeleccio(id, checked) {
+    if (checked) dlIncSeleccioIds.add(id); else dlIncSeleccioIds.delete(id);
 }
 
 function dlCanviarTab(tab) {
@@ -8241,71 +8541,174 @@ function dlCanviarTab(tab) {
     if (tab === 'itc') carregarVistaITC();
 }
 
-/* Llegeix galeriaFotos i agrupa per tipus d'incidència */
+/* Aplica cerca + tipus + rang de dates + ordre sobre la llista completa d'incidències */
+function _dlIncItemsFiltrats(items) {
+    const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
+    let incidencies = (items || []).filter(it => it.tipusIncidencia);
+
+    if (q) {
+        incidencies = incidencies.filter(it =>
+            (it.carr || '').toLowerCase().includes(q) ||
+            (it.pk   || '').toLowerCase().includes(q));
+    }
+    if (dlIncFiltreTipus) {
+        incidencies = incidencies.filter(it => it.tipusIncidencia === dlIncFiltreTipus);
+    }
+    if (dlIncEstatFiltre === 'pendents') {
+        incidencies = incidencies.filter(it => !it.reparada);
+    } else if (dlIncEstatFiltre === 'reparades') {
+        incidencies = incidencies.filter(it => !!it.reparada);
+    }
+
+    if (dlIncDataMode === 'undia' && dlIncDataUn) {
+        const [y, m, d] = dlIncDataUn.split('-').map(Number);
+        incidencies = incidencies.filter(it => {
+            if (!it.ts) return false;
+            const dt = new Date(it.ts);
+            return dt.getFullYear() === y && (dt.getMonth() + 1) === m && dt.getDate() === d;
+        });
+    } else if (dlIncDataMode === 'rang' && (dlIncDataDesde || dlIncDataFins)) {
+        const desde = dlIncDataDesde ? new Date(dlIncDataDesde + 'T00:00:00').getTime() : -Infinity;
+        const fins  = dlIncDataFins  ? new Date(dlIncDataFins  + 'T23:59:59').getTime() :  Infinity;
+        incidencies = incidencies.filter(it => it.ts && it.ts >= desde && it.ts <= fins);
+    }
+
+    incidencies.sort((a, b) => {
+        let cmp = 0;
+        if (dlIncOrdreCamp === 'data') {
+            cmp = (a.ts || 0) - (b.ts || 0);
+        } else if (dlIncOrdreCamp === 'tipus') {
+            cmp = (a.tipusIncidencia || '').localeCompare(b.tipusIncidencia || '');
+        } else {
+            cmp = (a.carr || '').localeCompare(b.carr || '') || ((parseFloat(a.pk) || 0) - (parseFloat(b.pk) || 0));
+        }
+        return dlIncOrdre === 'desc' ? -cmp : cmp;
+    });
+
+    return incidencies;
+}
+
+/* Llegeix galeriaFotos, aplica els filtres del panell i repinta comptador + llista (si "Triar-ne algunes") */
 function carregarVistaIncidencies() {
     const container = document.getElementById('listaIncidencies');
     if (!container || !db) { if (!db) setTimeout(carregarVistaIncidencies, 300); return; }
 
-    const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
-
     galeriaLlegirTotes(items => {
-        let incidencies = (items || []).filter(it => it.tipusIncidencia);
-        if (q) {
-            incidencies = incidencies.filter(it =>
-                (it.carr || '').toLowerCase().includes(q) ||
-                (it.pk   || '').toLowerCase().includes(q));
-        }
-        if (dlIncFiltreTipus) {
-            incidencies = incidencies.filter(it => it.tipusIncidencia === dlIncFiltreTipus);
-        }
-        incidencies.sort((a, b) => dlIncOrdre === 'desc' ? (b.ts || 0) - (a.ts || 0) : (a.ts || 0) - (b.ts || 0));
+        const incidencies = _dlIncItemsFiltrats(items);
+        const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
 
-        const countEl = document.getElementById('dlCountInc');
-        if (countEl) countEl.textContent = `${incidencies.length} incidènci${incidencies.length !== 1 ? 'es' : 'a'}`;
+        const countEl = document.getElementById('dlMatchCountInc');
+        if (countEl) countEl.textContent = `Coincideixen amb els filtres: ${incidencies.length} incidènci${incidencies.length !== 1 ? 'es' : 'a'}`;
 
         if (incidencies.length === 0) {
-            container.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
-                <div style='font-size:2.5rem;margin-bottom:12px;'>🚧</div>
-                <div style='font-weight:600;'>Cap incidència trobada</div>
-                <div style='font-size:0.82rem;margin-top:6px;'>Les fotos amb "Tipus d'incidència" marcat a Foto Ràpida apareixeran aquí</div>
+            container.innerHTML = `<div style='text-align:center;padding:30px 16px;color:var(--text-muted);'>
+                <div style='font-size:2rem;margin-bottom:8px;'>🚧</div>
+                <div style='font-weight:600;font-size:0.85rem;'>Cap incidència amb aquests filtres</div>
             </div>`;
             _renderFitxesAnimals(q);
             return;
         }
 
-        let html = '';
-
-        if (!dlIncFiltreTipus) {
-            // "Totes" seleccionat: una única targeta amb totes les incidències, ja ordenades
-            html += `<div class="dl-card" style="margin-bottom:12px;">
-                <div class="dl-card-header">
-                    <div style="min-width:0;flex:1;">
-                        <div class="dl-card-title">📋 Totes les incidències</div>
-                        <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} amb incidència registrada · ${dlIncOrdre === 'desc' ? 'més recents primer' : 'més antigues primer'}</div>
-                    </div>
-                </div>
-                <div class="dl-actions" style="margin-top:8px;">
-                    ${_incActionBtns('')}
-                </div>
-            </div>`;
+        if (dlIncAlcance === 'algunes') {
+            container.innerHTML = incidencies.map(it => {
+                const checked = dlIncSeleccioIds.has(it.id);
+                const icon = INC_TIPUS_ICONS[it.tipusIncidencia] || '⚠️';
+                return `<label class="dl-inc-check-item">
+                    <input type="checkbox" ${checked ? 'checked' : ''} onchange="dlIncToggleSeleccio('${it.id}', this.checked)">
+                    ${it.imgData ? `<img src="${it.imgData}" loading="lazy">` : ''}
+                    <span style="flex:1;">${icon} ${it.carr || '—'} · PK ${it.pk || '—'}${it.marge ? (' · ' + it.marge) : ''}</span>
+                </label>`;
+            }).join('');
         } else {
-            // Tipus concret seleccionat: una sola targeta amb només aquest tipus
-            const icon = INC_TIPUS_ICONS[dlIncFiltreTipus] || '⚠️';
-            html += `<div class="dl-card" style="margin-bottom:12px;">
-                <div class="dl-card-header">
-                    <div style="min-width:0;flex:1;">
-                        <div class="dl-card-title">${icon} ${dlIncFiltreTipus}</div>
-                        <div class="dl-card-meta">${incidencies.length} foto${incidencies.length !== 1 ? 's' : ''} · ${dlIncOrdre === 'desc' ? 'més recents primer' : 'més antigues primer'}</div>
-                    </div>
-                </div>
-                <div class="dl-actions" style="margin-top:8px;">
-                    ${_incActionBtns(dlIncFiltreTipus)}
-                </div>
-            </div>`;
+            container.innerHTML = '';
         }
 
-        container.innerHTML = html;
         _renderFitxesAnimals(q);
+    });
+}
+
+/* Descàrrega directa d'un blob (sense passar pel modal de compartir) */
+function _dlDescarregarBlobDirecte(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* Genera i descarrega un ZIP amb les fotos de les incidències donades */
+async function _dlIncDescarregarZip(incidencies, titolBase, date) {
+    const zip = new JSZip();
+    let n = 0;
+    incidencies.forEach((it, idx) => {
+        if (!it.imgData) return;
+        const base64 = it.imgData.split(',')[1];
+        const metres = (it.pk || '0').toString().replace('+', '_');
+        const dataFoto = it.ts ? new Date(it.ts).toISOString().slice(0, 10) : date;
+        const nom = `${(it.carr || 'SC')}_PK${metres}_${dataFoto}_${String(idx + 1).padStart(3, '0')}`
+            .replace(/[^a-z0-9_+]/gi, '_') + '.jpg';
+        zip.file(nom, base64, { base64: true });
+        n++;
+    });
+    if (n === 0) return;
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const slug = titolBase.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+    _dlDescarregarBlobDirecte(blob, `Fotos_${slug}_${date}.zip`);
+}
+
+/* Botó principal "Generar informe": aplica tots els filtres del panell i genera PDF (+ ZIP/Excel si toca) */
+async function dlIncGenerarInforme() {
+    if (!db) { alert('La base de dades encara no està llesta, torna-ho a provar en un moment.'); return; }
+    galeriaLlegirTotes(async (items) => {
+        let incidencies = _dlIncItemsFiltrats(items);
+        if (dlIncAlcance === 'algunes') {
+            incidencies = incidencies.filter(it => dlIncSeleccioIds.has(it.id));
+        }
+        if (incidencies.length === 0) {
+            alert('No hi ha incidències que coincideixin amb els filtres seleccionats.');
+            return;
+        }
+
+        showSpinner('GENERANT INFORME...');
+        try {
+            let titolBase = dlIncFiltreTipus ? `Incidències — ${dlIncFiltreTipus}` : 'Incidències — Totes';
+            if (dlIncEstatFiltre === 'pendents') titolBase += ' (Pendents)';
+            else if (dlIncEstatFiltre === 'reparades') titolBase += ' (Reparades)';
+            const date = new Date().toISOString().slice(0, 10);
+            const slug = titolBase.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+
+            if (dlIncExportZip) await _dlIncDescarregarZip(incidencies, titolBase, date);
+
+            if (dlIncExportExcel) {
+                const pExcel = _buildProjecteVirtualIncidencies(incidencies, titolBase);
+                const blobExcel = generarBlobExcel(pExcel);
+                _dlDescarregarBlobDirecte(blobExcel, `Incidencies_${slug}_${date}.xlsx`);
+            }
+
+            const p = _buildProjecteVirtualIncidencies(incidencies, titolBase);
+            currentBlob = await generarBlobPDF(p, dlIncFormat);
+            currentFileName = `${dlIncFormat}_Incidencies_${slug}_${date}.pdf`;
+
+            document.getElementById('exportTitle').innerText = dlIncFormat.toUpperCase();
+            document.getElementById('exportName').innerText = currentFileName;
+            document.getElementById('btnShare').onclick = () => {
+                const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
+                if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
+                else alert('El teu navegador no permet compartir directament.');
+                closeExportModal();
+            };
+            document.getElementById('btnDownload').onclick = () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(currentBlob);
+                a.download = currentFileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                closeExportModal();
+            };
+            hideSpinner();
+            document.getElementById('exportModal').style.display = 'flex';
+        } catch (err) {
+            hideSpinner();
+            alert('Error generant l\'informe: ' + err.message);
+        }
     });
 }
 
@@ -9217,7 +9620,7 @@ function _incActionBtns(tipusFiltre) {
 function _buildProjecteVirtualIncidencies(items, titol) {
     const fields = [
         { label: 'Carretera' }, { label: 'PK' }, { label: 'Marge' }, { label: 'Data' },
-        { label: "Tipus d'incidència" }, { label: 'Senyals afectades' }, { label: 'Detall biona' }
+        { label: "Tipus d'incidència" }, { label: 'Senyals afectades' }, { label: 'Detall biona' }, { label: 'Estat' }
     ];
     const registros = items
         .sort((a, b) => (b.ts || 0) - (a.ts || 0))
@@ -9235,7 +9638,8 @@ function _buildProjecteVirtualIncidencies(items, titol) {
                     { label: 'Data', val: dataStr },
                     { label: "Tipus d'incidència", val: it.tipusIncidencia || '—' },
                     { label: 'Senyals afectades', val: senyalsList },
-                    { label: 'Detall biona', val: it.biona || '—' }
+                    { label: 'Detall biona', val: it.biona || '—' },
+                    { label: 'Estat', val: it.reparada ? '✅ Reparada' : '⏳ Pendent' }
                 ],
                 fotos: it.imgData ? [it.imgData] : []
             };
@@ -10060,6 +10464,7 @@ function renderGaleria() {
             <div class="galeria-thumb ${sel}" data-id="${item.id}" onclick="galeriaThumbnailClick('${item.id}')">
                 <img src="${item.imgData}" loading="lazy" alt="${roadLabel}">
                 <div class="galeria-thumb-check">${sel ? '✓' : ''}</div>
+                ${item.reparada ? '<div class="galeria-thumb-reparada" title="Reparada">✓</div>' : ''}
                 <div class="galeria-thumb-info">
                     <div class="galeria-thumb-road">${roadLabel}</div>
                     ${pkLabel ? `<div class="galeria-thumb-pk">${pkLabel}</div>` : ''}
@@ -10144,6 +10549,7 @@ const _galeriaIncOptions = [
     { value: '', label: 'Totes les incidències' },
     { value: 'Animal', label: '🐾 Animal' },
     { value: 'Senyalització malmesa', label: '🚧 Senyalització malmesa' },
+    { value: 'Biona', label: '🛡️ Biona' },
     { value: 'Sot/Esquerda', label: '🕳️ Sot/Esquerda' },
     { value: 'Accident/Averiat', label: '🚗 Accident/Averiat' },
     { value: 'Incidència indefinida', label: '❓ Incidència indefinida' },
@@ -10280,6 +10686,7 @@ function _galeriaTextCompartir(item) {
         lines.push(`🚧 Senyal: ${item.senyalCodi} ${item.senyalNom ? '· ' + item.senyalNom : ''} ${item.senyalEstat ? '(' + item.senyalEstat + ')' : ''}`);
     }
     if (item.biona) lines.push(`🛡️ Biona: ${item.biona}`);
+    if (item.tipusIncidencia) lines.push(item.reparada ? '✅ Estat: Reparada' : '⏳ Estat: Pendent de reparar');
     if (item.lat && item.lon) {
         const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
         lines.push(`🌐 Ubicació: ${url}`);
@@ -10879,6 +11286,20 @@ function obrirEditorFotoDirecta(imgData) {
             </div>
         </div>
 
+        <div class="watermark-row" style="margin-bottom:18px;">
+            <div class="watermark-row-info">
+                <span class="watermark-row-icon">✅</span>
+                <div class="watermark-row-text">
+                    <div class="wm-title">Reparada</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Marca-ho quan la incidència ja estigui solucionada</div>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="fd_reparada">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         ${(!_fdEditId && (_galeriaQueueActiu || _galeriaImgQueue.length > 0)) ? `
         <div style="background:var(--accent-blue-lt); border:1px solid var(--cat-inventari-bd); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:0.82rem; color:var(--accent-blue); display:flex; align-items:center; gap:8px;">
             <span style="font-size:1rem;">📂</span>
@@ -10922,6 +11343,8 @@ function obrirEditorFotoDirecta(imgData) {
         if (bionaWrap) bionaWrap.style.display = (o.tipusIncidencia === 'Biona') ? 'block' : 'none';
         const elBionaDetall = document.getElementById('fd_biona_detall');
         if (elBionaDetall) elBionaDetall.value = o.biona || '';
+        const elReparada = document.getElementById('fd_reparada');
+        if (elReparada) elReparada.checked = !!o.reparada;
         // Senyals: suporta el format nou (array, múltiples) i el format antic (un sol camp)
         if (Array.isArray(o.senyals) && o.senyals.length) {
             _senyalsSeleccionades = o.senyals.map(s => ({ ...s }));
@@ -11101,6 +11524,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         const margeE = document.getElementById('fd_marge').value;
         const tipusE = document.getElementById('fd_tipus_incidencia')?.value || '';
         const bionaE = document.getElementById('fd_biona_detall')?.value.trim() || '';
+        const reparadaE = document.getElementById('fd_reparada')?.checked || false;
 
         showSpinner('DESANT CANVIS...');
         const itemActualitzat = {
@@ -11112,6 +11536,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
             senyals: (tipusE === 'Senyalització malmesa') ? _senyalsSeleccionades.map(s => ({ ...s })) : [],
             senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
             biona: (tipusE === 'Biona') ? bionaE : '',
+            reparada: reparadaE,
         };
 
         let peuRegenerat = false;
@@ -11161,6 +11586,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     const incDatetime = document.getElementById('fd_datetime')?.checked ?? true;
     const tipusIncidencia = document.getElementById('fd_tipus_incidencia')?.value || '';
     const bionaDetall = document.getElementById('fd_biona_detall')?.value.trim() || '';
+    const reparadaVal = document.getElementById('fd_reparada')?.checked || false;
 
     // Desar preferència data/hora
     try { localStorage.setItem('fd_datetime_pref', incDatetime ? 'true' : 'false'); } catch(e) {}
@@ -11200,6 +11626,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         senyals: (tipusIncidencia === 'Senyalització malmesa') ? _senyalsSeleccionades.map(s => ({ ...s })) : [],
         senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
         biona: (tipusIncidencia === 'Biona') ? bionaDetall : '',
+        reparada: reparadaVal,
         ts:       ara.getTime(),
         coordStr: '',
         lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
