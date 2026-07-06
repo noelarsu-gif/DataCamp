@@ -6263,6 +6263,17 @@ input:checked + .slider:before { transform: translateX(20px); }
              style="display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px; max-height:42vh; overflow-y:auto; padding:6px; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--surface-alt,#fafafa);">
         </div>
 
+        <div style="display:flex; align-items:center; gap:8px; margin:12px 0 8px;">
+            <div style="flex:1; height:1px; background:var(--border-color);"></div>
+            <span style="font-size:0.72rem; color:var(--text-muted);">o bé</span>
+            <div style="flex:1; height:1px; background:var(--border-color);"></div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:4px;">
+            <input type="text" id="catSenyalAltreText" placeholder="Altre: descriu la senyal..."
+                   style="flex:1; padding:9px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.85rem;">
+            <button class="btn btn-primary" style="margin:0; padding:9px 14px; white-space:nowrap;" onclick="afegirSenyalAltre()">➕ Afegir</button>
+        </div>
+
         <div id="catSenyalsCarregant" style="text-align:center; padding:14px; font-size:0.8rem; color:var(--text-muted);">
             Carregant catàleg…
         </div>
@@ -6288,10 +6299,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <option>Desapareguda</option>
                 <option>Mal ubicada</option>
             </select>
-            <button class="btn btn-primary" style="margin:0;" onclick="confirmarSenyalCataleg()">✔️ Confirmar senyal</button>
+            <button class="btn btn-primary" style="margin:0;" onclick="confirmarSenyalCataleg()">➕ Afegir senyal</button>
         </div>
 
-        <button class="btn btn-ghost" style="font-size:0.85rem; margin:10px 0 0;" onclick="tancarCatalegSenyals()">Tancar</button>
+        <button class="btn btn-ghost" style="font-size:0.85rem; margin:10px 0 0;" onclick="tancarCatalegSenyals()">Fet, tancar</button>
     </div>
 </div>
 
@@ -7006,7 +7017,7 @@ function aplicarMarcaAigua(base64, text) {
             ctx.textBaseline = "bottom";
             ctx.fillText(text, Math.round(canvas.width * 0.015), canvas.height - Math.round(hBarra * 0.12));
 
-            resolve(canvas.toDataURL("image/jpeg", 0.82));
+            resolve(canvas.toDataURL("image/jpeg", 0.92));
         };
         img.src = base64;
     });
@@ -7142,12 +7153,12 @@ async function handleFotos(input) {
             const img = new Image();
             img.onload = () => {
                 const cvs = document.createElement("canvas");
-                const max = 900;
+                const max = 1600;
                 let w = img.width, h = img.height;
                 if (w > max) { h *= max / w; w = max; }
                 cvs.width = w; cvs.height = h;
                 cvs.getContext("2d").drawImage(img, 0, 0, w, h);
-                const base64 = cvs.toDataURL("image/jpeg", 0.75);
+                const base64 = cvs.toDataURL("image/jpeg", 0.90);
                 if (isFotoDirecta) {
                     tmpFotos = [];
                     obrirEditorFotoDirecta(base64);
@@ -9206,13 +9217,16 @@ function _incActionBtns(tipusFiltre) {
 function _buildProjecteVirtualIncidencies(items, titol) {
     const fields = [
         { label: 'Carretera' }, { label: 'PK' }, { label: 'Marge' }, { label: 'Data' },
-        { label: "Tipus d'incidència" }, { label: 'Codi senyal' }, { label: 'Estat senyal' }
+        { label: "Tipus d'incidència" }, { label: 'Senyals afectades' }, { label: 'Detall biona' }
     ];
     const registros = items
         .sort((a, b) => (b.ts || 0) - (a.ts || 0))
         .map(it => {
             const d = it.ts ? new Date(it.ts) : null;
             const dataStr = d ? `${d.toLocaleDateString('ca-ES')} ${d.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}` : '—';
+            const senyalsList = Array.isArray(it.senyals) && it.senyals.length
+                ? it.senyals.map(s => `${s.codi}${s.nom ? ' · ' + s.nom : ''}${s.estat ? ' (' + s.estat + ')' : ''}`).join('; ')
+                : (it.senyalCodi ? `${it.senyalCodi}${it.senyalNom ? ' · ' + it.senyalNom : ''}${it.senyalEstat ? ' (' + it.senyalEstat + ')' : ''}` : '—');
             return {
                 values: [
                     { label: 'Carretera', val: it.carr || '—' },
@@ -9220,8 +9234,8 @@ function _buildProjecteVirtualIncidencies(items, titol) {
                     { label: 'Marge', val: it.marge || '—' },
                     { label: 'Data', val: dataStr },
                     { label: "Tipus d'incidència", val: it.tipusIncidencia || '—' },
-                    { label: 'Codi senyal', val: it.senyalCodi ? `${it.senyalCodi}${it.senyalNom ? ' · ' + it.senyalNom : ''}` : '—' },
-                    { label: 'Estat senyal', val: it.senyalEstat || '—' }
+                    { label: 'Senyals afectades', val: senyalsList },
+                    { label: 'Detall biona', val: it.biona || '—' }
                 ],
                 fotos: it.imgData ? [it.imgData] : []
             };
@@ -10260,7 +10274,12 @@ function _galeriaTextCompartir(item) {
     if (item.carr) lines.push(`🛣️ Carretera: ${item.carr}`);
     if (item.pk)   lines.push(`📍 PK: ${item.pk}${item.marge ? ' · ' + item.marge : ''}`);
     if (item.tipusIncidencia) lines.push(`⚠️ Incidència: ${item.tipusIncidencia}`);
-    if (item.senyalCodi) lines.push(`🚧 Senyal: ${item.senyalCodi} ${item.senyalNom ? '· ' + item.senyalNom : ''} ${item.senyalEstat ? '(' + item.senyalEstat + ')' : ''}`);
+    if (Array.isArray(item.senyals) && item.senyals.length) {
+        item.senyals.forEach(s => lines.push(`🚧 Senyal: ${s.codi}${s.nom ? ' · ' + s.nom : ''}${s.estat ? ' (' + s.estat + ')' : ''}`));
+    } else if (item.senyalCodi) {
+        lines.push(`🚧 Senyal: ${item.senyalCodi} ${item.senyalNom ? '· ' + item.senyalNom : ''} ${item.senyalEstat ? '(' + item.senyalEstat + ')' : ''}`);
+    }
+    if (item.biona) lines.push(`🛡️ Biona: ${item.biona}`);
     if (item.lat && item.lon) {
         const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
         lines.push(`🌐 Ubicació: ${url}`);
@@ -10829,10 +10848,13 @@ function obrirEditorFotoDirecta(imgData) {
                 document.getElementById('fdBtnSenyal').style.display = (this.value === 'Senyalització malmesa') ? 'flex' : 'none';
                 if(this.value !== 'Senyalització malmesa') eliminarSenyalChip();
                 document.getElementById('fdBtnAnimal').style.display = (this.value === 'Animal') ? 'flex' : 'none';
+                document.getElementById('fdBionaWrap').style.display = (this.value === 'Biona') ? 'block' : 'none';
+                if(this.value !== 'Biona') document.getElementById('fd_biona_detall').value = '';
             ">
                 <option value="">— Cap —</option>
                 <option value="Animal">🐾 Animal</option>
                 <option value="Senyalització malmesa">🚧 Senyalització malmesa</option>
+                <option value="Biona">🛡️ Biona (barrera de seguretat)</option>
                 <option value="Sot/Esquerda">🕳️ Sot/Esquerda</option>
                 <option value="Accident/Averiat">🚗 Accident/Averiat</option>
                 <option value="Incidència indefinida">❓ Incidència indefinida</option>
@@ -10840,18 +10862,21 @@ function obrirEditorFotoDirecta(imgData) {
 
             <button type="button" id="fdBtnSenyal" onclick="obrirCatalegSenyals()"
                     style="display:none; align-items:center; gap:6px; width:100%; margin-top:8px; padding:9px 12px; border-radius:var(--radius-sm); border:1px dashed var(--primary); background:#fff; color:var(--primary); font-size:0.82rem; font-weight:600; cursor:pointer;">
-                🚧 Seleccionar senyal del catàleg
+                ➕ Afegir senyal del catàleg
             </button>
 
-            <div id="fdSenyalChip" style="display:none; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; padding:8px 10px; background:var(--accent-blue-lt); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--accent-blue);">
-                <span class="fd-senyal-chip-text" style="flex:1;"></span>
-                <span onclick="eliminarSenyalChip()" style="cursor:pointer; font-weight:700; padding:0 4px;">✕</span>
-            </div>
+            <div id="fdSenyalChips" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;"></div>
 
             <button type="button" id="fdBtnAnimal" onclick="_fdObrirFitxaAnimal()"
                     style="display:none; align-items:center; gap:6px; width:100%; margin-top:8px; padding:9px 12px; border-radius:var(--radius-sm); border:1px dashed var(--primary); background:#fff; color:var(--primary); font-size:0.82rem; font-weight:600; cursor:pointer;">
                 🐾📋 Omplir fitxa completa d'animal
             </button>
+
+            <div id="fdBionaWrap" style="display:none; margin-top:8px;">
+                <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">🛡️ Detall de la biona (trams, pals, metres...)</label>
+                <textarea id="fd_biona_detall" rows="3" placeholder="Ex: 2 trams i 2 pals malmesos"
+                          style="width:100%; padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); font-size:0.85rem; font-family:inherit; resize:vertical;"></textarea>
+            </div>
         </div>
 
         ${(!_fdEditId && (_galeriaQueueActiu || _galeriaImgQueue.length > 0)) ? `
@@ -10893,15 +10918,19 @@ function obrirEditorFotoDirecta(imgData) {
         if (btnSenyal) btnSenyal.style.display = (o.tipusIncidencia === 'Senyalització malmesa') ? 'flex' : 'none';
         const btnAnimal = document.getElementById('fdBtnAnimal');
         if (btnAnimal) btnAnimal.style.display = (o.tipusIncidencia === 'Animal') ? 'flex' : 'none';
-        if (o.senyalCodi) {
-            _senyalSeleccionada = { codi: o.senyalCodi, nom: o.senyalNom || '', estat: o.senyalEstat || '' };
-            const chip = document.getElementById('fdSenyalChip');
-            if (chip) {
-                chip.style.display = 'flex';
-                chip.querySelector('.fd-senyal-chip-text').textContent =
-                    `${o.senyalCodi}${o.senyalNom ? ' · ' + o.senyalNom : ''}${o.senyalEstat ? ' — ' + o.senyalEstat : ''}`;
-            }
+        const bionaWrap = document.getElementById('fdBionaWrap');
+        if (bionaWrap) bionaWrap.style.display = (o.tipusIncidencia === 'Biona') ? 'block' : 'none';
+        const elBionaDetall = document.getElementById('fd_biona_detall');
+        if (elBionaDetall) elBionaDetall.value = o.biona || '';
+        // Senyals: suporta el format nou (array, múltiples) i el format antic (un sol camp)
+        if (Array.isArray(o.senyals) && o.senyals.length) {
+            _senyalsSeleccionades = o.senyals.map(s => ({ ...s }));
+        } else if (o.senyalCodi) {
+            _senyalsSeleccionades = [{ codi: o.senyalCodi, nom: o.senyalNom || '', estat: o.senyalEstat || '' }];
+        } else {
+            _senyalsSeleccionades = [];
         }
+        _renderFdSenyalChips();
     }
 
     // ── Connectar el botó Auto-PK de Foto Ràpida ──────────────────
@@ -11071,6 +11100,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         const pkE    = document.getElementById('fd_pk').value || "0";
         const margeE = document.getElementById('fd_marge').value;
         const tipusE = document.getElementById('fd_tipus_incidencia')?.value || '';
+        const bionaE = document.getElementById('fd_biona_detall')?.value.trim() || '';
 
         showSpinner('DESANT CANVIS...');
         const itemActualitzat = {
@@ -11079,9 +11109,9 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
             pk: pkE,
             marge: margeE,
             tipusIncidencia: tipusE,
-            senyalCodi:  (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.codi  : '',
-            senyalNom:   (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.nom   : '',
-            senyalEstat: (tipusE === 'Senyalització malmesa' && _senyalSeleccionada) ? _senyalSeleccionada.estat : '',
+            senyals: (tipusE === 'Senyalització malmesa') ? _senyalsSeleccionades.map(s => ({ ...s })) : [],
+            senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
+            biona: (tipusE === 'Biona') ? bionaE : '',
         };
 
         let peuRegenerat = false;
@@ -11130,6 +11160,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     const wm    = document.getElementById('fd_watermark').checked;
     const incDatetime = document.getElementById('fd_datetime')?.checked ?? true;
     const tipusIncidencia = document.getElementById('fd_tipus_incidencia')?.value || '';
+    const bionaDetall = document.getElementById('fd_biona_detall')?.value.trim() || '';
 
     // Desar preferència data/hora
     try { localStorage.setItem('fd_datetime_pref', incDatetime ? 'true' : 'false'); } catch(e) {}
@@ -11166,9 +11197,9 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         wmDatetime: incDatetime,  // si el peu incloïa data/hora
         carr, pk, marge,
         tipusIncidencia,
-        senyalCodi:  _senyalSeleccionada ? _senyalSeleccionada.codi : '',
-        senyalNom:   _senyalSeleccionada ? _senyalSeleccionada.nom : '',
-        senyalEstat: _senyalSeleccionada ? _senyalSeleccionada.estat : '',
+        senyals: (tipusIncidencia === 'Senyalització malmesa') ? _senyalsSeleccionades.map(s => ({ ...s })) : [],
+        senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
+        biona: (tipusIncidencia === 'Biona') ? bionaDetall : '',
         ts:       ara.getTime(),
         coordStr: '',
         lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
@@ -12454,7 +12485,8 @@ function _carregarSenyalsCatalegLazy() {
 /* ============================================================
    CATÀLEG DE SENYALITZACIÓ — selector visual
    ============================================================ */
-let _senyalSeleccionada = null; // {codi, nom, estat}
+let _senyalsSeleccionades = []; // [{codi, nom, estat}, ...] — sense límit
+let _senyalTempSeleccionada = null; // senyal del catàleg triada, pendent de confirmar l'estat
 
 function obrirCatalegSenyals() {
     _carregarSenyalsCatalegLazy();
@@ -12499,7 +12531,7 @@ function renderCatalegSenyals() {
 }
 
 function seleccionarSenyalCataleg(s) {
-    _senyalSeleccionada = { codi: s.c, nom: s.n, img: s.img, estat: '' };
+    _senyalTempSeleccionada = { codi: s.c, nom: s.n, img: s.img, estat: '' };
     document.getElementById('catSenyalsPanellImg').innerHTML = `<img src="data:image/png;base64,${s.img}" style="width:100%;height:auto;display:block;">`;
     document.getElementById('catSenyalsPanellNom').textContent = s.n;
     document.getElementById('catSenyalsPanellCodi').textContent = s.c;
@@ -12507,21 +12539,48 @@ function seleccionarSenyalCataleg(s) {
 }
 
 function confirmarSenyalCataleg() {
-    if (!_senyalSeleccionada) return;
-    _senyalSeleccionada.estat = document.getElementById('catSenyalsEstat').value;
-    const chip = document.getElementById('fdSenyalChip');
-    if (chip) {
-        chip.style.display = 'flex';
-        chip.querySelector('.fd-senyal-chip-text').textContent =
-            `${_senyalSeleccionada.codi} · ${_senyalSeleccionada.nom} — ${_senyalSeleccionada.estat}`;
-    }
-    tancarCatalegSenyals();
+    if (!_senyalTempSeleccionada) return;
+    _senyalTempSeleccionada.estat = document.getElementById('catSenyalsEstat').value;
+    _senyalsSeleccionades.push(_senyalTempSeleccionada);
+    _senyalTempSeleccionada = null;
+    _renderFdSenyalChips();
+    document.getElementById('catSenyalsPanell').style.display = 'none';
+    const cerca = document.getElementById('catSenyalsCerca');
+    if (cerca) cerca.value = '';
+    renderCatalegSenyals();
+    showToast('✅ Senyal afegida');
+    // El modal es queda obert perquè es puguin afegir més senyals; es tanca amb "Fet, tancar"
 }
 
-function eliminarSenyalChip() {
-    _senyalSeleccionada = null;
-    const chip = document.getElementById('fdSenyalChip');
-    if (chip) chip.style.display = 'none';
+function afegirSenyalAltre() {
+    const input = document.getElementById('catSenyalAltreText');
+    const text = (input?.value || '').trim();
+    if (!text) { showToast('Escriu una descripció per a "Altre"'); return; }
+    _senyalsSeleccionades.push({ codi: 'Altre', nom: text, estat: '' });
+    input.value = '';
+    _renderFdSenyalChips();
+    showToast('✅ Senyal afegida');
+}
+
+/* Repinta la llista de xips de senyals seleccionades al formulari de foto directa */
+function _renderFdSenyalChips() {
+    const cont = document.getElementById('fdSenyalChips');
+    if (!cont) return;
+    cont.innerHTML = _senyalsSeleccionades.map((s, idx) => `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; background:var(--accent-blue-lt); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--accent-blue);">
+            <span style="flex:1;">${s.codi}${s.nom ? ' · ' + s.nom : ''}${s.estat ? ' — ' + s.estat : ''}</span>
+            <span onclick="eliminarSenyalChip(${idx})" style="cursor:pointer; font-weight:700; padding:0 4px;">✕</span>
+        </div>`).join('');
+}
+
+/* Sense argument: neteja tota la llista. Amb índex: elimina només aquella senyal. */
+function eliminarSenyalChip(idx) {
+    if (typeof idx === 'number') {
+        _senyalsSeleccionades.splice(idx, 1);
+    } else {
+        _senyalsSeleccionades = [];
+    }
+    _renderFdSenyalChips();
 }
 
 /* ============================================================
