@@ -9639,7 +9639,7 @@ function _buildProjecteVirtualIncidencies(items, titol) {
                     { label: "Tipus d'incidència", val: it.tipusIncidencia || '—' },
                     { label: 'Senyals afectades', val: senyalsList },
                     { label: 'Detall biona', val: it.biona || '—' },
-                    { label: 'Estat', val: it.reparada ? '✅ Reparada' : '⏳ Pendent' }
+                    { label: 'Estat', val: it.reparada ? `✅ Reparada${it.reparadaTs ? ' (' + new Date(it.reparadaTs).toLocaleDateString('ca-ES') + ')' : ''}` : '⏳ Pendent' }
                 ],
                 fotos: it.imgData ? [it.imgData] : []
             };
@@ -10686,7 +10686,10 @@ function _galeriaTextCompartir(item) {
         lines.push(`🚧 Senyal: ${item.senyalCodi} ${item.senyalNom ? '· ' + item.senyalNom : ''} ${item.senyalEstat ? '(' + item.senyalEstat + ')' : ''}`);
     }
     if (item.biona) lines.push(`🛡️ Biona: ${item.biona}`);
-    if (item.tipusIncidencia) lines.push(item.reparada ? '✅ Estat: Reparada' : '⏳ Estat: Pendent de reparar');
+    if (item.tipusIncidencia) {
+        const dataRep = item.reparadaTs ? new Date(item.reparadaTs).toLocaleDateString('ca-ES') : '';
+        lines.push(item.reparada ? `✅ Estat: Reparada${dataRep ? ' el ' + dataRep : ''}` : '⏳ Estat: Pendent de reparar');
+    }
     if (item.lat && item.lon) {
         const url = `http://maps.google.com/maps?q=${item.lat.toFixed(7)},${item.lon.toFixed(7)}`;
         lines.push(`🌐 Ubicació: ${url}`);
@@ -11286,7 +11289,7 @@ function obrirEditorFotoDirecta(imgData) {
             </div>
         </div>
 
-        <div class="watermark-row" style="margin-bottom:18px;">
+        <div class="watermark-row" style="margin-bottom:4px;">
             <div class="watermark-row-info">
                 <span class="watermark-row-icon">✅</span>
                 <div class="watermark-row-text">
@@ -11295,10 +11298,11 @@ function obrirEditorFotoDirecta(imgData) {
                 </div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="fd_reparada">
+                <input type="checkbox" id="fd_reparada" onchange="document.getElementById('fdReparadaInfo').textContent = this.checked ? 'Es marcarà com reparada avui, ' + new Date().toLocaleDateString('ca-ES') : '';">
                 <span class="slider"></span>
             </label>
         </div>
+        <div id="fdReparadaInfo" style="font-size:0.76rem; color:var(--accent-blue); font-weight:600; margin:0 0 18px 2px;"></div>
 
         ${(!_fdEditId && (_galeriaQueueActiu || _galeriaImgQueue.length > 0)) ? `
         <div style="background:var(--accent-blue-lt); border:1px solid var(--cat-inventari-bd); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:0.82rem; color:var(--accent-blue); display:flex; align-items:center; gap:8px;">
@@ -11345,6 +11349,12 @@ function obrirEditorFotoDirecta(imgData) {
         if (elBionaDetall) elBionaDetall.value = o.biona || '';
         const elReparada = document.getElementById('fd_reparada');
         if (elReparada) elReparada.checked = !!o.reparada;
+        const reparadaInfo = document.getElementById('fdReparadaInfo');
+        if (reparadaInfo) {
+            reparadaInfo.textContent = (o.reparada && o.reparadaTs)
+                ? `Reparada el ${new Date(o.reparadaTs).toLocaleDateString('ca-ES')}`
+                : '';
+        }
         // Senyals: suporta el format nou (array, múltiples) i el format antic (un sol camp)
         if (Array.isArray(o.senyals) && o.senyals.length) {
             _senyalsSeleccionades = o.senyals.map(s => ({ ...s }));
@@ -11525,6 +11535,10 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         const tipusE = document.getElementById('fd_tipus_incidencia')?.value || '';
         const bionaE = document.getElementById('fd_biona_detall')?.value.trim() || '';
         const reparadaE = document.getElementById('fd_reparada')?.checked || false;
+        // Manté la data original si ja estava marcada; en posar-la ara, la data és avui; en desmarcar-la, s'esborra
+        let reparadaTsE = _fdEditOriginal.reparadaTs || null;
+        if (reparadaE && !reparadaTsE) reparadaTsE = Date.now();
+        if (!reparadaE) reparadaTsE = null;
 
         showSpinner('DESANT CANVIS...');
         const itemActualitzat = {
@@ -11537,6 +11551,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
             senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
             biona: (tipusE === 'Biona') ? bionaE : '',
             reparada: reparadaE,
+            reparadaTs: reparadaTsE,
         };
 
         let peuRegenerat = false;
@@ -11627,6 +11642,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         senyalCodi: '', senyalNom: '', senyalEstat: '', // camps antics substituïts per 'senyals' (array)
         biona: (tipusIncidencia === 'Biona') ? bionaDetall : '',
         reparada: reparadaVal,
+        reparadaTs: reparadaVal ? ara.getTime() : null,
         ts:       ara.getTime(),
         coordStr: '',
         lat: (typeof _fdLastLat !== 'undefined' ? _fdLastLat : null),
