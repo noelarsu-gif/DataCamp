@@ -17,6 +17,7 @@
     <!-- ── JS libs locals — defer evita bloqueig del render ───── -->
     <script src="./lib/sortable/Sortable.min.js" defer></script>
     <script src="./lib/jspdf/jspdf.umd.min.js" defer></script>
+    <script src="./lib/pdflib/pdf-lib.min.js" defer></script>
     <script src="./lib/jspdf/jspdf.plugin.autotable.min.js" defer></script>
     <script src="./lib/xlsx/xlsx.full.min.js" defer></script>
     <script src="./lib/jszip/jszip.min.js" defer></script>
@@ -9026,6 +9027,99 @@ function generarBlobPDFFitxaAnimal(fitxes) {
     return doc.output('blob');
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   PDF OFICIAL "INCIDÈNCIES PROVOCADES PER ANIMALS MORTS"
+   Rellena de veritat la plantilla oficial del Departament de Territori
+   (formulari AcroForm/XFA) amb pdf-lib, en comptes de redibuixar-lo.
+   ══════════════════════════════════════════════════════════════════ */
+const ANIMAL_PDF_TEMPLATE_URL = './assets/plantilles/incidencia_animal_oficial.pdf';
+
+const ANIMAL_PDF_FIELDS = {
+    parc:               { name: 'topmostSubform[0].Page1[0].Parc[0]',        type: 'dropdown' },
+    autor:              { name: 'topmostSubform[0].Page1[0].Autor[0]',       type: 'text' },
+    data:               { name: 'topmostSubform[0].Page1[0].Dia[0]',         type: 'text' },
+    hora:               { name: 'topmostSubform[0].Page1[0].Hora[0]',        type: 'text' },
+    carretera:          { name: 'topmostSubform[0].Page1[0].Carretera[0]',   type: 'text' },
+    pk:                 { name: 'topmostSubform[0].Page1[0].Pk[0]',          type: 'text' },
+    sentit:             { name: 'topmostSubform[0].Page1[0].Sentit[0]',      type: 'dropdown' },
+    ubicacio:           { name: "topmostSubform[0].Page1[0].Ubicació[0]",    type: 'dropdown' },
+    avisCcct:           { name: 'topmostSubform[0].Page1[0].Dia[1]',         type: 'checkbox' },
+    numIncidencia:      { name: "topmostSubform[0].Page1[0].incidència[0]",  type: 'text' },
+    domestic:           { name: "topmostSubform[0].Page1[0].Domèstic[0]",    type: 'dropdown' },
+    llibertat:          { name: 'topmostSubform[0].Page1[0].llibertat[0]',   type: 'dropdown' },
+    estat:              { name: 'topmostSubform[0].Page1[0].Estat[0]',       type: 'dropdown' },
+    tamany:             { name: "topmostSubform[0].Page1[0].Distància[0]",   type: 'text' },
+    mesuresCorrectores: { name: 'topmostSubform[0].Page1[0].Mesures_correctores[0]', type: 'checkbox' },
+    tipologia:          { name: 'topmostSubform[0].Page1[0].Tipologia[0]',   type: 'dropdown' },
+    estatEntorn:        { name: 'topmostSubform[0].Page1[0].Estat[1]',       type: 'dropdown' },
+    senyalitzacio:      { name: 'topmostSubform[0].Page1[0].Mesures_correctores[1]', type: 'checkbox' },
+    pkInici:            { name: 'topmostSubform[0].Page1[0].Pk[1]',          type: 'text' },
+    pkFi:               { name: 'topmostSubform[0].Page1[0].Pk[2]',          type: 'text' },
+    matricula:          { name: "topmostSubform[0].Page1[0].matrícula[0]",   type: 'text' },
+    observacions:       { name: 'topmostSubform[0].Page1[0].Carretera[1]',   type: 'text' }, // camp gran d'observacions
+    // Nota: "Vehicle implicat" no existeix com a camp real al PDF oficial
+    // (queda imprès com a text fix "0" a la plantilla) — no es pot omplir dinàmicament.
+};
+
+function _dataUrlToBytes(dataUrl) {
+    const base64 = dataUrl.split(',')[1];
+    const raw = atob(base64);
+    const bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    return bytes;
+}
+
+async function _omplirPlantillaOficialAnimal(fitxa, templateBytes) {
+    const { PDFDocument } = PDFLib;
+    const pdfDoc = await PDFDocument.load(templateBytes);
+    const form = pdfDoc.getForm();
+
+    const setText = (name, val) => { try { form.getTextField(name).setText(val != null ? String(val) : ''); } catch (e) { console.warn('Camp text no trobat:', name); } };
+    const setCheck = (name, val) => { try { const c = form.getCheckBox(name); val ? c.check() : c.uncheck(); } catch (e) { console.warn('Checkbox no trobat:', name); } };
+    const setDrop = (name, val) => {
+        if (val === undefined || val === null || val === '') return;
+        try {
+            const d = form.getDropdown(name);
+            if (!d.getOptions().includes(val)) d.addOptions([val]);
+            d.select(val);
+        } catch (e) { console.warn('Dropdown no trobat:', name); }
+    };
+
+    Object.entries(ANIMAL_PDF_FIELDS).forEach(([key, cfg]) => {
+        const val = fitxa[key];
+        if (cfg.type === 'text') setText(cfg.name, val);
+        else if (cfg.type === 'checkbox') setCheck(cfg.name, !!val);
+        else if (cfg.type === 'dropdown') setDrop(cfg.name, val);
+    });
+
+    const fotos = fitxa.fotos || [];
+    for (let i = 0; i < Math.min(fotos.length, 6); i++) {
+        try {
+            const dataUrl = fotos[i];
+            const bytes = _dataUrlToBytes(dataUrl);
+            const img = dataUrl.startsWith('data:image/png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+            form.getButton(`topmostSubform[0].Page2[0].Foto[${i}]`).setImage(img);
+        } catch (e) { console.warn('Error inserint foto', i, e.message); }
+    }
+
+    form.updateFieldAppearances();
+    return pdfDoc;
+}
+
+/* Genera un PDF combinat (2 pàgines per fitxa) amb la plantilla oficial real */
+async function generarPDFOficialAnimals(fitxes) {
+    const { PDFDocument } = PDFLib;
+    const templateBytes = await (await fetch(ANIMAL_PDF_TEMPLATE_URL)).arrayBuffer();
+    const combinat = await PDFDocument.create();
+    for (const fitxa of fitxes) {
+        const filled = await _omplirPlantillaOficialAnimal(fitxa, templateBytes);
+        const pages = await combinat.copyPages(filled, filled.getPageIndices());
+        pages.forEach(p => combinat.addPage(p));
+    }
+    const bytes = await combinat.save();
+    return new Blob([bytes], { type: 'application/pdf' });
+}
+
 async function _exportarAnimalsHelper(fitxes, titol, format) {
     const p = _buildProjecteVirtualAnimals(fitxes, titol);
     const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
@@ -9034,7 +9128,7 @@ async function _exportarAnimalsHelper(fitxes, titol, format) {
         currentBlob = generarBlobExcel(p);
         currentFileName = `Animals_${slug}_${date}.xlsx`;
     } else if (format === 'Fitxa') {
-        currentBlob = generarBlobPDFFitxaAnimal(fitxes);
+        currentBlob = await generarPDFOficialAnimals(fitxes);
         currentFileName = `Fitxa_Animals_${slug}_${date}.pdf`;
     } else {
         currentBlob = await generarBlobPDF(p, format);
