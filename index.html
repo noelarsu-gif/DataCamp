@@ -9095,22 +9095,29 @@ async function _omplirPlantillaOficialAnimal(fitxa, templateBytes) {
     });
 
     // Marca manual de les 3 caselles (Avís de CCCT, Mesures correctores,
-    // Senyalització), dibuixada directament sobre la pàgina perquè es vegi
-    // sempre, en qualsevol visor de PDF.
+    // Senyalització). El checkbox original del PDF es dibuixa com a "widget"
+    // per SOBRE del contingut de la pàgina, així que si només dibuixem la "X"
+    // al contingut, el quadre buit del widget la tapa per davant. Per això
+    // eliminem el camp (widget) i dibuixem nosaltres el quadre + la X.
     const page1 = pdfDoc.getPages()[0];
     const boldFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-    const marcarCasella = (rect, marcada) => {
-        if (!marcada) return;
+    const marcarCasella = (fieldName, rect, marcada) => {
+        try { form.removeField(form.getCheckBox(fieldName)); } catch (e) { /* ja no existeix */ }
         const [x0, y0, x1, y1] = rect;
+        page1.drawRectangle({
+            x: x0, y: y0, width: x1 - x0, height: y1 - y0,
+            borderColor: PDFLib.rgb(0, 0, 0), borderWidth: 1,
+        });
+        if (!marcada) return;
         const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
         page1.drawText('X', {
             x: cx - 3.2, y: cy - 3.6, size: 10, font: boldFont,
             color: PDFLib.rgb(0, 0, 0),
         });
     };
-    marcarCasella([177.077, 512.089, 187.077, 522.089], fitxa.avisCcct);          // Avís de CCCT
-    marcarCasella([226.128, 408.078, 236.128, 418.078], fitxa.mesuresCorrectores); // Mesures correctores
-    marcarCasella([225.145, 364.046, 235.145, 374.046], fitxa.senyalitzacio);      // Senyalització P-24
+    marcarCasella('topmostSubform[0].Page1[0].Dia[1]', [177.077, 512.089, 187.077, 522.089], fitxa.avisCcct);
+    marcarCasella('topmostSubform[0].Page1[0].Mesures_correctores[0]', [226.128, 408.078, 236.128, 418.078], fitxa.mesuresCorrectores);
+    marcarCasella('topmostSubform[0].Page1[0].Mesures_correctores[1]', [225.145, 364.046, 235.145, 374.046], fitxa.senyalitzacio);
 
     // Els 6 quadres de la pàgina 2 NO estan numerats en ordre visual (Foto[0] és
     // el quadre inferior-dret). Aquest ordre mapeja "1a foto" → quadre superior-
