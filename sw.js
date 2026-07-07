@@ -1,9 +1,9 @@
 /* ================================================================
-   DATACAMP — SERVICE WORKER v4 (Vercel)
+   DATACAMP — SERVICE WORKER v6 (Vercel)
    BASE: arrel '/' — Vercel serveix des de l'arrel, no /DataCamp/
    ================================================================ */
 
-const CACHE_NAME    = 'datacamp-v5';
+const CACHE_NAME    = 'datacamp-v6';
 const BASE          = '/';
 const OFFLINE_URL   = BASE + 'offline.html';
 
@@ -37,6 +37,10 @@ const APP_SHELL = [
     BASE + 'lib/jspdf/jspdf.umd.min.js',
     BASE + 'lib/jspdf/jspdf.plugin.autotable.min.js',
 
+    /* ── pdf-lib (fitxa oficial d'animals) ───────────── */
+    BASE + 'lib/pdflib/pdf-lib.min.js',
+    BASE + 'assets/plantilles/incidencia_animal_oficial.pdf',
+
     /* ── SheetJS (xlsx) ──────────────────────────────── */
     BASE + 'lib/xlsx/xlsx.full.min.js',
 
@@ -64,9 +68,19 @@ const APP_SHELL = [
     BASE + 'fonts/BarlowCondensed-Black.woff2',
 ];
 
+/* Fitxers "shell" que SEMPRE s'han de comprovar contra la xarxa abans
+   que contra la cache (perquè és on viu el codi de l'app: si es
+   serveixen en Cache First, un usuari pot quedar-se dies veient una
+   versió vella encara que ja hagis pujat una de nova al servidor). */
+const NETWORK_FIRST_PATHS = [
+    BASE,
+    BASE + 'datacamp.html',
+    BASE + 'manifest.json',
+];
+
 /* ── INSTALL ─────────────────────────────────────────────────── */
 self.addEventListener('install', event => {
-    console.log('[SW] install v4');
+    console.log('[SW] install v6');
     event.waitUntil(
         caches.open(CACHE_NAME).then(async cache => {
             const results = await Promise.allSettled(
@@ -86,7 +100,7 @@ self.addEventListener('install', event => {
 
 /* ── ACTIVATE ────────────────────────────────────────────────── */
 self.addEventListener('activate', event => {
-    console.log('[SW] activate v4');
+    console.log('[SW] activate v6');
     event.waitUntil(
         caches.keys().then(keys =>
             Promise.all(
@@ -108,6 +122,17 @@ self.addEventListener('fetch', event => {
 
     if (request.method !== 'GET') return;
     if (!url.protocol.startsWith('http')) return;
+
+    /* Navegació (l'HTML principal) i el "shell" de l'app — sempre Network First.
+       Així, cada cop que obris l'app amb connexió, es demana la versió nova al
+       servidor abans que res; si estàs offline, cau a la còpia en cache. */
+    const isAppShellDoc = request.mode === 'navigate'
+        || request.destination === 'document'
+        || NETWORK_FIRST_PATHS.includes(url.pathname);
+    if (isAppShellDoc && url.hostname === self.location.hostname) {
+        event.respondWith(networkFirstForShell(request));
+        return;
+    }
 
     /* ArcGIS — sempre xarxa */
     if (url.hostname.includes('arcgis.com')) {
@@ -161,6 +186,27 @@ async function cacheFirstWithNetworkFallback(request) {
             const offlinePage = await cache.match(OFFLINE_URL);
             if (offlinePage) return offlinePage;
         }
+        return new Response('Recurs no disponible offline', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' }
+        });
+    }
+}
+
+async function networkFirstForShell(request) {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+        const networkResponse = await fetch(request, { signal: AbortSignal.timeout(5000) });
+        if (networkResponse && networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+        }
+        return networkResponse;
+    } catch (err) {
+        console.warn('[SW] Xarxa no disponible per al shell, servint cache:', request.url);
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        const offlinePage = await cache.match(OFFLINE_URL);
+        if (offlinePage) return offlinePage;
         return new Response('Recurs no disponible offline', {
             status: 503,
             headers: { 'Content-Type': 'text/plain' }
