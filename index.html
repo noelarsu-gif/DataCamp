@@ -3516,16 +3516,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex;
     align-items: center;
 }
-.dl-search-icon {
-    position: absolute;
-    left: 12px;
-    font-size: 1rem;
-    color: var(--text-muted);
-    pointer-events: none;
-}
 .dl-search {
     width: 100%;
-    padding: 11px 14px 11px 38px;
+    padding: 11px 14px;
     border: 1.5px solid var(--border-dark);
     border-radius: var(--radius-sm);
     font-family: var(--font);
@@ -5416,7 +5409,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <div class="dl-topbar">
                     <div class="dl-search-wrap">
-                        <span class="dl-search-icon">🔍</span>
                         <input type="text" id="normativaSearch" class="dl-search"
                                placeholder="Cerca: zona de servitud, PK, publicitat, sanció..."
                                oninput="normativaRenderResultats()">
@@ -5715,194 +5707,246 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <h3>&#128229; Desc&#224;rregues</h3>
                 </div>
 
-                <!-- Tabs: Inventaris / Incidències -->
-                <div class="dl-tabs" style="display:flex; gap:8px; margin-bottom:14px;">
-                    <button id="dlTabInventaris" class="dl-tab-btn dl-tab-active" onclick="dlCanviarTab('inventaris')"
-                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:var(--primary); color:#fff; font-weight:700; font-size:0.82rem; cursor:pointer;">
-                        📦 Inventaris
-                    </button>
-                    <button id="dlTabIncidencies" class="dl-tab-btn" onclick="dlCanviarTab('incidencies')"
-                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; font-size:0.82rem; cursor:pointer;">
-                        🚧 Incidències
-                    </button>
-                    <button id="dlTabITC" class="dl-tab-btn" onclick="dlCanviarTab('itc')"
-                            style="flex:1; padding:9px 6px; border-radius:var(--radius-sm); border:1px solid var(--primary); background:#fff; color:var(--primary); font-weight:700; font-size:0.82rem; cursor:pointer;">
-                        📝 ITC
-                    </button>
-                </div>
-
-                <!-- ===== TAB: INVENTARIS (contingut existent) ===== -->
-                <div id="dlPanellInventaris">
-                    <!-- Search + stats row -->
-                    <div class="dl-topbar">
-                        <div class="dl-search-wrap">
-                            <span class="dl-search-icon">&#128269;</span>
-                            <input type="text" id="dlSearch" class="dl-search"
-                                   placeholder="Cerca per obra o carretera..."
-                                   oninput="carregarLlistaDescargues()">
-                        </div>
-                        <div class="dl-count" id="dlCount"></div>
+                <div class="action-grid">
+                    <div class="action-card" onclick="ir('dlInventaris')">
+                        <div class="action-icon">📦</div>
+                        <div class="action-label">Inventaris</div>
+                        <div class="action-desc">PDF, Excel, ZIP i backups de projectes</div>
                     </div>
-
-                    <!-- Legend -->
-                    <div class="dl-legend">
-                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe PDF</span>
-                        <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel / CSV</span>
-                        <span class="dl-legend-item"><span class="dl-icon zip">&#128452;&#65039;</span> ZIP Fotos</span>
-                        <span class="dl-legend-item"><span class="dl-icon bak">&#128190;</span> Backup</span>
+                    <div class="action-card" onclick="ir('dlIncidencies')">
+                        <div class="action-icon">🚧</div>
+                        <div class="action-label">Incidències</div>
+                        <div class="action-desc">Informes d'incidències de camp</div>
                     </div>
-
-                    <!-- Table (desktop) / Cards (mobile) -->
-                    <div id="listaDescargas"></div>
-                </div>
-
-                <!-- ===== TAB: INCIDÈNCIES (nou disseny estil assistent) ===== -->
-                <div id="dlPanellIncidencies" style="display:none;">
-                    <div class="dl-topbar">
-                        <div class="dl-search-wrap">
-                            <span class="dl-search-icon">&#128269;</span>
-                            <input type="text" id="dlSearchInc" class="dl-search"
-                                   placeholder="Cerca per carretera o PK..."
-                                   oninput="carregarVistaIncidencies()">
-                        </div>
+                    <div class="action-card" onclick="ir('dlFitxaAnimal')" style="border-left:3px solid #b45309;">
+                        <div class="action-icon">🐾</div>
+                        <div class="action-label">Fitxa Animal</div>
+                        <div class="action-desc">Fitxes completes d'atropellament</div>
                     </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">📋 Tipus d'incidència</div>
-                        <div class="dl-pill-grid" id="dlIncPillGrid">
-                            <button type="button" class="dl-pill active" data-val="" onclick="dlIncSetTipus('')">Totes</button>
-                            <button type="button" class="dl-pill" data-val="Animal" onclick="dlIncSetTipus('Animal')">🐾 Animal</button>
-                            <button type="button" class="dl-pill" data-val="Senyalització malmesa" onclick="dlIncSetTipus('Senyalització malmesa')">🚧 Senyalització</button>
-                            <button type="button" class="dl-pill" data-val="Accident/Averiat" onclick="dlIncSetTipus('Accident/Averiat')">🚗 Avaria / Accident</button>
-                            <button type="button" class="dl-pill" data-val="Biona" onclick="dlIncSetTipus('Biona')">🛡️ Biona</button>
-                            <button type="button" class="dl-pill" data-val="Sot/Esquerda" onclick="dlIncSetTipus('Sot/Esquerda')">🕳️ Sot / Esquerda</button>
-                            <button type="button" class="dl-pill" data-val="Incidència indefinida" onclick="dlIncSetTipus('Incidència indefinida')">⚠️ Altres</button>
-                        </div>
+                    <div class="action-card" onclick="ir('dlITC')">
+                        <div class="action-icon">📝</div>
+                        <div class="action-label">ITC</div>
+                        <div class="action-desc">Informes tècnics de carreteres</div>
                     </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">🎯 Abast</div>
-                        <div class="dl-seg">
-                            <button type="button" class="dl-seg-btn active" id="dlIncAbastTotes" onclick="dlIncSetAlcance('totes')">Totes del tipus</button>
-                            <button type="button" class="dl-seg-btn" id="dlIncAbastAlgunes" onclick="dlIncSetAlcance('algunes')">Triar-ne algunes</button>
-                        </div>
-                    </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">✅ Estat de reparació</div>
-                        <div class="dl-seg">
-                            <button type="button" class="dl-seg-btn active" id="dlIncEstatTotes" onclick="dlIncSetEstat('totes')">Totes</button>
-                            <button type="button" class="dl-seg-btn" id="dlIncEstatPendents" onclick="dlIncSetEstat('pendents')">⏳ Pendents</button>
-                            <button type="button" class="dl-seg-btn" id="dlIncEstatReparades" onclick="dlIncSetEstat('reparades')">✅ Reparades</button>
-                        </div>
-                    </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">↕️ Ordenar per</div>
-                        <select id="dlIncOrdreCampSelect" onchange="dlIncSetOrdreCamp(this.value)"
-                                style="width:100%; padding:10px; border-radius:var(--radius-sm); border:1.5px solid var(--border-dark); font-family:var(--font); font-size:0.85rem; margin-bottom:10px;">
-                            <option value="carrPk">Carretera + PK</option>
-                            <option value="data">Data</option>
-                            <option value="tipus">Tipus d'incidència</option>
-                        </select>
-                        <div class="dl-seg">
-                            <button type="button" class="dl-seg-btn" id="dlIncOrdreAsc" onclick="dlIncSetOrdre('asc')">↑ Ascendent</button>
-                            <button type="button" class="dl-seg-btn active" id="dlIncOrdreDesc" onclick="dlIncSetOrdre('desc')">↓ Descendent</button>
-                        </div>
-                    </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">📅 Rang de dates</div>
-                        <div class="dl-seg">
-                            <button type="button" class="dl-seg-btn active" id="dlIncDataTotes" onclick="dlIncSetDataMode('totes')">Totes</button>
-                            <button type="button" class="dl-seg-btn" id="dlIncDataUnDia" onclick="dlIncSetDataMode('undia')">Un dia</button>
-                            <button type="button" class="dl-seg-btn" id="dlIncDataRang" onclick="dlIncSetDataMode('rang')">Rang</button>
-                        </div>
-                        <div id="dlIncDataUnWrap" style="display:none; margin-top:10px;">
-                            <input type="date" id="dlIncDataUnInput" onchange="dlIncDataUn=this.value; carregarVistaIncidencies();" style="width:100%;">
-                        </div>
-                        <div id="dlIncDataRangWrap" class="dl-date-row" style="display:none;">
-                            <input type="date" id="dlIncDataDesdeInput" onchange="dlIncDataDesde=this.value; carregarVistaIncidencies();">
-                            <input type="date" id="dlIncDataFinsInput" onchange="dlIncDataFins=this.value; carregarVistaIncidencies();">
-                        </div>
-                    </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">📄 Format de l'informe</div>
-                        <div class="dl-radio-card active" id="dlIncFormatFitxa" onclick="dlIncSetFormat('Fitxa')">
-                            <div class="dl-radio-dot"></div>
-                            <div class="dl-radio-text">
-                                <div class="dl-radio-title">Fitxa detallada</div>
-                                <div class="dl-radio-sub">Un bloc per incidència, amb foto gran</div>
-                            </div>
-                        </div>
-                        <div class="dl-radio-card" id="dlIncFormatTaula" onclick="dlIncSetFormat('Taula')">
-                            <div class="dl-radio-dot"></div>
-                            <div class="dl-radio-text">
-                                <div class="dl-radio-title">Taula resum</div>
-                                <div class="dl-radio-sub">Una fila per incidència — ideal per llistats llargs</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="dl-sec">
-                        <div class="dl-sec-label">📦 Exportar també</div>
-                        <div class="watermark-row" style="margin-bottom:10px;">
-                            <div class="watermark-row-info">
-                                <span class="watermark-row-icon">📦</span>
-                                <div class="watermark-row-text">
-                                    <div class="wm-title">ZIP de fotos</div>
-                                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Anomenades Carretera_PK+metres_data.jpg</div>
-                                </div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="dlIncToggleZip" onchange="dlIncExportZip=this.checked">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="watermark-row">
-                            <div class="watermark-row-info">
-                                <span class="watermark-row-icon">📊</span>
-                                <div class="watermark-row-text">
-                                    <div class="wm-title">Excel de dades</div>
-                                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Totes les columnes, una fila per incidència</div>
-                                </div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="dlIncToggleExcel" onchange="dlIncExportExcel=this.checked">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="listaIncidencies"></div>
-
-                    <div class="dl-match-count" id="dlMatchCountInc">Coincideixen amb els filtres: 0 incidències</div>
-                    <button type="button" class="dl-generate-btn" onclick="dlIncGenerarInforme()">📄 Generar informe</button>
-
-                    <div style="font-weight:700; font-size:0.85rem; margin:18px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
-                    <div id="animalFitxesWrap"></div>
-                </div>
-
-                <!-- ===== TAB: ITC (nou) ===== -->
-                <div id="dlPanellITC" style="display:none;">
-                    <div class="dl-topbar">
-                        <div class="dl-search-wrap">
-                            <span class="dl-search-icon">&#128269;</span>
-                            <input type="text" id="dlSearchITC" class="dl-search"
-                                   placeholder="Cerca per expedient, carretera o petitionari..."
-                                   oninput="carregarVistaITC()">
-                        </div>
-                        <div class="dl-count" id="dlCountITC"></div>
-                    </div>
-                    <div class="dl-legend">
-                        <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe ITC PDF</span>
-                    </div>
-                    <div id="listaITC"></div>
                 </div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
             </div>
+
+            <!-- ================================================
+                 DESCÀRREGUES · INVENTARIS
+                 ================================================ -->
+            <div id="dlInventaris" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <h3>&#128230; Inventaris</h3>
+                </div>
+
+                <!-- Search + stats row -->
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <input type="text" id="dlSearch" class="dl-search"
+                               placeholder="Cerca per obra o carretera..."
+                               oninput="carregarLlistaDescargues()">
+                    </div>
+                    <div class="dl-count" id="dlCount"></div>
+                </div>
+
+                <!-- Legend -->
+                <div class="dl-legend">
+                    <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe PDF</span>
+                    <span class="dl-legend-item"><span class="dl-icon xls">&#128202;</span> Excel / CSV</span>
+                    <span class="dl-legend-item"><span class="dl-icon zip">&#128452;&#65039;</span> ZIP Fotos</span>
+                    <span class="dl-legend-item"><span class="dl-icon bak">&#128190;</span> Backup</span>
+                </div>
+
+                <!-- Table (desktop) / Cards (mobile) -->
+                <div id="listaDescargas"></div>
+
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+            </div>
+
+            <!-- ================================================
+                 DESCÀRREGUES · INCIDÈNCIES
+                 ================================================ -->
+            <div id="dlIncidencies" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <h3>&#128679; Incidències</h3>
+                </div>
+
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <input type="text" id="dlSearchInc" class="dl-search"
+                               placeholder="Cerca per carretera o PK..."
+                               oninput="carregarVistaIncidencies()">
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">📋 Tipus d'incidència</div>
+                    <div class="dl-pill-grid" id="dlIncPillGrid">
+                        <button type="button" class="dl-pill active" data-val="" onclick="dlIncSetTipus('')">Totes</button>
+                        <button type="button" class="dl-pill" data-val="Animal" onclick="dlIncSetTipus('Animal')">🐾 Animal</button>
+                        <button type="button" class="dl-pill" data-val="Senyalització malmesa" onclick="dlIncSetTipus('Senyalització malmesa')">🚧 Senyalització</button>
+                        <button type="button" class="dl-pill" data-val="Accident/Averiat" onclick="dlIncSetTipus('Accident/Averiat')">🚗 Avaria / Accident</button>
+                        <button type="button" class="dl-pill" data-val="Biona" onclick="dlIncSetTipus('Biona')">🛡️ Biona</button>
+                        <button type="button" class="dl-pill" data-val="Sot/Esquerda" onclick="dlIncSetTipus('Sot/Esquerda')">🕳️ Sot / Esquerda</button>
+                        <button type="button" class="dl-pill" data-val="Incidència indefinida" onclick="dlIncSetTipus('Incidència indefinida')">⚠️ Altres</button>
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">🎯 Abast</div>
+                    <div class="dl-seg">
+                        <button type="button" class="dl-seg-btn active" id="dlIncAbastTotes" onclick="dlIncSetAlcance('totes')">Totes del tipus</button>
+                        <button type="button" class="dl-seg-btn" id="dlIncAbastAlgunes" onclick="dlIncSetAlcance('algunes')">Triar-ne algunes</button>
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">✅ Estat de reparació</div>
+                    <div class="dl-seg">
+                        <button type="button" class="dl-seg-btn active" id="dlIncEstatTotes" onclick="dlIncSetEstat('totes')">Totes</button>
+                        <button type="button" class="dl-seg-btn" id="dlIncEstatPendents" onclick="dlIncSetEstat('pendents')">⏳ Pendents</button>
+                        <button type="button" class="dl-seg-btn" id="dlIncEstatReparades" onclick="dlIncSetEstat('reparades')">✅ Reparades</button>
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">↕️ Ordenar per</div>
+                    <select id="dlIncOrdreCampSelect" onchange="dlIncSetOrdreCamp(this.value)"
+                            style="width:100%; padding:10px; border-radius:var(--radius-sm); border:1.5px solid var(--border-dark); font-family:var(--font); font-size:0.85rem; margin-bottom:10px;">
+                        <option value="carrPk">Carretera + PK</option>
+                        <option value="data">Data</option>
+                        <option value="tipus">Tipus d'incidència</option>
+                    </select>
+                    <div class="dl-seg">
+                        <button type="button" class="dl-seg-btn" id="dlIncOrdreAsc" onclick="dlIncSetOrdre('asc')">↑ Ascendent</button>
+                        <button type="button" class="dl-seg-btn active" id="dlIncOrdreDesc" onclick="dlIncSetOrdre('desc')">↓ Descendent</button>
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">📅 Rang de dates</div>
+                    <div class="dl-seg">
+                        <button type="button" class="dl-seg-btn active" id="dlIncDataTotes" onclick="dlIncSetDataMode('totes')">Totes</button>
+                        <button type="button" class="dl-seg-btn" id="dlIncDataUnDia" onclick="dlIncSetDataMode('undia')">Un dia</button>
+                        <button type="button" class="dl-seg-btn" id="dlIncDataRang" onclick="dlIncSetDataMode('rang')">Rang</button>
+                    </div>
+                    <div id="dlIncDataUnWrap" style="display:none; margin-top:10px;">
+                        <input type="date" id="dlIncDataUnInput" onchange="dlIncDataUn=this.value; carregarVistaIncidencies();" style="width:100%;">
+                    </div>
+                    <div id="dlIncDataRangWrap" class="dl-date-row" style="display:none;">
+                        <input type="date" id="dlIncDataDesdeInput" onchange="dlIncDataDesde=this.value; carregarVistaIncidencies();">
+                        <input type="date" id="dlIncDataFinsInput" onchange="dlIncDataFins=this.value; carregarVistaIncidencies();">
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">📄 Format de l'informe</div>
+                    <div class="dl-radio-card active" id="dlIncFormatFitxa" onclick="dlIncSetFormat('Fitxa')">
+                        <div class="dl-radio-dot"></div>
+                        <div class="dl-radio-text">
+                            <div class="dl-radio-title">Fitxa detallada</div>
+                            <div class="dl-radio-sub">Un bloc per incidència, amb foto gran</div>
+                        </div>
+                    </div>
+                    <div class="dl-radio-card" id="dlIncFormatTaula" onclick="dlIncSetFormat('Taula')">
+                        <div class="dl-radio-dot"></div>
+                        <div class="dl-radio-text">
+                            <div class="dl-radio-title">Taula resum</div>
+                            <div class="dl-radio-sub">Una fila per incidència — ideal per llistats llargs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dl-sec">
+                    <div class="dl-sec-label">📦 Exportar també</div>
+                    <div class="watermark-row" style="margin-bottom:10px;">
+                        <div class="watermark-row-info">
+                            <span class="watermark-row-icon">📦</span>
+                            <div class="watermark-row-text">
+                                <div class="wm-title">ZIP de fotos</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Anomenades Carretera_PK+metres_data.jpg</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dlIncToggleZip" onchange="dlIncExportZip=this.checked">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="watermark-row">
+                        <div class="watermark-row-info">
+                            <span class="watermark-row-icon">📊</span>
+                            <div class="watermark-row-text">
+                                <div class="wm-title">Excel de dades</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Totes les columnes, una fila per incidència</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dlIncToggleExcel" onchange="dlIncExportExcel=this.checked">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="listaIncidencies"></div>
+
+                <div class="dl-match-count" id="dlMatchCountInc">Coincideixen amb els filtres: 0 incidències</div>
+                <button type="button" class="dl-generate-btn" onclick="dlIncGenerarInforme()">📄 Generar informe</button>
+
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+            </div>
+
+            <!-- ================================================
+                 DESCÀRREGUES · FITXA ANIMAL
+                 ================================================ -->
+            <div id="dlFitxaAnimal" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <h3>&#128062; Fitxa Animal</h3>
+                </div>
+
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <input type="text" id="dlSearchAnimal" class="dl-search"
+                               placeholder="Cerca per carretera, PK o espècie..."
+                               oninput="carregarVistaFitxesAnimal()">
+                    </div>
+                </div>
+
+                <div style="font-weight:700; font-size:0.85rem; margin:4px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
+                <div id="animalFitxesWrap"></div>
+
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+            </div>
+
+            <!-- ================================================
+                 DESCÀRREGUES · ITC
+                 ================================================ -->
+            <div id="dlITC" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <h3>&#128221; ITC</h3>
+                </div>
+
+                <div class="dl-topbar">
+                    <div class="dl-search-wrap">
+                        <input type="text" id="dlSearchITC" class="dl-search"
+                               placeholder="Cerca per expedient, carretera o petitionari..."
+                               oninput="carregarVistaITC()">
+                    </div>
+                    <div class="dl-count" id="dlCountITC"></div>
+                </div>
+                <div class="dl-legend">
+                    <span class="dl-legend-item"><span class="dl-icon pdf">&#128196;</span> Informe ITC PDF</span>
+                </div>
+                <div id="listaITC"></div>
+
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+            </div>
+
 
             <!-- ================================================
                  SETTINGS
@@ -6688,6 +6732,10 @@ const screenTitles = {
     'puntsLlistat':  'Punts Recollits',
     'list':          'Centre de Gestió',
     'downloads':     'Descàrregues',
+    'dlInventaris':  'Descàrregues · Inventaris',
+    'dlIncidencies': 'Descàrregues · Incidències',
+    'dlFitxaAnimal': 'Descàrregues · Fitxa Animal',
+    'dlITC':         'Descàrregues · ITC',
     'pantallaAjustos':'Configuració',
     'helpScreen':    'Ajuda',
     'projectDetail': 'Detall del Projecte',
@@ -6724,10 +6772,13 @@ function ir(id) {
 
     // Update sidebar active state
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el => el.classList.remove('active'));
-    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
+    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', dlInventaris:'nav-downloads', dlIncidencies:'nav-downloads', dlFitxaAnimal:'nav-downloads', dlITC:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
-    if (id === 'downloads') carregarLlistaDescargues();
+    if (id === 'dlInventaris') carregarLlistaDescargues();
+    if (id === 'dlIncidencies') carregarVistaIncidencies();
+    if (id === 'dlFitxaAnimal') carregarVistaFitxesAnimal();
+    if (id === 'dlITC') carregarVistaITC();
     if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); _omplirCampsTecnicAjustos(); }
     if (id === 'galeriaFotos') renderGaleria();
     if (id === 'normativa') normativaRenderResultats();
@@ -7879,7 +7930,7 @@ function obrirDetallProjecte(id, origin) {
             <button class="btn btn-danger btn-sm" onclick="borrarP('${id}');goBackFromDetail()">&#128465; ELIMINAR</button>
         </div>
         <div style="margin-top:10px;">
-            <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--text-muted);font-size:0.8rem;" onclick="ir('downloads')">
+            <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--text-muted);font-size:0.8rem;" onclick="ir('dlInventaris')">
                 &#128229; Anar a Desc&#224;rregues per exportar PDF / Excel / ZIP
             </button>
         </div>`;
@@ -8519,29 +8570,6 @@ function dlIncToggleSeleccio(id, checked) {
     if (checked) dlIncSeleccioIds.add(id); else dlIncSeleccioIds.delete(id);
 }
 
-function dlCanviarTab(tab) {
-    const btnInv = document.getElementById('dlTabInventaris');
-    const btnInc = document.getElementById('dlTabIncidencies');
-    const btnITC = document.getElementById('dlTabITC');
-    const panInv = document.getElementById('dlPanellInventaris');
-    const panInc = document.getElementById('dlPanellIncidencies');
-    const panITC = document.getElementById('dlPanellITC');
-    if (!btnInv || !btnInc || !panInv || !panInc) return;
-    panInv.style.display = tab === 'inventaris' ? 'block' : 'none';
-    panInc.style.display = tab === 'incidencies' ? 'block' : 'none';
-    if (panITC) panITC.style.display = tab === 'itc' ? 'block' : 'none';
-
-    [[btnInv,'inventaris'], [btnInc,'incidencies'], [btnITC,'itc']].forEach(([btn, key]) => {
-        if (!btn) return;
-        const actiu = key === tab;
-        btn.style.background = actiu ? 'var(--primary)' : '#fff';
-        btn.style.color = actiu ? '#fff' : 'var(--primary)';
-    });
-
-    if (tab === 'incidencies') carregarVistaIncidencies();
-    if (tab === 'itc') carregarVistaITC();
-}
-
 /* Aplica cerca + tipus + rang de dates + ordre sobre la llista completa d'incidències */
 function _dlIncItemsFiltrats(items) {
     const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
@@ -8606,7 +8634,6 @@ function carregarVistaIncidencies() {
                 <div style='font-size:2rem;margin-bottom:8px;'>🚧</div>
                 <div style='font-weight:600;font-size:0.85rem;'>Cap incidència amb aquests filtres</div>
             </div>`;
-            _renderFitxesAnimals(q);
             return;
         }
 
@@ -8623,9 +8650,13 @@ function carregarVistaIncidencies() {
         } else {
             container.innerHTML = '';
         }
-
-        _renderFitxesAnimals(q);
     });
+}
+
+/* Pantalla independent de Fitxa Animal (fora d'Incidències) */
+function carregarVistaFitxesAnimal() {
+    const q = (document.getElementById('dlSearchAnimal')?.value || '').toLowerCase().trim();
+    _renderFitxesAnimals(q);
 }
 
 /* Descàrrega directa d'un blob (sense passar pel modal de compartir) */
@@ -8718,12 +8749,6 @@ function _renderFitxesAnimals(q) {
     const wrap = document.getElementById('animalFitxesWrap');
     if (!wrap || !db) return;
     if (!db.objectStoreNames.contains('animalsIncidencies')) return;
-
-    // Si hi ha un filtre de tipus actiu i no és "Animal" ni "Totes", amaguem aquest bloc
-    if (dlIncFiltreTipus && dlIncFiltreTipus !== 'Animal') {
-        wrap.innerHTML = '';
-        return;
-    }
 
     db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
         let fitxes = e.target.result || [];
@@ -13414,7 +13439,7 @@ function eliminarFitxaAnimal(id) {
     if (!confirm('Vols eliminar aquesta fitxa d\'animal? Aquesta acció no es pot desfer.')) return;
     const tx = db.transaction('animalsIncidencies', 'readwrite');
     tx.objectStore('animalsIncidencies').delete(id);
-    tx.oncomplete = () => { showToast('🗑️ Fitxa eliminada'); carregarVistaIncidencies(); };
+    tx.oncomplete = () => { showToast('🗑️ Fitxa eliminada'); carregarVistaFitxesAnimal(); };
 }
 
 /* ============================================================
