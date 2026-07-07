@@ -9088,17 +9088,41 @@ async function _omplirPlantillaOficialAnimal(fitxa, templateBytes) {
     Object.entries(ANIMAL_PDF_FIELDS).forEach(([key, cfg]) => {
         const val = fitxa[key];
         if (cfg.type === 'text') setText(cfg.name, val);
-        else if (cfg.type === 'checkbox') setCheck(cfg.name, !!val);
+        // Els checkbox NO es marquen via l'estat del camp (alguns visors —Chrome
+        // mòbil, previsualitzadors, etc.— no respecten l'estat "/1" i es veuen
+        // sempre buits). Es dibuixa la "X" directament a sobre, més avall.
         else if (cfg.type === 'dropdown') setDrop(cfg.name, val);
     });
 
+    // Marca manual de les 3 caselles (Avís de CCCT, Mesures correctores,
+    // Senyalització), dibuixada directament sobre la pàgina perquè es vegi
+    // sempre, en qualsevol visor de PDF.
+    const page1 = pdfDoc.getPages()[0];
+    const boldFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    const marcarCasella = (rect, marcada) => {
+        if (!marcada) return;
+        const [x0, y0, x1, y1] = rect;
+        const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        page1.drawText('X', {
+            x: cx - 3.2, y: cy - 3.6, size: 10, font: boldFont,
+            color: PDFLib.rgb(0, 0, 0),
+        });
+    };
+    marcarCasella([177.077, 512.089, 187.077, 522.089], fitxa.avisCcct);          // Avís de CCCT
+    marcarCasella([226.128, 408.078, 236.128, 418.078], fitxa.mesuresCorrectores); // Mesures correctores
+    marcarCasella([225.145, 364.046, 235.145, 374.046], fitxa.senyalitzacio);      // Senyalització P-24
+
+    // Els 6 quadres de la pàgina 2 NO estan numerats en ordre visual (Foto[0] és
+    // el quadre inferior-dret). Aquest ordre mapeja "1a foto" → quadre superior-
+    // esquerra, seguint lectura esquerra-dreta / dalt-baix, tal com es veu al full.
+    const ANIMAL_PDF_FOTO_ORDER = ['Foto[2]', 'Foto[1]', 'Foto[5]', 'Foto[4]', 'Foto[3]', 'Foto[0]'];
     const fotos = fitxa.fotos || [];
     for (let i = 0; i < Math.min(fotos.length, 6); i++) {
         try {
             const dataUrl = fotos[i];
             const bytes = _dataUrlToBytes(dataUrl);
             const img = dataUrl.startsWith('data:image/png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-            form.getButton(`topmostSubform[0].Page2[0].Foto[${i}]`).setImage(img);
+            form.getButton(`topmostSubform[0].Page2[0].${ANIMAL_PDF_FOTO_ORDER[i]}`).setImage(img);
         } catch (e) { console.warn('Error inserint foto', i, e.message); }
     }
 
@@ -9120,6 +9144,19 @@ async function generarPDFOficialAnimals(fitxes) {
     return new Blob([bytes], { type: 'application/pdf' });
 }
 
+/* Nom de fitxer estàndard per a una fitxa d'animal individual:
+   "A-{any}-{carretera} PK {pk} {data}.pdf"  (ex: A-2026-C-26 PK 29+700 15-04-2026.pdf) */
+function _nomFitxerFitxaAnimal(f) {
+    const data = (f.data || '').trim();
+    const any = data.split('-')[2] || new Date().getFullYear();
+    const carretera = (f.carretera || '').trim();
+    let nom = `A-${any}`;
+    if (carretera) nom += `-${carretera}`;
+    if (f.pk) nom += ` PK ${f.pk}`;
+    if (data) nom += ` ${data}`;
+    return (nom + '.pdf').replace(/[\\/:*?"<>|]/g, '-');
+}
+
 async function _exportarAnimalsHelper(fitxes, titol, format) {
     const p = _buildProjecteVirtualAnimals(fitxes, titol);
     const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
@@ -9129,7 +9166,9 @@ async function _exportarAnimalsHelper(fitxes, titol, format) {
         currentFileName = `Animals_${slug}_${date}.xlsx`;
     } else if (format === 'Fitxa') {
         currentBlob = await generarPDFOficialAnimals(fitxes);
-        currentFileName = `Fitxa_Animals_${slug}_${date}.pdf`;
+        currentFileName = fitxes.length === 1
+            ? _nomFitxerFitxaAnimal(fitxes[0])
+            : `Fitxa_Animals_${slug}_${date}.pdf`;
     } else {
         currentBlob = await generarBlobPDF(p, format);
         currentFileName = `${format}_Animals_${slug}_${date}.pdf`;
