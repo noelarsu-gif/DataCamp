@@ -3153,12 +3153,17 @@ input:checked + .slider:before { transform: translateX(20px); }
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
     background: var(--bg-alt);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .galeria-thumb img {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
     transition: transform 0.22s ease;
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
 .galeria-thumb:hover img { transform: scale(1.04); }
 .galeria-thumb:hover { box-shadow: var(--shadow-md); }
@@ -6451,6 +6456,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorEditarDades()">✏️ Editar dades</button>
                 <button class="visor-menu-item" id="visorBtnFitxaAnimal" style="display:none;" onclick="visorMenuToggle(); visorFitxaAnimal()">🐾📋 Omplir fitxa completa d'animal</button>
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorGenerarInformePDF()">📄 Informe PDF</button>
+                <button class="visor-menu-item" style="color:#fca5a5;" onclick="visorMenuToggle(); visorEliminar()">🗑️ Eliminar</button>
             </div>
         </div>
     </div>
@@ -10773,12 +10779,62 @@ function galeriaMenuAccio(accio) {
 
 /* Click en miniatura: si mode selecció → toggle; si no → obre visor */
 function galeriaThumbnailClick(id) {
+    if (window._galeriaLongPressFired && window._galeriaLongPressFired()) return;
     if (galeriaSelectMode) {
         galeriaToggleSeleccio(id);
     } else {
         galeriaObrirVisor(id);
     }
 }
+
+/* Pulsació llarga sobre una miniatura: activa el mode selecció múltiple
+   i selecciona directament la foto polsada (estil galeria nativa Android) */
+(function initGaleriaLongPress() {
+    const LONGPRESS_MS = 480;
+    const MOVE_TOLERANCE = 10;
+    let timer = null;
+    let startX = 0, startY = 0;
+    let longPressFired = false;
+    let activeId = null;
+
+    function clearPress() {
+        clearTimeout(timer);
+        timer = null;
+        activeId = null;
+    }
+
+    document.addEventListener('pointerdown', e => {
+        const thumb = e.target.closest?.('.galeria-thumb');
+        if (!thumb) return;
+        activeId = thumb.dataset.id;
+        startX = e.clientX;
+        startY = e.clientY;
+        longPressFired = false;
+        timer = setTimeout(() => {
+            longPressFired = true;
+            timer = null;
+            if (navigator.vibrate) navigator.vibrate(15);
+            if (!galeriaSelectMode) toggleSelectMode();
+            if (activeId) galeriaToggleSeleccio(activeId);
+        }, LONGPRESS_MS);
+    });
+
+    document.addEventListener('pointermove', e => {
+        if (!timer) return;
+        if (Math.abs(e.clientX - startX) > MOVE_TOLERANCE || Math.abs(e.clientY - startY) > MOVE_TOLERANCE) clearPress();
+    });
+
+    document.addEventListener('pointerup', clearPress);
+    document.addEventListener('pointercancel', clearPress);
+
+    document.addEventListener('contextmenu', e => {
+        if (e.target.closest?.('.galeria-thumb')) e.preventDefault();
+    });
+
+    // Consultat des de galeriaThumbnailClick per ignorar el "click" que segueix
+    // automàticament a la pulsació llarga (evita que s'obri el visor de cop).
+    window._galeriaLongPressFired = () => longPressFired;
+})();
 
 /* Toggle selecció d'una foto */
 function galeriaToggleSeleccio(id) {
@@ -11098,6 +11154,33 @@ function visorDescarregar() {
     a.download = name;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     showToast(`💾 ${name}`);
+}
+
+/* Eliminar la foto que s'està veient al visor */
+function visorEliminar() {
+    const id = visorCurrentId;
+    if (!id) return;
+    if (!confirm('Vols eliminar aquesta foto? Aquesta acció no es pot desfer.')) return;
+
+    // Si hi ha més fotos a la llista actual, decidim cap a on saltar després d'eliminar
+    const llista  = galeriaFiltratsActuals.length ? galeriaFiltratsActuals : galeriaItems;
+    const idx     = llista.findIndex(i => i.id === id);
+    const seguent = llista[idx + 1] || llista[idx - 1] || null;
+
+    const tx = db.transaction('galeriaFotos', 'readwrite');
+    tx.objectStore('galeriaFotos').delete(id);
+    tx.oncomplete = () => {
+        galeriaSeleccio.delete(id);
+        showToast('🗑️ Foto eliminada');
+        if (seguent && seguent.id !== id) {
+            renderGaleria();
+            galeriaObrirVisor(seguent.id);
+        } else {
+            tancarVisor();
+            renderGaleria();
+        }
+    };
+    tx.onerror = () => showToast('❌ Error eliminant la foto');
 }
 
 /* Genera un informe PDF (Fitxa) d'una sola foto, des del visor a pantalla completa */
@@ -15609,6 +15692,80 @@ function pkmBack() {
     // El setTimeout a abrirPKMapa s'encarrega de cridar pkmInitSheet()
 })();
 
+/* ============================================================
+   BOTÓ "ENRERE" NATIU (Android)
+   Fa que la fletxa enrere del sistema respongui dins l'app
+   (tancar visor/menús/modals, o navegar a la pantalla anterior)
+   en lloc de sortir directament de l'aplicació. Prement enrere
+   dos cops seguits a l'inici sense res obert, sí que surt.
+   ============================================================ */
+(function initBackButtonNadiu() {
+    if (!window.history || !window.history.pushState) return;
+
+    history.pushState({ appTrap: true }, '');
+
+    let exitArmed = false;
+    let exitTimer = null;
+
+    function handleAppBack() {
+        // 1) Menú de 3 puntets del visor obert
+        const menuVisor = document.getElementById('visorMenuDropdown');
+        if (menuVisor && menuVisor.classList.contains('open')) {
+            menuVisor.classList.remove('open');
+            return;
+        }
+
+        // 2) Visor de foto a pantalla completa
+        const visor = document.getElementById('galeriaVisor');
+        if (visor && visor.classList.contains('open')) {
+            tancarVisor();
+            return;
+        }
+
+        // 3) Backdrops tipus "picker" (filtre carretera / incidència)
+        const openBackdrop = document.querySelector('.carr-picker-backdrop.open');
+        if (openBackdrop) { openBackdrop.click(); return; }
+
+        // 4) Modals clàssics visibles
+        const openModal = Array.from(document.querySelectorAll('.modal'))
+            .find(m => getComputedStyle(m).display !== 'none');
+        if (openModal) { openModal.click(); return; }
+
+        // 5) Mode selecció múltiple actiu a la galeria
+        if (typeof galeriaSelectMode !== 'undefined' && galeriaSelectMode) {
+            toggleSelectMode();
+            return;
+        }
+
+        // 6) Navegar a la pantalla anterior fent servir el propi botó ← de la pantalla activa
+        const activeScreen = document.querySelector('.screen.active');
+        const backBtn = activeScreen ? activeScreen.querySelector('.screen-header .btn-back') : null;
+        if (backBtn && activeScreen && activeScreen.id !== 'home') {
+            backBtn.click();
+            return;
+        }
+
+        // 7) Ja som a l'inici i no hi ha res obert: cal prémer 2 cops per sortir
+        if (!exitArmed) {
+            exitArmed = true;
+            showToast('Torna a prémer ENRERE per sortir');
+            exitTimer = setTimeout(() => { exitArmed = false; }, 2200);
+        }
+    }
+
+    window.addEventListener('popstate', () => {
+        if (exitArmed) {
+            // Segona pulsació confirmada dins del termini: deixem sortir de l'app
+            exitArmed = false;
+            clearTimeout(exitTimer);
+            return;
+        }
+        // Reposem la "trampa" a l'historial perquè la següent pulsació enrere
+        // torni a disparar aquest gestor, en lloc de sortir de l'app.
+        history.pushState({ appTrap: true }, '');
+        handleAppBack();
+    });
+})();
 
 </script>
 <!-- ── FIELD EDITOR BOTTOM SHEET ─────────────────────────────── -->
