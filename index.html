@@ -9154,13 +9154,33 @@ async function _omplirPlantillaOficialAnimal(fitxa, templateBytes) {
     // el quadre inferior-dret). Aquest ordre mapeja "1a foto" → quadre superior-
     // esquerra, seguint lectura esquerra-dreta / dalt-baix, tal com es veu al full.
     const ANIMAL_PDF_FOTO_ORDER = ['Foto[2]', 'Foto[1]', 'Foto[5]', 'Foto[4]', 'Foto[3]', 'Foto[0]'];
+    const page2 = pdfDoc.getPages()[1];
     const fotos = fitxa.fotos || [];
-    for (let i = 0; i < Math.min(fotos.length, 6); i++) {
+    // NOTA: no fem servir form.getButton(...).setImage() + form.flatten() per a les
+    // fotos: pdf-lib té un bug conegut pel qual flatten() sovint elimina la imatge
+    // d'un camp de tipus botó en lloc d'"imprimir-la". Per evitar-ho, dibuixem la
+    // imatge directament sobre la pàgina (igual que fem amb els checkboxes) i
+    // eliminem el camp botó nosaltres mateixos.
+    for (let i = 0; i < ANIMAL_PDF_FOTO_ORDER.length; i++) {
+        const fieldName = `topmostSubform[0].Page2[0].${ANIMAL_PDF_FOTO_ORDER[i]}`;
         try {
+            const btn = form.getButton(fieldName);
+            const widget = btn.acroField.getWidgets()[0];
+            const rect = widget.getRectangle();
+            form.removeField(btn);
             const dataUrl = fotos[i];
+            if (!dataUrl) continue;
             const bytes = _dataUrlToBytes(dataUrl);
             const img = dataUrl.startsWith('data:image/png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-            form.getButton(`topmostSubform[0].Page2[0].${ANIMAL_PDF_FOTO_ORDER[i]}`).setImage(img);
+            // Encaixem la imatge dins el quadre mantenint la proporció (com faria
+            // ImageAlignment.Center de setImage), centrada horitzontal i verticalment.
+            const scale = Math.min(rect.width / img.width, rect.height / img.height);
+            const w = img.width * scale, h = img.height * scale;
+            page2.drawImage(img, {
+                x: rect.x + (rect.width - w) / 2,
+                y: rect.y + (rect.height - h) / 2,
+                width: w, height: h,
+            });
         } catch (e) { console.warn('Error inserint foto', i, e.message); }
     }
 
