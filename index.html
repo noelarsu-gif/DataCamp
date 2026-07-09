@@ -9547,214 +9547,160 @@ function carregarVistaITC() {
     };
 }
 
-/* — Generació del PDF, rèplica fidel del model ITC oficial — */
-function generarBlobPDFInformeITC(informes) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+/* ══════════════════════════════════════════════════════════════════
+   PDF OFICIAL ITC — omple de veritat el formulari "ITC_MODEL" oficial
+   del Departament de Territori (AcroForm) amb pdf-lib, en comptes de
+   redibuixar-lo (igual que es fa amb la fitxa d'animal).
+   ══════════════════════════════════════════════════════════════════ */
+const ITC_PDF_TEMPLATE_URL = './assets/plantilles/informe_itc_oficial.pdf';
 
-    const ML = 12, MR = 198;
-    const BLACK = [20, 20, 20];
-    const GRAY = [90, 90, 90];
+/* Mapeig camp del registre (itcInformes) → nom real del camp AcroForm */
+const ITC_PDF_TEXT_FIELDS = {
+    expedient:      "Número d'Expedient",
+    data:           'Data',
+    peticionari:    'Peticionari',
+    telefon:        'Telèfon',
+    carretera:      'Carretera',
+    pkInici:        'PK',
+    pkFinal:        'PK 2',
+    termeMunicipal: 'Terme municipal',
+    titolObra:      "Títol de l'obra",
+    respecteAEE:    'Distància',    // fila impresa: "Distància de l'obra: Respecte l'A.E.E. : ___  Respecte l'A.E.C. : ___"
+    respecteAEC:    'Distància 2',
+    antecedents:    'Antecedents',
+    descripcio:     "Descripció de l'obra detallada", // caixa gran "Descripció de l'obra :"
+    incidencies:    'Incidències o afectacions',
+};
+// NOTA: la plantilla oficial NOMÉS té dos camps en aquesta fila (per a
+// "Respecte l'A.E.E." i "Respecte l'A.E.C."); no existeix un tercer camp
+// per a "distanciaObra" com a valor independent. Aquest valor es continua
+// desant a l'IndexedDB, però no s'imprimeix (el full oficial no té on).
 
-    const val = v => (v === undefined || v === null || v === '') ? '' : String(v);
+// Camps amb longitud màxima de fàbrica massa curta per a l'ús real
+// (Expedient=11, Data=11, Telèfon=9, PK=9, PK 2=9, Carretera=9)
+const ITC_SIN_MAXLENGTH = new Set(['expedient', 'telefon', 'data', 'pkInici', 'pkFinal', 'carretera']);
 
-    const drawHeader = () => {
+// Aquests dos venen amb contingut "rich text" (RV) de fàbrica a la
+// plantilla oficial; cal buidar-los amb setText('') abans d'escriure-hi
+// el valor real, o pdf-lib llança RichTextFieldReadError en regenerar
+// l'aparença.
+const ITC_CAMPOS_RICHTEXT = ["Descripció de l'obra detallada", 'Incidències o afectacions'];
+
+// Caselles de "Localització de l'obra". El nom intern de cada Check Box
+// al PDF NO segueix l'ordre visual — verificat una a una per coordenades:
+//   Travessera    → Check Box4
+//   Tram Urbà     → Check Box5      Sòl Urbà    → Check Box7
+//   Tram NO Urbà  → Check Box6      Sòl NO Urbà → Check Box8
+//   ME            → Check Box10     MD          → Check Box11
+const ITC_CHECKS = {
+    travessera: 'Check Box4', tramUrba: 'Check Box5', solUrba: 'Check Box7',
+    tramNoUrba: 'Check Box6', solNoUrba: 'Check Box8', me: 'Check Box10', md: 'Check Box11',
+};
+
+async function _omplirPlantillaOficialITC(f, templateBytes) {
+    const { PDFDocument } = PDFLib;
+    const pdfDoc = await PDFDocument.load(templateBytes);
+    const form = pdfDoc.getForm();
+
+    for (const [key, fieldName] of Object.entries(ITC_PDF_TEXT_FIELDS)) {
+        const val = f[key];
+        const tf = form.getTextField(fieldName);
+        if (ITC_CAMPOS_RICHTEXT.includes(fieldName)) tf.setText('');
+        if (ITC_SIN_MAXLENGTH.has(key)) tf.setMaxLength(undefined);
+        // "Antecedents" ve com a camp d'una sola línia a la plantilla oficial
+        // encara que la seva caixa és alta; sense multiline, el text llarg
+        // es retalla en lloc de saltar de línia.
+        if (key === 'antecedents') tf.enableMultiline();
+        if (val != null && val !== '') tf.setText(String(val));
+    }
+
+    // Desplegables: si el valor no coincideix amb cap opció de la
+    // plantilla, pdf-lib activa l'edició i l'escriu igualment (Vigilant i
+    // Franja ja són combos editables a l'original; Marge es força igual).
+    if (f.vigilant) form.getDropdown('Vigilant').select(f.vigilant);
+    if (f.marge) form.getDropdown('Marge').select(f.marge);
+    if (f.franjaProteccio) form.getDropdown('Franja').select(f.franjaProteccio);
+
+    for (const [key, fieldName] of Object.entries(ITC_CHECKS)) {
+        const cb = form.getCheckBox(fieldName);
+        if (f[key]) cb.check(); else cb.uncheck();
+    }
+
+    // Traiem el camp de firma interactiu (/Sig) abans d'aplanar: no el fem
+    // servir per signar digitalment, només hi pintem a sobre la firma
+    // manuscrita del vigilant.
+    let sigRect = null;
+    try {
+        const sigField = form.getField('Signatura electrònica');
+        const widgets = sigField.acroField.getWidgets();
+        if (widgets.length) sigRect = widgets[0].getRectangle();
+        form.removeField(sigField);
+    } catch (e) { console.warn('Camp de firma no trobat:', e.message); }
+
+    form.updateFieldAppearances();
+    form.flatten();
+
+    // ── Pàgina 2: fotos + firma, dibuixades directament sobre la pàgina ──
+    const page2 = pdfDoc.getPages()[1];
+
+    if (f.signatura && sigRect) {
         try {
-            const props = doc.getImageProperties(ANIMAL_LOGO_B64);
-            const hMax = 11, wMax = 58;
-            const r = Math.min(wMax / props.width, hMax / props.height);
-            doc.addImage(ANIMAL_LOGO_B64, 'PNG', ML, 10, props.width * r, props.height * r);
-        } catch (e) { console.error('Logo Generalitat:', e); }
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...BLACK);
-        doc.text('Serveis Territorials a Lleida', MR, 13, { align: 'right' });
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(...GRAY);
-        doc.text('Servei Territorial de Carreteres', MR, 17, { align: 'right' });
-    };
+            const bytes = _dataUrlToBytes(f.signatura);
+            const img = f.signatura.startsWith('data:image/png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+            const pad = 4;
+            const cw = sigRect.width - pad * 2, ch = sigRect.height - pad * 2;
+            const ratio = Math.min(cw / img.width, ch / img.height);
+            const w = img.width * ratio, h = img.height * ratio;
+            page2.drawImage(img, {
+                x: sigRect.x + (sigRect.width - w) / 2,
+                y: sigRect.y + (sigRect.height - h) / 2,
+                width: w, height: h,
+            });
+        } catch (e) { console.warn('Error inserint firma:', e.message); }
+    }
 
-    const labelLine = (x, y, label, value, w) => {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...BLACK);
-        doc.text(label, x, y);
-        const labelW = doc.getTextWidth(label) + 3;
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.2);
-        doc.line(x, y + 1.5, x + w, y + 1.5);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        const availW = Math.max(w - labelW - 1, 10);
-        const txt = doc.splitTextToSize(val(value), availW);
-        doc.text(txt[0] || '', x + labelW, y);
-    };
-
-    const checkSq = (x, y, label, checked) => {
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.3);
-        doc.rect(x, y - 3.2, 3.5, 3.5, 'S');
-        if (checked) {
-            doc.setLineWidth(0.5);
-            doc.line(x, y - 3.2, x + 3.5, y + 0.3);
-            doc.line(x, y + 0.3, x + 3.5, y - 3.2);
-        }
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...BLACK);
-        doc.text(label, x + 5, y);
-    };
-
-    const sectionTitle = (y, text) => {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9.5);
-        doc.setTextColor(...BLACK);
-        doc.text(text, ML, y);
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.5);
-        doc.line(ML, y + 1.5, MR, y + 1.5);
-    };
-
-    informes.forEach((f, idx) => {
-        if (idx > 0) doc.addPage();
-        drawHeader();
-
-        // Títol principal
-        let y = 24;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...BLACK);
-        doc.text('Expedient:', ML, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(val(f.expedient), ML + 18, y);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Data:', 100, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(val(f.data), 112, y);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Vigilant:', 150, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(val(f.vigilant), 167, y);
-
-        y = 32;
-        sectionTitle(y, "Dades de l'obra");
-        y += 8;
-        labelLine(ML, y, 'Peticionari', f.peticionari, MR - ML); y += 8;
-        labelLine(ML, y, 'Telèfon contacte', f.telefon, 80); y += 8;
-        labelLine(ML, y, 'Carretera', f.carretera, 55);
-        labelLine(ML + 60, y, 'PK inici', f.pkInici, 35);
-        labelLine(ML + 100, y, 'PK final', f.pkFinal, 35);
-        labelLine(ML + 140, y, 'Marge', f.marge, 46); y += 8;
-        labelLine(ML, y, 'Terme municipal', f.termeMunicipal, MR - ML); y += 8;
-        labelLine(ML, y, "Títol de l'obra", f.titolObra, MR - ML); y += 10;
-
-        sectionTitle(y, "Localització de l'obra"); y += 7;
-        checkSq(ML, y, 'Travessera', f.travessera);
-        checkSq(ML + 60, y, 'Sòl Urbà', f.solUrba); y += 6;
-        checkSq(ML, y, 'Tram Urbà', f.tramUrba);
-        checkSq(ML + 60, y, 'Sòl NO Urbà', f.solNoUrba);
-        checkSq(ML + 120, y, 'ME', f.me);
-        checkSq(ML + 145, y, 'MD', f.md); y += 6;
-        checkSq(ML, y, 'Tram NO Urbà', f.tramNoUrba); y += 9;
-
-        labelLine(ML, y, 'Franja de protecció', f.franjaProteccio, MR - ML); y += 8;
-        labelLine(ML, y, "Distància de l'obra", f.distanciaObra, 60);
-        labelLine(ML + 65, y, "Respecte l'A.E.E.", f.respecteAEE, 60);
-        labelLine(ML + 132, y, "Respecte l'A.E.C.", f.respecteAEC, 54); y += 10;
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.text('Antecedents (Informes, Denúncies o Projectes relacionats):', ML, y); y += 2;
-        doc.setDrawColor(...BLACK); doc.setLineWidth(0.3);
-        doc.rect(ML, y, MR - ML, 16, 'S');
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-        doc.text(doc.splitTextToSize(val(f.antecedents), MR - ML - 4), ML + 2, y + 5);
-        y += 22;
-
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-        doc.text("Descripció de l'obra:", ML, y); y += 2;
-        doc.rect(ML, y, MR - ML, 28, 'S');
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-        doc.text(doc.splitTextToSize(val(f.descripcio), MR - ML - 4), ML + 2, y + 5);
-        y += 34;
-
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-        doc.text('Incidències o afectacions importants:', ML, y); y += 2;
-        doc.rect(ML, y, MR - ML, 28, 'S');
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-        doc.text(doc.splitTextToSize(val(f.incidencies), MR - ML - 4), ML + 2, y + 5);
-
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.3);
-        doc.line(ML, 285, MR, 285);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(...GRAY);
-        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
-
-        // — Pàgina 2: Fotografies + Signatura —
-        doc.addPage();
-        drawHeader();
-        sectionTitle(30, 'Fotografies');
-
-        const photos = f.fotos || [];
-        const boxW = 91, boxH = 58, gapX = 4, gapY = 4;
-        const startY = 38;
-        for (let i = 0; i < 3; i++) {
-            const bx = ML + (i % 2) * (boxW + gapX);
-            const by = startY + Math.floor(i / 2) * (boxH + gapY);
-            doc.setDrawColor(...BLACK);
-            doc.setLineWidth(0.3);
-            doc.rect(bx, by, boxW, boxH, 'S');
-            const fotoSrc = photos[i];
-            if (fotoSrc) {
-                try {
-                    const props = doc.getImageProperties(fotoSrc);
-                    const pad = 2;
-                    const cW = boxW - pad * 2, cH = boxH - pad * 2;
-                    const ratio = Math.min(cW / props.width, cH / props.height);
-                    const fw = props.width * ratio, fh = props.height * ratio;
-                    doc.addImage(fotoSrc, 'JPEG', bx + (boxW - fw) / 2, by + (boxH - fh) / 2, fw, fh);
-                } catch (e) { console.error('Error foto informe ITC:', e); }
-            }
-        }
-
-        let sigY = startY + 2 * (boxH + gapY) + 10;
-        sectionTitle(sigY, 'Signatura electrònica del document');
-        sigY += 6;
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.3);
-        doc.rect(ML, sigY, 80, 35, 'S');
-        if (f.signatura) {
+    const fotos = f.fotos || [];
+    if (fotos.length) {
+        const ML = 40, gapX = 15, gapY = 15;
+        const boxW = (page2.getWidth() - 2 * ML - gapX) / 2;
+        const boxH = 165;
+        const firstRowTopY = (sigRect ? sigRect.y : 462) - 20;
+        for (let i = 0; i < Math.min(3, fotos.length); i++) {
+            const col = i % 2, row = Math.floor(i / 2);
+            const bx = ML + col * (boxW + gapX);
+            const by = (firstRowTopY - row * (boxH + gapY)) - boxH;
+            page2.drawRectangle({ x: bx, y: by, width: boxW, height: boxH, borderWidth: 0.7 });
             try {
-                const props = doc.getImageProperties(f.signatura);
-                const pad = 2;
-                const cW = 80 - pad * 2, cH = 35 - pad * 2;
-                const ratio = Math.min(cW / props.width, cH / props.height);
-                const fw = props.width * ratio, fh = props.height * ratio;
-                doc.addImage(f.signatura, 'PNG', ML + (80 - fw) / 2, sigY + (35 - fh) / 2, fw, fh);
-            } catch (e) { console.error('Error signatura informe ITC:', e); }
+                const bytes = _dataUrlToBytes(fotos[i]);
+                const img = fotos[i].startsWith('data:image/png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+                const pad = 3;
+                const cw = boxW - pad * 2, ch = boxH - pad * 2;
+                const ratio = Math.min(cw / img.width, ch / img.height);
+                const w = img.width * ratio, h = img.height * ratio;
+                page2.drawImage(img, { x: bx + (boxW - w) / 2, y: by + (boxH - h) / 2, width: w, height: h });
+            } catch (e) { console.warn('Error inserint foto ITC', i, e.message); }
         }
+    }
 
-        doc.setDrawColor(220, 220, 220);
-        doc.line(ML, 285, MR, 285);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(...GRAY);
-        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
-    });
+    return pdfDoc;
+}
 
-    return doc.output('blob');
+/* Genera el blob final. `f` és un únic registre d'itcInformes
+   (l'informe ITC sempre s'exporta d'un en un, no en lot). */
+async function generarPDFOficialITC(f) {
+    const templateBytes = await (await fetch(ITC_PDF_TEMPLATE_URL)).arrayBuffer();
+    const pdfDoc = await _omplirPlantillaOficialITC(f, templateBytes);
+    const bytes = await pdfDoc.save();
+    return new Blob([bytes], { type: 'application/pdf' });
 }
 
 async function exportarInformeITCIndividual(id) {
     showSpinner('GENERANT PDF...');
-    db.transaction('itcInformes').objectStore('itcInformes').get(id).onsuccess = e => {
+    db.transaction('itcInformes').objectStore('itcInformes').get(id).onsuccess = async e => {
         const f = e.target.result;
         if (!f) { hideSpinner(); return; }
         try {
-            const blob = generarBlobPDFInformeITC([f]);
+            const blob = await generarPDFOficialITC(f);
             const slug = (f.expedient || 'ITC').replace(/[^a-z0-9]/gi, '_').slice(0, 40);
             const date = new Date().toISOString().slice(0, 10);
             currentBlob = blob;
