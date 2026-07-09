@@ -9165,6 +9165,7 @@ async function _omplirPlantillaOficialAnimal(fitxa, templateBytes) {
     }
 
     form.updateFieldAppearances();
+    form.flatten();
     return pdfDoc;
 }
 
@@ -9638,7 +9639,6 @@ async function _omplirPlantillaOficialITC(f, templateBytes) {
     } catch (e) { console.warn('Camp de firma no trobat:', e.message); }
 
     form.updateFieldAppearances();
-    form.flatten();
 
     // ── Pàgina 2: fotos + firma, dibuixades directament sobre la pàgina ──
     const page2 = pdfDoc.getPages()[1];
