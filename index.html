@@ -5053,6 +5053,60 @@ input:checked + .slider:before { transform: translateX(20px); }
     margin-left: 6px;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   DESKTOP DENSITY — a partir d'ordinador (≥1025px) reduïm mides
+   pensades per a dit/tàctil (WCAG 44px) a mides pròpies de software
+   d'escriptori professional, sense tocar res en mòbil/tablet.
+   ══════════════════════════════════════════════════════════════════ */
+@media (min-width: 1025px) {
+
+    /* ── Botons: més petits, sense uppercase forçat gegant ── */
+    .btn {
+        min-height: 36px;
+        padding: 8px 16px;
+        font-size: 0.82rem;
+    }
+    .btn-sm { min-height: 30px; padding: 6px 12px; font-size: 0.76rem; }
+    .btn-icon { width: 34px; height: 34px; font-size: 0.95rem; }
+    .btn-back { width: 34px; height: 34px; font-size: 1.05rem; }
+    .btn-autopk { padding: 9px 16px; font-size: 0.85rem; }
+
+    /* Botons dins d'una pantalla: ja no a ample complet per defecte.
+       .btn-block segueix sent l'opt-in explícit per als que sí ho volen. */
+    .screen .btn { width: auto; min-width: 190px; margin: 4px 8px 4px 0; }
+    .screen .btn-sm { min-width: 0; margin: 0; }
+    .screen .btn-block { width: 100%; margin: 6px 0; }
+
+    /* ── Camps de formulari: menys padding, lletra una mica més petita ── */
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+        padding: 8px 12px;
+        font-size: 0.88rem;
+    }
+    label { font-size: 0.72rem; margin-bottom: 5px; }
+    .form-group { margin-bottom: 12px; }
+
+    .search-input, .sort-select { height: 38px; font-size: 0.88rem; }
+
+    /* ── Capçaleres de pantalla, més compactes ── */
+    .screen-header { margin-bottom: 14px; padding-bottom: 12px; }
+    .screen-header h3 { font-size: 1.05rem; }
+
+    /* ── Targetes i llistes, més denses ── */
+    .card { padding: 12px 16px; margin-bottom: 8px; }
+    .download-card { padding: 12px 14px; }
+
+    /* ── Modals amb proporcions d'escriptori (no una targeta de mòbil
+       flotant enmig d'una pantalla enorme) ── */
+    .modal-box { max-width: 480px; }
+
+    /* ── Formularis llargs: no s'estiren als 1200px del contenidor,
+       queden centrats amb una amplada de lectura còmoda ── */
+    .screen-form { max-width: 760px; margin-left: auto; margin-right: auto; }
+}
+
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
@@ -5463,7 +5517,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <!-- ================================================
                  CONFIG (FORM BUILDER)
                  ================================================ -->
-            <div id="config" class="screen">
+            <div id="config" class="screen screen-form">
                 <div class="screen-header">
                     <button class="btn-back" id="configBackBtn" onclick="configTornar()">←</button>
                     <h3>🛠️ <span id="configTitolH">Disseny del Formulari</span></h3>
@@ -5489,7 +5543,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <!-- ================================================
                  FORM (DATA ENTRY)
                  ================================================ -->
-            <div id="form" class="screen">
+            <div id="form" class="screen screen-form">
                 <div class="form-group">
                     <label>Nom del Projecte</label>
                     <input type="text" id="titulo" class="project-name-input" placeholder="Ex: Millora C-55 Tram Nord">
@@ -6632,6 +6686,7 @@ let currentBlob = null;
 let currentFileName = "";
 let _fdEditId = null;        // id de galeriaFotos en edició (null = nova captura)
 let _fdEditOriginal = null;  // item original que s'està editant
+let _fdCurrentImgData = null; // imatge actual de Foto Ràpida (evita incrustar el base64 al HTML)
 let db, curId = "", regs = [], fields = [], tmpFotos = [], editIdx = -1;
 let logoCorporativo = null;
 let isFotoDirecta = false;
@@ -9306,7 +9361,7 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
 
     const screen = document.createElement('div');
     screen.id = 'screen-informe-itc';
-    screen.className = 'screen active';
+    screen.className = 'screen screen-form active';
     screen.innerHTML = `
         <div class="screen-header">
             <button class="btn-back" onclick="_itcEditId=null; _itcFitxaOriginal=null; _itcFotos=[]; _itcSignaturaDataURL=''; this.closest('.screen').remove(); ir('home')">←</button>
@@ -11376,6 +11431,7 @@ function triarGaleria() {
 }
 
 function obrirEditorFotoDirecta(imgData) {
+    _fdCurrentImgData = imgData; // guardem la imatge en una variable en lloc de repetir-la al HTML
     const oldScreen = document.getElementById('screen-foto-directa');
     if (oldScreen) oldScreen.remove();
 
@@ -11525,17 +11581,17 @@ function obrirEditorFotoDirecta(imgData) {
         </div>` : ''}
 
         ${_fdEditId ? `
-        <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}', false)">
+        <button class="btn btn-primary" onclick="guardarFotoDirecta(_fdCurrentImgData, false)">
             💾 DESAR CANVIS
         </button>
         <button class="btn btn-ghost" style="margin-top:10px;" onclick="_fdEditId=null; _fdEditOriginal=null; document.getElementById('screen-foto-directa').remove(); ir('galeriaFotos')">
             Cancel·lar
         </button>` : `
-        <button class="btn btn-primary" onclick="guardarFotoDirecta('${imgData}', false)">
+        <button class="btn btn-primary" onclick="guardarFotoDirecta(_fdCurrentImgData, false)">
             ${_galeriaImgQueue.length > 0 ? `🖼️ GUARDAR I SEGUENT (${_galeriaImgQueue.length} restant${_galeriaImgQueue.length !== 1 ? 's' : ''})` : '🖼️ GUARDAR A GALERIA'}
         </button>
         ${_galeriaImgQueue.length === 0 ? `
-        <button class="btn" style="background:var(--accent-blue);color:white;border-color:var(--accent-blue);margin-top:10px;" onclick="guardarFotoDirecta('${imgData}', true)">
+        <button class="btn" style="background:var(--accent-blue);color:white;border-color:var(--accent-blue);margin-top:10px;" onclick="guardarFotoDirecta(_fdCurrentImgData, true)">
             💬 COMPARTIR I GUARDAR
         </button>` : ''}`}
     `;
@@ -13307,7 +13363,7 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
 
     const screen = document.createElement('div');
     screen.id = 'screen-fitxa-animal';
-    screen.className = 'screen active';
+    screen.className = 'screen screen-form active';
     screen.innerHTML = `
         <div class="screen-header">
             <button class="btn-back" onclick="_animalEditId=null; _animalFitxaOriginal=null; _animalFotos=[]; _animalLinkGaleriaId=null; this.closest('.screen').remove(); ir('home')">←</button>
