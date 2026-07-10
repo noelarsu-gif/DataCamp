@@ -5245,7 +5245,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div style="padding:12px;">
         <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon">🏠</span> Inici</button>
         <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon">🖼️</span> Galeria</button>
-        <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Historial</button>
+        <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Centre de Gestió</button>
         <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon">🗺️</span> Mapa</button>
         <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon">🛣️</span> PK Mapa</button>
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon">📥</span> Descàrregues</button>
@@ -5285,7 +5285,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="sidebar-section">
             <div class="sidebar-section-label">Projectes</div>
             <button class="nav-item" id="nav-list" onclick="historial()">
-                <span class="nav-icon">📂</span> Historial
+                <span class="nav-icon">📂</span> Centre de Gestió
             </button>
             <button class="nav-item" id="nav-map" onclick="abrirMapa()">
                 <span class="nav-icon">🗺️</span> Mapa
@@ -5423,8 +5423,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </div>
                     <div class="action-card" onclick="historial()">
                         <div class="action-icon">📂</div>
-                        <div class="action-label">Historial</div>
-                        <div class="action-desc">Cerca i obre projectes existents</div>
+                        <div class="action-label">Centre de Gestió</div>
+                        <div class="action-desc">Inventaris, Obres, Fitxes Animals i ITC</div>
                     </div>
                     <div class="action-card" onclick="ir('downloads')">
                         <div class="action-icon">📥</div>
@@ -5630,7 +5630,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <!-- ================================================
-                 HISTORIAL (LLISTA + CALENDARI + GANTT)
+                 CENTRE DE GESTIÓ (HUB)
                  ================================================ -->
             <div id="list" class="screen">
                 <div class="screen-header">
@@ -5638,80 +5638,51 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <h3>&#128194; Centre de Gestió</h3>
                 </div>
 
-                <!-- LEGEND FILTER ROW -->
-                <div class="legend-filter-row">
-                    <span class="legend-filter-label">Filtre:</span>
-                    <button class="legend-pill active captura" data-cat="captura" onclick="toggleCatFilter('captura')">
-                        <span class="lpill-dot" style="background:var(--cat-captura)"></span> Foto R&#224;pida
-                    </button>
-                    <button class="legend-pill active inventari" data-cat="inventari" onclick="toggleCatFilter('inventari')">
-                        <span class="lpill-dot" style="background:var(--cat-inventari)"></span> Inventari
-                    </button>
-                    <button class="legend-pill active obra" data-cat="obra" onclick="toggleCatFilter('obra')">
-                        <span class="lpill-dot" style="background:var(--cat-obra)"></span> Obra
-                    </button>
+                <div class="action-grid">
+                    <div class="action-card" onclick="obrirGestioTipus('inventari')">
+                        <div class="action-icon">📦</div>
+                        <div class="action-label">Inventaris</div>
+                        <div class="action-desc" id="gestioStatInventaris">—</div>
+                    </div>
+                    <div class="action-card" onclick="obrirGestioTipus('obra')">
+                        <div class="action-icon">🚧</div>
+                        <div class="action-label">Seguiment d'Obra</div>
+                        <div class="action-desc" id="gestioStatObra">—</div>
+                    </div>
+                    <div class="action-card" onclick="anarADescarrega('dlFitxaAnimal','list')" style="border-left:3px solid #b45309;">
+                        <div class="action-icon">🐾</div>
+                        <div class="action-label">Fitxes Animals</div>
+                        <div class="action-desc" id="gestioStatAnimals">—</div>
+                    </div>
+                    <div class="action-card" onclick="anarADescarrega('dlITC','list')">
+                        <div class="action-icon">📝</div>
+                        <div class="action-label">ITC</div>
+                        <div class="action-desc" id="gestioStatITC">—</div>
+                    </div>
                 </div>
 
-                <!-- TABS -->
-                <div class="hist-tabs">
-                    <button class="hist-tab active" id="tab-llista" onclick="switchHistTab('llista')">&#9776; Llista</button>
-                    <button class="hist-tab" id="tab-calendari" onclick="switchHistTab('calendari')">&#128197; Calendari</button>
-                    <button class="hist-tab" id="tab-gantt" onclick="switchHistTab('gantt')">&#9646; Gantt</button>
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
+            </div>
+
+            <!-- ================================================
+                 CENTRE DE GESTIÓ · LLISTAT PER TIPUS
+                 (Inventaris / Seguiment d'Obra)
+                 ================================================ -->
+            <div id="gestioLlista" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('list')">&#8592;</button>
+                    <h3 id="gestioLlistaTitle">&#128230; Inventaris</h3>
                 </div>
 
-                <!-- LIST PANEL -->
-                <div id="hist-panel-llista" class="hist-panel active">
-                    <div class="search-bar" style="margin-bottom:12px;">
-                        <input type="text" id="searchHistorial" class="search-input" placeholder="Cerca projecte..." oninput="renderHistLlista()">
-                        <select id="sortHistorial" class="sort-select" onchange="renderHistLlista()">
-                            <option value="new">Recents</option>
-                            <option value="old">Antics</option>
-                        </select>
-                    </div>
-                    <div id="listaInventarios"></div>
-                    <button class="btn btn-ghost" style="margin-top:16px;" onclick="ir('home')">TORNAR</button>
+                <div class="search-bar" style="margin-bottom:12px;">
+                    <input type="text" id="searchGestio" class="search-input" placeholder="Cerca projecte..." oninput="renderGestioLlista()">
+                    <select id="sortGestio" class="sort-select" onchange="renderGestioLlista()">
+                        <option value="new">Recents</option>
+                        <option value="old">Antics</option>
+                    </select>
                 </div>
-
-                <!-- CALENDAR PANEL -->
-                <div id="hist-panel-calendari" class="hist-panel">
-                    <div class="cal-filters">
-                        <select id="calFilterProject" class="sort-select" onchange="renderCalendar()" style="flex:1;width:auto;">
-                            <option value="all">Tots els projectes</option>
-                        </select>
-                    </div>
-                    <div class="cal-legend" id="calLegend">
-                        <div class="cal-legend-item active cat-captura" data-cat="captura" onclick="toggleCalCat('captura')">
-                            <div class="cal-legend-dot cat-captura"></div><span>Foto R&#224;pida</span>
-                        </div>
-                        <div class="cal-legend-item active cat-inventari" data-cat="inventari" onclick="toggleCalCat('inventari')">
-                            <div class="cal-legend-dot cat-inventari"></div><span>Inventari</span>
-                        </div>
-                        <div class="cal-legend-item active cat-obra" data-cat="obra" onclick="toggleCalCat('obra')">
-                            <div class="cal-legend-dot cat-obra"></div><span>Obra</span>
-                        </div>
-                    </div>
-                    <div class="cal-nav">
-                        <button class="cal-nav-btn" onclick="calPrevMonth()">&#8249;</button>
-                        <div class="cal-month-label" id="calMonthLabel"></div>
-                        <button class="cal-nav-btn" onclick="calNextMonth()">&#8250;</button>
-                    </div>
-                    <div class="cal-grid-wrap">
-                        <div class="cal-dow-row" id="calDowRow">
-                            <!-- filled by JS so we can use short labels on small screens -->
-                        </div>
-                        <div class="cal-grid" id="calGrid"></div>
-                    </div>
-                    <!-- Day detail panel — appears below calendar on tap -->
-                    <div id="calDayPanel" class="cal-day-panel" style="display:none;"></div>
-                    <button class="btn btn-ghost" style="margin-top:16px;" onclick="ir('home')">TORNAR</button>
-                </div>
-
-                <!-- GANTT PANEL -->
-                <div id="hist-panel-gantt" class="hist-panel">
-                    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Obres amb dates d&apos;inici i fi. Clica una barra per veure el detall.</p>
-                    <div id="ganttContainer"></div>
-                    <button class="btn btn-ghost" style="margin-top:16px;" onclick="ir('home')">TORNAR</button>
-                </div>
+                <div id="listaGestio"></div>
+                <button class="btn btn-ghost" style="margin-top:16px;" onclick="ir('list')">&#8592; TORNAR AL CENTRE DE GESTIÓ</button>
             </div>
 
             <!-- Project detail screen is below -->
@@ -5777,12 +5748,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-label">Incidències</div>
                         <div class="action-desc">Informes d'incidències de camp</div>
                     </div>
-                    <div class="action-card" onclick="ir('dlFitxaAnimal')" style="border-left:3px solid #b45309;">
+                    <div class="action-card" onclick="anarADescarrega('dlFitxaAnimal','downloads')" style="border-left:3px solid #b45309;">
                         <div class="action-icon">🐾</div>
                         <div class="action-label">Fitxa Animal</div>
                         <div class="action-desc">Fitxes completes d'atropellament</div>
                     </div>
-                    <div class="action-card" onclick="ir('dlITC')">
+                    <div class="action-card" onclick="anarADescarrega('dlITC','downloads')">
                         <div class="action-icon">📝</div>
                         <div class="action-label">ITC</div>
                         <div class="action-desc">Informes tècnics de carreteres</div>
@@ -5963,7 +5934,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                  ================================================ -->
             <div id="dlFitxaAnimal" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <button class="btn-back" onclick="tornarDlOrigen()">&#8592;</button>
                     <h3>&#128062; Fitxa Animal</h3>
                 </div>
 
@@ -5978,7 +5949,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div style="font-weight:700; font-size:0.85rem; margin:4px 0 8px; color:var(--text-muted);">🐾 Fitxes completes d'animal</div>
                 <div id="animalFitxesWrap"></div>
 
-                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="tornarDlOrigen()">&#8592; TORNAR</button>
             </div>
 
             <!-- ================================================
@@ -5986,7 +5957,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                  ================================================ -->
             <div id="dlITC" class="screen">
                 <div class="screen-header">
-                    <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
+                    <button class="btn-back" onclick="tornarDlOrigen()">&#8592;</button>
                     <h3>&#128221; ITC</h3>
                 </div>
 
@@ -6003,7 +5974,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
                 <div id="listaITC"></div>
 
-                <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('downloads')">&#8592; TORNAR A DESCÀRREGUES</button>
+                <button class="btn btn-ghost" style="margin-top:20px;" onclick="tornarDlOrigen()">&#8592; TORNAR</button>
             </div>
 
 
@@ -6792,6 +6763,7 @@ const screenTitles = {
     'form':          'Registre de Dades',
     'puntsLlistat':  'Punts Recollits',
     'list':          'Centre de Gestió',
+    'gestioLlista':  'Centre de Gestió',
     'downloads':     'Descàrregues',
     'dlInventaris':  'Descàrregues · Inventaris',
     'dlIncidencies': 'Descàrregues · Incidències',
@@ -6833,7 +6805,7 @@ function ir(id) {
 
     // Update sidebar active state
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el => el.classList.remove('active'));
-    const navMap = { home:'nav-home', list:'nav-list', downloads:'nav-downloads', dlInventaris:'nav-downloads', dlIncidencies:'nav-downloads', dlFitxaAnimal:'nav-downloads', dlITC:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
+    const navMap = { home:'nav-home', list:'nav-list', gestioLlista:'nav-list', downloads:'nav-downloads', dlInventaris:'nav-downloads', dlIncidencies:'nav-downloads', dlFitxaAnimal:'nav-downloads', dlITC:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'dlInventaris') carregarLlistaDescargues();
@@ -6871,11 +6843,24 @@ function closeModal()       { document.getElementById('projectModal').style.disp
    ============================================================ */
 let navFrom = 'list';      // default: historial
 let detailScrollY = 0;     // remember scroll position in historial
+let gestioTipusActual = 'inventari';  // 'inventari' | 'obra' — tipus actiu al Centre de Gestió
+let dlOrigin = 'downloads';           // 'downloads' | 'list' — d'on s'ha entrat a dlFitxaAnimal/dlITC
+
+/** Obre una pantalla de Descàrregues recordant d'on venim, per tornar-hi correctament */
+function anarADescarrega(id, origin) {
+    dlOrigin = origin || 'downloads';
+    ir(id);
+}
+function tornarDlOrigen() { ir(dlOrigin); }
 
 /** Back from projectDetail → go to wherever we came from */
 function goBackFromDetail() {
     if (navFrom === 'home') {
         ir('home');
+    } else if (navFrom === 'gestioLlista') {
+        ir('gestioLlista');
+        renderGestioLlista();
+        setTimeout(() => window.scrollTo({ top: detailScrollY, behavior: 'instant' }), 80);
     } else {
         // Restore historial with scroll position preserved
         historial();
@@ -7736,24 +7721,68 @@ function historial() {
     if (!db) return;
     db.transaction("projects").objectStore("projects").getAll().onsuccess = (e) => {
         allProjectsCache = e.target.result || [];
-        renderHistLlista();
+        renderGestioHubStats();
     };
+    if (db.objectStoreNames.contains('animalsIncidencies')) {
+        db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
+            const n = (e.target.result || []).length;
+            const el = document.getElementById('gestioStatAnimals');
+            if (el) el.textContent = n === 0 ? 'Cap fitxa encara' : `${n} fitxa${n !== 1 ? 'es' : ''} completa${n !== 1 ? 'es' : ''}`;
+        };
+    }
+    if (db.objectStoreNames.contains('itcInformes')) {
+        db.transaction('itcInformes').objectStore('itcInformes').getAll().onsuccess = e => {
+            const n = (e.target.result || []).length;
+            const el = document.getElementById('gestioStatITC');
+            if (el) el.textContent = n === 0 ? 'Cap informe encara' : `${n} informe${n !== 1 ? 's' : ''}`;
+        };
+    }
 }
 
 /* ============================================================
-   RENDER LIST TAB
+   HUB STATS — comptadors ràpids a les targetes del Centre de Gestió
    ============================================================ */
-function renderHistLlista() {
-    const l = document.getElementById("listaInventarios");
+function renderGestioHubStats() {
+    const invs  = allProjectsCache.filter(p => (p.tipusEntrada || 'inventari') === 'inventari');
+    const obres = allProjectsCache.filter(p => p.tipusEntrada === 'obra');
+    const obresActives = obres.filter(p => (p.porcentaje_progreso || 0) < 100).length;
+
+    const elInv = document.getElementById('gestioStatInventaris');
+    if (elInv) elInv.textContent = invs.length === 0 ? 'Cap inventari encara' : `${invs.length} inventari${invs.length !== 1 ? 's' : ''}`;
+
+    const elObra = document.getElementById('gestioStatObra');
+    if (elObra) {
+        elObra.textContent = obres.length === 0
+            ? 'Cap obra encara'
+            : `${obres.length} obra${obres.length !== 1 ? 's' : ''}${obresActives ? ' · ' + obresActives + ' en curs' : ''}`;
+    }
+}
+
+/** Obre el llistat d'un tipus concret (inventari / obra) dins del Centre de Gestió */
+function obrirGestioTipus(tipus) {
+    gestioTipusActual = tipus;
+    ir('gestioLlista');
+    const label = tipus === 'obra' ? "&#128679; Seguiment d'Obra" : '&#128230; Inventaris';
+    const titleEl = document.getElementById('gestioLlistaTitle');
+    if (titleEl) titleEl.innerHTML = label;
+    const tb = document.getElementById('topbarTitle');
+    if (tb) tb.textContent = tipus === 'obra' ? "Seguiment d'Obra" : 'Inventaris';
+    const searchEl = document.getElementById('searchGestio');
+    if (searchEl) searchEl.value = '';
+    renderGestioLlista();
+}
+
+/* ============================================================
+   RENDER LLISTAT PER TIPUS (Inventaris / Seguiment d'Obra)
+   ============================================================ */
+function renderGestioLlista() {
+    const l = document.getElementById("listaGestio");
     if (!l) return;
 
-    const searchText = (document.getElementById('searchHistorial')?.value || "").toLowerCase();
-    const sortOrder  = document.getElementById('sortHistorial')?.value || "new";
+    const searchText = (document.getElementById('searchGestio')?.value || "").toLowerCase();
+    const sortOrder  = document.getElementById('sortGestio')?.value || "new";
 
-    let result = [...allProjectsCache];
-
-    // Category legend filter
-    result = result.filter(p => activeCats.has(p.tipusEntrada || 'inventari'));
+    let result = allProjectsCache.filter(p => (p.tipusEntrada || 'inventari') === gestioTipusActual);
 
     // Text search
     if (searchText) result = result.filter(p => p.titulo.toLowerCase().includes(searchText));
@@ -7766,7 +7795,7 @@ function renderHistLlista() {
     });
 
     l.innerHTML = result.length === 0
-        ? "<div style='text-align:center;padding:40px;color:var(--text-muted);'><div style='font-size:2rem;margin-bottom:10px;'>&#128194;</div><div>Cap projecte trobat</div></div>"
+        ? `<div style='text-align:center;padding:40px;color:var(--text-muted);'><div style='font-size:2rem;margin-bottom:10px;'>${gestioTipusActual === 'obra' ? '&#128679;' : '&#128230;'}</div><div>Cap ${gestioTipusActual === 'obra' ? 'obra' : 'inventari'} trobat</div></div>`
         : "";
 
     result.forEach(p => {
@@ -7817,7 +7846,7 @@ function renderHistLlista() {
                 ${progrHTML}
             </div>
             <div class="project-card-actions">
-                <button class="btn btn-primary btn-sm pca-open" onclick="obrirDetallProjecte('${p.id}','list')">&#128269; DETALL</button>
+                <button class="btn btn-primary btn-sm pca-open" onclick="obrirDetallProjecte('${p.id}','gestioLlista')">&#128269; DETALL</button>
                 ${!isCap ? `<button class="btn btn-ghost btn-sm pca-clone" onclick="clonarP('${p.id}')">&#128260; CLONAR</button>` : ''}
                 <button class="btn btn-danger btn-sm btn-icon pca-delete" onclick="borrarP('${p.id}')" title="Eliminar">&#128465;</button>
             </div>`;
@@ -8400,11 +8429,18 @@ function crearObra() {
     };
 }
 
+/** Refresca les vistes del Centre de Gestió (llistat de tipus + comptadors del hub),
+ *  només si els seus elements són al DOM (evita errors si encara no s'han creat). */
+function refreshGestioViews() {
+    if (document.getElementById('listaGestio')) renderGestioLlista();
+    if (document.getElementById('gestioStatInventaris')) renderGestioHubStats();
+}
+
 function borrarP(id) {
     if (confirm("Eliminar tot el projecte? Aquesta accio no es pot desfer.")) {
         db.transaction("projects","readwrite").objectStore("projects").delete(id).onsuccess = () => {
             allProjectsCache = allProjectsCache.filter(p => p.id !== id);
-            renderHistLlista();
+            refreshGestioViews();
             showToast("Projecte eliminat");
         };
     }
