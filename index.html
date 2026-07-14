@@ -1029,6 +1029,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .photo-item img { width: 100%; height: 100%; object-fit: cover; }
 
+/* Fitxa animal: text d'ajuda per arrossegar fotos, ocult per defecte
+   (mòbil/tablet) — es mostra només a la vista d'escriptori, veure
+   bloc DESKTOP DENSITY més avall. */
+#animalFotosDropZoneHint { display: none; }
+
 .btn-del-photo {
     position: absolute; top: 0; right: 0;
     background: var(--primary);
@@ -5094,6 +5099,25 @@ input:checked + .slider:before { transform: translateX(20px); }
    d'escriptori professional, sense tocar res en mòbil/tablet.
    ══════════════════════════════════════════════════════════════════ */
 @media (min-width: 1025px) {
+
+    /* ── Fitxa animal: zona d'arrossegar fotos, només a escriptori ── */
+    #animalFotosDropZone {
+        border: 2px dashed var(--border-dark);
+        border-radius: var(--radius-sm);
+        padding: 10px;
+        transition: background .15s, border-color .15s;
+    }
+    #animalFotosDropZone.drag-over {
+        background: var(--surface-2);
+        border-color: var(--accent-blue);
+    }
+    #animalFotosDropZoneHint {
+        display: block;
+        text-align: center;
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
 
     /* ── Botons: més petits, sense uppercase forçat gegant ── */
     .btn {
@@ -13533,13 +13557,16 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
 
         <div class="form-group">
             <label>Fotos (màx. 6)</label>
-            <div id="animalFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputCamera').click()">📷 Càmera</button>
-                <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputGaleria').click()">🖼️ Galeria</button>
+            <div id="animalFotosDropZone">
+                <span id="animalFotosDropZoneHint">🖱️ Arrossega fotos aquí, o utilitza els botons</span>
+                <div id="animalFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputCamera').click()">📷 Càmera</button>
+                    <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('animalFotoInputGaleria').click()">🖼️ Galeria</button>
+                </div>
+                <input type="file" id="animalFotoInputCamera" accept="image/*" capture="environment" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
+                <input type="file" id="animalFotoInputGaleria" accept="image/*" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
             </div>
-            <input type="file" id="animalFotoInputCamera" accept="image/*" capture="environment" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
-            <input type="file" id="animalFotoInputGaleria" accept="image/*" multiple hidden onchange="_animalAfegirFotos(this.files); this.value='';">
         </div>
 
         <div class="form-group"><label>PARC</label><input type="text" id="an_parc" value="${parcDefault}"></div>
@@ -13601,7 +13628,23 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
 
     document.querySelector('.page-content').appendChild(screen);
     _animalRenderFotosGrid();
+    _animalInitDropZone();
     if (r.senyalitzacio) _animalBuscarTram();
+}
+
+function _animalInitDropZone() {
+    const dz = document.getElementById('animalFotosDropZone');
+    if (!dz) return;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
+        dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
+    });
+    dz.addEventListener('dragenter', () => dz.classList.add('drag-over'));
+    dz.addEventListener('dragover', () => dz.classList.add('drag-over'));
+    dz.addEventListener('dragleave', e => { if (e.target === dz) dz.classList.remove('drag-over'); });
+    dz.addEventListener('drop', e => {
+        dz.classList.remove('drag-over');
+        if (e.dataTransfer?.files?.length) _animalAfegirFotos(e.dataTransfer.files);
+    });
 }
 
 function _animalRenderFotosGrid() {
@@ -13793,15 +13836,41 @@ function _processarP24Json(json, desarConfig) {
             else if (nk.includes('llegenda') || nk.includes('caixeti')) llegenda = row[k];
             else if (nk === 'parc') parc = row[k];
         }
-        const distanciaM = _distanciaATexte(llegenda);
         return {
             carretera: String(carretera || '').trim().toUpperCase(),
             pk: _pkANumero(pk),
-            marge: String(marge || '').trim(),
-            distanciaM,
+            marge: String(marge || '').trim().toUpperCase(),
+            llegenda,
             parc: parc || '',
         };
     }).filter(t => t.carretera && t.pk !== null);
+
+    // Els cartells "RECORDI" són repetidors: no porten distància pròpia, repeteixen
+    // l'abast del darrer cartell real del mateix carretera+marge. Agrupem per
+    // carretera+marge, ordenem per PK i "heretem" la distància cap avall perquè
+    // aquests trams no quedin sense cobertura.
+    const grups = {};
+    trams.forEach(t => {
+        const key = t.carretera + '|' + t.marge;
+        (grups[key] = grups[key] || []).push(t);
+    });
+    Object.values(grups).forEach(arr => {
+        arr.sort((a, b) => a.pk - b.pk);
+        let ultimaDist = null;
+        arr.forEach(t => {
+            const d = _distanciaATexte(t.llegenda);
+            if (d !== null) {
+                t.distanciaM = d;
+                ultimaDist = d;
+            } else if (ultimaDist !== null) {
+                t.distanciaM = ultimaDist;
+                t.esRecordi = true;
+            } else {
+                t.distanciaM = null;
+            }
+        });
+    });
+
     P24_TRAMS = trams;
     if (desarConfig) {
         try { localStorage.setItem('p24_trams', JSON.stringify(trams)); } catch(e) {}
@@ -13868,7 +13937,8 @@ function _animalBuscarTram() {
     if (millor) {
         document.getElementById('an_pkInici').value = fmtPk(millor.ini);
         document.getElementById('an_pkFi').value = fmtPk(millor.fi);
-        if (status) status.textContent = `✅ Dins de tram senyalitzat (cartell PK ${fmtPk(millor.t.pk)}${millor.t.marge ? ', marge ' + millor.t.marge : ''}). Verifica el resultat.`;
+        const origenRecordi = millor.t.esRecordi ? ' — distància heretada d\'un cartell RECORDI anterior' : '';
+        if (status) status.textContent = `✅ Dins de tram senyalitzat (cartell PK ${fmtPk(millor.t.pk)}${millor.t.marge ? ', marge ' + millor.t.marge : ''}${origenRecordi}). Verifica el resultat.`;
     } else {
         if (status) status.textContent = '⚠️ No s\'ha trobat cap cartell P-24 que cobreixi aquest PK. Omple\'l manualment.';
     }
