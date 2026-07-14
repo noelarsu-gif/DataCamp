@@ -2092,6 +2092,14 @@ input:checked + .slider:before { transform: translateX(20px); }
     align-items: center;
     gap: 8px;
 }
+/* Files de configuració — en mòbil es queden apilades (comportament actual);
+   a escriptori es converteixen en fila (veure @media min-width:1025px) */
+.settings-row,
+.settings-btn-row,
+.settings-inline-row {
+    display: flex;
+    flex-direction: column;
+}
 .logo-preview-box {
     background: var(--surface-2);
     border: 2px dashed var(--border-dark);
@@ -5164,6 +5172,61 @@ input:checked + .slider:before { transform: translateX(20px); }
     /* ── Formularis llargs: no s'estiren als 1200px del contenidor,
        queden centrats amb una amplada de lectura còmoda ── */
     .screen-form { max-width: 760px; margin-left: auto; margin-right: auto; }
+
+    /* ── Configuració: pantalla compacta i centrada, com un formulari
+       d'escriptori normal en lloc d'una llista de botons de mòbil ── */
+    #pantallaAjustos {
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #pantallaAjustos .settings-section {
+        padding: 16px 20px;
+        margin-bottom: 14px;
+    }
+    #pantallaAjustos .settings-section-title {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+    #pantallaAjustos .logo-preview-box { padding: 14px; }
+
+    /* Nom del tècnic + PARC, un al costat de l'altre */
+    .settings-row {
+        flex-direction: row;
+        gap: 14px;
+    }
+    .settings-row .form-group { flex: 1; margin-bottom: 0; }
+
+    /* Parelles de botons (seleccionar/eliminar, sincro/esborrar, pujar/eliminar)
+       en una sola fila, mida de botó normal (no ample complet) ── */
+    .settings-btn-row {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .settings-btn-row > .btn {
+        width: auto;
+        min-width: 0;
+        margin: 0 !important;
+    }
+
+    /* Input + botó d'afegir carretera, en línia ── */
+    .settings-inline-row {
+        flex-direction: row;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    .settings-inline-row input[type="text"] {
+        flex: 1;
+        width: auto;
+        margin-bottom: 0 !important;
+    }
+    .settings-inline-row > .btn {
+        width: auto;
+        min-width: 0;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
 }
 
 </style>
@@ -6052,13 +6115,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
                         Aquestes dades es recordaran al dispositiu i s'utilitzaran per emplenar automàticament el teu nom i PARC als informes i fitxes (com la Fitxa d'Incidència Animal).
                     </p>
-                    <div class="form-group">
-                        <label>Nom del tècnic</label>
-                        <input type="text" id="tecnicNom" placeholder="Ex: Noel Arroyo">
-                    </div>
-                    <div class="form-group">
-                        <label>PARC</label>
-                        <input type="text" id="tecnicParc" placeholder="Ex: Tremp">
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label>Nom del tècnic</label>
+                            <input type="text" id="tecnicNom" placeholder="Ex: Noel Arroyo">
+                        </div>
+                        <div class="form-group">
+                            <label>PARC</label>
+                            <input type="text" id="tecnicParc" placeholder="Ex: Tremp">
+                        </div>
                     </div>
                     <button class="btn btn-secondary" onclick="desarDadesTecnic()">💾 DESAR DADES</button>
                 </div>
@@ -6073,8 +6138,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <img id="logoActual" src="" style="max-width:100%; max-height:70px; display:none;">
                         <div id="noLogoMsg" style="color:var(--text-light); font-size:0.85rem;">Cap logo carregat</div>
                     </div>
-                    <button class="btn btn-ghost" onclick="document.getElementById('inputLogo').click()" style="margin-bottom:8px;">📂 SELECCIONAR IMATGE</button>
-                    <button class="btn btn-danger" onclick="eliminarLogo()">🗑️ ELIMINAR LOGO</button>
+                    <div class="settings-btn-row">
+                        <button class="btn btn-ghost" onclick="document.getElementById('inputLogo').click()" style="margin-bottom:8px;">📂 SELECCIONAR IMATGE</button>
+                        <button class="btn btn-danger" onclick="eliminarLogo()">🗑️ ELIMINAR LOGO</button>
+                    </div>
                     <input type="file" id="inputLogo" accept="image/*" hidden onchange="handleLogo(this)">
                 </div>
 
@@ -6099,12 +6166,14 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="syncro-pk-info" id="syncroInfoText">
                         Opcional: descarrega les dades ArcGIS per a Catalunya amb major resolució.
                     </div>
-                    <button class="btn btn-secondary" id="btnSyncroPKs" onclick="sincronitzarPKsArcGIS()" style="margin-top:14px;">
-                        🔄 SINCRO PKS ARCGIS (OPCIONAL)
-                    </button>
-                    <button class="btn btn-danger" onclick="esborrarCachePKs()" style="margin-top:8px;">
-                        🗑️ ESBORRAR CACHE ARCGIS
-                    </button>
+                    <div class="settings-btn-row">
+                        <button class="btn btn-secondary" id="btnSyncroPKs" onclick="sincronitzarPKsArcGIS()" style="margin-top:14px;">
+                            🔄 SINCRO PKS ARCGIS (OPCIONAL)
+                        </button>
+                        <button class="btn btn-danger" onclick="esborrarCachePKs()" style="margin-top:8px;">
+                            🗑️ ESBORRAR CACHE ARCGIS
+                        </button>
+                    </div>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
@@ -6121,9 +6190,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <div id="p24ConfigStatus" style="font-size:0.78rem; color:var(--text-muted);">⏳ Cap fitxer carregat</div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" onclick="document.getElementById('p24Input').click()">📂 PUJAR FITXER DE TRAMS</button>
-                    <input type="file" id="p24Input" accept=".xlsx,.xls,.csv" hidden onchange="pujarTramsP24(this)">
-                    <button class="btn btn-danger" onclick="eliminarTramsP24()" style="margin-top:8px;">🗑️ ELIMINAR TRAMS</button>
+                    <div class="settings-btn-row">
+                        <button class="btn btn-secondary" onclick="document.getElementById('p24Input').click()">📂 PUJAR FITXER DE TRAMS</button>
+                        <input type="file" id="p24Input" accept=".xlsx,.xls,.csv" hidden onchange="pujarTramsP24(this)">
+                        <button class="btn btn-danger" onclick="eliminarTramsP24()" style="margin-top:8px;">🗑️ ELIMINAR TRAMS</button>
+                    </div>
                 </div>
                 <!-- ─────────────────────────────────────────────── -->
 
@@ -6133,8 +6204,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
                         El localitzador PK ignorarà les carreteres que afegeixis aquí. Útil per excloure vies que no gestioneu (autopistes, nacionals, etc.).
                     </p>
-                    <input type="text" id="blacklistInput" placeholder="Ex: AP-7, N-340..." onkeydown="if(event.key==='Enter')blacklistAfegir()" style="width:100%; margin-bottom:8px; text-transform:uppercase; font-size:1rem; font-weight:600; letter-spacing:0.5px;">
-                    <button class="btn btn-danger btn-sm" onclick="blacklistAfegir()" style="margin-bottom:14px;">+ AFEGIR CARRETERA</button>
+                    <div class="settings-inline-row">
+                        <input type="text" id="blacklistInput" placeholder="Ex: AP-7, N-340..." onkeydown="if(event.key==='Enter')blacklistAfegir()" style="width:100%; margin-bottom:8px; text-transform:uppercase; font-size:1rem; font-weight:600; letter-spacing:0.5px;">
+                        <button class="btn btn-danger btn-sm" onclick="blacklistAfegir()" style="margin-bottom:14px;">+ AFEGIR CARRETERA</button>
+                    </div>
                     <div class="blacklist-chips" id="blacklistChips">
                         <span class="blacklist-empty" id="blacklistEmpty">Cap carretera exclosa</span>
                     </div>
