@@ -13648,17 +13648,11 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
 
         <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">1. Localització</div>
 
-        <div class="form-group" style="margin:0 0 12px;">
-            <label>📎 Adjuntar captura de WhatsApp (opcional)</label>
-            <div style="display:flex; align-items:stretch; gap:8px;">
-                <div id="an_ocrDropZone" tabindex="0"
-                     style="flex:1; border:1.5px dashed var(--border,#cbd5e1); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.8rem; color:var(--text-muted,#64748b); cursor:pointer; text-align:center; transition:background .15s;"
-                     onclick="document.getElementById('an_ocrInput').click()">
-                    Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)
-                </div>
-                <button type="button" class="btn btn-ghost" style="margin:0; padding:0 12px; font-size:0.78rem; white-space:nowrap;" onclick="_animalOcrPegarBoto()">📋 Enganxar</button>
+        <div id="an_ocrPanel" class="form-group" style="margin:0 0 12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <label style="margin:0;">📎 Captura de WhatsApp</label>
+                <button type="button" class="btn btn-ghost" style="margin:0; padding:5px 12px; font-size:0.76rem; white-space:nowrap;" onclick="_animalOcrPegarBoto()">📋 Enganxar</button>
             </div>
-            <input type="file" id="an_ocrInput" accept="image/*" hidden onchange="if(this.files[0]) _animalOcrProcessar(this.files[0]); this.value='';">
             <div style="font-size:0.7rem; color:var(--text-muted,#94a3b8); margin-top:4px; line-height:1.35;">
                 💡 Retalla NOMÉS el missatge de l'animal en concret (hora, carretera/PK i "sense avís" si hi és) per evitar confusions amb altres missatges de la captura. A Windows: <strong>Win + Majús + S</strong>.
             </div>
@@ -13762,15 +13756,13 @@ function _carregarTesseract() {
 }
 
 function _animalInitOcrZone() {
-    const dz = document.getElementById('an_ocrDropZone');
-    if (!dz) return;
-    dz.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dz.click(); } });
+    if (!document.getElementById('an_ocrPanel')) return;
     // Enganxar amb Ctrl+V — actiu mentre la fitxa animal estigui oberta
     document.addEventListener('paste', _animalOcrPasteHandler);
 }
 
 function _animalOcrPasteHandler(e) {
-    if (!document.getElementById('an_ocrDropZone')) {
+    if (!document.getElementById('an_ocrPanel')) {
         document.removeEventListener('paste', _animalOcrPasteHandler);
         return;
     }
@@ -13811,22 +13803,64 @@ async function _animalOcrPegarBoto() {
     }
 }
 
+// Prepara la imatge abans de l'OCR: les captures retallades de WhatsApp
+// solen ser molt petites (ex. 182x110 px), i a aquesta mida Tesseract
+// confon símbols com ":" amb "-" o "8" amb "9". Escalem-la, la passem a
+// escala de grisos i n'estirem el contrast — validat amb captures reals
+// que sense això fallaven i amb això llegeixen bé.
+async function _animalOcrPreprocessarImatge(file) {
+    const img = await new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = () => reject(new Error('Imatge no vàlida'));
+        im.src = URL.createObjectURL(file);
+    });
+    const escala = Math.min(8, Math.max(1, 1600 / Math.max(img.width, img.height)));
+    const w = Math.round(img.width * escala), h = Math.round(img.height * escala);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(img.src);
+
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+    let min = 255, max = 0;
+    for (let i = 0; i < d.length; i += 4) {
+        const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        d[i] = d[i + 1] = d[i + 2] = g;
+        if (g < min) min = g;
+        if (g > max) max = g;
+    }
+    const rang = Math.max(1, max - min);
+    for (let i = 0; i < d.length; i += 4) {
+        const v = Math.min(255, Math.max(0, ((d[i] - min) / rang) * 255));
+        d[i] = d[i + 1] = d[i + 2] = v;
+    }
+    ctx.putImageData(imgData, 0, 0);
+    return canvas;
+}
+
 async function _animalOcrProcessar(file) {
     const status = document.getElementById('an_ocrStatus');
-    const dz = document.getElementById('an_ocrDropZone');
-    if (dz) dz.innerHTML = '⏳ Llegint la captura...';
-    if (status) status.innerHTML = '';
+    if (status) status.innerHTML = '⏳ Llegint la captura...';
+    let worker = null;
     try {
         await _carregarTesseract();
-        const { data } = await Tesseract.recognize(file, 'cat+spa', {
-            logger: () => {},
-        });
-        const text = data.text || '';
-        _animalOcrEmplenar(text);
+        const canvas = await _animalOcrPreprocessarImatge(file);
+        worker = await Tesseract.createWorker('cat+spa');
+        // PSM "sparse text": llegeix línies de text independents disperses
+        // per la imatge (com missatges de WhatsApp separats), en lloc de
+        // suposar un únic bloc de paràgraf.
+        await worker.setParameters({ tessedit_pageseg_mode: '11' });
+        const { data } = await worker.recognize(canvas);
+        _animalOcrEmplenar(data.text || '');
     } catch (err) {
         if (status) status.innerHTML = `⚠️ No s'ha pogut llegir la imatge (${err.message || 'error OCR'}). Omple els camps manualment.`;
     } finally {
-        if (dz) dz.innerHTML = 'Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)';
+        if (worker) { try { await worker.terminate(); } catch (e) {} }
     }
 }
 
