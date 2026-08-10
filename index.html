@@ -13897,11 +13897,14 @@ function _animalOcrEmplenar(textRaw) {
         if (el && !el.value.trim()) { el.value = val; detectat.push(`carretera ${val}`); }
     }
 
-    // PK: 4+400, 16+200...
-    const pkM = text.match(/\d{1,3}\s*\+\s*\d{1,3}/);
+    // PK: 4+400, 16+200... Provem primer el format exacte amb "+"; si l'OCR
+    // ha confós el símbol "+" amb un altre caràcter (força habitual en
+    // captures petites), acceptem separadors semblants com a segona opció.
+    let pkM = text.match(/\b(\d{1,3})\s*\+\s*(\d{2,3})\b/);
+    if (!pkM) pkM = text.match(/\b(\d{1,3})\s*[-~=–—]\s*(\d{3})\b/);
     if (pkM) {
         const el = document.getElementById('an_pk');
-        const val = pkM[0].replace(/\s+/g, '');
+        const val = `${pkM[1]}+${pkM[2].padStart(3, '0')}`;
         if (el && !el.value.trim()) { el.value = val; detectat.push(`PK ${val}`); }
     }
 
@@ -13916,11 +13919,18 @@ function _animalOcrEmplenar(textRaw) {
         if (el) { el.checked = !senseAvis; detectat.push(senseAvis ? 'sense avís' : 'amb avís'); }
     }
 
+    // Text cru de l'OCR, en petit — útil per veure exactament què ha llegit
+    // quan algun camp no surt (ex. el símbol "+" mal interpretat).
+    const textCurt = text.trim().replace(/\n+/g, ' · ').slice(0, 200);
+    const rawHtml = textCurt
+        ? `<div style="color:var(--text-muted,#94a3b8); margin-top:3px;">Text llegit: "${textCurt}"</div>`
+        : '';
+
     if (detectat.length) {
-        if (status) status.innerHTML = `📋 Detectat per OCR: ${detectat.join(', ')}. <strong>Verifica-ho abans de desar.</strong>`;
+        if (status) status.innerHTML = `📋 Detectat per OCR: ${detectat.join(', ')}. <strong>Verifica-ho abans de desar.</strong>${rawHtml}`;
         if (document.getElementById('an_pk')?.value) _animalBuscarTram();
     } else {
-        if (status) status.innerHTML = '⚠️ No s\'ha detectat cap dada reconeixible a la captura. Omple els camps manualment.';
+        if (status) status.innerHTML = `⚠️ No s'ha detectat cap dada reconeixible a la captura. Omple els camps manualment.${rawHtml}`;
     }
 }
 
@@ -13954,11 +13964,23 @@ function _animalEliminarFoto(idx) {
 }
 
 async function guardarFitxaAnimal() {
-    const v = id => document.getElementById(id)?.value || '';
+    const v = id => document.getElementById(id)?.value.trim() || '';
     const c = id => document.getElementById(id)?.checked || false;
 
-    if (_animalFotos.length === 0) {
-        if (!confirm('No has afegit cap foto a la fitxa. Vols desar-la igualment?')) return;
+    const falten = [];
+    if (!v('an_data')) falten.push('Data');
+    if (!v('an_hora')) falten.push('Hora');
+    if (!v('an_carretera')) falten.push('Carretera');
+    if (!v('an_pk')) falten.push('PK');
+    if (!v('an_sentit')) falten.push('Sentit');
+    if (!v('an_ubicacio')) falten.push('Ubicació');
+    if (!v('an_domestic') && !v('an_llibertat')) falten.push('Domèstic o Llibertat');
+    if (!v('an_estat')) falten.push('Estat');
+    if (_animalFotos.length === 0) falten.push('Foto (mínim 1)');
+
+    if (falten.length) {
+        alert('⚠️ Falten camps per omplir abans de desar:\n\n' + falten.map(f => '• ' + f).join('\n'));
+        return;
     }
 
     const registre = {
