@@ -13596,7 +13596,6 @@ function _fdObrirFitxaAnimal() {
         const ara = new Date();
         obrirFitxaAnimal(imgSrc, null, {
             carretera, pk,
-            data: `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`,
             hora: `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`,
         });
     } else {
@@ -13617,7 +13616,10 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
     const autorDefault = r.autor || tecnic.nom || '';
     const parcDefault = r.parc || tecnic.parc || '';
     const ara = new Date();
-    const dataDefault = r.data || `${ara.getDate().toString().padStart(2,'0')}-${(ara.getMonth()+1).toString().padStart(2,'0')}-${ara.getFullYear()}`;
+    // La data ja NO es posa per defecte a avui: en veure-la ja emplenada es
+    // dona per bona sense fixar-s'hi i sovint és incorrecta. Es deixa en
+    // blanc, tret que vingui d'una fitxa existent o l'hagi omplert l'OCR.
+    const dataDefault = r.data || '';
     const horaDefault = r.hora || `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`;
 
     const screen = document.createElement('div');
