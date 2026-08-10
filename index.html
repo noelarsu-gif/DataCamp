@@ -13968,51 +13968,46 @@ function _animalBuscarTram() {
     if (!carretera || pkNum === null) { if (status) status.textContent = 'Introdueix carretera i PK per cercar el tram.'; return; }
 
     const fmtPk = n => `${Math.floor(n/1000)}+${String(Math.round(n%1000)).padStart(3,'0')}`;
-    const reals = P24_TRAMS.filter(t => t.carretera === carretera && t.distanciaM !== null);
 
-    // Cada cartell real anuncia una distància, però no sabem amb certesa si "cap
-    // endavant" vol dir PK creixent o decreixent. Per resoldre-ho sense inventar-nos
-    // trams: primer busquem si aquest cartell té una "parella" real (marge oposat,
-    // mateixa distància anunciada, i el buit de PK entre tots dos coincideix amb
-    // aquesta distància) — això és el cas normal d'un P-24: un cartell a cada
-    // extrem del mateix tram físic. Quan hi ha parella, el tram és exacte i fiable.
-    // Quan NO n'hi ha, fem servir l'estimació d'abans (cap a un costat o l'altre)
-    // però ho marquem com estimació perquè el tècnic ho verifiqui expressament.
-    const finestres = [];
-    reals.forEach(t => {
-        const parella = reals.find(o => o !== t && o.marge !== t.marge
-            && Math.abs(o.distanciaM - t.distanciaM) < 5
-            && Math.abs(Math.abs(o.pk - t.pk) - t.distanciaM) < 50);
-        if (parella) {
-            finestres.push({ ini: Math.min(t.pk, parella.pk), fi: Math.max(t.pk, parella.pk), pk: t.pk, marge: t.marge, fiable: true });
-        } else {
-            finestres.push({ ini: t.pk, fi: t.pk + t.distanciaM, pk: t.pk, marge: t.marge, fiable: false });
-            finestres.push({ ini: t.pk - t.distanciaM, fi: t.pk, pk: t.pk, marge: t.marge, fiable: false });
-        }
-    });
+    // L'Excel és la font única de veritat: cap càlcul, cap tolerància. Només
+    // els cartells amb distància real anunciada delimiten un tram (distanciaM
+    // !== null ja exclou els "RECORDI", que són repetidors intermedis i
+    // s'ignoren del tot: ni inicien ni tanquen res). Ordenem aquests cartells
+    // per PK i cada parella de cartells CONSECUTIUS amb marge oposat és,
+    // literalment, un tram tal com figura al full — el PK inici i el PK fi
+    // són exactament els que hi ha a l'Excel, punt.
+    const reals = P24_TRAMS.filter(t => t.carretera === carretera && t.distanciaM !== null)
+        .sort((a, b) => a.pk - b.pk);
 
-    const cobreixen = finestres.filter(f => pkNum >= f.ini && pkNum <= f.fi);
-    const fiables = cobreixen.filter(f => f.fiable);
-    const bossa = fiables.length ? fiables : cobreixen;
-
-    let millor = null, millorLlargada = Infinity, millorMarge = Infinity;
-    bossa.forEach(f => {
-        const llargada = f.fi - f.ini;
-        const marge = Math.min(pkNum - f.ini, f.fi - pkNum);
-        if (llargada < millorLlargada || (llargada === millorLlargada && marge < millorMarge)) {
-            millorLlargada = llargada; millorMarge = marge; millor = f;
-        }
-    });
+    let millor = null;
+    for (let i = 0; i < reals.length - 1; i++) {
+        const a = reals[i], b = reals[i + 1];
+        if (a.marge === b.marge) continue; // dos cartells seguits del mateix marge no formen tram entre ells
+        // Únic filtre de sensatesa (no és una tolerància sobre el resultat):
+        // el buit real entre els dos cartells ha d'estar en el mateix ordre
+        // de magnitud que la llegenda anunciada (entre la meitat i el doble).
+        // Això només serveix per descartar buits de dades — trams de la
+        // carretera sense cap cartell durant molts km (ex. C-26: cartell a
+        // 48+350 i el següent real a 85+000, 36 km després) que altrament
+        // es llegirien com un sol tram fantasma. El PK inici/fi que s'usa
+        // sempre és el literal de l'Excel, mai un valor calculat.
+        const gap = b.pk - a.pk;
+        const avgDist = (a.distanciaM + b.distanciaM) / 2;
+        if (gap < avgDist * 0.5 || gap > avgDist * 2) continue;
+        const ini = Math.min(a.pk, b.pk), fi = Math.max(a.pk, b.pk);
+        if (pkNum >= ini && pkNum <= fi) { millor = { ini, fi, fiable: true }; break; }
+    }
 
     if (millor) {
         document.getElementById('an_pkInici').value = fmtPk(millor.ini);
         document.getElementById('an_pkFi').value = fmtPk(millor.fi);
-        const nota = millor.fiable
-            ? ''
-            : ' — estimació a partir d\'un sol cartell (sense parella confirmada), verifica-ho especialment';
-        if (status) status.textContent = `✅ Dins de tram senyalitzat (cartell PK ${fmtPk(millor.pk)}${millor.marge ? ', marge ' + millor.marge : ''}${nota}). Verifica el resultat.`;
+        if (status) status.textContent = '✅ Dins de tram senyalitzat. Verifica el resultat.';
     } else {
-        if (status) status.textContent = '⚠️ No s\'ha trobat cap cartell P-24 que cobreixi aquest PK. Omple\'l manualment.';
+        // Pot ser que aquest PK només tingui un cartell solt (l'altre extrem
+        // del tram cau en un altre sector, fora d'aquest full) — en aquest
+        // cas NO inventem cap PK fi: es deixa en blanc perquè el tècnic ho
+        // ompli manualment amb la informació del sector veí.
+        if (status) status.textContent = '⚠️ Cap tram complet d\'aquest sector cobreix aquest PK (pot ser que l\'altre extrem sigui d\'un altre sector). Omple-ho manualment.';
     }
 }
 
