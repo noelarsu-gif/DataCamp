@@ -14210,14 +14210,21 @@ function _animalBuscarTram() {
     for (let i = 0; i < reals.length - 1; i++) {
         const a = reals[i], b = reals[i + 1];
         if (a.marge === b.marge) continue; // dos cartells seguits del mateix marge no formen tram entre ells
-        // Únic filtre de sensatesa (no és una tolerància sobre el resultat):
-        // el buit real entre els dos cartells ha d'estar en el mateix ordre
-        // de magnitud que la llegenda anunciada (entre la meitat i el doble).
-        // Això només serveix per descartar buits de dades — trams de la
-        // carretera sense cap cartell durant molts km (ex. C-26: cartell a
-        // 48+350 i el següent real a 85+000, 36 km després) que altrament
-        // es llegirien com un sol tram fantasma. El PK inici/fi que s'usa
-        // sempre és el literal de l'Excel, mai un valor calculat.
+        // Dos filtres de sensatesa (no són una tolerància sobre el resultat,
+        // només decideixen si dos cartells consecutius formen tram entre ells):
+        // 1) Les dues llegendes han de ser del mateix ordre de magnitud entre
+        //    elles — sense això, un cartell de "700 m" es podia aparellar amb
+        //    el següent real de "7 km" (C-26: 38+135 "700 m" ↔ 41+500 "7 km"),
+        //    robant-li el tram al seu veritable parell.
+        const petita = Math.min(a.distanciaM, b.distanciaM), gran = Math.max(a.distanciaM, b.distanciaM);
+        if (petita / gran < 0.5) continue;
+        // 2) El buit real entre els dos cartells ha d'estar en el mateix ordre
+        //    de magnitud que la llegenda anunciada (entre la meitat i el doble).
+        //    Això només serveix per descartar buits de dades — trams de la
+        //    carretera sense cap cartell durant molts km (ex. C-26: cartell a
+        //    48+350 i el següent real a 85+000, 36 km després) que altrament
+        //    es llegirien com un sol tram fantasma. El PK inici/fi que s'usa
+        //    sempre és el literal de l'Excel, mai un valor calculat.
         const gap = b.pk - a.pk;
         const avgDist = (a.distanciaM + b.distanciaM) / 2;
         if (gap < avgDist * 0.5 || gap > avgDist * 2) continue;
