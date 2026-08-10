@@ -13650,10 +13650,13 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
 
         <div class="form-group" style="margin:0 0 12px;">
             <label>📎 Adjuntar captura de WhatsApp (opcional)</label>
-            <div id="an_ocrDropZone" tabindex="0"
-                 style="border:1.5px dashed var(--border,#cbd5e1); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.8rem; color:var(--text-muted,#64748b); cursor:pointer; text-align:center; transition:background .15s;"
-                 onclick="document.getElementById('an_ocrInput').click()">
-                Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)
+            <div style="display:flex; align-items:stretch; gap:8px;">
+                <div id="an_ocrDropZone" tabindex="0"
+                     style="flex:1; border:1.5px dashed var(--border,#cbd5e1); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.8rem; color:var(--text-muted,#64748b); cursor:pointer; text-align:center; transition:background .15s;"
+                     onclick="document.getElementById('an_ocrInput').click()">
+                    Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)
+                </div>
+                <button type="button" class="btn btn-ghost" style="margin:0; padding:0 12px; font-size:0.78rem; white-space:nowrap;" onclick="_animalOcrPegarBoto()">📋 Enganxar</button>
             </div>
             <input type="file" id="an_ocrInput" accept="image/*" hidden onchange="if(this.files[0]) _animalOcrProcessar(this.files[0]); this.value='';">
             <div style="font-size:0.7rem; color:var(--text-muted,#94a3b8); margin-top:4px; line-height:1.35;">
@@ -13782,6 +13785,32 @@ function _animalOcrPasteHandler(e) {
     }
 }
 
+// Botó "📋 Enganxar": alternativa al Ctrl+V per a mòbil o quan el focus
+// del teclat no cau al requadre. Usa l'API moderna del porta-retalls; si
+// el navegador no la suporta o l'usuari denega el permís, es demana que
+// facin servir Ctrl+V dins del requadre com a alternativa.
+async function _animalOcrPegarBoto() {
+    const status = document.getElementById('an_ocrStatus');
+    if (!navigator.clipboard || !navigator.clipboard.read) {
+        if (status) status.innerHTML = '⚠️ Aquest navegador no permet el botó d\'enganxar — prova Ctrl+V dins del requadre.';
+        return;
+    }
+    try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+            const tipusImatge = item.types.find(t => t.startsWith('image/'));
+            if (tipusImatge) {
+                const blob = await item.getType(tipusImatge);
+                _animalOcrProcessar(blob);
+                return;
+            }
+        }
+        if (status) status.innerHTML = '⚠️ No hi ha cap imatge al porta-retalls.';
+    } catch (err) {
+        if (status) status.innerHTML = `⚠️ No s'ha pogut accedir al porta-retalls (${err.message || 'permís denegat'}). Prova Ctrl+V dins del requadre.`;
+    }
+}
+
 async function _animalOcrProcessar(file) {
     const status = document.getElementById('an_ocrStatus');
     const dz = document.getElementById('an_ocrDropZone');
@@ -13805,6 +13834,16 @@ function _animalOcrEmplenar(textRaw) {
     const status = document.getElementById('an_ocrStatus');
     const text = String(textRaw || '');
     const detectat = [];
+
+    // Data: dd/mm/aaaa (com mostra WhatsApp Web al visor de fotos, ex.
+    // "7/8/2026 a la(s) 19:31"). Sempre es sobreescriu, igual que l'hora:
+    // per defecte el camp ja porta la data d'avui, que no és la de la foto.
+    const dataM = text.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
+    if (dataM) {
+        const el = document.getElementById('an_data');
+        const val = `${dataM[1].padStart(2, '0')}-${dataM[2].padStart(2, '0')}-${dataM[3]}`;
+        if (el) { el.value = val; detectat.push(`data ${val}`); }
+    }
 
     // Hora: HH:MM (agafem la darrera trobada — sol ser la del missatge amb la foto).
     // A diferència de carretera/PK, l'hora SEMPRE es sobreescriu: per defecte
@@ -13832,10 +13871,15 @@ function _animalOcrEmplenar(textRaw) {
         if (el && !el.value.trim()) { el.value = val; detectat.push(`PK ${val}`); }
     }
 
-    // "Sense avís" — desactiva l'Avís de CCCT si es detecta explícitament
-    if (/sense\s*avi?s|sin\s*aviso/i.test(text)) {
+    // "Sense avís" — si NO apareix aquest text al missatge, vol dir que SÍ hi
+    // va haver avís, així que activem l'interruptor; si hi apareix, el
+    // desactivem. Només ho toquem si la captura sembla realment un missatge
+    // d'incidència (s'hi ha detectat carretera o PK), per no activar-lo per
+    // error amb una captura que no tingui res a veure.
+    if (carreteraM || pkM) {
         const el = document.getElementById('an_avisCcct');
-        if (el) { el.checked = false; detectat.push('sense avís'); }
+        const senseAvis = /sense\s*avi?s|sin\s*aviso/i.test(text);
+        if (el) { el.checked = !senseAvis; detectat.push(senseAvis ? 'sense avís' : 'amb avís'); }
     }
 
     if (detectat.length) {
