@@ -13891,19 +13891,22 @@ function _animalOcrEmplenar(textRaw) {
         if (el) { el.value = h; detectat.push(`hora ${h}`); }
     }
 
-    // Carretera: C-14, L-313, LV-3025, LP-9221, N-II, etc.
-    const carreteraM = text.match(/\b(N|C|L|LV|LP)-\s?\d{1,4}[A-Za-z]?\b/i);
+    // Carretera: C-14, L-313, LV-3025, LP-9221, N-II, etc. El guionet i
+    // l'espai són opcionals: sovint s'escriu "C14" sense guionet.
+    const carreteraM = text.match(/\b(N|C|L|LV|LP)-?\s?(\d{1,4})([A-Za-z]?)\b/i);
     if (carreteraM) {
         const el = document.getElementById('an_carretera');
-        const val = carreteraM[0].toUpperCase().replace(/\s+/g, '');
+        const val = `${carreteraM[1].toUpperCase()}-${carreteraM[2]}${carreteraM[3].toUpperCase()}`;
         if (el && !el.value.trim()) { el.value = val; detectat.push(`carretera ${val}`); }
     }
 
-    // PK: 4+400, 16+200... Provem primer el format exacte amb "+"; si l'OCR
+    // PK: 4+400, 16+200... Sense "\b" davant del primer número, perquè sovint
+    // no hi ha espai entre "pk" i la xifra (ex. "pk125+950"), i "k1" no és
+    // un límit de paraula. Provem primer el format exacte amb "+"; si l'OCR
     // ha confós el símbol "+" amb un altre caràcter (força habitual en
     // captures petites), acceptem separadors semblants com a segona opció.
-    let pkM = text.match(/\b(\d{1,3})\s*\+\s*(\d{2,3})\b/);
-    if (!pkM) pkM = text.match(/\b(\d{1,3})\s*[-~=–—]\s*(\d{3})\b/);
+    let pkM = text.match(/(\d{1,3})\s*\+\s*(\d{2,3})\b/);
+    if (!pkM) pkM = text.match(/(\d{1,3})\s*[-~=–—]\s*(\d{3})\b/);
     if (pkM) {
         const el = document.getElementById('an_pk');
         const val = `${pkM[1]}+${pkM[2].padStart(3, '0')}`;
