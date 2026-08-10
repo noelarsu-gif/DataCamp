@@ -13647,6 +13647,21 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
         <div class="form-group"><label>Autor/a informe</label><input type="text" id="an_autor" value="${autorDefault}"></div>
 
         <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">1. Localització</div>
+
+        <div class="form-group" style="margin:0 0 12px;">
+            <label>📎 Adjuntar captura de WhatsApp (opcional)</label>
+            <div id="an_ocrDropZone" tabindex="0"
+                 style="border:1.5px dashed var(--border,#cbd5e1); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.8rem; color:var(--text-muted,#64748b); cursor:pointer; text-align:center; transition:background .15s;"
+                 onclick="document.getElementById('an_ocrInput').click()">
+                Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)
+            </div>
+            <input type="file" id="an_ocrInput" accept="image/*" hidden onchange="if(this.files[0]) _animalOcrProcessar(this.files[0]); this.value='';">
+            <div style="font-size:0.7rem; color:var(--text-muted,#94a3b8); margin-top:4px; line-height:1.35;">
+                💡 Retalla NOMÉS el missatge de l'animal en concret (hora, carretera/PK i "sense avís" si hi és) per evitar confusions amb altres missatges de la captura. A Windows: <strong>Win + Majús + S</strong>.
+            </div>
+            <div id="an_ocrStatus" style="font-size:0.78rem; margin-top:6px;"></div>
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="form-group" style="margin:0"><label>Data</label><input type="text" id="an_data" value="${dataDefault}" placeholder="DD-MM-AAAA"></div>
             <div class="form-group" style="margin:0"><label>Hora</label><input type="text" id="an_hora" value="${horaDefault}" placeholder="HH:MM"></div>
@@ -13703,6 +13718,7 @@ function obrirFitxaAnimal(imgDataInicial, registreExistent, prefill) {
     document.querySelector('.page-content').appendChild(screen);
     _animalRenderFotosGrid();
     _animalInitDropZone();
+    _animalInitOcrZone();
     if (r.senyalitzacio) _animalBuscarTram();
 }
 
@@ -13719,6 +13735,115 @@ function _animalInitDropZone() {
         dz.classList.remove('drag-over');
         if (e.dataTransfer?.files?.length) _animalAfegirFotos(e.dataTransfer.files);
     });
+}
+
+/* ============================================================
+   OCR DE CAPTURES DE WHATSAPP (fitxa animal)
+   Llegeix hora, carretera, PK i "sense avís" d'una captura
+   retallada i emplena el formulari — mai substitueix un camp que
+   el tècnic ja hagi omplert a mà, i sempre queda editable.
+   ============================================================ */
+let _tesseractCarregant = null;
+
+function _carregarTesseract() {
+    if (typeof Tesseract !== 'undefined') return Promise.resolve();
+    if (_tesseractCarregant) return _tesseractCarregant;
+    _tesseractCarregant = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Tesseract no disponible'));
+        document.head.appendChild(script);
+    });
+    return _tesseractCarregant;
+}
+
+function _animalInitOcrZone() {
+    const dz = document.getElementById('an_ocrDropZone');
+    if (!dz) return;
+    dz.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dz.click(); } });
+    // Enganxar amb Ctrl+V — actiu mentre la fitxa animal estigui oberta
+    document.addEventListener('paste', _animalOcrPasteHandler);
+}
+
+function _animalOcrPasteHandler(e) {
+    if (!document.getElementById('an_ocrDropZone')) {
+        document.removeEventListener('paste', _animalOcrPasteHandler);
+        return;
+    }
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) { _animalOcrProcessar(file); e.preventDefault(); }
+            break;
+        }
+    }
+}
+
+async function _animalOcrProcessar(file) {
+    const status = document.getElementById('an_ocrStatus');
+    const dz = document.getElementById('an_ocrDropZone');
+    if (dz) dz.innerHTML = '⏳ Llegint la captura...';
+    if (status) status.innerHTML = '';
+    try {
+        await _carregarTesseract();
+        const { data } = await Tesseract.recognize(file, 'cat+spa', {
+            logger: () => {},
+        });
+        const text = data.text || '';
+        _animalOcrEmplenar(text);
+    } catch (err) {
+        if (status) status.innerHTML = `⚠️ No s'ha pogut llegir la imatge (${err.message || 'error OCR'}). Omple els camps manualment.`;
+    } finally {
+        if (dz) dz.innerHTML = 'Toca per triar la imatge, o enganxa-la aquí (Ctrl+V)';
+    }
+}
+
+function _animalOcrEmplenar(textRaw) {
+    const status = document.getElementById('an_ocrStatus');
+    const text = String(textRaw || '');
+    const detectat = [];
+
+    // Hora: HH:MM (agafem la darrera trobada — sol ser la del missatge amb la foto).
+    // A diferència de carretera/PK, l'hora SEMPRE es sobreescriu: per defecte
+    // el camp ja porta l'hora actual (no buida), que no és la de l'atropellament.
+    const hores = text.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
+    if (hores && hores.length) {
+        const el = document.getElementById('an_hora');
+        const h = hores[hores.length - 1].padStart(5, '0');
+        if (el) { el.value = h; detectat.push(`hora ${h}`); }
+    }
+
+    // Carretera: C-14, L-313, LV-3025, LP-9221, N-II, etc.
+    const carreteraM = text.match(/\b(N|C|L|LV|LP)-\s?\d{1,4}[A-Za-z]?\b/i);
+    if (carreteraM) {
+        const el = document.getElementById('an_carretera');
+        const val = carreteraM[0].toUpperCase().replace(/\s+/g, '');
+        if (el && !el.value.trim()) { el.value = val; detectat.push(`carretera ${val}`); }
+    }
+
+    // PK: 4+400, 16+200...
+    const pkM = text.match(/\d{1,3}\s*\+\s*\d{1,3}/);
+    if (pkM) {
+        const el = document.getElementById('an_pk');
+        const val = pkM[0].replace(/\s+/g, '');
+        if (el && !el.value.trim()) { el.value = val; detectat.push(`PK ${val}`); }
+    }
+
+    // "Sense avís" — desactiva l'Avís de CCCT si es detecta explícitament
+    if (/sense\s*avi?s|sin\s*aviso/i.test(text)) {
+        const el = document.getElementById('an_avisCcct');
+        if (el) { el.checked = false; detectat.push('sense avís'); }
+    }
+
+    if (detectat.length) {
+        if (status) status.innerHTML = `📋 Detectat per OCR: ${detectat.join(', ')}. <strong>Verifica-ho abans de desar.</strong>`;
+        if (document.getElementById('an_pk')?.value) _animalBuscarTram();
+    } else {
+        if (status) status.innerHTML = '⚠️ No s\'ha detectat cap dada reconeixible a la captura. Omple els camps manualment.';
+    }
 }
 
 function _animalRenderFotosGrid() {
