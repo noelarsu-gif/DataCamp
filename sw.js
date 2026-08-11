@@ -3,13 +3,13 @@
    BASE: arrel '/' — Vercel serveix des de l'arrel, no /DataCamp/
    ================================================================ */
 
-const CACHE_NAME    = 'datacamp-v6';
+const CACHE_NAME    = 'datacamp-v7';
 const BASE          = '/';
 const OFFLINE_URL   = BASE + 'offline.html';
 
 const APP_SHELL = [
     /* ── Fitxers principals ──────────────────────────── */
-    BASE + 'datacamp.html',
+    BASE + 'index.html',
     BASE + 'manifest.json',
     BASE + 'offline.html',
     BASE,
@@ -74,7 +74,7 @@ const APP_SHELL = [
    versió vella encara que ja hagis pujat una de nova al servidor). */
 const NETWORK_FIRST_PATHS = [
     BASE,
-    BASE + 'datacamp.html',
+    BASE + 'index.html',
     BASE + 'manifest.json',
 ];
 
