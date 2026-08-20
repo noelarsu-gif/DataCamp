@@ -9588,27 +9588,10 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
         <div class="form-group"><label>Descripció de l'obra</label><textarea id="itc_descripcio" rows="4" style="width:100%;">${r.descripcio || ''}</textarea></div>
         <div class="form-group"><label>Incidències o afectacions importants</label><textarea id="itc_incidencies" rows="4" style="width:100%;">${r.incidencies || ''}</textarea></div>
 
-        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Fotografies (opcional, màx. 3)</div>
-        <div id="itcFotosGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;"></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
-            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('itcFotoInputCamera').click()">📷 Càmera</button>
-            <button type="button" class="btn btn-ghost" style="margin:0;" onclick="document.getElementById('itcFotoInputGaleria').click()">🖼️ Galeria</button>
-        </div>
-        <input type="file" id="itcFotoInputCamera" accept="image/*" capture="environment" multiple hidden onchange="_itcAfegirFotos(this.files); this.value='';">
-        <input type="file" id="itcFotoInputGaleria" accept="image/*" multiple hidden onchange="_itcAfegirFotos(this.files); this.value='';">
-
-        <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin:14px 0 10px; font-size:0.85rem;">Signatura electrònica del document</div>
-        <div style="border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; background:#fff;">
-            <canvas id="itcSignaturePad" width="335" height="150" style="width:100%; height:150px; touch-action:none; display:block;"></canvas>
-        </div>
-        <button type="button" class="btn btn-ghost" style="margin-top:6px;" onclick="_itcPadClear()">🧹 Esborrar signatura</button>
-
         <button class="btn btn-primary" onclick="guardarInformeITC()" style="margin-top:14px; background:#7c3aed;">💾 ${_itcEditId ? 'DESAR CANVIS' : 'DESAR INFORME'}</button>
     `;
 
     document.querySelector('.page-content').appendChild(screen);
-    _itcRenderFotosGrid();
-    _itcPadInit(r.signatura || '');
 }
 
 function _itcRenderFotosGrid() {
