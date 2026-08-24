@@ -2025,6 +2025,60 @@ input:checked + .slider:before { transform: translateX(20px); }
 .norm-empty-title { font-weight: 700; color: var(--dark); margin-bottom: 8px; font-size: 0.95rem; }
 .norm-empty-text { font-size: 0.84rem; line-height: 1.5; margin-bottom: 16px; }
 
+/* ── Calculadora de distàncies (consulta intel·ligent) ──────── */
+.calc-field { margin-bottom: 14px; }
+.calc-field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+}
+.calc-field select, .calc-field input[type="number"] {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.92rem;
+    background: var(--surface);
+    color: var(--dark);
+}
+.calc-field select:focus, .calc-field input[type="number"]:focus {
+    outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+.calc-field-hint { font-size: 0.72rem; color: var(--text-light); margin-top: 4px; line-height: 1.4; }
+.calc-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.calc-result { border-radius: var(--radius); padding: 16px; margin-top: 6px; }
+.calc-result.ok       { background: var(--cat-obra-lt);    border: 1.5px solid var(--cat-obra-bd); }
+.calc-result.warn     { background: var(--cat-captura-lt); border: 1.5px solid var(--cat-captura-bd); }
+.calc-result.forbid   { background: var(--primary-light);  border: 1.5px solid #f3b6c1; }
+.calc-result.neutral  { background: var(--bg-alt);         border: 1.5px solid var(--border-dark); }
+.calc-result-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-cond); font-weight: 700; font-size: 0.95rem;
+    text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px;
+}
+.calc-result.ok     .calc-result-badge { color: var(--cat-obra); }
+.calc-result.warn   .calc-result-badge { color: #c2610a; }
+.calc-result.forbid .calc-result-badge { color: var(--primary); }
+.calc-result.neutral .calc-result-badge { color: var(--text-muted); }
+.calc-result-zona { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 700; }
+.calc-result-text { font-size: 0.88rem; line-height: 1.55; color: var(--text); }
+.calc-result-text b { color: var(--dark); }
+.calc-result-arts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.calc-result-art-chip {
+    font-size: 0.72rem; font-weight: 700; color: #7c3aed; background: #f3e8ff;
+    border: 1px solid #e0c9fb; border-radius: 20px; padding: 4px 10px; cursor: pointer;
+}
+.calc-warning-box {
+    background: var(--cat-captura-lt); border: 1.5px solid var(--cat-captura-bd);
+    border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px;
+    font-size: 0.78rem; line-height: 1.5; color: #9a4d0a;
+}
+
 /* Full image modal */
 .full-img-modal {
     position: fixed; top: 0; left: 0;
@@ -5605,6 +5659,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <button class="norm-doc-tab" id="normTabReglament" onclick="normativaCanviarDoc('reglament')">
                         📙 Reglament <span class="norm-doc-tab-badge">2003</span>
                     </button>
+                    <button class="norm-doc-tab" id="normTabCalc" onclick="normativaCanviarDoc('calc')">
+                        🧮 Calculadora
+                    </button>
                 </div>
 
                 <div id="normativaResultats"></div>
@@ -5622,6 +5679,78 @@ input:checked + .slider:before { transform: translateX(20px); }
                        target="_blank" class="btn btn-ghost" style="text-decoration:none; display:inline-block;">
                         📄 Obrir al Portal Jurídic
                     </a>
+                </div>
+
+                <!-- Calculadora de distàncies / consulta intel·ligent -->
+                <div id="normativaCalcPanell" style="display:none;">
+                    <div class="calc-field">
+                        <label>Tipus de carretera</label>
+                        <select id="calcTipusVia">
+                            <option value="alta">Autopista o via preferent</option>
+                            <option value="basica">Convencional — xarxa bàsica</option>
+                            <option value="resta" selected>Convencional — xarxa comarcal o local</option>
+                        </select>
+                    </div>
+
+                    <div class="calc-row2">
+                        <div class="calc-field">
+                            <label>Distància (metres)</label>
+                            <input type="number" id="calcDistancia" min="0" step="0.5" placeholder="Ex: 9">
+                        </div>
+                        <div class="calc-field">
+                            <label>Mesurada des de</label>
+                            <select id="calcReferencia" onchange="normCalcActualitzarHint()">
+                                <option value="explanacio">Aresta ext. explanació (AEE)</option>
+                                <option value="calcada">Aresta ext. calçada (AEC)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="calc-field-hint" id="calcReferenciaHint">
+                        L'aresta exterior de l'explanació és el peu del talús o la vora de la cuneta/marge: el punt on el terreny natural
+                        s'ajunta amb l'obra de la carretera. És la referència legal per a les zones de domini públic, servitud i afectació.
+                    </div>
+
+                    <div class="calc-field">
+                        <label>Tipus d'actuació</label>
+                        <select id="calcActuacio" onchange="normCalcActuacioCanviat()">
+                            <option value="obra">Obra fixa / excavació / moviment de terres</option>
+                            <option value="instalacio">Instal·lació temporal (aspersor, canonada, mobiliari...)</option>
+                            <option value="plaques_solars">Plaques solars / instal·lació fotovoltaica</option>
+                            <option value="agricola">Treballs agrícoles (cultiu, sense construcció)</option>
+                            <option value="plantacio">Plantació o tala d'arbres</option>
+                            <option value="tancament_diafan">Tancament diàfan o arbustiu</option>
+                            <option value="tancament_opac">Tancament opac / mur</option>
+                            <option value="aparcament">Aparcament de vehicles</option>
+                            <option value="publicitat">Publicitat / rètol</option>
+                            <option value="canalitzacio">Canalització o creuament soterrat de serveis</option>
+                            <option value="edificacio">Edificació / construcció nova (habitatge, nau...)</option>
+                            <option value="reforma_edificacio">Reforma o manteniment d'edificació existent (façana, teulada...)</option>
+                        </select>
+                    </div>
+
+                    <div class="calc-field" id="calcReformaAbastWrap" style="display:none;">
+                        <label>Abast de la reforma</label>
+                        <select id="calcReformaAbast">
+                            <option value="manteniment">Manteniment / reparació (mateixos materials i volum)</option>
+                            <option value="reconstruccio">Reconstrucció, ampliació o canvi de volum</option>
+                        </select>
+                        <div class="calc-field-hint">L'art. 40.1 només permet, dins la línia d'edificació, les obres imprescindibles per a la conservació i el manteniment. Reconstruir o ampliar hi queda prohibit, encara que sigui el mateix propietari.</div>
+                    </div>
+
+                    <div class="calc-field" style="display:flex; align-items:center; gap:9px;">
+                        <input type="checkbox" id="calcTramUrba" style="width:18px; height:18px; flex-shrink:0;">
+                        <label for="calcTramUrba" style="margin:0; text-transform:none; font-weight:600; font-size:0.85rem; color:var(--dark);">És un tram urbà o travessia (dins nucli de població)</label>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin:4px 0 0;" onclick="normCalcAnalitzar()">🔍 Consultar</button>
+
+                    <div id="normCalcResultat" style="margin-top:16px;"></div>
+
+                    <div class="norm-empty-text" style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border);">
+                        ⚠️ Eina d'orientació basada en el Text refós de la Llei de carreteres (Decret legislatiu 2/2009). No substitueix
+                        l'informe ni l'autorització preceptiva del departament competent en matèria de carreteres. En cas de dubte, contacta
+                        amb els serveis territorials.
+                    </div>
                 </div>
             </div>
 
@@ -11586,6 +11715,18 @@ function _normativaSenseAccents(s) {
 function normativaCanviarDoc(doc) {
     normativaDocActiu = doc;
     document.getElementById('normTabLlei')?.classList.toggle('active', doc === 'llei');
+    document.getElementById('normTabCalc')?.classList.toggle('active', doc === 'calc');
+    const cercaVisible = doc !== 'calc';
+    const topbar = document.getElementById('normativaSearch')?.closest('.dl-topbar');
+    if (topbar) topbar.style.display = cercaVisible ? '' : 'none';
+    const calcPanell = document.getElementById('normativaCalcPanell');
+    if (calcPanell) calcPanell.style.display = doc === 'calc' ? 'block' : 'none';
+    if (doc === 'calc') {
+        document.getElementById('normativaResultats').innerHTML = '';
+        document.getElementById('normativaReglamentAvis').style.display = 'none';
+        document.getElementById('normativaCount').textContent = '';
+        return;
+    }
     document.getElementById('normTabReglament')?.classList.toggle('active', doc === 'reglament');
     normativaRenderResultats();
 }
@@ -11646,6 +11787,230 @@ function normativaObrirDetall(idx) {
 
 function normativaTancarDetall() {
     document.getElementById('normativaDetallModal').style.display = 'none';
+}
+
+/* ============================================================
+   CALCULADORA DE DISTÀNCIES — consulta intel·ligent
+   Basada en el Text refós de la Llei de carreteres (DL 2/2009),
+   arts. 33-42 (zones de domini públic, servitud, afectació i
+   línia d'edificació). Els llindars en metres són els del text
+   oficial; vegeu NORMATIVA_LLEI per al resum de cada article.
+   ============================================================ */
+
+// Llindars en metres, mesurats des de l'ARESTA EXTERIOR DE L'EXPLANACIÓ (art. 34/36/38)
+const NORM_LLINDARS = {
+    alta:   { dp: 8, sv: 25, af: 100, edif: 50, nom: 'Autopista o via preferent' },
+    basica: { dp: 3, sv: 8,  af: 50,  edif: 25, nom: 'Convencional — xarxa bàsica' },
+    resta:  { dp: 3, sv: 8,  af: 30,  edif: 25, nom: 'Convencional — xarxa comarcal o local' },
+};
+
+function normCalcActualitzarHint() {
+    const ref = document.getElementById('calcReferencia')?.value;
+    const hint = document.getElementById('calcReferenciaHint');
+    if (!hint) return;
+    if (ref === 'calcada') {
+        hint.innerHTML = '⚠️ Les zones de domini públic, servitud i afectació es mesuren legalment des de l\'aresta exterior de l\'explanació (AEE), no des de l\'aresta exterior de la calçada (AEC). Com que l\'AEE sol quedar més enllà (vorals + cuneta/talús), una distància mesurada des de l\'AEC pot correspondre a una zona MÉS restrictiva del que sembla. Utilitza aquesta opció només si no pots identificar el peu del talús sobre el terreny.';
+    } else {
+        hint.textContent = 'L\'aresta exterior de l\'explanació (AEE) és el peu del talús o la vora de la cuneta/marge: el punt on el terreny natural s\'ajunta amb l\'obra de la carretera. És la referència legal per a les zones de domini públic, servitud i afectació.';
+    }
+}
+
+function _normArtIdx(numero) {
+    return NORMATIVA_LLEI.findIndex(it => it.n === numero);
+}
+
+function _normArtChip(numero) {
+    const idx = _normArtIdx(numero);
+    if (idx < 0) return '';
+    return `<span class="calc-result-art-chip" onclick="normativaCanviarDoc('llei'); setTimeout(()=>normativaObrirDetall(${idx}),0)">Art. ${numero}</span>`;
+}
+
+function _normZonaExplanacio(distancia, ll) {
+    if (distancia <= ll.dp) return 'domini';
+    if (distancia <= ll.sv) return 'servitud';
+    if (distancia <= ll.af) return 'afectacio';
+    return 'fora';
+}
+
+// Actuacions que la Llei tracta com a "obra de construcció" a efectes de línia d'edificació (art. 40)
+function _esConstruccioForta(actuacio, abast) {
+    if (actuacio === 'edificacio' || actuacio === 'plaques_solars') return true;
+    if (actuacio === 'reforma_edificacio' && abast === 'reconstruccio') return true;
+    return false;
+}
+
+// Missatge i estat (ok / warn / forbid / neutral) segons zona + tipus d'actuació
+function _normVeredicte(zona, actuacio, ll, distancia, abast) {
+    const dins = (a, b) => `entre ${a} i ${b} m`;
+    const construccio = _esConstruccioForta(actuacio, abast);
+    let estat = 'warn', titol = 'Requereix autorització prèvia', text = '';
+
+    // Manteniment/reparació d'un edifici existent: excepció específica de l'art. 40.1,
+    // independentment de la zona — es tracta a part i no com una "construcció nova".
+    if (actuacio === 'reforma_edificacio' && abast === 'manteniment') {
+        const zonaLabel2 = { domini: 'de domini públic', servitud: 'de servitud', afectacio: "d'afectació", fora: '' }[zona];
+        if (zona === 'domini') {
+            return { estat: 'forbid', titol: 'NO PERMÈS amb caràcter general',
+                text: `Estàs dins la <b>zona de domini públic</b> (0–${ll.dp} m des de l'AEE). Ni tan sols les obres de manteniment d'un edifici existent hi són viables amb caràcter general, ja que aquesta zona es reserva a la carretera (art. 35.1); només seria plantejable si l'edifici ja existia legalment abans de la delimitació d'aquesta zona, cas en què cal consultar directament amb els serveis territorials.` };
+        }
+        return { estat: 'warn', titol: 'Manteniment permès (amb autorització de zona)',
+            text: `L'art. 40.1 permet expressament, ${zona === 'fora' ? 'en tot cas' : `dins la línia d'edificació i també en zona ${zonaLabel2}`}, les obres <b>imprescindibles per a la conservació i el manteniment</b> d'una construcció ja existent (reparar teulada, façana, instal·lacions...), a diferència de la reconstrucció o l'ampliació, que hi queden prohibides. Tot i això, si l'edifici es troba en zona ${zonaLabel2 || 'protegida'}, cal tramitar igualment l'autorització prèvia habitual d'aquesta zona per a l'obra concreta (art. ${zona === 'servitud' ? '37' : zona === 'afectacio' ? '39' : '37 o 39'}).` };
+    }
+
+    if (zona === 'domini') {
+        titol = 'NO PERMÈS amb caràcter general';
+        estat = 'forbid';
+        text = `Estàs dins la <b>zona de domini públic</b> (0–${ll.dp} m des de l'AEE). Només s'hi permeten obres directament vinculades a la construcció, la conservació o l'explotació de la carretera (art. 35.1).`;
+        if (actuacio === 'canalitzacio') {
+            estat = 'warn'; titol = 'Possible, amb autorització especial';
+            text += ' Per a canalitzacions de serveis públics essencials o telecomunicacions, el departament de carreteres pot autoritzar l\'ocupació del subsòl, preferentment a la franja d\'1 m més exterior de la zona (art. 35.2).';
+        } else {
+            text += ' Qualsevol altra actuació privada (excavació, instal·lació, tancament, plantació, publicitat...) no és viable en aquest punt.';
+        }
+        return { estat, titol, text };
+    }
+
+    if (zona === 'servitud') {
+        text = `Estàs dins la <b>zona de servitud</b> (${dins(ll.dp, ll.sv)} des de l'AEE). Només s'hi permeten els usos i les activitats <b>prèviament autoritzats</b> pel departament de carreteres i compatibles amb la seguretat viària (art. 37.1).`;
+        if (actuacio === 'tancament_diafan') {
+            estat = 'warn'; titol = 'Autoritzable (tancament diàfan)';
+            text += ' La Llei preveu expressament l\'autorització de tancaments diàfans o arbustius, sempre que no afectin la visibilitat ni la seguretat (art. 37.2).';
+        } else if (actuacio === 'aparcament') {
+            estat = 'warn'; titol = 'Autoritzable (aparcament en sòl públic)';
+            text += ' Es pot autoritzar l\'ús com a aparcament si el terreny és de titularitat pública, no està vinculat a cap concessió i es garanteix la seguretat viària (art. 37.4).';
+        } else if (construccio) {
+            estat = 'forbid'; titol = 'NO VIABLE — dins la línia d\'edificació';
+            text += ` A més, la línia d'edificació mai pot quedar dins la zona de servitud (art. 40.3): en aquesta carretera se situa a ${ll.edif} m de l'AEC, sempre més enllà d'aquest punt. Per tant, ${actuacio === 'plaques_solars' ? 'instal·lar-hi plaques amb estructura fixa' : 'construir-hi'} és inviable encara que s'obtingués autorització d'ús del sòl.`;
+        } else if (actuacio === 'agricola') {
+            titol = 'Requereix autorització prèvia';
+            text += ' L\'excepció de treballs agrícoles sense autorització només aplica a la zona d\'afectació (art. 39), no a la de servitud.';
+        } else {
+            titol = 'Requereix autorització prèvia';
+        }
+        return { estat, titol, text };
+    }
+
+    if (zona === 'afectacio') {
+        text = `Estàs dins la <b>zona d'afectació</b> (${dins(ll.sv, ll.af)} des de l'AEE). Qualsevol obra, instal·lació fixa o provisional, canvi d'ús o plantació/tala d'arbres requereix <b>autorització prèvia</b> del departament de carreteres (art. 39).`;
+        if (actuacio === 'agricola') {
+            estat = 'ok'; titol = 'PERMÈS sense autorització (treballs agrícoles)';
+            text = `Estàs dins la <b>zona d'afectació</b> (${dins(ll.sv, ll.af)} des de l'AEE). Els treballs propis dels cultius agrícoles NO requereixen autorització prèvia, sempre que no afectin la zona de domini públic ni la seguretat viària (art. 39).`;
+        } else if (construccio && distancia > ll.edif) {
+            estat = 'warn'; titol = 'Requereix autorització prèvia';
+            text += ` Com que ${distancia} m supera també els ${ll.edif} m de la línia d'edificació (art. 40), la construcció no topa amb aquest límit addicional, però continua necessitant l'autorització d'aquest article.`;
+        } else if (construccio && distancia <= ll.edif) {
+            estat = 'forbid'; titol = 'NO VIABLE — dins la línia d\'edificació';
+            text += ` A més, aquest punt queda dins la línia d'edificació (a ${ll.edif} m de l'AEC en aquest tipus de via, art. 40.1): s'hi prohibeix qualsevol obra de nova construcció${actuacio === 'plaques_solars' ? ' (inclosa una instal·lació fotovoltaica amb estructura fixa)' : ''}.`;
+        } else if (actuacio === 'plantacio') {
+            titol = 'Requereix autorització prèvia (sense excepció)';
+            text += ' A diferència dels cultius, la plantació o la tala d\'arbres SÍ requereix autorització, sense excepció, dins la zona d\'afectació (art. 39).';
+        }
+        return { estat, titol, text };
+    }
+
+    // fora de les zones de protecció de la Llei de carreteres
+    estat = 'neutral';
+    titol = 'Fora de les zones de protecció d\'aquesta Llei';
+    text = `A ${distancia} m de l'aresta exterior de l'explanació (AEE) ja quedes fora de la zona d'afectació (límit: ${ll.af} m per a aquest tipus de via). No aplica el règim d'autorització dels arts. 34-39, sense perjudici del planejament urbanístic municipal.`;
+    if (construccio || actuacio === 'publicitat') {
+        text += ` Comprova igualment la línia d'edificació i, si és publicitat, la franja de 100 m des de l'AEC (art. 40 i 42) — aquestes es mesuren des d'una referència diferent (l'AEC, no l'AEE).`;
+    }
+    return { estat, titol, text };
+}
+
+function normCalcActuacioCanviat() {
+    const actuacio = document.getElementById('calcActuacio')?.value;
+    const wrap = document.getElementById('calcReformaAbastWrap');
+    if (wrap) wrap.style.display = actuacio === 'reforma_edificacio' ? 'block' : 'none';
+}
+
+// Nota addicional quan l'actuació té lloc en tram urbà o travessia (art. 41, 42.2, 46-48)
+function _normNotaTramUrba(actuacio) {
+    let text = `Com que has indicat que és un <b>tram urbà o travessia</b>, l'autorització la sol·licitar normalment l'ajuntament, no directament el departament de carreteres — encara que aquest ha d'emetre informe previ favorable en molts casos (obres a la calçada, zona de domini públic, o si el tram urbà no és travessia) (art. 47).`;
+    text += ` La línia d'edificació d'aquesta simulació és la general de l'art. 40; en sòl urbà, el planejament pot fixar-ne una de diferent amb informe previ favorable de carreteres (art. 41.1), així que la distància real aplicable pot variar — consulta el planejament municipal.`;
+    if (actuacio === 'publicitat') {
+        text += ` Pel que fa a publicitat: la prohibició general de 100 m (art. 42.1) NO s'aplica en determinats sòls urbans (calçada única, calçades separades amb velocitat ≤80 km/h, o certs municipis amb velocitat dins els límits del reglament de circulació) — art. 42.2.`;
+    }
+    return text;
+}
+
+function normCalcAnalitzar() {
+    const tipusVia = document.getElementById('calcTipusVia')?.value || 'resta';
+    const referencia = document.getElementById('calcReferencia')?.value || 'explanacio';
+    const distancia = parseFloat(document.getElementById('calcDistancia')?.value);
+    const actuacio = document.getElementById('calcActuacio')?.value || 'obra';
+    const abast = document.getElementById('calcReformaAbast')?.value;
+    const tramUrba = document.getElementById('calcTramUrba')?.checked;
+    const cont = document.getElementById('normCalcResultat');
+    if (!cont) return;
+
+    if (isNaN(distancia) || distancia < 0) {
+        showToast('⚠️ Indica una distància vàlida en metres');
+        return;
+    }
+
+    const ll = NORM_LLINDARS[tipusVia];
+    const artsBase = ['33'];
+    let resultat;
+    const notaUrba = tramUrba ? `<div class="calc-warning-box">🏘️ ${_normNotaTramUrba(actuacio)}</div>` : '';
+    if (tramUrba) artsBase.push('41', '47');
+
+    if (referencia === 'explanacio') {
+        const zona = _normZonaExplanacio(distancia, ll);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast);
+        const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
+        const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
+        artsBase.push(artZona);
+        if (zona === 'domini') artsBase.push('35');
+        if (zona === 'servitud') artsBase.push('37');
+        if (zona === 'afectacio') artsBase.push('39');
+        if (_esConstruccioForta(actuacio, abast) || actuacio === 'reforma_edificacio') artsBase.push('40');
+
+        cont.innerHTML = `
+            <div class="calc-result ${resultat.estat}">
+                <div class="calc-result-badge">${resultat.estat === 'ok' ? '✅' : resultat.estat === 'forbid' ? '🚫' : resultat.estat === 'warn' ? '⚠️' : 'ℹ️'} ${resultat.titol}</div>
+                <div class="calc-result-zona">${zonaLabel} · ${ll.nom} · ${distancia} m des de l'AEE</div>
+                <div class="calc-result-text">${resultat.text}</div>
+                <div class="calc-result-arts">${[...new Set(artsBase)].map(_normArtChip).join('')}</div>
+            </div>${notaUrba}`;
+    } else {
+        // Mesura des de la calçada: útil sobretot per a línia d'edificació i publicitat.
+        // Per a domini/servitud/afectació donem una orientació amb l'avís explícit de l'incertesa.
+        const zona = _normZonaExplanacio(distancia, ll);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast);
+        const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
+        const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
+        artsBase.push(artZona, '40');
+        if (zona === 'domini') artsBase.push('35');
+        if (zona === 'servitud') artsBase.push('37');
+        if (zona === 'afectacio') artsBase.push('39');
+
+        const dinsEdificacio = distancia <= ll.edif;
+        const dinsPublicitat = distancia <= 100;
+
+        let extra = `<br><br><b>Línia d'edificació (art. 40):</b> es fixa a ${ll.edif} m des de l'AEC per a aquest tipus de via. `;
+        extra += dinsEdificacio
+            ? `A ${distancia} m encara ets DINS d'aquesta línia: <b>prohibit construir o ampliar</b> (només conservació del que ja existeix).`
+            : `A ${distancia} m ja quedes fora d'aquesta línia, pel que fa estrictament a l'article 40.`;
+        if (actuacio === 'publicitat') {
+            extra += `<br><br><b>Publicitat (art. 42):</b> prohibida amb caràcter general fins als 100 m des de l'AEC. `;
+            extra += dinsPublicitat ? `A ${distancia} m estàs dins d'aquesta franja: <b>no permesa</b>, tret d'excepcions en sòl urbà (art. 42.2).` : `A ${distancia} m ja superes els 100 m des de l'AEC.`;
+        }
+
+        cont.innerHTML = `
+            <div class="calc-result ${resultat.estat}">
+                <div class="calc-result-badge">${resultat.estat === 'ok' ? '✅' : resultat.estat === 'forbid' ? '🚫' : resultat.estat === 'warn' ? '⚠️' : 'ℹ️'} ${resultat.titol}</div>
+                <div class="calc-result-zona">${zonaLabel} (orientatiu) · ${ll.nom} · ${distancia} m des de l'AEC</div>
+                <div class="calc-result-text">${resultat.text}${extra}</div>
+                <div class="calc-result-arts">${[...new Set(artsBase)].map(_normArtChip).join('')}</div>
+            </div>
+            <div class="calc-warning-box">
+                ⚠️ Aquesta distància és des de l'<b>aresta exterior de la calçada (AEC)</b>, no des de l'aresta exterior de l'explanació
+                (AEE) que marca legalment les zones de domini públic/servitud/afectació (arts. 34, 36 i 38). L'AEE sol quedar més
+                enllà de l'AEC (vorals + cuneta o talús), de manera que la classificació de zona de dalt és orientativa i podria ser
+                MÉS restrictiva a la pràctica. Sempre que puguis, mesura des del peu real del talús (AEE).
+            </div>${notaUrba}`;
+    }
 }
 
 /* ============================================================
