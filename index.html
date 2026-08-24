@@ -11715,6 +11715,7 @@ function _normativaSenseAccents(s) {
 function normativaCanviarDoc(doc) {
     normativaDocActiu = doc;
     document.getElementById('normTabLlei')?.classList.toggle('active', doc === 'llei');
+    document.getElementById('normTabReglament')?.classList.toggle('active', doc === 'reglament');
     document.getElementById('normTabCalc')?.classList.toggle('active', doc === 'calc');
     const cercaVisible = doc !== 'calc';
     const topbar = document.getElementById('normativaSearch')?.closest('.dl-topbar');
@@ -11727,7 +11728,6 @@ function normativaCanviarDoc(doc) {
         document.getElementById('normativaCount').textContent = '';
         return;
     }
-    document.getElementById('normTabReglament')?.classList.toggle('active', doc === 'reglament');
     normativaRenderResultats();
 }
 
@@ -11822,7 +11822,7 @@ function _normArtIdx(numero) {
 function _normArtChip(numero) {
     const idx = _normArtIdx(numero);
     if (idx < 0) return '';
-    return `<span class="calc-result-art-chip" onclick="normativaCanviarDoc('llei'); setTimeout(()=>normativaObrirDetall(${idx}),0)">Art. ${numero}</span>`;
+    return `<span class="calc-result-art-chip" onclick="normativaObrirDetall(${idx})">Art. ${numero}</span>`;
 }
 
 function _normZonaExplanacio(distancia, ll) {
