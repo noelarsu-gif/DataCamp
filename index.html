@@ -11834,16 +11834,43 @@ function _normZonaExplanacio(distancia, ll) {
 
 // Actuacions que la Llei tracta com a "obra de construcció" a efectes de línia d'edificació (art. 40)
 function _esConstruccioForta(actuacio, abast) {
-    if (actuacio === 'edificacio' || actuacio === 'plaques_solars') return true;
+    if (actuacio === 'edificacio') return true;
     if (actuacio === 'reforma_edificacio' && abast === 'reconstruccio') return true;
     return false;
 }
 
+// Criteri intern del departament (no és article literal de la Llei) per a plaques solars:
+// admeses a partir de 8 m de l'AEE; en instal·lacions grans, si els plànols aportats
+// respecten els 25 m de l'AEC (criteri anterior), s'informen amb aquesta referència.
+const PLAQUES_LLINDAR_AEE = 8;
+const PLAQUES_LLINDAR_AEC_GRANS = 25;
+
+function _normVeredictePlaquesSolars(distancia, ll, tipusVia, tramUrba) {
+    if (distancia < PLAQUES_LLINDAR_AEE) {
+        if (tramUrba) {
+            return { estat: 'warn', titol: 'Possible només sobre teulada, sense sobresortir de façana',
+                text: `Segons el <b>criteri intern del departament</b> (no és un article literal de la Llei), les plaques solars només es col·loquen a partir de ${PLAQUES_LLINDAR_AEE} m de l'AEE. Per sota d'aquesta distància, únicament es contempla si van instal·lades sobre la teulada d'un edifici existent i no sobresurten de la façana — i sempre en sòl urbà, com és aquest cas. Si no es compleixen totes dues condicions, no és viable.` };
+        }
+        return { estat: 'forbid', titol: `NO PERMÈS — per sota dels ${PLAQUES_LLINDAR_AEE} m AEE`,
+            text: `Segons el <b>criteri intern del departament</b> (no és un article literal de la Llei), les plaques solars només es col·loquen a partir de ${PLAQUES_LLINDAR_AEE} m de l'AEE. A ${distancia} m encara hi ets per sota, per la qual cosa no és viable — tret que vagin sobre la teulada d'un edifici existent, sense sobresortir de la façana, i en sòl urbà (marca la casella de tram urbà per veure aquest supòsit).` };
+    }
+    if (distancia <= ll.af) {
+        return { estat: 'warn', titol: `Autoritzable des dels ${PLAQUES_LLINDAR_AEE} m AEE`,
+            text: `Ets a ${distancia} m de l'AEE, per sobre del llindar intern de ${PLAQUES_LLINDAR_AEE} m, per la qual cosa la instal·lació és viable amb l'<b>autorització prèvia</b> habitual del departament (règim de zona d'afectació, art. 39), sense que li apliqui la línia d'edificació de l'art. 40. Si és una instal·lació <b>gran</b> i els plànols aportats respecten els ${PLAQUES_LLINDAR_AEC_GRANS} m de l'AEC (criteri anterior), el departament la pot informar amb aquesta referència en comptes de la de ${PLAQUES_LLINDAR_AEE} m AEE.${tipusVia === 'alta' ? ' Aquest criteri es va parlar pensant en carreteres convencionals; en autopistes o vies preferents, on la zona de servitud legal arriba fins als 25 m, convé confirmar-lo amb els serveis territorials abans d\'aplicar-lo literalment.' : ''}` };
+    }
+    return { estat: 'neutral', titol: 'Fora de les zones de protecció d\'aquesta Llei',
+        text: `A ${distancia} m de l'AEE ja quedes fora de la zona d'afectació (límit: ${ll.af} m per a aquest tipus de via) i molt per sobre del llindar intern de ${PLAQUES_LLINDAR_AEE} m. La instal·lació de plaques no hauria de tenir objeccions per part de carreteres, sense perjudici del planejament urbanístic municipal.` };
+}
+
 // Missatge i estat (ok / warn / forbid / neutral) segons zona + tipus d'actuació
-function _normVeredicte(zona, actuacio, ll, distancia, abast) {
+function _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba) {
     const dins = (a, b) => `entre ${a} i ${b} m`;
     const construccio = _esConstruccioForta(actuacio, abast);
     let estat = 'warn', titol = 'Requereix autorització prèvia', text = '';
+
+    if (actuacio === 'plaques_solars') {
+        return _normVeredictePlaquesSolars(distancia, ll, tipusVia, tramUrba);
+    }
 
     // Manteniment/reparació d'un edifici existent: excepció específica de l'art. 40.1,
     // independentment de la zona — es tracta a part i no com una "construcció nova".
@@ -11880,7 +11907,7 @@ function _normVeredicte(zona, actuacio, ll, distancia, abast) {
             text += ' Es pot autoritzar l\'ús com a aparcament si el terreny és de titularitat pública, no està vinculat a cap concessió i es garanteix la seguretat viària (art. 37.4).';
         } else if (construccio) {
             estat = 'forbid'; titol = 'NO VIABLE — dins la línia d\'edificació';
-            text += ` A més, la línia d'edificació mai pot quedar dins la zona de servitud (art. 40.3): en aquesta carretera se situa a ${ll.edif} m de l'AEC, sempre més enllà d'aquest punt. Per tant, ${actuacio === 'plaques_solars' ? 'instal·lar-hi plaques amb estructura fixa' : 'construir-hi'} és inviable encara que s'obtingués autorització d'ús del sòl.`;
+            text += ` A més, la línia d'edificació mai pot quedar dins la zona de servitud (art. 40.3): en aquesta carretera se situa a ${ll.edif} m de l'AEC, sempre més enllà d'aquest punt. Per tant, construir-hi és inviable encara que s'obtingués autorització d'ús del sòl.`;
         } else if (actuacio === 'agricola') {
             titol = 'Requereix autorització prèvia';
             text += ' L\'excepció de treballs agrícoles sense autorització només aplica a la zona d\'afectació (art. 39), no a la de servitud.';
@@ -11900,7 +11927,7 @@ function _normVeredicte(zona, actuacio, ll, distancia, abast) {
             text += ` Com que ${distancia} m supera també els ${ll.edif} m de la línia d'edificació (art. 40), la construcció no topa amb aquest límit addicional, però continua necessitant l'autorització d'aquest article.`;
         } else if (construccio && distancia <= ll.edif) {
             estat = 'forbid'; titol = 'NO VIABLE — dins la línia d\'edificació';
-            text += ` A més, aquest punt queda dins la línia d'edificació (a ${ll.edif} m de l'AEC en aquest tipus de via, art. 40.1): s'hi prohibeix qualsevol obra de nova construcció${actuacio === 'plaques_solars' ? ' (inclosa una instal·lació fotovoltaica amb estructura fixa)' : ''}.`;
+            text += ` A més, aquest punt queda dins la línia d'edificació (a ${ll.edif} m de l'AEC en aquest tipus de via, art. 40.1): s'hi prohibeix qualsevol obra de nova construcció.`;
         } else if (actuacio === 'plantacio') {
             titol = 'Requereix autorització prèvia (sense excepció)';
             text += ' A diferència dels cultius, la plantació o la tala d\'arbres SÍ requereix autorització, sense excepció, dins la zona d\'afectació (art. 39).';
@@ -11950,49 +11977,61 @@ function normCalcAnalitzar() {
     }
 
     const ll = NORM_LLINDARS[tipusVia];
-    const artsBase = ['33'];
+    const esPlaques = actuacio === 'plaques_solars';
+    const artsBase = esPlaques ? [] : ['33'];
     let resultat;
     const notaUrba = tramUrba ? `<div class="calc-warning-box">🏘️ ${_normNotaTramUrba(actuacio)}</div>` : '';
-    if (tramUrba) artsBase.push('41', '47');
+    if (tramUrba && !esPlaques) artsBase.push('41', '47');
+    const notaCriteriIntern = esPlaques
+        ? `<div class="calc-warning-box">ℹ️ Aquest resultat es basa en el <b>criteri intern del departament</b> comentat internament per a plaques solars (llindars de ${PLAQUES_LLINDAR_AEE} m AEE / ${PLAQUES_LLINDAR_AEC_GRANS} m AEC), no en un article literal de la Llei. Si aquest criteri canvia, cal actualitzar-lo aquí.</div>`
+        : '';
 
     if (referencia === 'explanacio') {
         const zona = _normZonaExplanacio(distancia, ll);
-        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba);
         const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
-        const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
-        artsBase.push(artZona);
-        if (zona === 'domini') artsBase.push('35');
-        if (zona === 'servitud') artsBase.push('37');
-        if (zona === 'afectacio') artsBase.push('39');
-        if (_esConstruccioForta(actuacio, abast) || actuacio === 'reforma_edificacio') artsBase.push('40');
+        if (!esPlaques) {
+            const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
+            artsBase.push(artZona);
+            if (zona === 'domini') artsBase.push('35');
+            if (zona === 'servitud') artsBase.push('37');
+            if (zona === 'afectacio') artsBase.push('39');
+            if (_esConstruccioForta(actuacio, abast) || actuacio === 'reforma_edificacio') artsBase.push('40');
+        } else if (distancia >= PLAQUES_LLINDAR_AEE) {
+            artsBase.push('39');
+        }
 
         cont.innerHTML = `
             <div class="calc-result ${resultat.estat}">
                 <div class="calc-result-badge">${resultat.estat === 'ok' ? '✅' : resultat.estat === 'forbid' ? '🚫' : resultat.estat === 'warn' ? '⚠️' : 'ℹ️'} ${resultat.titol}</div>
-                <div class="calc-result-zona">${zonaLabel} · ${ll.nom} · ${distancia} m des de l'AEE</div>
+                <div class="calc-result-zona">${zonaLabel}${esPlaques ? ' (context legal)' : ''} · ${ll.nom} · ${distancia} m des de l'AEE</div>
                 <div class="calc-result-text">${resultat.text}</div>
                 <div class="calc-result-arts">${[...new Set(artsBase)].map(_normArtChip).join('')}</div>
-            </div>${notaUrba}`;
+            </div>${notaCriteriIntern}${notaUrba}`;
     } else {
         // Mesura des de la calçada: útil sobretot per a línia d'edificació i publicitat.
         // Per a domini/servitud/afectació donem una orientació amb l'avís explícit de l'incertesa.
         const zona = _normZonaExplanacio(distancia, ll);
-        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba);
         const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
-        const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
-        artsBase.push(artZona, '40');
-        if (zona === 'domini') artsBase.push('35');
-        if (zona === 'servitud') artsBase.push('37');
-        if (zona === 'afectacio') artsBase.push('39');
+        let extra = '';
+        if (!esPlaques) {
+            const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
+            artsBase.push(artZona, '40');
+            if (zona === 'domini') artsBase.push('35');
+            if (zona === 'servitud') artsBase.push('37');
+            if (zona === 'afectacio') artsBase.push('39');
 
-        const dinsEdificacio = distancia <= ll.edif;
-        const dinsPublicitat = distancia <= 100;
-
-        let extra = `<br><br><b>Línia d'edificació (art. 40):</b> es fixa a ${ll.edif} m des de l'AEC per a aquest tipus de via. `;
-        extra += dinsEdificacio
-            ? `A ${distancia} m encara ets DINS d'aquesta línia: <b>prohibit construir o ampliar</b> (només conservació del que ja existeix).`
-            : `A ${distancia} m ja quedes fora d'aquesta línia, pel que fa estrictament a l'article 40.`;
+            const dinsEdificacio = distancia <= ll.edif;
+            extra = `<br><br><b>Línia d'edificació (art. 40):</b> es fixa a ${ll.edif} m des de l'AEC per a aquest tipus de via. `;
+            extra += dinsEdificacio
+                ? `A ${distancia} m encara ets DINS d'aquesta línia: <b>prohibit construir o ampliar</b> (només conservació del que ja existeix).`
+                : `A ${distancia} m ja quedes fora d'aquesta línia, pel que fa estrictament a l'article 40.`;
+        } else if (distancia >= PLAQUES_LLINDAR_AEE) {
+            artsBase.push('39');
+        }
         if (actuacio === 'publicitat') {
+            const dinsPublicitat = distancia <= 100;
             extra += `<br><br><b>Publicitat (art. 42):</b> prohibida amb caràcter general fins als 100 m des de l'AEC. `;
             extra += dinsPublicitat ? `A ${distancia} m estàs dins d'aquesta franja: <b>no permesa</b>, tret d'excepcions en sòl urbà (art. 42.2).` : `A ${distancia} m ja superes els 100 m des de l'AEC.`;
         }
@@ -12009,7 +12048,7 @@ function normCalcAnalitzar() {
                 (AEE) que marca legalment les zones de domini públic/servitud/afectació (arts. 34, 36 i 38). L'AEE sol quedar més
                 enllà de l'AEC (vorals + cuneta o talús), de manera que la classificació de zona de dalt és orientativa i podria ser
                 MÉS restrictiva a la pràctica. Sempre que puguis, mesura des del peu real del talús (AEE).
-            </div>${notaUrba}`;
+            </div>${notaCriteriIntern}${notaUrba}`;
     }
 }
 
