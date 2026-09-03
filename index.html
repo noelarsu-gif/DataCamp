@@ -2073,6 +2073,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 0.72rem; font-weight: 700; color: #7c3aed; background: #f3e8ff;
     border: 1px solid #e0c9fb; border-radius: 20px; padding: 4px 10px; cursor: pointer;
 }
+.calc-reg-chip {
+    font-size: 0.72rem; font-weight: 700; color: #0e7490; background: #ecfeff;
+    border: 1px solid #a5f3fc; border-radius: 20px; padding: 4px 10px; cursor: default;
+}
 .calc-warning-box {
     background: var(--cat-captura-lt); border: 1.5px solid var(--cat-captura-bd);
     border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px;
@@ -5702,6 +5706,16 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <!-- Calculadora de distàncies / consulta intel·ligent -->
                 <div id="normativaCalcPanell" style="display:none;">
                     <div class="calc-field">
+                        <label>Carretera i PK (opcional — consulta el MUC automàticament)</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="calcCarretera" placeholder="Ex: C-14" style="flex:0 0 90px; text-transform:uppercase;">
+                            <input type="text" id="calcPK" placeholder="Ex: 120+500" style="flex:1;">
+                            <button class="btn btn-secondary" style="flex:0 0 auto; padding:0 14px;" onclick="normCalcConsultarMucPerPK()">📍</button>
+                        </div>
+                        <div class="calc-field-hint" id="calcMucPkHint">Omple carretera i PK i toca 📍 per localitzar el punt i comprovar automàticament si és sòl urbà (MUC) — marca sola la casella de sota.</div>
+                    </div>
+
+                    <div class="calc-field">
                         <label>Tipus de carretera</label>
                         <select id="calcTipusVia">
                             <option value="alta">Autopista o via preferent</option>
@@ -5741,6 +5755,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <option value="aparcament">Aparcament de vehicles</option>
                             <option value="publicitat">Publicitat / rètol</option>
                             <option value="canalitzacio">Canalització o creuament soterrat de serveis</option>
+                            <option value="creuament_subterrani">Creuament subterrani perpendicular (tub, mina, túnel)</option>
+                            <option value="linies_aeries">Línies aèries (elèctriques, telecomunicacions)</option>
+                            <option value="moviment_terres">Moviment de terres, esplanacions o murs de contenció</option>
+                            <option value="pas_elevat">Pas elevat o passarel·la sobre la carretera</option>
+                            <option value="instalacio_industrial">Instal·lació industrial, agrícola o ramadera fixa</option>
                             <option value="edificacio">Edificació / construcció nova (habitatge, nau...)</option>
                             <option value="reforma_edificacio">Reforma o manteniment d'edificació existent (façana, teulada...)</option>
                         </select>
@@ -5756,8 +5775,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </div>
 
                     <div class="calc-field" style="display:flex; align-items:center; gap:9px;">
-                        <input type="checkbox" id="calcTramUrba" style="width:18px; height:18px; flex-shrink:0;">
-                        <label for="calcTramUrba" style="margin:0; text-transform:none; font-weight:600; font-size:0.85rem; color:var(--dark);">És un tram urbà o travessia (dins nucli de població)</label>
+                        <input type="checkbox" id="calcTramUrba" style="width:18px; height:18px; flex-shrink:0;" onchange="normCalcTramUrbaCanviat()">
+                        <label for="calcTramUrba" style="margin:0; text-transform:none; font-weight:600; font-size:0.85rem; color:var(--dark);">És un tram urbà o travessia declarat (dins nucli de població)</label>
+                    </div>
+                    <div class="calc-field" style="display:flex; align-items:center; gap:9px; margin-top:6px;">
+                        <input type="checkbox" id="calcSolUrba" style="width:18px; height:18px; flex-shrink:0;">
+                        <label for="calcSolUrba" style="margin:0; text-transform:none; font-weight:600; font-size:0.85rem; color:var(--dark);">És sòl urbà (MUC), encara sense tram urbà formalment declarat</label>
+                    </div>
+                    <div class="calc-field-hint">
+                        Marca la primera si aquest tram JA té la declaració administrativa de tram urbà/travessia (art. 46). Marca només la segona si el MUC mostra sòl urbà (SUC/SNC) però encara no hi ha aquesta declaració formal per a la carretera — situació habitual en zones de creixement recent.
                     </div>
 
                     <button class="btn btn-primary" style="margin:4px 0 0;" onclick="normCalcAnalitzar()">🔍 Consultar</button>
@@ -11859,6 +11885,33 @@ function _normArtChip(numero) {
     return `<span class="calc-result-art-chip" onclick="normativaObrirDetall(${idx})">Art. ${numero}</span>`;
 }
 
+// Referència visual a un article del REGLAMENT 293/2003 (no de la Llei) — no obrim modal perquè
+// aquest text no està carregat a NORMATIVA_LLEI, només mostrem el número com a referència.
+function _regChip(numero) {
+    return `<span class="calc-reg-chip">Reglament art. ${numero}</span>`;
+}
+
+// Notes tècniques específiques del Reglament general de carreteres (Decret 293/2003) per a
+// actuacions que tenen un règim propi més enllà del simple esquema de zones DP/SV/AF.
+function _normNotaActuacioEspecifica(actuacio, tipusVia) {
+    if (actuacio === 'linies_aeries') {
+        return `Les línies aèries de transport i distribució (elèctriques, telecomunicacions...) s'han de situar preferentment darrere la línia d'edificació. Es poden autoritzar quan la distància dels suports a l'aresta exterior de la calçada sigui, com a mínim, una vegada i mitja la seva alçada; els castellets metàl·lics de línies d'alta tensió s'han de situar sempre darrere la línia d'edificació ${_regChip('83.4 i 104.b')}. Dins la zona de domini públic només s'admeten com a <b>creuaments</b> aeris puntuals, no com a traçat longitudinal, i cal autorització expressa ${_regChip('76.5')}.`;
+    }
+    if (actuacio === 'creuament_subterrani') {
+        const imdAlta = tipusVia === 'alta';
+        return `Els creuaments subterranis no poden alterar el ferm de manera permanent i han de deixar la carretera en les condicions anteriors. ${imdAlta
+            ? 'En <b>autopistes o vies preferents no es permet el creuament a cel obert</b>: cal executar-lo mitjançant mina, túnel o perforació mecànica subterrània.'
+            : 'En carreteres convencionals amb una IMD superior a 3.000 vehicles/dia tampoc es permet a cel obert (cal mina, túnel o perforació); per sota d\'aquesta intensitat, i a travessies, es pot autoritzar a cel obert amb la justificació deguda, deixant sempre un carril lliure per a la circulació.'} ${_regChip('104.d')}`;
+    }
+    if (actuacio === 'moviment_terres') {
+        return `A la zona de servitud, els moviments de terra només són autoritzables si no afecten la seguretat viària; els murs de contenció requereixen justificació tècnica de la seva necessitat i, en tot cas, s'ha d'impedir que hi arribin aigües a la calçada ${_regChip('80.2.e')}. A la zona d'afectació i fora d'aquesta, el criteri és similar però amb un marge més ampli ${_regChip('104.h')}.`;
+    }
+    if (actuacio === 'pas_elevat') {
+        return `Els estreps de l'estructura no poden ocupar la zona de domini públic, tret d'autorització justificada del servei territorial. En calçades separades es poden ubicar pilars a la mediana si l'amplada és suficient per no suposar un perill (amb dispositiu de contenció de vehicles si cal). El gàlib mínim sobre la calçada l'ha de fixar el servei territorial competent ${_regChip('104.i')}.`;
+    }
+    return '';
+}
+
 function _normZonaExplanacio(distancia, ll) {
     if (distancia <= ll.dp) return 'domini';
     if (distancia <= ll.sv) return 'servitud';
@@ -11879,14 +11932,14 @@ function _esConstruccioForta(actuacio, abast) {
 const PLAQUES_LLINDAR_AEE = 8;
 const PLAQUES_LLINDAR_AEC_GRANS = 25;
 
-function _normVeredictePlaquesSolars(distancia, ll, tipusVia, tramUrba) {
+function _normVeredictePlaquesSolars(distancia, ll, tipusVia, solUrba) {
     if (distancia < PLAQUES_LLINDAR_AEE) {
-        if (tramUrba) {
+        if (solUrba) {
             return { estat: 'warn', titol: 'Possible només sobre teulada, sense sobresortir de façana',
                 text: `Segons el <b>criteri intern del departament</b> (no és un article literal de la Llei), les plaques solars només es col·loquen a partir de ${PLAQUES_LLINDAR_AEE} m de l'AEE. Per sota d'aquesta distància, únicament es contempla si van instal·lades sobre la teulada d'un edifici existent i no sobresurten de la façana — i sempre en sòl urbà, com és aquest cas. Si no es compleixen totes dues condicions, no és viable.` };
         }
         return { estat: 'forbid', titol: `NO PERMÈS — per sota dels ${PLAQUES_LLINDAR_AEE} m AEE`,
-            text: `Segons el <b>criteri intern del departament</b> (no és un article literal de la Llei), les plaques solars només es col·loquen a partir de ${PLAQUES_LLINDAR_AEE} m de l'AEE. A ${distancia} m encara hi ets per sota, per la qual cosa no és viable — tret que vagin sobre la teulada d'un edifici existent, sense sobresortir de la façana, i en sòl urbà (marca la casella de tram urbà per veure aquest supòsit).` };
+            text: `Segons el <b>criteri intern del departament</b> (no és un article literal de la Llei), les plaques solars només es col·loquen a partir de ${PLAQUES_LLINDAR_AEE} m de l'AEE. A ${distancia} m encara hi ets per sota, per la qual cosa no és viable — tret que vagin sobre la teulada d'un edifici existent, sense sobresortir de la façana, i en sòl urbà (marca la casella de sòl urbà per veure aquest supòsit).` };
     }
     if (distancia <= ll.af) {
         return { estat: 'warn', titol: `Autoritzable des dels ${PLAQUES_LLINDAR_AEE} m AEE`,
@@ -11897,13 +11950,13 @@ function _normVeredictePlaquesSolars(distancia, ll, tipusVia, tramUrba) {
 }
 
 // Missatge i estat (ok / warn / forbid / neutral) segons zona + tipus d'actuació
-function _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba) {
+function _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, solUrba) {
     const dins = (a, b) => `entre ${a} i ${b} m`;
     const construccio = _esConstruccioForta(actuacio, abast);
     let estat = 'warn', titol = 'Requereix autorització prèvia', text = '';
 
     if (actuacio === 'plaques_solars') {
-        return _normVeredictePlaquesSolars(distancia, ll, tipusVia, tramUrba);
+        return _normVeredictePlaquesSolars(distancia, ll, tipusVia, solUrba);
     }
 
     // Manteniment/reparació d'un edifici existent: excepció específica de l'art. 40.1,
@@ -11945,6 +11998,9 @@ function _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba
         } else if (actuacio === 'agricola') {
             titol = 'Requereix autorització prèvia';
             text += ' L\'excepció de treballs agrícoles sense autorització només aplica a la zona d\'afectació (art. 39), no a la de servitud.';
+        } else if (actuacio === 'instalacio_industrial') {
+            estat = 'forbid'; titol = 'NO PERMÈS a la zona de servitud';
+            text += ` El Reglament exclou expressament de la zona de servitud les instal·lacions industrials o de maquinària fixes i les instal·lacions desmontables permanents ${_regChip('80.3.b i c')}; només serien viables a partir de la zona d'afectació, amb autorització i condicions específiques.`;
         } else {
             titol = 'Requereix autorització prèvia';
         }
@@ -11965,6 +12021,9 @@ function _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba
         } else if (actuacio === 'plantacio') {
             titol = 'Requereix autorització prèvia (sense excepció)';
             text += ' A diferència dels cultius, la plantació o la tala d\'arbres SÍ requereix autorització, sense excepció, dins la zona d\'afectació (art. 39).';
+        } else if (actuacio === 'instalacio_industrial') {
+            titol = 'Autoritzable, amb condicions específiques';
+            text += ` A la zona d'afectació SÍ és autoritzable una instal·lació industrial, agrícola o ramadera fixa; el servei territorial pot imposar condicions específiques per evitar perills a la circulació i perjudicis mediambientals a l'entorn de la carretera ${_regChip('104.g')}.`;
         }
         return { estat, titol, text };
     }
@@ -11985,13 +12044,80 @@ function normCalcActuacioCanviat() {
     if (wrap) wrap.style.display = actuacio === 'reforma_edificacio' ? 'block' : 'none';
 }
 
-// Nota addicional quan l'actuació té lloc en tram urbà o travessia (art. 41, 42.2, 46-48)
+// Un tram urbà/travessia declarat és, per definició legal (art. 46), sòl classificat com a urbà:
+// si es marca el primer checkbox, el segon queda implícit i bloquejat per evitar estats contradictoris.
+// Consulta el MUC (classificació del sòl) per a un punt localitzat a partir de carretera + PK,
+// reutilitzant les mateixes funcions que PKMapa (pkmBuscarPosPK / pkmConsultarMUC).
+async function normCalcConsultarMucPerPK() {
+    const roadRaw = document.getElementById('calcCarretera')?.value?.trim();
+    const pkRaw = document.getElementById('calcPK')?.value?.trim();
+    const hint = document.getElementById('calcMucPkHint');
+    if (!roadRaw || !pkRaw) { showToast('⚠️ Indica carretera i PK', 'warn'); return; }
+
+    const m = pkRaw.match(/^(\d+)(?:\+(\d{1,3}))?$/);
+    if (!m) { showToast('⚠️ Format de PK no vàlid (ex: 120+500)', 'warn'); return; }
+    const km = parseInt(m[1]), metres = parseInt(m[2] || '0');
+    const road = roadRaw.toUpperCase();
+
+    if (typeof pkmBuscarPosPK !== 'function') { showToast('⚠️ Mòdul PK·Mapa no disponible', 'err'); return; }
+    if (hint) hint.innerHTML = '⏳ Localitzant el punt…';
+
+    try {
+        const pos = await pkmBuscarPosPK(road, km, metres);
+        if (!pos) {
+            if (hint) hint.innerHTML = `⚠️ No s'ha trobat ${road} PK ${km}+${String(metres).padStart(3,'0')}. Comprova el nom de la carretera.`;
+            return;
+        }
+        if (hint) hint.innerHTML = '⏳ Consultant classificació del sòl (MUC)…';
+        const res = typeof pkmConsultarMUC === 'function' ? await pkmConsultarMUC(pos.lat, pos.lon) : null;
+
+        const tramUrbaChk = document.getElementById('calcTramUrba');
+        const solUrbaChk = document.getElementById('calcSolUrba');
+        if (tramUrbaChk?.checked) { /* ja implica sòl urbà, no cal tocar-ho */ }
+        else if (solUrbaChk) solUrbaChk.checked = !!(res && res.urbano);
+
+        if (res === null) {
+            if (hint) hint.innerHTML = `📍 Punt localitzat (${pos.lat.toFixed(5)}, ${pos.lon.toFixed(5)}) — el MUC no ha respost (sense connexió?). Marca la casella manualment si ho saps.`;
+        } else if (res.urbano) {
+            if (hint) hint.innerHTML = `📍 Punt localitzat — 🏙️ <b>Sòl urbà</b> (${res.label}). Casella marcada automàticament.`;
+        } else {
+            if (hint) hint.innerHTML = `📍 Punt localitzat — 🌾 <b>${res.label}</b>. Casella desmarcada automàticament.`;
+        }
+    } catch (e) {
+        if (hint) hint.innerHTML = '⚠️ Error consultant el punt: ' + e.message;
+    }
+}
+
+function normCalcTramUrbaCanviat() {
+    const tramUrba = document.getElementById('calcTramUrba')?.checked;
+    const solUrbaChk = document.getElementById('calcSolUrba');
+    if (!solUrbaChk) return;
+    if (tramUrba) {
+        solUrbaChk.checked = true;
+        solUrbaChk.disabled = true;
+    } else {
+        solUrbaChk.disabled = false;
+    }
+}
+
+// Nota addicional quan l'actuació té lloc en tram urbà o travessia declarat (art. 41, 42.2, 46-48)
 function _normNotaTramUrba(actuacio) {
     let text = `Com que has indicat que és un <b>tram urbà o travessia</b>, l'autorització la sol·licitar normalment l'ajuntament, no directament el departament de carreteres — encara que aquest ha d'emetre informe previ favorable en molts casos (obres a la calçada, zona de domini públic, o si el tram urbà no és travessia) (art. 47).`;
     text += ` La línia d'edificació d'aquesta simulació és la general de l'art. 40; en sòl urbà, el planejament pot fixar-ne una de diferent amb informe previ favorable de carreteres (art. 41.1), així que la distància real aplicable pot variar — consulta el planejament municipal.`;
     if (actuacio === 'publicitat') {
         text += ` Pel que fa a publicitat: la prohibició general de 100 m (art. 42.1) NO s'aplica en determinats sòls urbans (calçada única, calçades separades amb velocitat ≤80 km/h, o certs municipis amb velocitat dins els límits del reglament de circulació) — art. 42.2.`;
     }
+    return text;
+}
+
+// Nota quan hi ha sòl urbà (MUC) però SENSE declaració formal de tram urbà/travessia (art. 46).
+// La competència d'autorització i les zones DP/SV/AF segueixen el règim general (arts. 33-40, departament
+// directament — NO l'art. 47/ajuntament), però l'art. 41.1 i el 42.2 es refereixen literalment a "sòl urbà",
+// no exigeixen la declaració formal de tram urbà, per la qual cosa poden ser al·legables igualment.
+function _normNotaSolUrba(actuacio) {
+    let text = `Has indicat que és <b>sòl urbà (MUC)</b> però sense declaració formal de tram urbà/travessia per a aquesta carretera. Això vol dir que, a efectes de qui autoritza (art. 47: ajuntament amb informe previ de carreteres), <b>encara s'aplica el règim general</b> — l'autorització la continua donant directament el departament de carreteres, com si fos un tram interurbà normal, fins que la carretera tingui aquesta declaració (art. 46).`;
+    text += ` Ara bé, l'art. 41.1 (reducció de la línia d'edificació) i l'art. 42.2 (excepcions de publicitat) es refereixen literalment a estar en <b>sòl urbà</b>, no exigeixen que hi hagi declaració formal de tram urbà — per tant, aquestes dues flexibilitzacions poden ser al·legables igualment, sempre amb l'informe previ favorable corresponent.`;
+    text += ` És habitual que el MUC vagi per davant de la declaració administrativa en zones de creixement recent: convé confirmar amb els serveis territorials si ja s'ha tramitat la declaració de tram urbà per a aquest punt concret.`;
     return text;
 }
 
@@ -12002,6 +12128,7 @@ function normCalcAnalitzar() {
     const actuacio = document.getElementById('calcActuacio')?.value || 'obra';
     const abast = document.getElementById('calcReformaAbast')?.value;
     const tramUrba = document.getElementById('calcTramUrba')?.checked;
+    const solUrba = document.getElementById('calcSolUrba')?.checked; // ja implica true si tramUrba ho és
     const cont = document.getElementById('normCalcResultat');
     if (!cont) return;
 
@@ -12014,15 +12141,24 @@ function normCalcAnalitzar() {
     const esPlaques = actuacio === 'plaques_solars';
     const artsBase = esPlaques ? [] : ['33'];
     let resultat;
-    const notaUrba = tramUrba ? `<div class="calc-warning-box">🏘️ ${_normNotaTramUrba(actuacio)}</div>` : '';
-    if (tramUrba && !esPlaques) artsBase.push('41', '47');
+    let notaUrba = '';
+    if (tramUrba) {
+        notaUrba = `<div class="calc-warning-box">🏘️ ${_normNotaTramUrba(actuacio)}</div>`;
+        if (!esPlaques) artsBase.push('41', '47');
+    } else if (solUrba) {
+        notaUrba = `<div class="calc-warning-box">🏙️ ${_normNotaSolUrba(actuacio)}</div>`;
+        if (!esPlaques) artsBase.push('41', '46');
+        if (actuacio === 'publicitat') artsBase.push('42');
+    }
     const notaCriteriIntern = esPlaques
         ? `<div class="calc-warning-box">ℹ️ Aquest resultat es basa en el <b>criteri intern del departament</b> comentat internament per a plaques solars (llindars de ${PLAQUES_LLINDAR_AEE} m AEE / ${PLAQUES_LLINDAR_AEC_GRANS} m AEC), no en un article literal de la Llei. Si aquest criteri canvia, cal actualitzar-lo aquí.</div>`
         : '';
+    const notaActEspecifica = _normNotaActuacioEspecifica(actuacio, tipusVia);
+    const notaReg = notaActEspecifica ? `<div class="calc-warning-box">📘 ${notaActEspecifica}</div>` : '';
 
     if (referencia === 'explanacio') {
         const zona = _normZonaExplanacio(distancia, ll);
-        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, solUrba);
         const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
         if (!esPlaques) {
             const artZona = { domini: '34', servitud: '36', afectacio: '38', fora: '38' }[zona];
@@ -12041,12 +12177,12 @@ function normCalcAnalitzar() {
                 <div class="calc-result-zona">${zonaLabel}${esPlaques ? ' (context legal)' : ''} · ${ll.nom} · ${distancia} m des de l'AEE</div>
                 <div class="calc-result-text">${resultat.text}</div>
                 <div class="calc-result-arts">${[...new Set(artsBase)].map(_normArtChip).join('')}</div>
-            </div>${notaCriteriIntern}${notaUrba}`;
+            </div>${notaCriteriIntern}${notaReg}${notaUrba}`;
     } else {
         // Mesura des de la calçada: útil sobretot per a línia d'edificació i publicitat.
         // Per a domini/servitud/afectació donem una orientació amb l'avís explícit de l'incertesa.
         const zona = _normZonaExplanacio(distancia, ll);
-        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, tramUrba);
+        resultat = _normVeredicte(zona, actuacio, ll, distancia, abast, tipusVia, solUrba);
         const zonaLabel = { domini: 'Zona de domini públic', servitud: 'Zona de servitud', afectacio: 'Zona d\'afectació', fora: 'Fora de les zones de protecció' }[zona];
         let extra = '';
         if (!esPlaques) {
@@ -12082,7 +12218,7 @@ function normCalcAnalitzar() {
                 (AEE) que marca legalment les zones de domini públic/servitud/afectació (arts. 34, 36 i 38). L'AEE sol quedar més
                 enllà de l'AEC (vorals + cuneta o talús), de manera que la classificació de zona de dalt és orientativa i podria ser
                 MÉS restrictiva a la pràctica. Sempre que puguis, mesura des del peu real del talús (AEE).
-            </div>${notaCriteriIntern}${notaUrba}`;
+            </div>${notaCriteriIntern}${notaReg}${notaUrba}`;
     }
 }
 
