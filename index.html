@@ -15670,7 +15670,11 @@ function pkmToggleMucLayer() {
                 transparent: true,
                 version: '1.3.0',
                 opacity: 0.55,
-                attribution: 'MUC · Generalitat de Catalunya'
+                attribution: 'MUC · Generalitat de Catalunya',
+                // El servei MUC_2CLAS deixa de dibuixar per sota d'escala ~1:4.500 (zoom ~16-17).
+                // maxNativeZoom evita que Leaflet demani tiles buides: reutilitza i amplia l'última vàlida.
+                maxNativeZoom: 16,
+                maxZoom: 19
             });
         }
         pkmMucTileLayer.addTo(pkmMap);
