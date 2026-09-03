@@ -4980,6 +4980,24 @@ input:checked + .slider:before { transform: translateX(20px); }
 #pkmBtnSortirMesura.visible { display: flex; }
 #pkmBtnSortirMesura:active { transform: translateX(-50%) scale(.95); }
 
+/* Badge zona urbana (MUC) */
+.pkm-muc-badge {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 5px 10px; border-radius: 8px;
+    font-size: .68rem; font-weight: 700; letter-spacing: .2px;
+    font-family: var(--font-cond);
+}
+.pkm-muc-badge small { font-weight: 500; opacity: .8; font-size: .9em; margin-left: 2px; }
+.pkm-muc-badge .pkm-muc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pkm-muc-badge.loading  { background: rgba(148,163,184,.12); color: #94a3b8; }
+.pkm-muc-badge.loading  .pkm-muc-dot { background: #94a3b8; animation: pkmspin 1s linear infinite; }
+.pkm-muc-badge.urban    { background: rgba(198,12,48,.14); color: #f87171; }
+.pkm-muc-badge.urban    .pkm-muc-dot { background: #f87171; }
+.pkm-muc-badge.rural    { background: rgba(34,197,94,.12); color: #4ade80; }
+.pkm-muc-badge.rural    .pkm-muc-dot { background: #4ade80; }
+.pkm-muc-badge.unknown  { background: rgba(245,166,35,.12); color: #f59e0b; }
+.pkm-muc-badge.unknown  .pkm-muc-dot { background: #f59e0b; }
+
 /* Popup marcador */
 .pkm-pin-popup { padding: 12px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
 .pkm-pp-road { font-family: var(--font-cond); font-size: .68rem; font-weight: 700; color: #9ca3af; letter-spacing: 1.5px; text-transform: uppercase; }
@@ -6516,6 +6534,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="pkm-res-pk" id="pkmResPK">—</div>
                         <div class="pkm-res-dist" id="pkmResDist"></div>
                         <div class="pkm-res-coords" id="pkmResCoords"></div>
+                        <div class="pkm-muc-badge" id="pkmResZonaUrbana" style="display:none;"></div>
                       </div>
                       <div id="pkmResWarn" style="display:none;">
                         <div class="pkm-res-warn">⚠ Fora de Carretera</div>
@@ -6604,6 +6623,21 @@ input:checked + .slider:before { transform: translateX(20px); }
                         </div>
                         <button class="pkm-area-close-btn" onclick="pkmTancarPoligon()">✔ Tancar Polígon i Calcular</button>
                         <button class="pkm-area-clear-btn" onclick="pkmEsborrarArea()">🗑️ Esborrar</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CLASSIFICACIÓ DEL SÒL (MUC) -->
+                  <div>
+                    <div class="pkm-sec-label">Classificació del Sòl (MUC)</div>
+                    <div class="pkm-amid-card">
+                      <div class="pkm-amid-head" onclick="pkmToggleMucLayer()">
+                        <span style="font-size:.9rem;">🏙️</span>
+                        <span style="font-size:.72rem;font-weight:600;color:#d1d5db;">Sombrejat zones urbanes</span>
+                        <button class="pkm-amid-toggle" id="pkmBtnMUC">Activar</button>
+                      </div>
+                      <div class="pkm-amid-hint" style="padding:0 12px 10px;">
+                        Toca el mapa o mou el pin per veure si el punt és sòl urbà (font: Mapa Urbanístic de Catalunya).
                       </div>
                     </div>
                   </div>
@@ -15511,6 +15545,144 @@ const PKM_ARCGIS = (typeof AUTOPK_CONFIG !== 'undefined' && AUTOPK_CONFIG.ARCGIS
     ? AUTOPK_CONFIG.ARCGIS_URL
     : 'https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Puntos_kilometricos_Espana/FeatureServer/0/query';
 
+/* ── MUC — Classificació del sòl (zones urbanes) ─────────
+   Servei WMS del Mapa Urbanístic de Catalunya (dtes.gencat.cat).
+   Capa MUC_2CLAS: SUC/SNC = sòl urbà · SUD/SND = urbanitzable · resta = no urbanitzable */
+const PKM_MUC_WMS_URL = 'https://dtes.gencat.cat/webmap/MUC/service.svc/get';
+const PKM_MUC_LAYER    = 'MUC_2CLAS';
+let pkmMucTileLayer = null;   // capa visual (sombreado) sobre el mapa
+let pkmMucVisible   = false;
+let pkmMucCacheMem  = {};     // cache en memòria d'aquesta sessió { "lat4_lon4": resultat }
+const PKM_MUC_CACHE_KEY = 'pkm_muc_cache_v1';
+const PKM_MUC_CACHE_MAX = 500; // entrades màx. persistides a localStorage
+
+/* Codis MUC → etiqueta i booleà urbà */
+const PKM_MUC_CODIS = {
+    'SUC': { label: 'Sòl urbà consolidat',        urbano: true  },
+    'SNC': { label: 'Sòl urbà no consolidat',      urbano: true  },
+    'SUD': { label: 'Sòl urbanitzable delimitat',  urbano: false },
+    'SND': { label: 'Sòl urbanitzable no delimitat', urbano: false }
+};
+
+function _pkmMucGridKey(lat, lon) {
+    // Cel·la ~11 m (4 decimals) — suficient per no repetir consulta al mateix punt
+    return lat.toFixed(4) + '_' + lon.toFixed(4);
+}
+
+function _pkmMucCacheLoad() {
+    try {
+        const raw = localStorage.getItem(PKM_MUC_CACHE_KEY);
+        pkmMucCacheMem = raw ? JSON.parse(raw) : {};
+    } catch { pkmMucCacheMem = {}; }
+}
+function _pkmMucCacheSave() {
+    try {
+        const keys = Object.keys(pkmMucCacheMem);
+        if (keys.length > PKM_MUC_CACHE_MAX) {
+            // Purga les entrades més antigues (FIFO senzill)
+            keys.slice(0, keys.length - PKM_MUC_CACHE_MAX).forEach(k => delete pkmMucCacheMem[k]);
+        }
+        localStorage.setItem(PKM_MUC_CACHE_KEY, JSON.stringify(pkmMucCacheMem));
+    } catch { /* localStorage ple o no disponible: cache només en memòria */ }
+}
+
+/** Parseja la resposta text/html del GetFeatureInfo del MUC i n'extreu el codi de classificació */
+function _pkmMucParseRespostaHTML(html) {
+    if (!html) return null;
+    const m = html.match(/\b(SUC|SNC|SUD|SND)\b/);
+    return m ? m[1] : null;
+}
+
+/** Consulta la classificació del sòl del MUC per a un punt (amb cache).
+ *  Retorna { code, label, urbano } o null si no hi ha dada / sense connexió / fora de servei.  */
+async function pkmConsultarMUC(lat, lon) {
+    const key = _pkmMucGridKey(lat, lon);
+    if (pkmMucCacheMem[key] !== undefined) return pkmMucCacheMem[key];
+
+    if (!navigator.onLine) return null;
+
+    try {
+        const d = 0.0004; // ~40 m de marge al voltant del punt
+        const params = new URLSearchParams({
+            service: 'WMS', version: '1.3.0', request: 'GetFeatureInfo',
+            layers: PKM_MUC_LAYER, query_layers: PKM_MUC_LAYER,
+            crs: 'EPSG:4326',
+            bbox: `${(lat - d).toFixed(6)},${(lon - d).toFixed(6)},${(lat + d).toFixed(6)},${(lon + d).toFixed(6)}`,
+            width: '101', height: '101', i: '50', j: '50',
+            info_format: 'text/html'
+        });
+        const resp = await fetch(`${PKM_MUC_WMS_URL}?${params}`, { signal: AbortSignal.timeout(6000) });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const html = await resp.text();
+        const code = _pkmMucParseRespostaHTML(html);
+
+        const result = code && PKM_MUC_CODIS[code]
+            ? { code, label: PKM_MUC_CODIS[code].label, urbano: PKM_MUC_CODIS[code].urbano }
+            : { code: null, label: 'Sòl no urbanitzable', urbano: false };
+
+        pkmMucCacheMem[key] = result;
+        _pkmMucCacheSave();
+        return result;
+    } catch (e) {
+        console.warn('[MUC] Consulta fallida (offline, CORS o servei caigut):', e.message);
+        return null; // no persistim negatius per error de xarxa — es reintentarà
+    }
+}
+
+/** Mostra/actualitza el badge de zona urbana a la targeta de resultat */
+async function pkmActualizarBadgeMUC(lat, lon) {
+    const badge = document.getElementById('pkmResZonaUrbana');
+    if (!badge) return;
+    badge.style.display = 'flex';
+    badge.className = 'pkm-muc-badge loading';
+    badge.innerHTML = '<span class="pkm-muc-dot"></span> Consultant MUC…';
+
+    const res = await pkmConsultarMUC(lat, lon);
+
+    // Si l'usuari ja ha mogut el pin a un altre punt mentre esperàvem, no pintis resultat vell
+    if (!pkmUltimResultat || pkmUltimResultat.lat !== lat || pkmUltimResultat.lon !== lon) return;
+
+    if (res === null) {
+        badge.className = 'pkm-muc-badge unknown';
+        badge.innerHTML = '<span class="pkm-muc-dot"></span> MUC no disponible (sense connexió)';
+        return;
+    }
+    if (res.urbano) {
+        badge.className = 'pkm-muc-badge urban';
+        badge.innerHTML = `<span class="pkm-muc-dot"></span> 🏙️ Zona urbana <small>(${res.label})</small>`;
+    } else {
+        badge.className = 'pkm-muc-badge rural';
+        badge.innerHTML = `<span class="pkm-muc-dot"></span> 🌾 Fora de nucli urbà <small>(${res.label})</small>`;
+    }
+}
+
+/** Activa/desactiva la capa visual (sombreado) del MUC sobre el mapa */
+function pkmToggleMucLayer() {
+    if (!pkmMap) return;
+    pkmMucVisible = !pkmMucVisible;
+    const btn = document.getElementById('pkmBtnMUC');
+
+    if (pkmMucVisible) {
+        if (!pkmMucTileLayer) {
+            pkmMucTileLayer = L.tileLayer.wms(PKM_MUC_WMS_URL, {
+                layers: PKM_MUC_LAYER,
+                format: 'image/png',
+                transparent: true,
+                version: '1.3.0',
+                opacity: 0.55,
+                attribution: 'MUC · Generalitat de Catalunya'
+            });
+        }
+        pkmMucTileLayer.addTo(pkmMap);
+        if (btn) { btn.className = 'pkm-amid-toggle on'; btn.textContent = 'Desactivar'; }
+    } else {
+        if (pkmMucTileLayer) pkmMap.removeLayer(pkmMucTileLayer);
+        if (btn) { btn.className = 'pkm-amid-toggle'; btn.textContent = 'Activar'; }
+    }
+}
+
+_pkmMucCacheLoad();
+
 /* ── Init ─────────────────────────────────────────────── */
 function abrirPKMapa() {
     ir('pkMapaScreen');
@@ -15648,6 +15820,7 @@ function pkmMostrarOK(lat, lon, res) {
     document.getElementById('pkmResDist').textContent = `A ${Math.round(res.dist)} m de la calçada`;
     document.getElementById('pkmResCoords').textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     pkmDragPin.bindPopup(`<div class="pkm-pin-popup"><span class="pkm-pp-road">${res.carretera}</span><span class="pkm-pp-pk">PK ${res.km}+${mStr}</span></div>`).openPopup();
+    pkmActualizarBadgeMUC(lat, lon);
 }
 function pkmMostrarFora(res) {
     pkmUltimResultat = null;
@@ -15658,6 +15831,8 @@ function pkmMostrarFora(res) {
     document.getElementById('pkmResCard').className = 'pkm-res-card warn';
     const d = res ? ` (${res.carretera} a ${Math.round(res.dist)} m)` : '';
     document.getElementById('pkmResWarnSub').textContent = 'Punt fora de la xarxa de carreteres.' + d;
+    const badge = document.getElementById('pkmResZonaUrbana');
+    if (badge) badge.style.display = 'none';
 }
 function pkmMostrarIdle() {
     pkmUltimResultat = null;
@@ -15666,6 +15841,8 @@ function pkmMostrarIdle() {
     document.getElementById('pkmResWarn').style.display = 'none';
     document.getElementById('pkmResActions').style.display = 'none';
     document.getElementById('pkmResCard').className = 'pkm-res-card';
+    const badge = document.getElementById('pkmResZonaUrbana');
+    if (badge) badge.style.display = 'none';
 }
 function pkmActualizarCoords(lat, lng) {
     document.getElementById('pkmResCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
