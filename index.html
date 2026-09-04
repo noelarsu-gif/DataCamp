@@ -2077,6 +2077,14 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 0.72rem; font-weight: 700; color: #0e7490; background: #ecfeff;
     border: 1px solid #a5f3fc; border-radius: 20px; padding: 4px 10px; cursor: default;
 }
+.calc-pk-locate-btn {
+    flex: 0 0 44px; width: 44px; height: 44px; min-width: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; border-radius: var(--radius-sm);
+    background: var(--primary); border: none; color: #fff; cursor: pointer;
+    padding: 0; margin: 0;
+}
+.calc-pk-locate-btn:active { transform: scale(.92); }
 .calc-warning-box {
     background: var(--cat-captura-lt); border: 1.5px solid var(--cat-captura-bd);
     border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px;
@@ -5707,10 +5715,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div id="normativaCalcPanell" style="display:none;">
                     <div class="calc-field">
                         <label>Carretera i PK (opcional — consulta el MUC automàticament)</label>
-                        <div style="display:flex; gap:8px;">
-                            <input type="text" id="calcCarretera" placeholder="Ex: C-14" style="flex:0 0 90px; text-transform:uppercase;">
-                            <input type="text" id="calcPK" placeholder="Ex: 120+500" style="flex:1;">
-                            <button class="btn btn-secondary" style="flex:0 0 auto; padding:0 14px;" onclick="normCalcConsultarMucPerPK()">📍</button>
+                        <div style="display:flex; gap:8px; align-items:stretch;">
+                            <input type="text" id="calcCarretera" placeholder="Ex: C-14" style="flex:1.1; min-width:0; text-transform:uppercase;">
+                            <input type="text" id="calcPK" placeholder="Ex: 120+500" style="flex:1.4; min-width:0;">
+                            <button type="button" class="calc-pk-locate-btn" onclick="normCalcConsultarMucPerPK()" aria-label="Localitzar punt">📍</button>
                         </div>
                         <div class="calc-field-hint" id="calcMucPkHint">Omple carretera i PK i toca 📍 per localitzar el punt i comprovar automàticament si és sòl urbà (MUC) — marca sola la casella de sota.</div>
                     </div>
