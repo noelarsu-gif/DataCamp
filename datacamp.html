@@ -21,6 +21,7 @@
     <script src="./lib/xlsx/xlsx.full.min.js" defer></script>
     <script src="./lib/jszip/jszip.min.js" defer></script>
     <script src="./lib/leaflet/leaflet.js" defer></script>
+    <script src="./lib/leaflet/leaflet-rotate.js" defer></script>
     <script src="./lib/leaflet/leaflet.markercluster.js" defer></script>
 <style>
 /* ============================================================
@@ -2637,6 +2638,20 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 0.9rem;
     color: var(--text-muted);
     background: var(--surface-2);
+}
+
+/* Brúixola de rotació del mapa (leaflet-rotate) */
+.map-compass {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    touch-action: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+    transition: opacity 0.2s ease;
+}
+.map-compass-needle {
+    transform-origin: 20px 20px;
+    transition: transform 0.08s linear;
 }
 
 /* Leaflet popup custom style */
@@ -7497,6 +7512,43 @@ function makeMarkerIcon(color) {
     });
 }
 
+/** Afegeix una brúixola en viu al mapa (requereix leaflet-rotate carregat).
+ *  La fletxa vermella sempre apunta al nord real: quan l'usuari gira el
+ *  mapa amb el gest de dos dits, la brúixola gira en sentit contrari per
+ *  compensar. Tocant-la, es reinicia l'orientació (bearing = 0). */
+function addMapCompass(map) {
+    const div = L.DomUtil.create('div', 'map-compass');
+    div.innerHTML = `
+        <svg viewBox="0 0 40 40" width="40" height="40">
+            <circle cx="20" cy="20" r="18.5" fill="rgba(255,255,255,0.95)" stroke="#d0d5dd" stroke-width="1.5"/>
+            <g class="map-compass-needle">
+                <path d="M20 5 L24.5 20 L20 16.5 L15.5 20 Z" fill="var(--primary, #c60c30)"/>
+                <path d="M20 35 L24.5 20 L20 23.5 L15.5 20 Z" fill="#9aa3af"/>
+                <text x="20" y="12" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">N</text>
+            </g>
+        </svg>`;
+    div.title = 'Toca per orientar el mapa cap al nord';
+
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    L.DomEvent.on(div, 'click', () => map.setBearing(0));
+
+    const needle = div.querySelector('.map-compass-needle');
+    const updateCompass = () => {
+        const bearing = map.getBearing ? map.getBearing() : 0;
+        needle.style.transform = `rotate(${-bearing}deg)`;
+        div.style.opacity = bearing ? '1' : '0.55';
+    };
+    map.on('rotate', updateCompass);
+    updateCompass();
+
+    const CompassControl = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: () => div
+    });
+    map.addControl(new CompassControl());
+}
+
 /** Inicialitza el mapa Leaflet de forma segura (offline-safe).
  *  — Si Leaflet no ha carregat (libs locals no trobades): banner elegant.
  *  — Si no hi ha internet: mapa amb fons gris + avís, GPS segueix actiu.
@@ -7524,8 +7576,20 @@ function initLeafletMap() {
         center: [41.4, 1.6],
         zoom: 8,
         zoomControl: true,
-        attributionControl: true
+        attributionControl: true,
+        /* Rotació amb gest tàctil (leaflet-rotate). Si el plugin no ha
+           carregat (offline i encara no cachejat pel SW), Leaflet ignora
+           aquestes opcions sense trencar-se — degradació segura. */
+        rotate: true,
+        touchRotate: true,
+        rotateControl: false,   // fem servir la nostra pròpia brúixola
+        bearing: 0
     });
+
+    /* ── Brúixola en viu (només si leaflet-rotate ha carregat) ──── */
+    if (typeof leafletMap.setBearing === 'function') {
+        addMapCompass(leafletMap);
+    }
 
     /* ── Tiles OSM amb gestió d'error offline ─────────────────── */
     const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
