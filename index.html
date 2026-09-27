@@ -22,7 +22,6 @@
     <script src="./lib/xlsx/xlsx.full.min.js" defer></script>
     <script src="./lib/jszip/jszip.min.js" defer></script>
     <script src="./lib/leaflet/leaflet.js" defer></script>
-    <script src="./lib/leaflet/leaflet-rotate.js" defer></script>
     <script src="./lib/leaflet/leaflet.markercluster.js" defer></script>
 <style>
 /* ============================================================
@@ -4940,24 +4939,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 #pkmBtnBack:active { transform: scale(.9); background: #c60c30; color: white; }
 
-/* Brúixola */
-#pkmBtnCompass {
-    position: absolute;
-    top: calc(64px + env(safe-area-inset-top, 0px));
-    right: 10px;
-    z-index: 36; width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid rgba(198,12,48,.4);
-    background: rgba(17,24,39,.9); cursor: pointer;
-    align-items: center; justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,.5);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    transition: opacity .2s;
-    opacity: .6;
-}
-#pkmBtnCompass.rotated { opacity: 1; }
-#pkmBtnCompass:active { transform: scale(.92); }
-.pkm-compass-needle { transform-origin: 20px 20px; transition: transform .08s linear; }
-
 /* Centrar GPS */
 #pkmBtnCentrar {
     position: absolute;
@@ -6737,17 +6718,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                   </svg>
-                </button>
-
-                <!-- Brúixola (orientació del mapa) — oculta fins que leaflet-rotate carrega -->
-                <button id="pkmBtnCompass" title="Orientació del mapa · Toca per tornar al nord" style="display:none;">
-                    <svg viewBox="0 0 40 40" width="26" height="26">
-                        <g class="pkm-compass-needle">
-                            <path d="M20 5 L24.5 20 L20 16.5 L15.5 20 Z" fill="#c60c30"/>
-                            <path d="M20 35 L24.5 20 L20 23.5 L15.5 20 Z" fill="#9ca3af"/>
-                            <text x="20" y="12" text-anchor="middle" font-size="8" font-weight="700" fill="#f9fafb">N</text>
-                        </g>
-                    </svg>
                 </button>
 
                 <!-- Centrar GPS -->
@@ -15861,25 +15831,6 @@ function pkmToggleMucLayer() {
 
 _pkmMucCacheLoad();
 
-/* ── Brúixola en viu del PK Mapa (requereix leaflet-rotate) ──
-   La fletxa sempre apunta al nord real: en girar el mapa amb el gest
-   de dos dits, la brúixola gira en sentit contrari per compensar.
-   Tocar-la reinicia l'orientació (bearing = 0). */
-function pkmInitCompass() {
-    const btn = document.getElementById('pkmBtnCompass');
-    if (!btn || !pkmMap) return;
-    btn.style.display = 'flex';
-    const needle = btn.querySelector('.pkm-compass-needle');
-    const updateCompass = () => {
-        const bearing = pkmMap.getBearing ? pkmMap.getBearing() : 0;
-        needle.style.transform = `rotate(${-bearing}deg)`;
-        btn.classList.toggle('rotated', !!bearing);
-    };
-    pkmMap.on('rotate', updateCompass);
-    btn.onclick = () => pkmMap.setBearing(0);
-    updateCompass();
-}
-
 /* ── Init ─────────────────────────────────────────────── */
 function abrirPKMapa() {
     ir('pkMapaScreen');
@@ -15895,15 +15846,7 @@ function abrirPKMapa() {
                 }
                 const script = document.createElement('script');
                 script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-                script.onload = () => {
-                    // Carrega també el plugin de rotació (no crític: si falla, el mapa
-                    // funciona igualment sense rotació — degradació segura).
-                    const rot = document.createElement('script');
-                    rot.src = 'https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate.js';
-                    rot.onload = resolve;
-                    rot.onerror = resolve;
-                    document.head.appendChild(rot);
-                };
+                script.onload = resolve;
                 script.onerror = () => reject(new Error('Leaflet no disponible'));
                 document.head.appendChild(script);
             }).catch(err => {
@@ -15915,19 +15858,8 @@ function abrirPKMapa() {
         if (typeof L === 'undefined') return;
         pkmInicialitzat = true;
 
-        pkmMap = L.map('pkMapaContainer', {
-                      zoomControl: false,
-                      attributionControl: true,
-                      /* Rotació amb gest tàctil (leaflet-rotate). Si el plugin no ha
-                         carregat, Leaflet ignora aquestes opcions sense trencar-se. */
-                      rotate: true,
-                      touchRotate: true,
-                      rotateControl: false,
-                      bearing: 0
-                  })
+        pkmMap = L.map('pkMapaContainer', { zoomControl: false, attributionControl: true })
                   .setView([41.65, 1.62], 13);
-
-        if (typeof pkmMap.setBearing === 'function') pkmInitCompass();
 
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
             { attribution: 'Esri', maxZoom: 19 }).addTo(pkmMap);
