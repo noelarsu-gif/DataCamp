@@ -1028,7 +1028,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     touch-action: auto;
     box-shadow: var(--shadow-sm);
 }
-.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }
 
 /* Fitxa animal: text d'ajuda per arrossegar fotos, ocult per defecte
    (mòbil/tablet) — es mostra només a la vista d'escriptori, veure
@@ -1041,9 +1041,11 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: white;
     border-radius: 0 0 0 10px;
     width: 32px; height: 32px;
-    border: none; cursor: pointer; z-index: 100;
+    border: none; cursor: pointer; z-index: 101;
     display: flex; align-items: center; justify-content: center;
     font-size: 1rem; font-weight: bold;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: var(--transition);
 }
 .btn-del-photo:hover { background: var(--primary-dark); }
@@ -1141,8 +1143,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-radius: 0 10px 0 0;
     width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem; z-index: 2; cursor: pointer;
-    border: none; touch-action: none;
+    font-size: 1rem; z-index: 101; cursor: pointer;
+    border: none; touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
     transition: var(--transition);
 }
 .zoom-icon:hover { background: rgba(29,78,216,1); }
@@ -7059,8 +7063,11 @@ window.onload = () => {
     if (previewEl) {
         Sortable.create(previewEl, {
             animation: 150,
+            // Los botones (✕ y 🔍) quedan excluidos del arrastre, pero SIN
+            // preventDefault: en iOS Safari cancelar touchstart/pointerdown
+            // elimina el "click" sintetizado y los onclick nunca se ejecutan.
             filter: '.btn-del-photo, .zoom-icon',
-            preventOnFilter: true
+            preventOnFilter: false
         });
     }
 
@@ -7875,9 +7882,9 @@ function renderPreview() {
     if (!preview) return;
     preview.innerHTML = tmpFotos.map((f, i) => `
         <div class="photo-item">
-            <img src="${f}" alt="">
-            <div class="zoom-icon" onclick="obrirVisor(${i}); event.stopPropagation();" role="button" title="Veure">🔍</div>
-            <button class="btn-del-photo" onclick="eliminarFoto(event,${i})" title="Eliminar">✕</button>
+            <img src="${f}" alt="" draggable="false">
+            <button type="button" class="zoom-icon" onclick="obrirVisor(${i}); event.stopPropagation();" title="Veure">🔍</button>
+            <button type="button" class="btn-del-photo" onclick="eliminarFoto(event,${i})" title="Eliminar">✕</button>
         </div>`).join('');
 }
 
