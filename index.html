@@ -5498,6 +5498,128 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 }
 
+
+/* ============================================================
+   FASE 1.5 · IDENTITAT DE CARRETERA
+   Detalls presos de la senyalització i la marca vial reals.
+   ============================================================ */
+
+/* Línia vermella sòlida sota la capçalera */
+.mobile-header,
+.topbar { border-bottom: 3px solid var(--primary); }
+
+/* Placa de carretera reutilitzable (C-14, LV-9124…) */
+.road-plate {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-cond);
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 4px;
+    padding: 1px 8px;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75);
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+/* ── Localitzador PK: carretera en perspectiva ─────────────── */
+.pk-widget::after { display: none; }
+.pk-road-bg {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+    max-width: 62%;
+    opacity: 0.22;
+    pointer-events: none;
+}
+.pk-widget > :not(.pk-road-bg) { position: relative; z-index: 1; }
+.pk-widget-icon {
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+}
+.pk-widget-icon .ico { font-size: 1.7rem; stroke-width: 2.2; }
+
+/* ── Fita quilomètrica (resultat del PK) ──────────────────── */
+.pk-fita {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border-radius: 22px 22px 6px 6px;
+    padding: 9px 12px 8px;
+    min-width: 104px;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.18), 0 8px 18px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+}
+.pk-fita .pk-result-road {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 4px;
+    padding: 1px 9px;
+    font-size: 0.95rem;
+    min-width: 0;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75);
+    line-height: 1.35;
+}
+.pk-fita .pk-result-pk {
+    color: var(--dark);
+    font-size: 1.45rem;
+    white-space: nowrap;
+}
+
+/* ── Icones amb forma de senyal ───────────────────────────── */
+.action-icon.sign-tri {
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 42'%3E%3Cpath d='M23 3.5 L43 38.5 H3 Z' fill='%23ffffff' stroke='%23c60c30' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    color: #111827;
+    border-radius: 0;
+    place-items: end center;
+    padding-bottom: 5px;
+}
+.action-icon.sign-tri.sign-obra {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 42'%3E%3Cpath d='M23 3.5 L43 38.5 H3 Z' fill='%23facc15' stroke='%23c60c30' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.action-icon.sign-tri .ico { font-size: 0.82em; stroke-width: 2.4; }
+.action-icon.sign-tri .ico[aria-hidden] use[href="#i-excl"] { stroke-width: 3.4; }
+
+.action-icon.sign-round {
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: 3px;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #1d4ed8;
+}
+.action-icon.sign-round .ico { font-size: 0.82em; }
+
+/* ── Títols de secció amb marca vial discontínua ──────────── */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-title::after {
+    content: '';
+    flex: 1;
+    min-width: 24px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--border-dark) 0 12px, transparent 12px 20px);
+}
+.recents-header .section-title { flex: 1; margin-right: 12px !important; }
+
+@media (max-width: 768px) {
+    .action-icon.sign-round { width: 34px; height: 34px; }
+    .pk-fita { min-width: 96px; padding: 8px 10px 7px; }
+    .pk-fita .pk-result-pk { font-size: 1.3rem; }
+}
+
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
@@ -5526,6 +5648,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.2M12 17.2h.01"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M14.5 7.5l3 3"/></symbol>
+  <symbol id="i-excl" viewBox="0 0 24 24"><path d="M12 6.5v8M12 18.5h.01"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
 </svg>
 <!-- ══ SPLASH SCREEN ══════════════════════════════════════════ -->
@@ -5767,10 +5890,17 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <!-- ── WIDGET ON ESTIC — PK LOCALITZADOR ─────────── -->
                 <div class="pk-widget" id="pkWidget">
+                    <svg class="pk-road-bg" viewBox="0 0 220 140" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+                        <polygon points="78,140 222,140 156,32 144,32" fill="#ffffff" fill-opacity="0.05"/>
+                        <line x1="80" y1="140" x2="144" y2="32" stroke="#ffffff" stroke-width="1.6"/>
+                        <line x1="220" y1="140" x2="156" y2="32" stroke="#ffffff" stroke-width="1.6"/>
+                        <line x1="150" y1="140" x2="150" y2="32" stroke="#facc15" stroke-width="2.2" stroke-dasharray="11 9"/>
+                        <line x1="0" y1="32" x2="220" y2="32" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6"/>
+                    </svg>
                     <!-- Estat idle -->
                     <div class="pk-widget-idle" id="pkWidgetIdle">
                         <div class="pk-widget-left">
-                            <div class="pk-widget-icon">📍</div>
+                            <div class="pk-widget-icon"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg></div>
                             <div>
                                 <div class="pk-widget-label">Localitzador PK</div>
                                 <div class="pk-widget-hint">On estic ara?</div>
@@ -5784,8 +5914,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                     <!-- Resultat: una carretera o cap -->
                     <div class="pk-widget-result" id="pkWidgetResult" style="display:none;">
-                        <div class="pk-result-road" id="pkResultRoad">—</div>
-                        <div class="pk-result-pk" id="pkResultPK">PK —</div>
+                        <div class="pk-fita">
+                            <div class="pk-result-road" id="pkResultRoad">—</div>
+                            <div class="pk-result-pk" id="pkResultPK">PK —</div>
+                        </div>
                         <div class="pk-result-meta" id="pkResultMeta"></div>
                         <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
                             🔄 Actualitzar
@@ -5805,8 +5937,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="pk-chips-area" id="pkMultiArea" style="display:none;">
                         <div class="pk-multi-area">
                             <div class="pk-multi-main">
-                                <div class="pk-result-road" id="pkMultiRoad">—</div>
-                                <div class="pk-result-pk" id="pkMultiPK">PK —</div>
+                                <div class="pk-fita">
+                                    <div class="pk-result-road" id="pkMultiRoad">—</div>
+                                    <div class="pk-result-pk" id="pkMultiPK">PK —</div>
+                                </div>
                                 <div class="pk-result-meta" id="pkMultiMeta"></div>
                             </div>
                             <div class="pk-multi-secondary" id="pkMultiSecondary"></div>
@@ -5847,7 +5981,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-desc">Genera PDF, Excel i ZIP de fotos</div>
                     </div>
                     <div class="action-card tone-amber" onclick="abrirPKMapa()">
-                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></div>
+                        <div class="action-icon sign-round"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></div>
                         <div class="action-label">PK Mapa</div>
                         <div class="action-desc">Consulta PKs sobre satèl·lit, mesures i Street View</div>
                     </div>
@@ -6157,12 +6291,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-desc" id="gestioStatInventaris">—</div>
                     </div>
                     <div class="action-card tone-green" onclick="obrirGestioTipus('obra')">
-                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-cone"/></svg></div>
+                        <div class="action-icon sign-tri sign-obra"><svg class="ico" aria-hidden="true"><use href="#i-cone"/></svg></div>
                         <div class="action-label">Seguiment d'Obra</div>
                         <div class="action-desc" id="gestioStatObra">—</div>
                     </div>
                     <div class="action-card tone-brown" onclick="anarADescarrega('dlFitxaAnimal','list')">
-                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
+                        <div class="action-icon sign-tri"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
                         <div class="action-label">Fitxes Animals</div>
                         <div class="action-desc" id="gestioStatAnimals">—</div>
                     </div>
@@ -6256,12 +6390,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-desc">PDF, Excel, ZIP i backups de projectes</div>
                     </div>
                     <div class="action-card tone-red" onclick="ir('dlIncidencies')">
-                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg></div>
+                        <div class="action-icon sign-tri"><svg class="ico" aria-hidden="true"><use href="#i-excl"/></svg></div>
                         <div class="action-label">Incidències</div>
                         <div class="action-desc">Informes d'incidències de camp</div>
                     </div>
                     <div class="action-card tone-brown" onclick="anarADescarrega('dlFitxaAnimal','downloads')">
-                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
+                        <div class="action-icon sign-tri"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
                         <div class="action-label">Fitxa Animal</div>
                         <div class="action-desc">Fitxes completes d'atropellament</div>
                     </div>
