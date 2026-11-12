@@ -5545,33 +5545,66 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .pk-widget-icon .ico { font-size: 1.7rem; stroke-width: 2.2; }
 
-/* ── Fita quilomètrica (resultat del PK) ──────────────────── */
-.pk-fita {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    background: #fff;
-    border-radius: 22px 22px 6px 6px;
-    padding: 9px 12px 8px;
-    min-width: 104px;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.18), 0 8px 18px rgba(0,0,0,0.35);
-    flex-shrink: 0;
-}
-.pk-fita .pk-result-road {
-    background: var(--primary);
-    color: #fff;
-    border-radius: 4px;
-    padding: 1px 9px;
-    font-size: 0.95rem;
-    min-width: 0;
+/* ── Resultat del PK: capçalera + comptador tipus odòmetre ─ */
+.pk-widget-result,
+.pk-multi-main { flex-direction: column; align-items: stretch; gap: 12px; }
+.pk-res-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pk-res-top .pk-result-road {
+    background: var(--primary); color: #fff;
+    border-radius: 4px; padding: 2px 10px; min-width: 0;
+    font-size: 1.05rem; line-height: 1.35;
     box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75);
-    line-height: 1.35;
 }
-.pk-fita .pk-result-pk {
-    color: var(--dark);
-    font-size: 1.45rem;
-    white-space: nowrap;
+.pk-res-top .pk-result-meta { flex: 1; min-width: 0; }
+.pk-res-top .pk-widget-btn-sm { margin-left: auto; }
+
+/* El text original es manté (accessible i per al JS) però no es veu */
+.odo-src {
+    position: absolute !important; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.odo {
+    --h: clamp(48px, 14vw, 72px);
+    display: flex; align-items: center;
+    gap: clamp(3px, 1.1vw, 6px);
+    width: 100%;
+}
+.odo[hidden] { display: none; }
+.odo-lbl {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: var(--font-cond); font-weight: 800;
+    font-size: 0.72rem; letter-spacing: 3px;
+    color: rgba(255,255,255,0.55);
+    margin-right: 2px;
+}
+.odo-d {
+    flex: 1 1 0; min-width: 0; max-width: 76px;
+    height: var(--h);
+    position: relative; overflow: hidden;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #05070b 0%, #1f2937 24%, #2d3a4d 50%, #1f2937 76%, #05070b 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09), 0 3px 8px rgba(0,0,0,0.45);
+}
+.odo-d.m {
+    background: linear-gradient(180deg, #4a0612 0%, #a80a29 24%, #d0143a 50%, #a80a29 76%, #4a0612 100%);
+}
+.odo-d::after {   /* ombra de cilindre per sobre dels dígits */
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5), transparent 32%, transparent 68%, rgba(0,0,0,0.5));
+}
+.odo-strip { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+.odo-strip span {
+    display: block; height: var(--h); line-height: var(--h);
+    text-align: center;
+    font-family: var(--font-cond); font-weight: 800;
+    font-size: calc(var(--h) * 0.74);
+    color: #f9fafb;
+    font-variant-numeric: tabular-nums;
+}
+.odo-sep {
+    font-family: var(--font-cond); font-weight: 800;
+    font-size: calc(var(--h) * 0.6); line-height: 1;
+    color: #fff; padding: 0 1px;
 }
 
 /* ── Icones amb forma de senyal ───────────────────────────── */
@@ -5616,8 +5649,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 @media (max-width: 768px) {
     .action-icon.sign-round { width: 34px; height: 34px; }
-    .pk-fita { min-width: 96px; padding: 8px 10px 7px; }
-    .pk-fita .pk-result-pk { font-size: 1.3rem; }
 }
 
 </style>
@@ -5675,20 +5706,31 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: #c60c30; letter-spacing: 4px;
     animation: spWord .7s cubic-bezier(.2,.8,.2,1) both;
 }
-.sp-road {
-    position: relative; width: 182px; height: 14px; margin: 18px 0 26px;
-    border-radius: 2px; overflow: hidden;
-    background: #fff;
-    box-shadow: 0 0 0 1px rgba(198,12,48,.18);
-    transform-origin: center;
-    animation: spRoad .55s cubic-bezier(.2,.8,.2,1) .25s both;
-}
-.sp-road::before {
-    content: ''; position: absolute; inset: 0; width: 200%;
-    /* Fila de quadres vermells i blancs, com els vehicles de conservació */
-    background: repeating-linear-gradient(90deg, #c60c30 0 14px, transparent 14px 28px);
-    animation: spDrive .7s linear infinite;
-}
+/* Escena: furgoneta de conservació passant per la carretera */
+.sp-scene { position: relative; width: 100%; max-width: 420px; height: 104px; margin: 12px 0 20px; overflow: hidden; }
+.sp-asphalt { position: absolute; left: 0; right: 0; bottom: 6px; height: 3px; background: #374151; border-radius: 2px;
+    animation: spFade .4s ease .1s both; }
+.sp-asphalt::after { content: ''; position: absolute; left: 0; right: -60px; top: 9px; height: 2px;
+    background: repeating-linear-gradient(90deg, #d1d5db 0 18px, transparent 18px 34px);
+    animation: spLane 1.5s cubic-bezier(.2,.75,.25,1) .15s 1 both; }
+.sp-van { position: absolute; bottom: 4px; left: -200px; width: 160px;
+    animation: spPass 1.5s cubic-bezier(.2,.75,.25,1) .15s 1 forwards; }
+.sp-van svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-van .body { animation: spBob .22s ease-in-out .15s 6 alternate; }
+.sp-van .spin { transform-box: fill-box; transform-origin: center;
+    animation: spRoll 1.5s cubic-bezier(.2,.75,.25,1) .15s 1 both; }
+.sp-van .flashA { animation: spFlash .5s steps(1) infinite; }
+.sp-van .flashB { animation: spFlash .5s steps(1) infinite .25s; }
+.sp-van .glow { transform-box: fill-box; transform-origin: center; animation: spGlow .5s ease-in-out infinite alternate; }
+.sp-van .speed { animation: spSpeedOut 1.5s ease-out .15s 1 both; }
+@keyframes spPass  { from { left: -200px; } to { left: calc(50% - 80px); } }
+@keyframes spLane  { from { transform: translateX(0); } to { transform: translateX(-170px); } }
+@keyframes spRoll  { from { transform: rotate(0); } to { transform: rotate(1440deg); } }
+@keyframes spSpeedOut { 0% { opacity: .8; } 70% { opacity: .5; } 100% { opacity: 0; } }
+@keyframes spBob   { from { transform: translateY(0); } to { transform: translateY(-1.2px); } }
+@keyframes spSpin  { to { transform: rotate(360deg); } }
+@keyframes spFlash { 0% { opacity: 1; } 50% { opacity: .15; } }
+@keyframes spGlow  { from { opacity: .25; transform: scale(.85); } to { opacity: .7; transform: scale(1.15); } }
 .sp-hello {
     font-family: Barlow, system-ui, sans-serif;
     font-size: 1.65rem; font-weight: 700; color: #111827; line-height: 1.2;
@@ -5713,19 +5755,108 @@ input:checked + .slider:before { transform: translateX(20px); }
     text-transform: uppercase; color: #9ca3af;
 }
 @keyframes spWord  { from { opacity: 0; transform: translateY(10px); letter-spacing: 12px; } to { opacity: 1; transform: none; letter-spacing: 4px; } }
-@keyframes spRoad  { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
-@keyframes spDrive { from { transform: translateX(-28px); } to { transform: translateX(0); } }
 @keyframes spUp    { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes spFade  { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-    .sp-road::before { animation: none; }
+    .sp-van { animation: none; left: calc(50% - 80px); }
+    .sp-asphalt::after, .sp-van * { animation: none !important; }
 }
 </style>
 
 <div id="splashScreen" role="status" aria-live="polite" aria-label="Benvinguda a DataCamp">
     <div class="sp-center">
         <div class="sp-word">DATACAMP</div>
-        <div class="sp-road" aria-hidden="true"></div>
+        <div class="sp-scene" aria-hidden="true">
+            <div class="sp-asphalt"></div>
+            <div class="sp-van">
+                <svg viewBox="0 0 230 135" xmlns="http://www.w3.org/2000/svg">
+                <!-- línies de velocitat -->
+                <g class="speed" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="-40" y1="50" x2="-12" y2="50"/>
+                    <line x1="-54" y1="70" x2="-8"  y2="70"/>
+                    <line x1="-36" y1="90" x2="-12" y2="90"/>
+                </g>
+                <ellipse cx="114" cy="127" rx="104" ry="4" fill="#000" opacity=".12"/>
+
+                <g class="body">
+                    <!-- pont de llums: baix i pla, sobre el pilar central -->
+                    <ellipse class="glow" cx="100" cy="31" rx="22" ry="5" fill="#f59e0b" opacity=".4"/>
+                    <rect x="74" y="33" width="52" height="4" rx="1.5" fill="#374151"/>
+                    <rect x="77" y="28" width="23" height="6" rx="2.5" fill="#f59e0b" class="flashA"/>
+                    <rect x="100" y="28" width="23" height="6" rx="2.5" fill="#fbbf24" class="flashB"/>
+
+                    <!-- carrosseria: proporcions tipus furgoneta compacta -->
+                    <path d="M16 104 L16 52 Q16 37 30 36 L136 35 Q146 35 151 41 L172 62
+                             Q198 64 207 71 Q213 77 213 90 L213 100 Q213 108 205 108 L24 108 Q16 108 16 104 Z"
+                          fill="#ffd200" stroke="#1f2937" stroke-width="2.5" stroke-linejoin="round"/>
+
+                    <!-- vidres: posterior d'una peça amb junta de goma -->
+                    <path d="M31 44 L106 43 Q110 43 110 47 L110 62 Q110 66 106 66 L31 66 Q25 66 25 61 L25 50 Q25 44 31 44 Z"
+                          fill="#1f2937" stroke="#4b5563" stroke-width="1.6"/>
+                    <line x1="66" y1="44.5" x2="66" y2="65.5" stroke="#374151" stroke-width="1.6"/>
+                    <path d="M118 43 L140 42 Q147 42 150 47 L166 66 L118 66 Z" fill="#1f2937"/>
+                    <path d="M38 47 L49 47 L41 63 L32 63 Z" fill="#fff" opacity=".1"/>
+                    <path d="M126 46 L133 46 L125 63 L119 63 Z" fill="#fff" opacity=".12"/>
+
+                    <!-- portes i tiradors -->
+                    <line x1="64" y1="66" x2="64" y2="106" stroke="#a16207" stroke-width="1.4"/>
+                    <line x1="114" y1="41" x2="114" y2="106" stroke="#a16207" stroke-width="1.4"/>
+                    <rect x="101" y="71" width="10" height="3.5" rx="1.7" fill="#a16207"/>
+                    <rect x="118" y="71" width="10" height="3.5" rx="1.7" fill="#a16207"/>
+
+                    <!-- retrovisor -->
+                    <path d="M158 50 Q166 48 170 53 L170 59 L160 59 Q157 56 158 50 Z" fill="#ffd200" stroke="#1f2937" stroke-width="2"/>
+
+                    <!-- retolació: placa de sector · text · quadre vermell (amplada dels vidres) -->
+                    <rect x="27" y="70" width="15" height="19" rx="1.5" fill="#1f2937"/>
+                    <text x="34.5" y="84" font-family="Arial, sans-serif" font-size="8.5" font-weight="700" fill="#fff" text-anchor="middle">32</text>
+                    <g fill="#92400e" opacity=".85">
+                        <rect x="46" y="72" width="24" height="1.6" rx=".8"/><rect x="46" y="76" width="20" height="1.6" rx=".8"/>
+                        <rect x="46" y="82" width="14" height="1.6" rx=".8"/><rect x="46" y="86" width="16" height="1.6" rx=".8"/>
+                    </g>
+                    <rect x="74" y="69" width="22" height="22" fill="#c60c30"/>
+
+                    <!-- protecció lateral negra i franja de quadres -->
+                    <path d="M104 86 L150 85 Q156 85 156 90 Q156 95 150 95 L100 95 Q97 95 99 91 Z" fill="#1f2937"/>
+                    <rect x="112" y="88" width="14" height="4" rx="2" fill="#ffd200"/>
+                    <g fill="#c60c30"><rect x="74" y="97" width="7" height="7"/><rect x="88" y="97" width="7" height="7"/><rect x="102" y="97" width="7" height="7"/><rect x="116" y="97" width="7" height="7"/><rect x="130" y="97" width="7" height="7"/><rect x="144" y="97" width="7" height="7"/><rect x="158" y="97" width="7" height="7"/></g>
+
+                    <!-- para-xocs, far i pilot -->
+                    <path d="M12 92 L22 92 L22 110 L16 110 Q12 110 12 106 Z" fill="#1f2937"/>
+                    <path d="M196 92 L215 92 L215 102 Q215 110 207 110 L196 110 Z" fill="#1f2937"/>
+                    <path d="M194 70 Q205 71 211 77 L203 80 Q198 78 192 74 Z" fill="#e5e7eb" stroke="#1f2937" stroke-width="1.5"/>
+                    <rect x="16" y="52" width="5" height="16" rx="2" fill="#dc2626"/>
+
+                    <!-- passos de roda -->
+                    <circle cx="52"  cy="108" r="21" fill="#1f2937"/>
+                    <circle cx="180" cy="108" r="21" fill="#1f2937"/>
+                </g>
+
+                <g>
+                    <circle cx="52" cy="111" r="17" fill="#111827"/>
+                    <circle cx="52" cy="111" r="10" fill="#cbd5e1"/>
+                    <g class="spin" stroke="#64748b" stroke-width="2.2" stroke-linecap="round">
+                        <circle cx="52" cy="111" r="10" fill="none" stroke="none"/>
+                        <line x1="52" y1="102" x2="52" y2="120"/>
+                        <line x1="43.4" y1="106" x2="60.6" y2="116"/>
+                        <line x1="43.4" y1="116" x2="60.6" y2="106"/>
+                    </g>
+                    <circle cx="52" cy="111" r="3" fill="#475569"/>
+                </g>
+                <g>
+                    <circle cx="180" cy="111" r="17" fill="#111827"/>
+                    <circle cx="180" cy="111" r="10" fill="#cbd5e1"/>
+                    <g class="spin" stroke="#64748b" stroke-width="2.2" stroke-linecap="round">
+                        <circle cx="180" cy="111" r="10" fill="none" stroke="none"/>
+                        <line x1="180" y1="102" x2="180" y2="120"/>
+                        <line x1="171.4" y1="106" x2="188.6" y2="116"/>
+                        <line x1="171.4" y1="116" x2="188.6" y2="106"/>
+                    </g>
+                    <circle cx="180" cy="111" r="3" fill="#475569"/>
+                </g>
+            </svg>
+            </div>
+        </div>
         <div class="sp-hello" id="splashGreeting"></div>
         <div class="sp-msg" id="splashMsg"></div>
     </div>
@@ -5828,7 +5959,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
     s.addEventListener('click', tancar);
     const reduit = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(tancar, reduit ? 1600 : 2600);
+    setTimeout(tancar, reduit ? 1600 : 2700);
 })();
 </script>
 
@@ -5988,14 +6119,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                     <!-- Resultat: una carretera o cap -->
                     <div class="pk-widget-result" id="pkWidgetResult" style="display:none;">
-                        <div class="pk-fita">
+                        <div class="pk-res-top">
                             <div class="pk-result-road" id="pkResultRoad">—</div>
-                            <div class="pk-result-pk" id="pkResultPK">PK —</div>
+                            <div class="pk-result-meta" id="pkResultMeta"></div>
+                            <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
+                                🔄 Actualitzar
+                            </button>
                         </div>
-                        <div class="pk-result-meta" id="pkResultMeta"></div>
-                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
-                            🔄 Actualitzar
-                        </button>
+                        <div class="pk-result-pk odo-src" id="pkResultPK">PK —</div>
+                        <div class="odo" data-odo-for="pkResultPK" aria-hidden="true"></div>
                     </div>
 
                     <!-- Chips: múltiples carreteres properes -->
@@ -6011,11 +6143,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="pk-chips-area" id="pkMultiArea" style="display:none;">
                         <div class="pk-multi-area">
                             <div class="pk-multi-main">
-                                <div class="pk-fita">
+                                <div class="pk-res-top">
                                     <div class="pk-result-road" id="pkMultiRoad">—</div>
-                                    <div class="pk-result-pk" id="pkMultiPK">PK —</div>
+                                    <div class="pk-result-meta" id="pkMultiMeta"></div>
                                 </div>
-                                <div class="pk-result-meta" id="pkMultiMeta"></div>
+                                <div class="pk-result-pk odo-src" id="pkMultiPK">PK —</div>
+                                <div class="odo" data-odo-for="pkMultiPK" aria-hidden="true"></div>
                             </div>
                             <div class="pk-multi-secondary" id="pkMultiSecondary"></div>
                         </div>
@@ -17497,5 +17630,48 @@ function pkmBack() {
         </div>
     </div>
 </div>
+
+<script>
+/* ============================================================
+   COMPTADOR TIPUS ODÒMETRE PER AL PK DEL LOCALITZADOR
+   Llegeix el text "PK 120+350" que ja escriu el JS existent i
+   el pinta amb tambors que giren. No toca la lògica de detecció.
+   ============================================================ */
+(function () {
+    const reduit = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DIGITS = '012345678901234567890123456789'.split('').map(d => '<span>' + d + '</span>').join('');
+    const tambor = (d, cls) => '<span class="odo-d' + cls + '"><span class="odo-strip" data-v="' + d + '">' + DIGITS + '</span></span>';
+
+    function pinta(odo, text) {
+        const m = /(\d+)\s*\+\s*(\d+)/.exec(text || '');
+        if (!m) { odo.innerHTML = ''; odo.hidden = true; return; }
+        odo.hidden = false;
+        const km = m[1], metres = m[2].padStart(3, '0').slice(-3);
+        odo.innerHTML = '<span class="odo-lbl">PK</span>'
+            + km.split('').map(d => tambor(d, '')).join('')
+            + '<span class="odo-sep">+</span>'
+            + metres.split('').map(d => tambor(d, ' m')).join('');
+        void odo.offsetHeight;   // força el reflow perquè la transició arrenqui des de 0
+        odo.querySelectorAll('.odo-strip').forEach((st, i) => {
+            const passos = 20 + Number(st.dataset.v);       // dues voltes completes i s'atura
+            st.style.transition = reduit ? 'none'
+                : 'transform ' + (0.9 + i * 0.12).toFixed(2) + 's cubic-bezier(.15,.85,.25,1)';
+            st.style.transform = 'translateY(calc(var(--h) * -' + passos + '))';
+        });
+    }
+
+    function inicia() {
+        document.querySelectorAll('.odo[data-odo-for]').forEach(odo => {
+            const src = document.getElementById(odo.dataset.odoFor);
+            if (!src) return;
+            const refresca = () => pinta(odo, src.textContent);
+            new MutationObserver(refresca).observe(src, { childList: true, characterData: true, subtree: true });
+            refresca();
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia);
+    else inicia();
+})();
+</script>
 
 </html>
