@@ -5682,6 +5682,169 @@ input:checked + .slider:before { transform: translateX(20px); }
     .action-icon.sign-round { width: 34px; height: 34px; }
 }
 
+
+/* ============================================================
+   PARTS DIARIS
+   ============================================================ */
+body.pd-noscroll { overflow: hidden; }
+
+/* Targeta "Part d'avui" a l'inici */
+.pd-home {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 var(--radius-card) var(--radius-card) 0;
+    padding: 12px 14px;
+    margin: -14px 0 24px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pd-home:active { transform: scale(0.98); }
+.pd-home.fet { border-left-color: var(--success); }
+.pd-home .action-icon { width: 40px; height: 40px; font-size: 22px; border-radius: 11px; flex-shrink: 0; }
+.pd-home-txt { flex: 1; min-width: 0; }
+.pd-home-txt b { display: block; font-family: var(--font-cond); font-size: 0.95rem; letter-spacing: .5px; text-transform: uppercase; color: var(--dark); }
+.pd-home-txt span { display: block; font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pd-home > .ico { color: var(--text-light); font-size: 20px; }
+@media (max-width: 768px) { .pd-home { margin: -4px 0 18px; } }
+
+/* Navegació de setmana */
+.pd-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.pd-nav-btn {
+    width: 44px; height: 44px; flex-shrink: 0;
+    display: grid; place-items: center;
+    background: var(--surface); border: 1px solid var(--border-dark); border-radius: 12px;
+    color: var(--dark); font-size: 20px; cursor: pointer;
+}
+.pd-nav-btn:active { transform: scale(0.94); background: var(--bg-alt); }
+.pd-week-title {
+    flex: 1; background: none; border: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-family: var(--font-cond); font-size: 1.1rem; font-weight: 700; color: var(--dark);
+    text-transform: uppercase; letter-spacing: .5px;
+}
+.pd-week-title small { font-family: var(--font); font-size: .8rem; font-weight: 500; color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+
+/* Llista de dies */
+.pd-llista { display: grid; gap: 8px; margin-bottom: 18px; }
+.pd-dia {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; min-height: 60px; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 10px 12px; cursor: pointer; font-family: var(--font);
+    transition: transform var(--dur-fast) var(--ease);
+}
+.pd-dia:active { transform: scale(0.98); }
+.pd-dia.avui { border: 2px solid var(--primary); }
+.pd-dia.futur { opacity: .6; }
+.pd-dia.festa { background: #fff7e6; border-color: #fde2b0; }
+.pd-dn { width: 44px; flex-shrink: 0; text-align: center; }
+.pd-dn b { display: block; font-family: var(--font-cond); font-size: 1.45rem; font-weight: 800; color: var(--dark); line-height: 1.05; }
+.pd-dn small { display: block; font-size: .7rem; color: var(--text-muted); white-space: nowrap; }
+.pd-dia.avui .pd-dn b { color: var(--primary); }
+.pd-cos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pd-plaques { display: flex; flex-wrap: wrap; gap: 5px; }
+.pd-obs { font-size: .78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pd-buit { font-size: .88rem; color: var(--text-light); }
+.pd-dia.avui .pd-buit { color: var(--text-muted); }
+.pd-tag-festa { align-self: flex-start; font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 10px; background: #fde2b0; color: #854f0b; }
+.pd-mes { color: var(--primary); font-size: 22px; }
+.road-plate { font-size: .82rem; }
+
+.pd-accions { display: grid; gap: 8px; }
+.pd-accions .btn .ico { font-size: 1.15em; }
+
+/* Fulls inferiors */
+.pd-sheet { max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+.pd-sheet h4 { margin-bottom: 12px; }
+.pd-camp { margin-bottom: 14px; }
+.pd-camp > label { margin-bottom: 6px; }
+.pd-sheet input[type="date"] {
+    width: 100%; padding: 12px 14px; font-family: var(--font); font-size: 1rem; color: var(--dark);
+    border: 1.5px solid var(--border-dark); border-radius: 10px; background: var(--surface); box-sizing: border-box;
+}
+.pd-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.pd-seg button {
+    min-height: 44px; border-radius: 10px; cursor: pointer;
+    border: 1.5px solid var(--border-dark); background: var(--surface); color: var(--text);
+    font-family: var(--font); font-size: .95rem; font-weight: 600;
+}
+.pd-seg button.actiu { background: var(--primary); border-color: var(--primary); color: #fff; }
+#pdTipusFesta.actiu { background: #d97706; border-color: #d97706; }
+
+.pd-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pd-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 40px; padding: 0 14px; border-radius: 6px; cursor: pointer;
+    font-family: var(--font-cond); font-size: 1rem; font-weight: 800; letter-spacing: .6px;
+    background: var(--surface); color: var(--primary);
+    border: 2px solid var(--primary);
+}
+.pd-chip.on { background: var(--primary); color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.7); }
+.pd-chip .ico { font-size: 16px; stroke-width: 3; }
+
+.pd-afegir { display: flex; gap: 8px; }
+.pd-afegir input { flex: 1; min-width: 0; text-transform: uppercase; }
+.pd-afegir input::placeholder { text-transform: none; }
+.pd-afegir .btn { width: auto !important; margin: 0 !important; }
+.pd-sug { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pd-sug:empty { display: none; }
+.pd-sug-item {
+    min-height: 34px; padding: 0 12px; border-radius: 6px; cursor: pointer;
+    border: 1.5px dashed var(--text-light); background: var(--surface-2); color: var(--text);
+    font-family: var(--font-cond); font-weight: 700; font-size: .92rem; letter-spacing: .4px;
+}
+.pd-desar-llista {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+    background: var(--success-lt); font-size: .85rem; color: var(--text);
+}
+.pd-desar-llista[hidden] { display: none; }
+.pd-sheet textarea { min-height: 64px; resize: vertical; }
+
+.pd-sheet-peu { display: flex; justify-content: space-between; margin-top: 6px; }
+.pd-link {
+    background: none; border: none; cursor: pointer; padding: 10px 4px;
+    font-family: var(--font); font-size: .9rem; font-weight: 600; color: var(--text-muted);
+}
+.pd-link-perill { color: var(--danger); }
+.pd-link[hidden] { display: none; }
+.pd-ajuda { font-size: .85rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px; }
+.pd-nota { font-size: .78rem; color: var(--text-muted); line-height: 1.45; margin: 10px 0 0; }
+.pd-exp-opcions { display: grid; gap: 4px; }
+
+/* Llista "Les meves carreteres" */
+.pd-carr-llista { list-style: none; margin: 14px 0 16px; padding: 0; display: grid; gap: 6px; }
+.pd-carr-llista li {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 8px 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface);
+}
+.pd-carr-llista li.pd-ajuda { border: none; padding: 0; background: none; }
+.pd-li-acc { display: flex; gap: 4px; }
+.pd-li-acc button {
+    width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 18px;
+}
+.pd-li-acc button:disabled { opacity: .35; cursor: default; }
+.pd-li-acc .pd-x { color: var(--danger); }
+
+/* Avís de privacitat */
+.pd-avis-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.pd-avis-cap h4 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
+.pd-avis-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--success-lt); color: var(--success); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+.pd-avis-txt { font-size: .95rem; color: var(--text); line-height: 1.55; margin-bottom: 14px; }
+.pd-check {
+    display: flex !important; align-items: center; gap: 10px;
+    text-transform: none !important; letter-spacing: 0 !important;
+    font-size: .92rem !important; font-weight: 500 !important; color: var(--text) !important;
+    margin-bottom: 14px !important; cursor: pointer; min-height: 40px;
+}
+.pd-check input { width: 22px; height: 22px; accent-color: var(--primary); }
+
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
@@ -5711,6 +5874,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M14.5 7.5l3 3"/></symbol>
   <symbol id="i-excl" viewBox="0 0 24 24"><path d="M12 6.5v8M12 18.5h.01"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17.5h2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.3-7.5 9.5-4.3-1.2-7.5-4.9-7.5-9.5V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-chev-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-chev-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-chev-up" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></symbol>
+  <symbol id="i-chev-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
 </svg>
 <!-- ══ SPLASH SCREEN ══════════════════════════════════════════
@@ -6020,6 +6191,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span> Inici</button>
         <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></span> Galeria</button>
         <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió</button>
+        <button class="nav-item" onclick="mobileNavTo('partsDiaris')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Parts diaris</button>
         <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa</button>
         <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></span> PK Mapa</button>
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Descàrregues</button>
@@ -6060,6 +6232,9 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div class="sidebar-section-label">Projectes</div>
             <button class="nav-item" id="nav-list" onclick="historial()">
                 <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió
+            </button>
+            <button class="nav-item" id="nav-parts" onclick="ir('partsDiaris')">
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Parts diaris
             </button>
             <button class="nav-item" id="nav-map" onclick="abrirMapa()">
                 <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa
@@ -6229,6 +6404,13 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <div class="action-desc">Cerca articles de la Llei i el Reglament de carreteres</div>
                     </div>
                 </div>
+
+                <!-- PART D'AVUI -->
+                <button type="button" class="pd-home" id="pdHomeCard" onclick="ir('partsDiaris')">
+                    <span class="action-icon tone-red"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span>
+                    <span class="pd-home-txt"><b>Part d'avui</b><span id="pdHomeEstat">Apunta les carreteres que fas avui</span></span>
+                    <svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg>
+                </button>
 
                 <!-- RECENT PROJECTS SECTION -->
                 <div class="recents-header">
@@ -6546,6 +6728,41 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
+            </div>
+
+            <!-- ================================================
+                 PARTS DIARIS — registre manual de la ruta de cada dia
+                 (sense GPS: només el que escriu el treballador)
+                 ================================================ -->
+            <div id="partsDiaris" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('home')">&#8592;</button>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>Parts diaris</h3>
+                </div>
+
+                <div class="pd-week-nav">
+                    <button class="pd-nav-btn" onclick="pdCanviarSetmana(-1)" aria-label="Setmana anterior">
+                        <svg class="ico" aria-hidden="true"><use href="#i-chev-left"/></svg>
+                    </button>
+                    <button class="pd-week-title" onclick="pdAnarAvui()" aria-label="Tornar a la setmana actual">
+                        <span id="pdSetmanaNum">Setmana</span>
+                        <small id="pdSetmanaRang"></small>
+                    </button>
+                    <button class="pd-nav-btn" onclick="pdCanviarSetmana(1)" aria-label="Setmana següent">
+                        <svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg>
+                    </button>
+                </div>
+
+                <div id="pdLlista" class="pd-llista"></div>
+
+                <div class="pd-accions">
+                    <button class="btn btn-ghost" onclick="pdObrirCarreteres()">
+                        <svg class="ico" aria-hidden="true"><use href="#i-road"/></svg> Les meves carreteres
+                    </button>
+                    <button class="btn btn-primary" onclick="pdObrirExportar()">
+                        <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Exportar al calendari
+                    </button>
+                </div>
             </div>
 
             <!-- ================================================
@@ -7693,7 +7910,8 @@ const screenTitles = {
     'mapScreen':     'Mapa de Registres',
     'galeriaFotos':  'Galeria de Fotos',
     'pkMapaScreen':  'PK Mapa',
-    'normativa':     'Normativa de Carreteres'
+    'normativa':     'Normativa de Carreteres',
+    'partsDiaris':   'Parts diaris'
 };
 
 // Show FAB on initial load (home is active by default)
@@ -7711,6 +7929,7 @@ function ir(id) {
         if (btnPunts) btnPunts.style.display = 'flex';
         /* Refresh recents every time home is opened */
         renderRecents();
+        if (typeof pdRenderHomeCard === 'function') pdRenderHomeCard();
     }
 
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -7723,7 +7942,7 @@ function ir(id) {
 
     // Update sidebar active state
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(el => el.classList.remove('active'));
-    const navMap = { home:'nav-home', list:'nav-list', gestioLlista:'nav-list', downloads:'nav-downloads', dlInventaris:'nav-downloads', dlIncidencies:'nav-downloads', dlFitxaAnimal:'nav-downloads', dlITC:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa' };
+    const navMap = { home:'nav-home', list:'nav-list', gestioLlista:'nav-list', downloads:'nav-downloads', dlInventaris:'nav-downloads', dlIncidencies:'nav-downloads', dlFitxaAnimal:'nav-downloads', dlITC:'nav-downloads', pantallaAjustos:'nav-settings', helpScreen:'nav-help', mapScreen:'nav-map', galeriaFotos:'nav-foto', pkMapaScreen:'nav-pkmapa', partsDiaris:'nav-parts' };
     if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active');
 
     if (id === 'dlInventaris') carregarLlistaDescargues();
@@ -7733,6 +7952,7 @@ function ir(id) {
     if (id === 'pantallaAjustos') { autopkActualizarUIinici(); blacklistRenderChips(); initPreferenciaFoto(); _carregarP24DesDeLocalStorage(); _actualitzarEstatP24Config(); _omplirCampsTecnicAjustos(); }
     if (id === 'galeriaFotos') renderGaleria();
     if (id === 'normativa') normativaRenderResultats();
+    if (id === 'partsDiaris' && typeof pdObrir === 'function') pdObrir();
     if (id === 'pkMapaScreen') {
         // Forçar invalidateSize de Leaflet després que la pantalla sigui visible i fixed
         setTimeout(() => { if (pkmMap) pkmMap.invalidateSize(); pkmSyncPeek(); }, 120);
@@ -11327,7 +11547,8 @@ function exportarBackup() {
                     __datacampBackup: true,
                     version: 2,
                     exportedAt: new Date().toISOString(),
-                    stores: result
+                    stores: result,
+                    partsDiaris: (typeof pdSnapshotBackup === 'function') ? pdSnapshotBackup() : undefined
                 };
                 const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
                 const a = document.createElement("a");
@@ -11353,6 +11574,9 @@ function importarBackup(input) {
             const storesData = (parsed && parsed.__datacampBackup && parsed.stores)
                 ? parsed.stores
                 : { projects: Array.isArray(parsed) ? parsed : [] };
+
+            // Parts diaris: van en una base de dades a part
+            if (parsed && parsed.partsDiaris && typeof pdImportarBackup === 'function') pdImportarBackup(parsed.partsDiaris);
 
             const storeNames = Object.keys(storesData).filter(s => db.objectStoreNames.contains(s) && Array.isArray(storesData[s]));
             if (storeNames.length === 0) throw new Error("El fitxer no conté cap magatzem reconegut.");
@@ -17703,6 +17927,543 @@ function pkmBack() {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia);
     else inicia();
 })();
+</script>
+
+
+<!-- ============================================================
+     PARTS DIARIS — fulls inferiors i avís de privacitat
+     ============================================================ -->
+<div class="fe-sheet-overlay pd-overlay" id="pdAvis" onclick="if(event.target===this)pdTancarAvis()">
+    <div class="fe-sheet pd-sheet pd-avis" role="dialog" aria-modal="true" aria-labelledby="pdAvisTitol">
+        <div class="fe-sheet-handle"></div>
+        <div class="pd-avis-cap">
+            <div class="pd-avis-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div>
+            <h4 id="pdAvisTitol">La teva ubicació és teva</h4>
+        </div>
+        <p class="pd-avis-txt">Els parts diaris <strong>no fan cap seguiment GPS</strong> ni registren on ets. Només es guarda el que tu escrius, i es queda en aquest mòbil fins que tu decideixis exportar-ho.</p>
+        <label class="pd-check"><input type="checkbox" id="pdAvisNoMostrar"> No tornar a mostrar</label>
+        <button class="btn btn-primary btn-block" onclick="pdTancarAvis()">Entesos</button>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdDiaSheet" onclick="if(event.target===this)pdTancarDia()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdDiaTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdDiaTitol">Part del dia</h4>
+
+        <div class="pd-camp">
+            <label for="pdData">Data</label>
+            <input type="date" id="pdData">
+        </div>
+
+        <div class="pd-seg" role="group" aria-label="Tipus de jornada">
+            <button type="button" id="pdTipusTreball" onclick="pdSetTipus('treball')">Treball</button>
+            <button type="button" id="pdTipusFesta" onclick="pdSetTipus('festa')">Festa</button>
+        </div>
+
+        <div id="pdBlocTreball">
+            <div class="pd-camp">
+                <label>Carreteres fetes</label>
+                <div id="pdChips" class="pd-chips"></div>
+            </div>
+            <div class="pd-camp">
+                <label for="pdAltraInput">Afegir una altra</label>
+                <div class="pd-afegir">
+                    <input type="text" id="pdAltraInput" autocomplete="off" autocapitalize="characters"
+                           placeholder="C-26, LV-3022…" oninput="pdSuggerir('pdAltraInput','pdAltraSug',pdAfegirAlDia)"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();pdAfegirAlDia(this.value);}">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="pdAfegirAlDia(document.getElementById('pdAltraInput').value)">Afegir</button>
+                </div>
+                <div id="pdAltraSug" class="pd-sug"></div>
+                <div id="pdDesarLlista" class="pd-desar-llista" hidden></div>
+            </div>
+        </div>
+
+        <div class="pd-camp">
+            <label for="pdObs">Observacions (opcional)</label>
+            <textarea id="pdObs" rows="2" placeholder="Zona de company, incidències del dia…"></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="pdDesarDia()">Desar</button>
+        <div class="pd-sheet-peu">
+            <button type="button" class="pd-link pd-link-perill" id="pdEsborrarBtn" onclick="pdEsborrarDia()">Esborrar aquest dia</button>
+            <button type="button" class="pd-link" onclick="pdTancarDia()">Cancel·lar</button>
+        </div>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdCarrSheet" onclick="if(event.target===this)pdTancarCarreteres()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdCarrTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdCarrTitol">Les meves carreteres</h4>
+        <p class="pd-ajuda">Les carreteres que fas habitualment. Al part de cada dia només caldrà marcar-les.</p>
+        <div class="pd-afegir">
+            <input type="text" id="pdCarrInput" autocomplete="off" autocapitalize="characters"
+                   placeholder="Escriu una carretera" oninput="pdSuggerir('pdCarrInput','pdCarrSug',pdAfegirALlista)"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();pdAfegirALlista(this.value);}">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="pdAfegirALlista(document.getElementById('pdCarrInput').value)">Afegir</button>
+        </div>
+        <div id="pdCarrSug" class="pd-sug"></div>
+        <ul id="pdCarrLlista" class="pd-carr-llista"></ul>
+        <button class="btn btn-primary btn-block" onclick="pdTancarCarreteres()">Fet</button>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdExpSheet" onclick="if(event.target===this)pdTancarExportar()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdExpTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdExpTitol">Exportar al calendari</h4>
+        <p class="pd-ajuda">Es crea un fitxer de calendari (.ics) amb un esdeveniment per dia. El pots obrir amb el calendari d'Apple, Google, Samsung…</p>
+        <div class="pd-exp-opcions">
+            <button class="btn btn-ghost btn-block" onclick="pdExportarICS('setmana')">Aquesta setmana</button>
+            <button class="btn btn-ghost btn-block" onclick="pdExportarICS('mes')">Aquest mes</button>
+            <button class="btn btn-ghost btn-block" onclick="pdExportarICS('tot')">Tots els dies registrats</button>
+        </div>
+        <p class="pd-nota">En exportar, la teva ruta passa al calendari que triïs (i al seu núvol), fora de DataCamp.</p>
+        <p class="pd-nota">A Android, si el calendari de Google no l'obre directament, importa'l des de calendar.google.com › Configuració › Importa.</p>
+        <button type="button" class="pd-link" onclick="pdTancarExportar()">Cancel·lar</button>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   PARTS DIARIS
+   Registre manual de les carreteres fetes cada dia.
+   · Sense GPS: només es desa el que escriu el treballador.
+   · Base de dades pròpia ("DataCampPartsDiaris"), separada de la
+     principal: no cal pujar-ne la versió ni hi ha risc de bloqueig.
+   · Entra a la còpia de seguretat (exportarBackup / importarBackup).
+   ============================================================ */
+const PD_DB_NOM = 'DataCampPartsDiaris';
+const PD_KEY_CARR = 'pd_carreteres';
+const PD_KEY_AVIS = 'pd_avis_ok';
+const PD_KEY_UID  = 'pd_uid';
+const PD_DIES_CURTS = ['dg', 'dl', 'dt', 'dc', 'dj', 'dv', 'ds'];
+const PD_MESOS = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+
+let pdDb = null;
+const pdDies = new Map();          // 'AAAA-MM-DD' → { data, tipus, carreteres[], obs, updatedAt }
+let pdDilluns = null;              // Date del dilluns de la setmana visible
+let pdEdicio = null;               // estat del full d'edició
+
+/* ── Utilitats de data (sempre en hora local) ─────────────── */
+function pdISO(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function pdDeISO(s) { const [a, m, d] = s.split('-').map(Number); return new Date(a, m - 1, d); }
+function pdDMA(s) { const [a, m, d] = s.split('-'); return d + '-' + m + '-' + a; }       // DD-MM-AAAA
+function pdDillunsDe(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function pdSumaDies(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function pdNumSetmana(d) {   // ISO-8601
+    const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dia = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - dia);
+    const inici = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+    return Math.ceil(((t - inici) / 864e5 + 1) / 7);
+}
+function pdEsc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ── Carreteres: normalització i llista pròpia ────────────── */
+function pdNormalitza(txt) {
+    let s = String(txt || '').toUpperCase().replace(/[‐–—_\s]+/g, m => /\s/.test(m) ? '' : '-').replace(/[^A-Z0-9.\-]/g, '');
+    if (!s) return '';
+    if (!s.includes('-')) { const m = /^([A-Z]+)(\d.*)$/.exec(s); if (m) s = m[1] + '-' + m[2]; }
+    s = s.slice(0, 16);
+    return pdCanonic(s);
+}
+/* Respecta la grafia oficial del catàleg (p. ex. C-1412a, amb minúscula) */
+let _pdCanonMap = null, _pdCanonMida = -1;
+function pdCanonic(u) {
+    const cat = pdCatalegBase();
+    if (!_pdCanonMap || _pdCanonMida !== cat.length) {
+        _pdCanonMap = new Map(); cat.forEach(c => _pdCanonMap.set(c.toUpperCase(), c)); _pdCanonMida = cat.length;
+    }
+    return _pdCanonMap.get(u) || u;
+}
+function pdCatalegBase() {
+    try { if (typeof PK_SEED !== 'undefined') return Object.keys(PK_SEED); } catch (e) {}
+    return [];
+}
+function pdLlista() {
+    try { const v = JSON.parse(localStorage.getItem(PD_KEY_CARR) || '[]'); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+}
+function pdDesaLlista(arr) { try { localStorage.setItem(PD_KEY_CARR, JSON.stringify(arr)); } catch (e) {} }
+
+let _pdCatalegCache = null;
+function pdCataleg() {
+    if (_pdCatalegCache) return _pdCatalegCache;
+    const set = new Set(pdLlista());
+    pdDies.forEach(r => (r.carreteres || []).forEach(c => set.add(c)));
+    try { if (typeof PK_SEED !== 'undefined') { Object.keys(PK_SEED).forEach(k => set.add(k)); _pdCatalegCache = [...set]; return _pdCatalegCache; } }
+    catch (e) {}
+    return [...set];   // sense cache: el seed pot arribar més tard
+}
+
+/* ── Base de dades ───────────────────────────────────────── */
+function pdInitDB() {
+    return new Promise(resolve => {
+        if (pdDb) return resolve(pdDb);
+        let req;
+        try { req = indexedDB.open(PD_DB_NOM, 1); } catch (e) { return resolve(null); }
+        req.onupgradeneeded = e => {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains('dies')) d.createObjectStore('dies', { keyPath: 'data' });
+        };
+        req.onsuccess = e => {
+            pdDb = e.target.result;
+            pdDb.onversionchange = () => { pdDb.close(); pdDb = null; };
+            pdDb.transaction('dies').objectStore('dies').getAll().onsuccess = ev => {
+                pdDies.clear();
+                (ev.target.result || []).forEach(r => pdDies.set(r.data, r));
+                resolve(pdDb);
+            };
+        };
+        req.onerror = () => resolve(null);
+    });
+}
+function pdGuarda(reg) {
+    pdDies.set(reg.data, reg);
+    _pdCatalegCache = null;
+    if (!pdDb) return Promise.resolve();
+    return new Promise(res => { const tx = pdDb.transaction('dies', 'readwrite'); tx.objectStore('dies').put(reg); tx.oncomplete = res; tx.onerror = res; });
+}
+function pdEsborra(data) {
+    pdDies.delete(data);
+    if (!pdDb) return Promise.resolve();
+    return new Promise(res => { const tx = pdDb.transaction('dies', 'readwrite'); tx.objectStore('dies').delete(data); tx.oncomplete = res; tx.onerror = res; });
+}
+
+/* ── Còpia de seguretat ──────────────────────────────────── */
+function pdSnapshotBackup() {
+    return { dies: [...pdDies.values()], carreteres: pdLlista() };
+}
+async function pdImportarBackup(obj) {
+    if (!obj || typeof obj !== 'object') return 0;
+    await pdInitDB();
+    let n = 0;
+    for (const r of (Array.isArray(obj.dies) ? obj.dies : [])) {
+        if (!r || !/^\d{4}-\d{2}-\d{2}$/.test(r.data)) continue;
+        await pdGuarda({
+            data: r.data,
+            tipus: r.tipus === 'festa' ? 'festa' : 'treball',
+            carreteres: Array.isArray(r.carreteres) ? r.carreteres.map(pdNormalitza).filter(Boolean) : [],
+            obs: String(r.obs || ''),
+            updatedAt: Number(r.updatedAt) || Date.now()
+        });
+        n++;
+    }
+    if (Array.isArray(obj.carreteres)) {
+        const llista = pdLlista();
+        obj.carreteres.map(pdNormalitza).filter(c => c && !llista.includes(c)).forEach(c => llista.push(c));
+        pdDesaLlista(llista);
+    }
+    pdRenderHomeCard();
+    if (document.getElementById('partsDiaris')?.classList.contains('active')) pdRenderSetmana();
+    return n;
+}
+
+/* ── Fulls inferiors (obrir / tancar) ────────────────────── */
+function pdObreSheet(id) { document.getElementById(id)?.classList.add('open'); document.body.classList.add('pd-noscroll'); }
+function pdTancaSheet(id) {
+    document.getElementById(id)?.classList.remove('open');
+    if (!document.querySelector('.pd-overlay.open')) document.body.classList.remove('pd-noscroll');
+}
+
+/* ── Pantalla principal ──────────────────────────────────── */
+async function pdObrir() {
+    if (!pdDilluns) pdDilluns = pdDillunsDe(new Date());
+    pdRenderSetmana();                       // pinta de seguida amb el que hi hagi en memòria
+    await pdInitDB();
+    pdRenderSetmana();
+    let vist = false;
+    try { vist = localStorage.getItem(PD_KEY_AVIS) === '1'; } catch (e) {}
+    if (!vist) { document.getElementById('pdAvisNoMostrar').checked = false; pdObreSheet('pdAvis'); }
+}
+function pdTancarAvis() {
+    if (document.getElementById('pdAvisNoMostrar').checked) { try { localStorage.setItem(PD_KEY_AVIS, '1'); } catch (e) {} }
+    pdTancaSheet('pdAvis');
+}
+function pdCanviarSetmana(delta) { pdDilluns = pdSumaDies(pdDilluns || pdDillunsDe(new Date()), 7 * delta); pdRenderSetmana(); }
+function pdAnarAvui() { pdDilluns = pdDillunsDe(new Date()); pdRenderSetmana(); }
+
+function pdRenderSetmana() {
+    const cont = document.getElementById('pdLlista');
+    if (!cont) return;
+    if (!pdDilluns) pdDilluns = pdDillunsDe(new Date());
+    const avui = pdISO(new Date());
+    const diumenge = pdSumaDies(pdDilluns, 6);
+    document.getElementById('pdSetmanaNum').textContent = 'Setmana ' + pdNumSetmana(pdDilluns);
+    document.getElementById('pdSetmanaRang').textContent = pdDMA(pdISO(pdDilluns)) + ' · ' + pdDMA(pdISO(diumenge));
+
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+        const d = pdSumaDies(pdDilluns, i);
+        const iso = pdISO(d);
+        const r = pdDies.get(iso);
+        const esAvui = iso === avui;
+        const futur = iso > avui;
+        let cos, cls = 'pd-dia';
+        if (r && r.tipus === 'festa') {
+            cls += ' festa';
+            cos = '<span class="pd-tag-festa">Festa</span>' + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
+        } else if (r && r.carreteres.length) {
+            cos = '<span class="pd-plaques">' + r.carreteres.map(c => '<span class="road-plate">' + pdEsc(c) + '</span>').join('') + '</span>'
+                + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
+        } else {
+            cls += ' buit';
+            cos = '<span class="pd-buit">' + (esAvui ? 'Toca per afegir la ruta d\u2019avui' : 'Sense registre') + '</span>';
+        }
+        if (esAvui) cls += ' avui';
+        if (futur) cls += ' futur';
+        html += '<button type="button" class="' + cls + '" onclick="pdEditar(\'' + iso + '\')">'
+            + '<span class="pd-dn"><b>' + String(d.getDate()).padStart(2, '0') + '</b><small>' + PD_DIES_CURTS[d.getDay()] + (esAvui ? ' · avui' : '') + '</small></span>'
+            + '<span class="pd-cos">' + cos + '</span>'
+            + (esAvui && !r ? '<svg class="ico pd-mes" aria-hidden="true"><use href="#i-plus"/></svg>' : '')
+            + '</button>';
+    }
+    cont.innerHTML = html;
+}
+
+/* ── Targeta "Part d'avui" a l'inici ─────────────────────── */
+function pdRenderHomeCard() {
+    const el = document.getElementById('pdHomeEstat');
+    if (!el) return;
+    const r = pdDies.get(pdISO(new Date()));
+    const card = document.getElementById('pdHomeCard');
+    if (r && r.tipus === 'festa') { el.textContent = 'Avui: festa'; card?.classList.add('fet'); }
+    else if (r && r.carreteres.length) { el.textContent = 'Avui: ' + r.carreteres.join(' · '); card?.classList.add('fet'); }
+    else { el.textContent = 'Encara no has apuntat la ruta d\u2019avui'; card?.classList.remove('fet'); }
+}
+
+/* ── Editar un dia ───────────────────────────────────────── */
+function pdEditar(iso) {
+    const r = pdDies.get(iso);
+    pdEdicio = {
+        original: r ? iso : null,
+        tipus: r ? r.tipus : 'treball',
+        marcades: new Set(r ? r.carreteres : []),
+    };
+    document.getElementById('pdData').value = iso;
+    document.getElementById('pdObs').value = r ? (r.obs || '') : '';
+    document.getElementById('pdAltraInput').value = '';
+    document.getElementById('pdAltraSug').innerHTML = '';
+    document.getElementById('pdDesarLlista').hidden = true;
+    document.getElementById('pdEsborrarBtn').hidden = !r;
+    document.getElementById('pdDiaTitol').textContent = 'Part del ' + pdDMA(iso);
+    pdSetTipus(pdEdicio.tipus);
+    pdRenderChips();
+    pdObreSheet('pdDiaSheet');
+}
+function pdTancarDia() { pdTancaSheet('pdDiaSheet'); pdEdicio = null; }
+
+function pdSetTipus(t) {
+    if (!pdEdicio) return;
+    pdEdicio.tipus = t;
+    document.getElementById('pdTipusTreball').classList.toggle('actiu', t === 'treball');
+    document.getElementById('pdTipusFesta').classList.toggle('actiu', t === 'festa');
+    document.getElementById('pdBlocTreball').hidden = t === 'festa';
+}
+
+function pdRenderChips() {
+    const cont = document.getElementById('pdChips');
+    const llista = pdLlista();
+    const extres = [...pdEdicio.marcades].filter(c => !llista.includes(c));
+    const totes = [...llista, ...extres];
+    if (!totes.length) {
+        cont.innerHTML = '<p class="pd-ajuda">Encara no tens carreteres habituals. Escriu-ne una a sota o desa-les a «Les meves carreteres».</p>';
+        return;
+    }
+    cont.innerHTML = totes.map(c => {
+        const on = pdEdicio.marcades.has(c);
+        return '<button type="button" class="pd-chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" onclick="pdToggle(\'' + pdEsc(c) + '\')">'
+            + (on ? '<svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>' : '') + pdEsc(c) + '</button>';
+    }).join('');
+}
+function pdToggle(c) {
+    if (!pdEdicio) return;
+    if (pdEdicio.marcades.has(c)) pdEdicio.marcades.delete(c); else pdEdicio.marcades.add(c);
+    pdRenderChips();
+}
+
+function pdAfegirAlDia(txt) {
+    const c = pdNormalitza(txt);
+    if (!c || !pdEdicio) return;
+    pdEdicio.marcades.add(c);
+    document.getElementById('pdAltraInput').value = '';
+    document.getElementById('pdAltraSug').innerHTML = '';
+    pdRenderChips();
+    const box = document.getElementById('pdDesarLlista');
+    if (!pdLlista().includes(c)) {
+        box.innerHTML = '<span>Vols desar <span class="road-plate">' + pdEsc(c) + '</span> a les teves carreteres?</span>'
+            + '<button type="button" class="pd-link" onclick="pdAfegirALlista(\'' + pdEsc(c) + '\',true)">Desar-la</button>';
+        box.hidden = false;
+    } else box.hidden = true;
+}
+
+/* Suggeriments: primer les pròpies, després el catàleg offline */
+function pdSuggerir(inputId, sugId, onTria) {
+    const q = pdNormalitza(document.getElementById(inputId).value);
+    const box = document.getElementById(sugId);
+    if (!q) { box.innerHTML = ''; return; }
+    const propies = pdLlista();
+    const cat = pdCataleg();
+    const Q = q.toUpperCase();
+    const comenca = c => c.toUpperCase().startsWith(Q), conte = c => !comenca(c) && c.toUpperCase().includes(Q);
+    const ordre = (a, b) => (propies.includes(b) - propies.includes(a)) || a.length - b.length || a.localeCompare(b);
+    const res = [...cat.filter(comenca).sort(ordre), ...cat.filter(conte).sort(ordre)].slice(0, 6);
+    box._onTria = onTria;
+    box.innerHTML = res.map(c => '<button type="button" class="pd-sug-item" data-c="' + pdEsc(c) + '">' + pdEsc(c) + '</button>').join('');
+    box.querySelectorAll('.pd-sug-item').forEach(b => b.onclick = () => box._onTria(b.dataset.c));
+}
+
+async function pdDesarDia() {
+    if (!pdEdicio) return;
+    const data = document.getElementById('pdData').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del part'); return; }
+    const carreteres = pdEdicio.tipus === 'festa' ? [] : [...pdEdicio.marcades];
+    if (pdEdicio.tipus === 'treball' && !carreteres.length) { showToast('Marca almenys una carretera, o tria «Festa»'); return; }
+    const ocupat = pdDies.get(data);
+    if (data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(data) + ' ja té un part. Vols substituir-lo?')) return;
+    await pdInitDB();
+    if (pdEdicio.original && pdEdicio.original !== data) await pdEsborra(pdEdicio.original);
+    await pdGuarda({ data, tipus: pdEdicio.tipus, carreteres, obs: document.getElementById('pdObs').value.trim(), updatedAt: Date.now() });
+    pdTancarDia();
+    pdDilluns = pdDillunsDe(pdDeISO(data));
+    pdRenderSetmana();
+    pdRenderHomeCard();
+    showToast('Part del ' + pdDMA(data) + ' desat');
+}
+async function pdEsborrarDia() {
+    if (!pdEdicio || !pdEdicio.original) return;
+    if (!confirm('Vols esborrar el part del ' + pdDMA(pdEdicio.original) + '?')) return;
+    await pdEsborra(pdEdicio.original);
+    pdTancarDia();
+    pdRenderSetmana();
+    pdRenderHomeCard();
+    showToast('Part esborrat');
+}
+
+/* ── Les meves carreteres ────────────────────────────────── */
+function pdObrirCarreteres() {
+    document.getElementById('pdCarrInput').value = '';
+    document.getElementById('pdCarrSug').innerHTML = '';
+    pdRenderLlista();
+    pdObreSheet('pdCarrSheet');
+}
+function pdTancarCarreteres() { pdTancaSheet('pdCarrSheet'); if (pdEdicio) pdRenderChips(); }
+function pdAfegirALlista(txt, desDelDia) {
+    const c = pdNormalitza(txt);
+    if (!c) return;
+    const llista = pdLlista();
+    if (!llista.includes(c)) { llista.push(c); pdDesaLlista(llista); _pdCatalegCache = null; }
+    if (desDelDia) {
+        document.getElementById('pdDesarLlista').hidden = true;
+        pdRenderChips();
+        showToast(c + ' desada a les teves carreteres');
+        return;
+    }
+    document.getElementById('pdCarrInput').value = '';
+    document.getElementById('pdCarrSug').innerHTML = '';
+    pdRenderLlista();
+}
+function pdTreureDeLlista(c) { pdDesaLlista(pdLlista().filter(x => x !== c)); pdRenderLlista(); }
+function pdMoure(c, delta) {
+    const l = pdLlista(); const i = l.indexOf(c); const j = i + delta;
+    if (i < 0 || j < 0 || j >= l.length) return;
+    [l[i], l[j]] = [l[j], l[i]]; pdDesaLlista(l); pdRenderLlista();
+}
+function pdRenderLlista() {
+    const ul = document.getElementById('pdCarrLlista');
+    const l = pdLlista();
+    if (!l.length) { ul.innerHTML = '<li class="pd-ajuda">Encara no n\u2019hi ha cap. Afegeix les que fas habitualment.</li>'; return; }
+    ul.innerHTML = l.map((c, i) => '<li>'
+        + '<span class="road-plate">' + pdEsc(c) + '</span>'
+        + '<span class="pd-li-acc">'
+        + '<button type="button" aria-label="Pujar" onclick="pdMoure(\'' + pdEsc(c) + '\',-1)"' + (i === 0 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-up"/></svg></button>'
+        + '<button type="button" aria-label="Baixar" onclick="pdMoure(\'' + pdEsc(c) + '\',1)"' + (i === l.length - 1 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-down"/></svg></button>'
+        + '<button type="button" aria-label="Treure" class="pd-x" onclick="pdTreureDeLlista(\'' + pdEsc(c) + '\')"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>'
+        + '</span></li>').join('');
+}
+
+/* ── Exportació al calendari (.ics) ──────────────────────── */
+function pdObrirExportar() { pdObreSheet('pdExpSheet'); }
+function pdTancarExportar() { pdTancaSheet('pdExpSheet'); }
+
+function pdIcsText(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function pdIcsPlega(linia) {   // línies de màx. 75 octets (RFC 5545)
+    const enc = new TextEncoder();
+    if (enc.encode(linia).length <= 75) return linia;
+    const parts = []; let act = '', mida = 0, limit = 75;
+    for (const ch of linia) {
+        const n = enc.encode(ch).length;
+        if (mida + n > limit) { parts.push(act); act = ' '; mida = 1; limit = 75; }
+        act += ch; mida += n;
+    }
+    parts.push(act);
+    return parts.join('\r\n');
+}
+function pdGeneraICS(registres) {
+    let uid;
+    try { uid = localStorage.getItem(PD_KEY_UID); if (!uid) { uid = Math.random().toString(36).slice(2, 10); localStorage.setItem(PD_KEY_UID, uid); } }
+    catch (e) { uid = 'dc'; }
+    const ara = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DataCamp//Parts diaris//CA', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:DataCamp · Parts diaris'];
+    registres.forEach(r => {
+        const ini = r.data.replace(/-/g, '');
+        const fi = pdISO(pdSumaDies(pdDeISO(r.data), 1)).replace(/-/g, '');
+        const titol = r.tipus === 'festa' ? 'Festa' : 'Ruta: ' + r.carreteres.join(', ');
+        const desc = [r.tipus === 'festa' ? 'Dia de festa' : 'Carreteres: ' + r.carreteres.join(', '), r.obs ? 'Observacions: ' + r.obs : '', 'Registrat a DataCamp'].filter(Boolean).join('\n');
+        L.push('BEGIN:VEVENT',
+            'UID:part-' + ini + '-' + uid + '@datacamp',
+            'DTSTAMP:' + ara,
+            'DTSTART;VALUE=DATE:' + ini,
+            'DTEND;VALUE=DATE:' + fi,
+            'SEQUENCE:' + (Math.floor((r.updatedAt || Date.now()) / 60000) % 2147483647),
+            'SUMMARY:' + pdIcsText(titol),
+            'DESCRIPTION:' + pdIcsText(desc),
+            'TRANSP:TRANSPARENT',
+            'END:VEVENT');
+    });
+    L.push('END:VCALENDAR');
+    return L.map(pdIcsPlega).join('\r\n') + '\r\n';
+}
+async function pdExportarICS(abast) {
+    await pdInitDB();
+    let regs = [...pdDies.values()].filter(r => r.tipus === 'festa' || r.carreteres.length);
+    let nomAbast = 'tot';
+    if (abast === 'setmana') {
+        const dl = pdDilluns || pdDillunsDe(new Date());
+        const a = pdISO(dl), b = pdISO(pdSumaDies(dl, 6));
+        regs = regs.filter(r => r.data >= a && r.data <= b);
+        nomAbast = 'setmana-' + pdNumSetmana(dl);
+    } else if (abast === 'mes') {
+        const ref = pdSumaDies(pdDilluns || pdDillunsDe(new Date()), 3);   // el mes del dijous visible
+        const pref = ref.getFullYear() + '-' + String(ref.getMonth() + 1).padStart(2, '0');
+        regs = regs.filter(r => r.data.startsWith(pref));
+        nomAbast = PD_MESOS[ref.getMonth()] + '-' + ref.getFullYear();
+    }
+    if (!regs.length) { showToast('No hi ha cap dia registrat en aquest període'); return; }
+    regs.sort((x, y) => x.data.localeCompare(y.data));
+    const nom = 'parts-diaris-' + nomAbast + '.ics';
+    const blob = new Blob([pdGeneraICS(regs)], { type: 'text/calendar;charset=utf-8' });
+    pdTancarExportar();
+    try {
+        const fitxer = new File([blob], nom, { type: 'text/calendar' });
+        if (navigator.canShare && navigator.canShare({ files: [fitxer] })) {
+            await navigator.share({ files: [fitxer], title: 'Parts diaris' });
+            return;
+        }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nom;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    showToast(regs.length + ' dies exportats al fitxer ' + nom);
+}
+
+/* Càrrega inicial (en segon pla) per tenir la targeta d'inici al dia */
+pdInitDB().then(pdRenderHomeCard);
 </script>
 
 </html>
