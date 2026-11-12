@@ -5843,6 +5843,31 @@ body.pd-noscroll { overflow: hidden; }
 }
 .pd-carr-llista li.pd-ajuda { border: none; padding: 0; background: none; }
 .pd-li-acc { display: flex; gap: 4px; }
+.pd-li-nom {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+    background: none; border: none; padding: 2px 0; cursor: pointer; text-align: left; font-family: var(--font);
+}
+.pd-li-nom small { font-size: .75rem; color: var(--text-muted); }
+.pd-panell-tit {
+    flex-basis: 100%; margin-top: 10px;
+    font-size: .72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+}
+.pd-trams { display: grid; gap: 8px; margin-top: 14px; }
+.pd-trams:empty { display: none; }
+.pd-trams > label { margin-bottom: 0; }
+.pd-tram-row { display: flex; align-items: center; gap: 10px; }
+.pd-tram-row .road-plate { min-width: 64px; justify-content: center; }
+.pd-tram-ins { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.pd-tram-llista { flex-basis: 100%; margin-top: 6px; }
+.pd-tram-fl { color: var(--text-muted); flex-shrink: 0; }
+.pd-sheet .pd-pk-inp, .pd-carr-llista .pd-pk-inp {
+    flex: 1; min-width: 0; width: 100%;
+    padding: 9px 10px; font-size: 1rem; text-align: center;
+    font-family: var(--font-cond); font-weight: 700; letter-spacing: .4px;
+    border: 1.5px solid var(--border-dark); border-radius: 8px; background: var(--surface); color: var(--dark);
+}
+.pd-pk-inp.err { border-color: var(--danger); background: var(--danger-lt); }
+.pd-trams .pd-nota { margin-top: 0; }
 .pd-li-acc button {
     width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
     border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 18px;
@@ -17983,6 +18008,7 @@ function pkmBack() {
             <div class="pd-camp">
                 <label>Carreteres fetes</label>
                 <div id="pdChips" class="pd-chips"></div>
+                <div id="pdTrams" class="pd-trams"></div>
             </div>
             <div class="pd-camp">
                 <label for="pdAltraInput">Afegir una altra</label>
@@ -18014,7 +18040,7 @@ function pkmBack() {
     <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdCarrTitol">
         <div class="fe-sheet-handle"></div>
         <h4 id="pdCarrTitol">Les meves carreteres</h4>
-        <p class="pd-ajuda">Les carreteres que fas habitualment. Al comunicat de cada dia només caldrà marcar-les. Toca el cercle per donar-los un color segons la classificació: el localitzador de PK també el farà servir.</p>
+        <p class="pd-ajuda">Les carreteres que fas habitualment. Al comunicat de cada dia només caldrà marcar-les. Toca una carretera per fixar el seu tram de PK per defecte i el color de la classificació (el localitzador de PK també el farà servir).</p>
         <div class="pd-afegir">
             <input type="text" id="pdCarrInput" autocomplete="off" autocapitalize="characters"
                    placeholder="Escriu una carretera" oninput="pdSuggerir('pdCarrInput','pdCarrSug',pdAfegirALlista)"
@@ -18146,6 +18172,47 @@ function pdAplicaColor(el, carretera) {
     else { el.style.removeProperty('--pc'); el.style.removeProperty('--pf'); el.classList.remove('pd-nostra'); }
 }
 
+/* Trams de PK (inici / fi) per carretera
+   · Per defecte: el que l'usuari hagi fixat a «Les meves carreteres»;
+     si no n'ha fixat cap, l'extensió de la carretera al catàleg offline.
+   · A cada comunicat es copia i es pot modificar només per a aquell dia. */
+const PD_KEY_TRAMS = 'pd_carr_trams';
+function pdTramsLlista() {
+    try { const v = JSON.parse(localStorage.getItem(PD_KEY_TRAMS) || '{}'); return (v && typeof v === 'object') ? v : {}; }
+    catch (e) { return {}; }
+}
+function pdDesaTramsLlista(o) { try { localStorage.setItem(PD_KEY_TRAMS, JSON.stringify(o)); } catch (e) {} }
+/** Accepta «120+350», «120 350», «120.35», «120,35» o «120». Retorna «120+350», '' si és buit o null si no és vàlid */
+function pdParsePK(txt) {
+    const t = String(txt || '').trim().replace(',', '.');
+    if (!t) return '';
+    let m = /^(\d{1,4})\s*[+ ]\s*(\d{1,3})$/.exec(t);
+    if (m) return Number(m[1]) + '+' + m[2].padStart(3, '0');
+    m = /^(\d{1,4})(?:\.(\d{1,3}))?$/.exec(t);
+    if (m) return Number(m[1]) + '+' + (m[2] || '').padEnd(3, '0');
+    return null;
+}
+function pdFormatPK(dec) {
+    let km = Math.floor(dec + 1e-9), m = Math.round((dec - km) * 1000);
+    if (m >= 1000) { km += 1; m = 0; }
+    return km + '+' + String(m).padStart(3, '0');
+}
+function pdTramCataleg(c) {
+    try {
+        if (typeof PK_SEED === 'undefined' || !PK_SEED[c] || !PK_SEED[c].length) return null;
+        let mn = Infinity, mx = -Infinity;
+        PK_SEED[c].forEach(p => { if (p[0] < mn) mn = p[0]; if (p[0] > mx) mx = p[0]; });
+        return { ini: pdFormatPK(mn), fi: pdFormatPK(mx) };
+    } catch (e) { return null; }
+}
+function pdTramDefecte(c) {
+    const t = pdTramsLlista()[c];
+    if (t && (t.ini || t.fi)) return { ini: t.ini || '', fi: t.fi || '', propi: true };
+    const k = pdTramCataleg(c);
+    return k ? { ini: k.ini, fi: k.fi, propi: false } : { ini: '', fi: '', propi: false };
+}
+function pdTramTxt(t) { return (t && (t.ini || t.fi)) ? 'PK ' + (t.ini || '?') + ' – ' + (t.fi || '?') : ''; }
+
 let _pdCatalegCache = null;
 function pdCataleg() {
     if (_pdCatalegCache) return _pdCatalegCache;
@@ -18191,8 +18258,17 @@ function pdEsborra(data) {
 }
 
 /* ── Còpia de seguretat ──────────────────────────────────── */
+function pdNetejaTrams(o) {
+    const net = {};
+    if (o && typeof o === 'object') Object.entries(o).forEach(([c, t]) => {
+        if (!t || typeof t !== 'object') return;
+        const ini = pdParsePK(t.ini), fi = pdParsePK(t.fi);
+        net[pdNormalitza(c)] = { ini: ini || '', fi: fi || '' };
+    });
+    return net;
+}
 function pdSnapshotBackup() {
-    return { dies: [...pdDies.values()], carreteres: pdLlista(), colors: pdColors() };
+    return { dies: [...pdDies.values()], carreteres: pdLlista(), colors: pdColors(), trams: pdTramsLlista() };
 }
 async function pdImportarBackup(obj) {
     if (!obj || typeof obj !== 'object') return 0;
@@ -18204,6 +18280,7 @@ async function pdImportarBackup(obj) {
             data: r.data,
             tipus: r.tipus === 'festa' ? 'festa' : 'treball',
             carreteres: Array.isArray(r.carreteres) ? r.carreteres.map(pdNormalitza).filter(Boolean) : [],
+            trams: pdNetejaTrams(r.trams),
             obs: String(r.obs || ''),
             updatedAt: Number(r.updatedAt) || Date.now()
         });
@@ -18213,6 +18290,11 @@ async function pdImportarBackup(obj) {
         const llista = pdLlista();
         obj.carreteres.map(pdNormalitza).filter(c => c && !llista.includes(c)).forEach(c => llista.push(c));
         pdDesaLlista(llista);
+    }
+    if (obj.trams && typeof obj.trams === 'object') {
+        const tl = pdTramsLlista();
+        Object.assign(tl, pdNetejaTrams(obj.trams));
+        pdDesaTramsLlista(tl);
     }
     if (obj.colors && typeof obj.colors === 'object') {
         const cols = pdColors();
@@ -18305,6 +18387,7 @@ function pdEditar(iso) {
         original: r ? iso : null,
         tipus: r ? r.tipus : 'treball',
         marcades: new Set(r ? r.carreteres : []),
+        trams: r && r.trams ? JSON.parse(JSON.stringify(r.trams)) : {},
     };
     document.getElementById('pdData').value = iso;
     document.getElementById('pdObs').value = r ? (r.obs || '') : '';
@@ -18334,13 +18417,39 @@ function pdRenderChips() {
     const totes = [...llista, ...extres];
     if (!totes.length) {
         cont.innerHTML = '<p class="pd-ajuda">Encara no tens carreteres habituals. Escriu-ne una a sota o desa-les a «Les meves carreteres».</p>';
+        pdRenderTrams([]);
         return;
     }
+    pdRenderTrams(totes);
     cont.innerHTML = totes.map(c => {
         const on = pdEdicio.marcades.has(c);
         return '<button type="button" class="pd-chip' + (on ? ' on' : '') + '"' + pdEstilPlaca(c) + ' aria-pressed="' + on + '" onclick="pdToggle(\'' + pdEsc(c) + '\')">'
             + (on ? '<svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>' : '') + pdEsc(c) + '</button>';
     }).join('');
+}
+function pdRenderTrams(ordre) {
+    const box = document.getElementById('pdTrams');
+    if (!box || !pdEdicio) return;
+    const marcades = ordre.filter(c => pdEdicio.marcades.has(c));
+    if (!marcades.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<label>Tram de PK</label>' + marcades.map(c => {
+        if (!pdEdicio.trams[c]) { const d = pdTramDefecte(c); pdEdicio.trams[c] = { ini: d.ini, fi: d.fi }; }
+        const t = pdEdicio.trams[c];
+        const inp = (k, v, ph) => '<input type="text" inputmode="decimal" autocomplete="off" class="pd-pk-inp" data-c="' + pdEsc(c) + '" data-k="' + k + '"'
+            + ' value="' + pdEsc(v || '') + '" placeholder="' + ph + '" aria-label="PK ' + ph.toLowerCase() + ' de ' + pdEsc(c) + '" oninput="this.classList.remove(\'err\')" onchange="pdSetTram(this)">';
+        return '<div class="pd-tram-row"><span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>'
+            + '<span class="pd-tram-ins">' + inp('ini', t.ini, 'Inici') + '<span class="pd-tram-fl">→</span>' + inp('fi', t.fi, 'Fi') + '</span></div>';
+    }).join('') + '<p class="pd-nota">Per defecte surt el tram de «Les meves carreteres». Si el canvies aquí, només afecta aquest dia.</p>';
+}
+function pdSetTram(el) {
+    if (!pdEdicio) return;
+    const v = pdParsePK(el.value);
+    if (v === null) { el.classList.add('err'); showToast('PK no vàlid. Exemple: 120+350'); return; }
+    el.classList.remove('err');
+    el.value = v;
+    const c = el.dataset.c;
+    pdEdicio.trams[c] = pdEdicio.trams[c] || { ini: '', fi: '' };
+    pdEdicio.trams[c][el.dataset.k] = v;
 }
 function pdToggle(c) {
     if (!pdEdicio) return;
@@ -18385,11 +18494,17 @@ async function pdDesarDia() {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del comunicat'); return; }
     const carreteres = pdEdicio.tipus === 'festa' ? [] : [...pdEdicio.marcades];
     if (pdEdicio.tipus === 'treball' && !carreteres.length) { showToast('Marca almenys una carretera, o tria «Festa»'); return; }
+    // Llegeix els trams que hi hagi escrits (encara que no s'hagi disparat «change»)
+    let pkMal = false;
+    document.querySelectorAll('#pdTrams .pd-pk-inp').forEach(el => { pdSetTram(el); if (el.classList.contains('err')) pkMal = true; });
+    if (pkMal && pdEdicio.tipus === 'treball') { showToast('Revisa els PK marcats en vermell (ex.: 120+350)'); return; }
+    const trams = {};
+    carreteres.forEach(c => { const t = pdEdicio.trams[c] || pdTramDefecte(c); trams[c] = { ini: t.ini || '', fi: t.fi || '' }; });
     const ocupat = pdDies.get(data);
     if (data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(data) + ' ja té un comunicat. Vols substituir-lo?')) return;
     await pdInitDB();
     if (pdEdicio.original && pdEdicio.original !== data) await pdEsborra(pdEdicio.original);
-    await pdGuarda({ data, tipus: pdEdicio.tipus, carreteres, obs: document.getElementById('pdObs').value.trim(), updatedAt: Date.now() });
+    await pdGuarda({ data, tipus: pdEdicio.tipus, carreteres, trams, obs: document.getElementById('pdObs').value.trim(), updatedAt: Date.now() });
     pdTancarDia();
     pdDilluns = pdDillunsDe(pdDeISO(data));
     pdRenderSetmana();
@@ -18432,6 +18547,7 @@ function pdAfegirALlista(txt, desDelDia) {
 function pdTreureDeLlista(c) {
     pdDesaLlista(pdLlista().filter(x => x !== c));
     const cols = pdColors(); delete cols[c]; pdDesaColors(cols);
+    const tl = pdTramsLlista(); delete tl[c]; pdDesaTramsLlista(tl);
     pdRenderLlista(); pdPintaLocalitzador();
 }
 let pdPaletaOberta = null;
@@ -18440,8 +18556,32 @@ function pdTriaColor(c, k) {
     const cols = pdColors();
     if (k && PD_COLORS[k]) cols[c] = k; else delete cols[c];
     pdDesaColors(cols);
-    pdPaletaOberta = null;
     pdRenderLlista(); pdRenderSetmana(); pdPintaLocalitzador();
+}
+function pdSetTramLlista(el) {
+    const v = pdParsePK(el.value);
+    if (v === null) { el.classList.add('err'); showToast('PK no vàlid. Exemple: 120+350'); return; }
+    el.classList.remove('err');
+    const c = el.dataset.c, tl = pdTramsLlista();
+    const act = pdTramDefecte(c);
+    const nou = { ini: act.ini, fi: act.fi };
+    nou[el.dataset.k] = v;
+    tl[c] = nou;
+    pdDesaTramsLlista(tl);
+    pdRenderLlista();
+}
+function pdRestaurarTram(c) {
+    const tl = pdTramsLlista(); delete tl[c]; pdDesaTramsLlista(tl);
+    pdRenderLlista();
+    showToast('Tram de ' + c + ' restaurat');
+}
+function pdPanellTram(c) {
+    const t = pdTramDefecte(c), cat = pdTramCataleg(c);
+    const inp = (k, v, ph) => '<input type="text" inputmode="decimal" autocomplete="off" class="pd-pk-inp" data-c="' + pdEsc(c) + '" data-k="' + k + '"'
+        + ' value="' + pdEsc(v || '') + '" placeholder="' + ph + '" aria-label="PK ' + ph.toLowerCase() + ' per defecte de ' + pdEsc(c) + '" oninput="this.classList.remove(\'err\')" onchange="pdSetTramLlista(this)">';
+    return '<span class="pd-panell-tit">Tram per defecte</span>'
+        + '<span class="pd-tram-ins pd-tram-llista">' + inp('ini', t.ini, 'Inici') + '<span class="pd-tram-fl">→</span>' + inp('fi', t.fi, 'Fi') + '</span>'
+        + (t.propi && cat ? '<button type="button" class="pd-link" onclick="pdRestaurarTram(\'' + pdEsc(c) + '\')">Tornar al tram del catàleg (' + cat.ini + ' – ' + cat.fi + ')</button>' : '');
 }
 function pdMoure(c, delta) {
     const l = pdLlista(); const i = l.indexOf(c); const j = i + delta;
@@ -18456,15 +18596,19 @@ function pdRenderLlista() {
     ul.innerHTML = l.map((c, i) => '<li' + (pdPaletaOberta === c ? ' class="obert"' : '') + '>'
         + '<span class="pd-li-cap">'
         + '<button type="button" class="pd-swatch"' + pdEstilPlaca(c) + ' aria-label="Color de ' + pdEsc(c) + '" onclick="pdObrePaleta(\'' + pdEsc(c) + '\')"></button>'
+        + '<button type="button" class="pd-li-nom" onclick="pdObrePaleta(\'' + pdEsc(c) + '\')">'
         + '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>'
+        + '<small>' + (pdTramTxt(pdTramDefecte(c)) || 'Sense tram') + '</small>'
+        + '</button>'
         + '</span>'
         + '<span class="pd-li-acc">'
         + '<button type="button" aria-label="Pujar" onclick="pdMoure(\'' + pdEsc(c) + '\',-1)"' + (i === 0 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-up"/></svg></button>'
         + '<button type="button" aria-label="Baixar" onclick="pdMoure(\'' + pdEsc(c) + '\',1)"' + (i === l.length - 1 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-down"/></svg></button>'
         + '<button type="button" aria-label="Treure" class="pd-x" onclick="pdTreureDeLlista(\'' + pdEsc(c) + '\')"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>'
         + '</span>'
+        + (pdPaletaOberta === c ? pdPanellTram(c) : '')
         + (pdPaletaOberta === c
-            ? '<span class="pd-paleta">' + Object.entries(PD_COLORS).map(([k, v]) =>
+            ? '<span class="pd-panell-tit">Color</span><span class="pd-paleta">' + Object.entries(PD_COLORS).map(([k, v]) =>
                 '<button type="button" class="pd-pal-color' + ((cols[c] || 'vermell') === k ? ' sel' : '') + '" style="--pc:' + v[0] + '" aria-label="' + v[2] + '" title="' + v[2] + '" onclick="pdTriaColor(\'' + pdEsc(c) + '\',\'' + k + '\')"></button>').join('')
               + '</span>'
             : '')
@@ -18498,7 +18642,9 @@ function pdGeneraICS(registres) {
         const ini = r.data.replace(/-/g, '');
         const fi = pdISO(pdSumaDies(pdDeISO(r.data), 1)).replace(/-/g, '');
         const titol = r.tipus === 'festa' ? 'Festa' : 'Ruta: ' + r.carreteres.join(', ');
-        const desc = [r.tipus === 'festa' ? 'Dia de festa' : 'Carreteres: ' + r.carreteres.join(', '), r.obs ? 'Observacions: ' + r.obs : '', 'Registrat a DataCamp'].filter(Boolean).join('\n');
+        const linies = r.tipus === 'festa' ? ['Dia de festa']
+            : r.carreteres.map(c => { const t = (r.trams || {})[c]; return c + (t && (t.ini || t.fi) ? ' (' + pdTramTxt(t) + ')' : ''); });
+        const desc = [...linies, r.obs ? 'Observacions: ' + r.obs : '', 'Registrat a DataCamp'].filter(Boolean).join('\n');
         L.push('BEGIN:VEVENT',
             'UID:part-' + ini + '-' + uid + '@datacamp',
             'DTSTAMP:' + ara,
