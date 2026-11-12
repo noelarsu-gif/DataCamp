@@ -5607,6 +5607,37 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: #fff; padding: 0 1px;
 }
 
+/* ── Diverses carreteres properes: una sola fila que es desplaça ─ */
+.pk-multi-area { gap: 12px; }
+.pk-multi-secondary {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    gap: 6px;
+    padding-right: 28px;
+    -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+            mask-image: linear-gradient(90deg, #000 82%, transparent);
+}
+.pk-multi-secondary::-webkit-scrollbar { display: none; }
+.pk-multi-secondary-label { flex-shrink: 0; scroll-snap-align: start; }
+.pk-multi-secondary .pk-chip-mini {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    min-height: 36px;
+    display: inline-flex; align-items: center;
+    background: #1f2937;
+    border: 1.5px solid rgba(255,255,255,0.55);
+    border-radius: 4px;
+    padding: 0 12px;
+    color: #fff;
+    font-size: 0.88rem;
+    letter-spacing: 0.6px;
+}
+.pk-multi-secondary .pk-chip-mini:active { background: var(--primary); border-color: var(--primary); }
+
 /* ── Icones amb forma de senyal ───────────────────────────── */
 .action-icon.sign-tri {
     background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 42'%3E%3Cpath d='M23 3.5 L43 38.5 H3 Z' fill='%23ffffff' stroke='%23c60c30' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -6146,15 +6177,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 <div class="pk-res-top">
                                     <div class="pk-result-road" id="pkMultiRoad">—</div>
                                     <div class="pk-result-meta" id="pkMultiMeta"></div>
+                                    <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()">
+                                        🔄 Actualitzar
+                                    </button>
                                 </div>
                                 <div class="pk-result-pk odo-src" id="pkMultiPK">PK —</div>
                                 <div class="odo" data-odo-for="pkMultiPK" aria-hidden="true"></div>
                             </div>
                             <div class="pk-multi-secondary" id="pkMultiSecondary"></div>
                         </div>
-                        <button class="pk-widget-btn-sm" onclick="executarAutoPKWidget()" style="margin-top:8px;">
-                            🔄 Actualitzar
-                        </button>
                     </div>
 
                     <!-- Missatge d'error / advertència -->
