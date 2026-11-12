@@ -5550,7 +5550,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .pk-multi-main { flex-direction: column; align-items: stretch; gap: 12px; }
 .pk-res-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pk-res-top .pk-result-road {
-    background: var(--primary); color: #fff;
+    background: var(--pc, var(--primary)); color: var(--pf, #fff);
     border-radius: 4px; padding: 2px 10px; min-width: 0;
     font-size: 1.05rem; line-height: 1.35;
     box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75);
@@ -5684,11 +5684,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 
 /* ============================================================
-   PARTS DIARIS
+   COMUNICATS DE TREBALL (identificadors interns: pd*)
    ============================================================ */
 body.pd-noscroll { overflow: hidden; }
 
-/* Targeta "Part d'avui" a l'inici */
+/* Targeta "Comunicat d'avui" a l'inici */
 .pd-home {
     display: flex; align-items: center; gap: 12px;
     width: 100%; text-align: left;
@@ -5753,7 +5753,24 @@ body.pd-noscroll { overflow: hidden; }
 .pd-dia.avui .pd-buit { color: var(--text-muted); }
 .pd-tag-festa { align-self: flex-start; font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 10px; background: #fde2b0; color: #854f0b; }
 .pd-mes { color: var(--primary); font-size: 22px; }
-.road-plate { font-size: .82rem; }
+.road-plate { font-size: .82rem; background: var(--pc, var(--primary)); color: var(--pf, #fff); }
+.pk-multi-secondary .pk-chip-mini.pd-nostra { background: var(--pc); border-color: var(--pc); color: var(--pf); }
+
+/* Selector de color a "Les meves carreteres" */
+.pd-carr-llista li { flex-wrap: wrap; }
+.pd-li-cap { display: flex; align-items: center; gap: 10px; }
+.pd-swatch {
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer; flex-shrink: 0;
+    background: var(--pc, var(--primary));
+    border: 3px solid var(--surface); box-shadow: 0 0 0 1.5px var(--border-dark);
+}
+.pd-carr-llista li.obert .pd-swatch { box-shadow: 0 0 0 2px var(--dark); }
+.pd-paleta { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 10px; padding: 10px 2px 4px; }
+.pd-pal-color {
+    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+    background: var(--pc); border: 3px solid var(--surface); box-shadow: 0 0 0 1.5px var(--border-dark);
+}
+.pd-pal-color.sel { box-shadow: 0 0 0 3px var(--dark); }
 
 .pd-accions { display: grid; gap: 8px; }
 .pd-accions .btn .ico { font-size: 1.15em; }
@@ -5784,7 +5801,8 @@ body.pd-noscroll { overflow: hidden; }
     background: var(--surface); color: var(--primary);
     border: 2px solid var(--primary);
 }
-.pd-chip.on { background: var(--primary); color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.7); }
+.pd-chip { border-color: var(--pc, var(--primary)); color: var(--dark); }
+.pd-chip.on { background: var(--pc, var(--primary)); color: var(--pf, #fff); box-shadow: inset 0 0 0 2px rgba(255,255,255,.7); }
 .pd-chip .ico { font-size: 16px; stroke-width: 3; }
 
 .pd-afegir { display: flex; gap: 8px; }
@@ -6191,7 +6209,7 @@ body.pd-noscroll { overflow: hidden; }
         <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span> Inici</button>
         <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></span> Galeria</button>
         <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió</button>
-        <button class="nav-item" onclick="mobileNavTo('partsDiaris')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Parts diaris</button>
+        <button class="nav-item" onclick="mobileNavTo('partsDiaris')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Comunicats de treball</button>
         <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa</button>
         <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></span> PK Mapa</button>
         <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Descàrregues</button>
@@ -6234,7 +6252,7 @@ body.pd-noscroll { overflow: hidden; }
                 <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió
             </button>
             <button class="nav-item" id="nav-parts" onclick="ir('partsDiaris')">
-                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Parts diaris
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span> Comunicats de treball
             </button>
             <button class="nav-item" id="nav-map" onclick="abrirMapa()">
                 <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa
@@ -6408,7 +6426,7 @@ body.pd-noscroll { overflow: hidden; }
                 <!-- PART D'AVUI -->
                 <button type="button" class="pd-home" id="pdHomeCard" onclick="ir('partsDiaris')">
                     <span class="action-icon tone-red"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg></span>
-                    <span class="pd-home-txt"><b>Part d'avui</b><span id="pdHomeEstat">Apunta les carreteres que fas avui</span></span>
+                    <span class="pd-home-txt"><b>Comunicat d'avui</b><span id="pdHomeEstat">Apunta les carreteres que fas avui</span></span>
                     <svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg>
                 </button>
 
@@ -6731,13 +6749,13 @@ body.pd-noscroll { overflow: hidden; }
             </div>
 
             <!-- ================================================
-                 PARTS DIARIS — registre manual de la ruta de cada dia
+                 COMUNICATS DE TREBALL — registre manual de la ruta de cada dia
                  (sense GPS: només el que escriu el treballador)
                  ================================================ -->
             <div id="partsDiaris" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">&#8592;</button>
-                    <h3><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>Parts diaris</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>Comunicats de treball</h3>
                 </div>
 
                 <div class="pd-week-nav">
@@ -7911,7 +7929,7 @@ const screenTitles = {
     'galeriaFotos':  'Galeria de Fotos',
     'pkMapaScreen':  'PK Mapa',
     'normativa':     'Normativa de Carreteres',
-    'partsDiaris':   'Parts diaris'
+    'partsDiaris':   'Comunicats de treball'
 };
 
 // Show FAB on initial load (home is active by default)
@@ -11575,7 +11593,7 @@ function importarBackup(input) {
                 ? parsed.stores
                 : { projects: Array.isArray(parsed) ? parsed : [] };
 
-            // Parts diaris: van en una base de dades a part
+            // Comunicats de treball: van en una base de dades a part
             if (parsed && parsed.partsDiaris && typeof pdImportarBackup === 'function') pdImportarBackup(parsed.partsDiaris);
 
             const storeNames = Object.keys(storesData).filter(s => db.objectStoreNames.contains(s) && Array.isArray(storesData[s]));
@@ -17931,7 +17949,7 @@ function pkmBack() {
 
 
 <!-- ============================================================
-     PARTS DIARIS — fulls inferiors i avís de privacitat
+     COMUNICATS DE TREBALL — fulls inferiors i avís de privacitat
      ============================================================ -->
 <div class="fe-sheet-overlay pd-overlay" id="pdAvis" onclick="if(event.target===this)pdTancarAvis()">
     <div class="fe-sheet pd-sheet pd-avis" role="dialog" aria-modal="true" aria-labelledby="pdAvisTitol">
@@ -17940,7 +17958,7 @@ function pkmBack() {
             <div class="pd-avis-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div>
             <h4 id="pdAvisTitol">La teva ubicació és teva</h4>
         </div>
-        <p class="pd-avis-txt">Els parts diaris <strong>no fan cap seguiment GPS</strong> ni registren on ets. Només es guarda el que tu escrius, i es queda en aquest mòbil fins que tu decideixis exportar-ho.</p>
+        <p class="pd-avis-txt">Els comunicats de treball <strong>no fan cap seguiment GPS</strong> ni registren on ets. Només es guarda el que tu escrius, i es queda en aquest mòbil fins que tu decideixis exportar-ho.</p>
         <label class="pd-check"><input type="checkbox" id="pdAvisNoMostrar"> No tornar a mostrar</label>
         <button class="btn btn-primary btn-block" onclick="pdTancarAvis()">Entesos</button>
     </div>
@@ -17949,7 +17967,7 @@ function pkmBack() {
 <div class="fe-sheet-overlay pd-overlay" id="pdDiaSheet" onclick="if(event.target===this)pdTancarDia()">
     <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdDiaTitol">
         <div class="fe-sheet-handle"></div>
-        <h4 id="pdDiaTitol">Part del dia</h4>
+        <h4 id="pdDiaTitol">Comunicat del dia</h4>
 
         <div class="pd-camp">
             <label for="pdData">Data</label>
@@ -17996,7 +18014,7 @@ function pkmBack() {
     <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdCarrTitol">
         <div class="fe-sheet-handle"></div>
         <h4 id="pdCarrTitol">Les meves carreteres</h4>
-        <p class="pd-ajuda">Les carreteres que fas habitualment. Al part de cada dia només caldrà marcar-les.</p>
+        <p class="pd-ajuda">Les carreteres que fas habitualment. Al comunicat de cada dia només caldrà marcar-les. Toca el cercle per donar-los un color segons la classificació: el localitzador de PK també el farà servir.</p>
         <div class="pd-afegir">
             <input type="text" id="pdCarrInput" autocomplete="off" autocapitalize="characters"
                    placeholder="Escriu una carretera" oninput="pdSuggerir('pdCarrInput','pdCarrSug',pdAfegirALlista)"
@@ -18027,7 +18045,7 @@ function pkmBack() {
 
 <script>
 /* ============================================================
-   PARTS DIARIS
+   COMUNICATS DE TREBALL (identificadors interns: pd*)
    Registre manual de les carreteres fetes cada dia.
    · Sense GPS: només es desa el que escriu el treballador.
    · Base de dades pròpia ("DataCampPartsDiaris"), separada de la
@@ -18090,6 +18108,44 @@ function pdLlista() {
 }
 function pdDesaLlista(arr) { try { localStorage.setItem(PD_KEY_CARR, JSON.stringify(arr)); } catch (e) {} }
 
+/* Colors per carretera (classificació pròpia de cada usuari) */
+const PD_KEY_COL = 'pd_carr_colors';
+const PD_COLORS = {
+    vermell: ['#c60c30', '#ffffff', 'Vermell'],
+    taronja: ['#ea580c', '#ffffff', 'Taronja'],
+    groc:    ['#facc15', '#111827', 'Groc'],
+    verd:    ['#15803d', '#ffffff', 'Verd'],
+    blau:    ['#1d4ed8', '#ffffff', 'Blau'],
+    lila:    ['#7c3aed', '#ffffff', 'Lila'],
+    marro:   ['#92400e', '#ffffff', 'Marró'],
+    gris:    ['#4b5563', '#ffffff', 'Gris'],
+};
+function pdColors() {
+    try { const v = JSON.parse(localStorage.getItem(PD_KEY_COL) || '{}'); return (v && typeof v === 'object') ? v : {}; }
+    catch (e) { return {}; }
+}
+function pdDesaColors(o) { try { localStorage.setItem(PD_KEY_COL, JSON.stringify(o)); } catch (e) {} }
+/** Color d'una carretera de la llista pròpia (compara sense majúscules ni espais) o null */
+function pdColorDe(carretera) {
+    if (!carretera) return null;
+    const clau = String(carretera).toUpperCase().replace(/\s+/g, '');
+    const cols = pdColors();
+    for (const [c, k] of Object.entries(cols)) {
+        if (c.toUpperCase() === clau && PD_COLORS[k]) return { k, bg: PD_COLORS[k][0], fg: PD_COLORS[k][1] };
+    }
+    return null;
+}
+function pdEstilPlaca(c) {
+    const col = pdColorDe(c);
+    return col ? ' style="--pc:' + col.bg + ';--pf:' + col.fg + '"' : '';
+}
+function pdAplicaColor(el, carretera) {
+    if (!el) return;
+    const col = pdColorDe(carretera);
+    if (col) { el.style.setProperty('--pc', col.bg); el.style.setProperty('--pf', col.fg); el.classList.add('pd-nostra'); }
+    else { el.style.removeProperty('--pc'); el.style.removeProperty('--pf'); el.classList.remove('pd-nostra'); }
+}
+
 let _pdCatalegCache = null;
 function pdCataleg() {
     if (_pdCatalegCache) return _pdCatalegCache;
@@ -18136,7 +18192,7 @@ function pdEsborra(data) {
 
 /* ── Còpia de seguretat ──────────────────────────────────── */
 function pdSnapshotBackup() {
-    return { dies: [...pdDies.values()], carreteres: pdLlista() };
+    return { dies: [...pdDies.values()], carreteres: pdLlista(), colors: pdColors() };
 }
 async function pdImportarBackup(obj) {
     if (!obj || typeof obj !== 'object') return 0;
@@ -18158,7 +18214,13 @@ async function pdImportarBackup(obj) {
         obj.carreteres.map(pdNormalitza).filter(c => c && !llista.includes(c)).forEach(c => llista.push(c));
         pdDesaLlista(llista);
     }
+    if (obj.colors && typeof obj.colors === 'object') {
+        const cols = pdColors();
+        Object.entries(obj.colors).forEach(([c, k]) => { if (PD_COLORS[k]) cols[pdNormalitza(c)] = k; });
+        pdDesaColors(cols);
+    }
     pdRenderHomeCard();
+    pdPintaLocalitzador();
     if (document.getElementById('partsDiaris')?.classList.contains('active')) pdRenderSetmana();
     return n;
 }
@@ -18208,7 +18270,7 @@ function pdRenderSetmana() {
             cls += ' festa';
             cos = '<span class="pd-tag-festa">Festa</span>' + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
         } else if (r && r.carreteres.length) {
-            cos = '<span class="pd-plaques">' + r.carreteres.map(c => '<span class="road-plate">' + pdEsc(c) + '</span>').join('') + '</span>'
+            cos = '<span class="pd-plaques">' + r.carreteres.map(c => '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>').join('') + '</span>'
                 + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
         } else {
             cls += ' buit';
@@ -18225,7 +18287,7 @@ function pdRenderSetmana() {
     cont.innerHTML = html;
 }
 
-/* ── Targeta "Part d'avui" a l'inici ─────────────────────── */
+/* ── Targeta "Comunicat d'avui" a l'inici ─────────────────────── */
 function pdRenderHomeCard() {
     const el = document.getElementById('pdHomeEstat');
     if (!el) return;
@@ -18250,7 +18312,7 @@ function pdEditar(iso) {
     document.getElementById('pdAltraSug').innerHTML = '';
     document.getElementById('pdDesarLlista').hidden = true;
     document.getElementById('pdEsborrarBtn').hidden = !r;
-    document.getElementById('pdDiaTitol').textContent = 'Part del ' + pdDMA(iso);
+    document.getElementById('pdDiaTitol').textContent = 'Comunicat del ' + pdDMA(iso);
     pdSetTipus(pdEdicio.tipus);
     pdRenderChips();
     pdObreSheet('pdDiaSheet');
@@ -18276,7 +18338,7 @@ function pdRenderChips() {
     }
     cont.innerHTML = totes.map(c => {
         const on = pdEdicio.marcades.has(c);
-        return '<button type="button" class="pd-chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" onclick="pdToggle(\'' + pdEsc(c) + '\')">'
+        return '<button type="button" class="pd-chip' + (on ? ' on' : '') + '"' + pdEstilPlaca(c) + ' aria-pressed="' + on + '" onclick="pdToggle(\'' + pdEsc(c) + '\')">'
             + (on ? '<svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>' : '') + pdEsc(c) + '</button>';
     }).join('');
 }
@@ -18320,11 +18382,11 @@ function pdSuggerir(inputId, sugId, onTria) {
 async function pdDesarDia() {
     if (!pdEdicio) return;
     const data = document.getElementById('pdData').value;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del part'); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del comunicat'); return; }
     const carreteres = pdEdicio.tipus === 'festa' ? [] : [...pdEdicio.marcades];
     if (pdEdicio.tipus === 'treball' && !carreteres.length) { showToast('Marca almenys una carretera, o tria «Festa»'); return; }
     const ocupat = pdDies.get(data);
-    if (data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(data) + ' ja té un part. Vols substituir-lo?')) return;
+    if (data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(data) + ' ja té un comunicat. Vols substituir-lo?')) return;
     await pdInitDB();
     if (pdEdicio.original && pdEdicio.original !== data) await pdEsborra(pdEdicio.original);
     await pdGuarda({ data, tipus: pdEdicio.tipus, carreteres, obs: document.getElementById('pdObs').value.trim(), updatedAt: Date.now() });
@@ -18332,16 +18394,16 @@ async function pdDesarDia() {
     pdDilluns = pdDillunsDe(pdDeISO(data));
     pdRenderSetmana();
     pdRenderHomeCard();
-    showToast('Part del ' + pdDMA(data) + ' desat');
+    showToast('Comunicat del ' + pdDMA(data) + ' desat');
 }
 async function pdEsborrarDia() {
     if (!pdEdicio || !pdEdicio.original) return;
-    if (!confirm('Vols esborrar el part del ' + pdDMA(pdEdicio.original) + '?')) return;
+    if (!confirm('Vols esborrar el comunicat del ' + pdDMA(pdEdicio.original) + '?')) return;
     await pdEsborra(pdEdicio.original);
     pdTancarDia();
     pdRenderSetmana();
     pdRenderHomeCard();
-    showToast('Part esborrat');
+    showToast('Comunicat esborrat');
 }
 
 /* ── Les meves carreteres ────────────────────────────────── */
@@ -18367,7 +18429,20 @@ function pdAfegirALlista(txt, desDelDia) {
     document.getElementById('pdCarrSug').innerHTML = '';
     pdRenderLlista();
 }
-function pdTreureDeLlista(c) { pdDesaLlista(pdLlista().filter(x => x !== c)); pdRenderLlista(); }
+function pdTreureDeLlista(c) {
+    pdDesaLlista(pdLlista().filter(x => x !== c));
+    const cols = pdColors(); delete cols[c]; pdDesaColors(cols);
+    pdRenderLlista(); pdPintaLocalitzador();
+}
+let pdPaletaOberta = null;
+function pdObrePaleta(c) { pdPaletaOberta = pdPaletaOberta === c ? null : c; pdRenderLlista(); }
+function pdTriaColor(c, k) {
+    const cols = pdColors();
+    if (k && PD_COLORS[k]) cols[c] = k; else delete cols[c];
+    pdDesaColors(cols);
+    pdPaletaOberta = null;
+    pdRenderLlista(); pdRenderSetmana(); pdPintaLocalitzador();
+}
 function pdMoure(c, delta) {
     const l = pdLlista(); const i = l.indexOf(c); const j = i + delta;
     if (i < 0 || j < 0 || j >= l.length) return;
@@ -18377,13 +18452,23 @@ function pdRenderLlista() {
     const ul = document.getElementById('pdCarrLlista');
     const l = pdLlista();
     if (!l.length) { ul.innerHTML = '<li class="pd-ajuda">Encara no n\u2019hi ha cap. Afegeix les que fas habitualment.</li>'; return; }
-    ul.innerHTML = l.map((c, i) => '<li>'
-        + '<span class="road-plate">' + pdEsc(c) + '</span>'
+    const cols = pdColors();
+    ul.innerHTML = l.map((c, i) => '<li' + (pdPaletaOberta === c ? ' class="obert"' : '') + '>'
+        + '<span class="pd-li-cap">'
+        + '<button type="button" class="pd-swatch"' + pdEstilPlaca(c) + ' aria-label="Color de ' + pdEsc(c) + '" onclick="pdObrePaleta(\'' + pdEsc(c) + '\')"></button>'
+        + '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>'
+        + '</span>'
         + '<span class="pd-li-acc">'
         + '<button type="button" aria-label="Pujar" onclick="pdMoure(\'' + pdEsc(c) + '\',-1)"' + (i === 0 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-up"/></svg></button>'
         + '<button type="button" aria-label="Baixar" onclick="pdMoure(\'' + pdEsc(c) + '\',1)"' + (i === l.length - 1 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-down"/></svg></button>'
         + '<button type="button" aria-label="Treure" class="pd-x" onclick="pdTreureDeLlista(\'' + pdEsc(c) + '\')"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>'
-        + '</span></li>').join('');
+        + '</span>'
+        + (pdPaletaOberta === c
+            ? '<span class="pd-paleta">' + Object.entries(PD_COLORS).map(([k, v]) =>
+                '<button type="button" class="pd-pal-color' + ((cols[c] || 'vermell') === k ? ' sel' : '') + '" style="--pc:' + v[0] + '" aria-label="' + v[2] + '" title="' + v[2] + '" onclick="pdTriaColor(\'' + pdEsc(c) + '\',\'' + k + '\')"></button>').join('')
+              + '</span>'
+            : '')
+        + '</li>').join('');
 }
 
 /* ── Exportació al calendari (.ics) ──────────────────────── */
@@ -18408,7 +18493,7 @@ function pdGeneraICS(registres) {
     try { uid = localStorage.getItem(PD_KEY_UID); if (!uid) { uid = Math.random().toString(36).slice(2, 10); localStorage.setItem(PD_KEY_UID, uid); } }
     catch (e) { uid = 'dc'; }
     const ara = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
-    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DataCamp//Parts diaris//CA', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:DataCamp · Parts diaris'];
+    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DataCamp//Comunicats de treball//CA', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:DataCamp · Comunicats de treball'];
     registres.forEach(r => {
         const ini = r.data.replace(/-/g, '');
         const fi = pdISO(pdSumaDies(pdDeISO(r.data), 1)).replace(/-/g, '');
@@ -18445,13 +18530,13 @@ async function pdExportarICS(abast) {
     }
     if (!regs.length) { showToast('No hi ha cap dia registrat en aquest període'); return; }
     regs.sort((x, y) => x.data.localeCompare(y.data));
-    const nom = 'parts-diaris-' + nomAbast + '.ics';
+    const nom = 'comunicats-treball-' + nomAbast + '.ics';
     const blob = new Blob([pdGeneraICS(regs)], { type: 'text/calendar;charset=utf-8' });
     pdTancarExportar();
     try {
         const fitxer = new File([blob], nom, { type: 'text/calendar' });
         if (navigator.canShare && navigator.canShare({ files: [fitxer] })) {
-            await navigator.share({ files: [fitxer], title: 'Parts diaris' });
+            await navigator.share({ files: [fitxer], title: 'Comunicats de treball' });
             return;
         }
     } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -18461,6 +18546,26 @@ async function pdExportarICS(abast) {
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     showToast(regs.length + ' dies exportats al fitxer ' + nom);
 }
+
+/* ── Localitzador PK: les carreteres pròpies surten amb el seu color ── */
+function pdPintaLocalitzador() {
+    ['pkResultRoad', 'pkMultiRoad'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) pdAplicaColor(el, el.textContent.trim());
+    });
+    document.querySelectorAll('#pkMultiSecondary .pk-chip-mini').forEach(el => pdAplicaColor(el, el.textContent.trim()));
+}
+(function pdObservaLocalitzador() {
+    const inicia = () => {
+        const obs = new MutationObserver(pdPintaLocalitzador);
+        ['pkResultRoad', 'pkMultiRoad', 'pkMultiSecondary'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) obs.observe(el, { childList: true, characterData: true, subtree: true });
+        });
+        pdPintaLocalitzador();
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia); else inicia();
+})();
 
 /* Càrrega inicial (en segon pla) per tenir la targeta d'inici al dia */
 pdInitDB().then(pdRenderHomeCard);
