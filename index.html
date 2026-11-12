@@ -5905,6 +5905,28 @@ body.pd-noscroll { overflow: hidden; }
 .pd-avis-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .pd-avis-cap h4 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
 .pd-avis-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--success-lt); color: var(--success); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+/* ── Novetats de la versió ─────────────────────────────── */
+.nv-sheet { max-width: 520px; }
+.nv-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.nv-cap-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+.nv-cap-ico .ico { width: 24px; height: 24px; }
+.nv-cap h4 { margin: 0 !important; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
+.nv-versio { font-size: .78rem; color: var(--text-light, #64748b); font-weight: 600; letter-spacing: .4px; }
+.nv-intro { font-size: .92rem; color: var(--text); margin: 10px 0 12px; line-height: 1.5; }
+.nv-llista { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.nv-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 4px; border-bottom: 1px solid var(--border, #e5e7eb); opacity: 0; transform: translateY(6px); }
+.nv-item:last-child { border-bottom: 0; }
+.fe-sheet-overlay.open .nv-item { animation: nvEntra .35s var(--ease, ease-out) forwards; }
+.nv-item .action-icon { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; margin: 0; }
+.nv-item .action-icon .ico { width: 22px; height: 22px; }
+.nv-item b { display: block; font-size: .95rem; color: var(--text); margin-bottom: 2px; }
+.nv-item .nv-d { display: block; font-size: .85rem; color: var(--text-light, #64748b); line-height: 1.45; }
+.nv-badge { display: inline-block; font-size: .62rem; font-weight: 800; letter-spacing: .6px; background: var(--primary); color: #fff; border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: 2px; }
+.nv-peu { display: flex; flex-direction: column; gap: 8px; }
+@keyframes nvEntra { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .nv-item { opacity: 1; transform: none; } .fe-sheet-overlay.open .nv-item { animation: none; } }
+.nv-help-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--primary-light, #fdecef); border: 1.5px solid var(--primary); color: var(--primary); border-radius: var(--radius-card, 14px); padding: 12px 14px; font-weight: 700; font-size: .95rem; margin-bottom: 14px; cursor: pointer; }
+.nv-help-btn .ico { width: 22px; height: 22px; }
 .pd-avis-txt { font-size: .95rem; color: var(--text); line-height: 1.55; margin-bottom: 14px; }
 .pd-check {
     display: flex !important; align-items: center; gap: 10px;
@@ -5951,7 +5973,8 @@ body.pd-noscroll { overflow: hidden; }
   <symbol id="i-chev-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-chev-up" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></symbol>
   <symbol id="i-chev-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
-  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
 </svg>
 <!-- ══ SPLASH SCREEN ══════════════════════════════════════════
      Benvinguda: marca + marca vial animada + salutació segons
@@ -6138,6 +6161,8 @@ body.pd-noscroll { overflow: hidden; }
 </div>
 
 <script>
+/* Instal·lació nova? (es mira abans que l'app escrigui res) */
+window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; } catch (e) { return false; } })();
 (function () {
     const ara = new Date();
     const h = ara.getHours();
@@ -7290,6 +7315,8 @@ body.pd-noscroll { overflow: hidden; }
                     <button class="btn-back" onclick="ir('home')">←</button>
                     <h3><svg class="ico" aria-hidden="true"><use href="#i-help"/></svg>Guia i Consells</h3>
                 </div>
+
+                <button type="button" class="nv-help-btn" onclick="nvObrir()"><svg class="ico" aria-hidden="true"><use href="#i-spark"/></svg>Novetats d'aquesta versió</button>
 
                 <div class="tip-card yellow">
                     <div class="tip-title">📏 Inventaris Grans</div>
@@ -18761,6 +18788,79 @@ function pdPintaLocalitzador() {
 
 /* Càrrega inicial (en segon pla) per tenir la targeta d'inici al dia */
 pdInitDB().then(pdRenderHomeCard);
+</script>
+
+<!-- ============================================================
+     NOVETATS DE LA VERSIÓ — surt un sol cop per versió
+     ============================================================ -->
+<div class="fe-sheet-overlay pd-overlay" id="nvSheet" onclick="if(event.target===this)nvTancar()">
+    <div class="fe-sheet pd-sheet nv-sheet" role="dialog" aria-modal="true" aria-labelledby="nvTitol">
+        <div class="fe-sheet-handle"></div>
+        <div class="nv-cap">
+            <div class="nv-cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-spark"/></svg></div>
+            <div><h4 id="nvTitol">Novetats de DataCamp</h4><div class="nv-versio" id="nvVersio"></div></div>
+        </div>
+        <p class="nv-intro">Hem renovat l'app de dalt a baix. Això és el que trobaràs de nou:</p>
+        <ul class="nv-llista" id="nvLlista"></ul>
+        <div class="nv-peu">
+            <button class="btn btn-primary btn-block" onclick="nvTancar()">Som-hi</button>
+            <button class="btn btn-ghost btn-block" id="nvProvar" onclick="nvTancar(); ir('partsDiaris')">Provar els comunicats de treball</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* Per a la propera actualització: canvia NV_VERSIO i la llista NV_ITEMS. */
+const NV_VERSIO = '2026.11';
+const NV_DATA   = '12-11-2026';
+const NV_KEY    = 'dc_novetats_vistes';
+const NV_ITEMS = [
+    { ico: 'i-file',     to: 'tone-red',   nou: true, t: 'Comunicats de treball',
+      d: "Registra cada dia les carreteres que has fet, marca els dies de festa i exporta-ho al calendari d'Apple o Google." },
+    { ico: 'i-road',     to: 'tone-blue',  nou: true, t: 'Les meves carreteres',
+      d: 'Les de sempre, preparades per marcar amb un toc, amb el seu color i el tram de PK inicial i final.' },
+    { ico: 'i-shield',   to: 'tone-green', t: 'Sense seguiment GPS',
+      d: "Els comunicats només guarden el que escrius tu. La teva ubicació no es registra mai." },
+    { ico: 'i-pin',      to: 'tone-amber', t: 'Localitzador de PK renovat',
+      d: "El PK es mostra en gran com un comptador, i les carreteres properes en una sola fila. Si és una de les teves, surt amb el teu color." },
+    { ico: 'i-spark',    to: 'tone-violet', t: 'Disseny nou',
+      d: "Icones professionals, línia de carretera a la capçalera i una benvinguda que et saluda segons l'hora." },
+    { ico: 'i-download', to: 'tone-slate', t: 'Còpia de seguretat completa',
+      d: 'El backup ara també desa els comunicats, les teves carreteres, els colors i els trams.' }
+];
+
+function nvRender() {
+    document.getElementById('nvVersio').textContent = 'Versió ' + NV_DATA;
+    document.getElementById('nvLlista').innerHTML = NV_ITEMS.map((it, i) =>
+        '<li class="nv-item" style="animation-delay:' + (120 + i * 70) + 'ms">' +
+        '<span class="action-icon ' + it.to + '"><svg class="ico" aria-hidden="true"><use href="#' + it.ico + '"/></svg></span>' +
+        '<div><b>' + it.t + (it.nou ? '<span class="nv-badge">NOU</span>' : '') + '</b><span class="nv-d">' + it.d + '</span></div></li>'
+    ).join('');
+}
+function nvObrir() {
+    nvRender();
+    const ov = document.getElementById('nvSheet');
+    ov.classList.remove('open'); void ov.offsetWidth;   // reinicia l'animació
+    pdObreSheet('nvSheet');
+}
+function nvTancar() {
+    try { localStorage.setItem(NV_KEY, NV_VERSIO); } catch (e) {}
+    pdTancaSheet('nvSheet');
+}
+(function nvAlArrencar() {
+    let vista = null;
+    try { vista = localStorage.getItem(NV_KEY); } catch (e) {}
+    if (vista === NV_VERSIO) return;
+    // Instal·lació nova: no té sentit explicar novetats; es marca com a vista.
+    if (window.DC_INSTAL_NOVA) { try { localStorage.setItem(NV_KEY, NV_VERSIO); } catch (e) {} return; }
+    let intents = 0;
+    (function espera() {
+        // Espera que s'hagi tancat la benvinguda i que no hi hagi cap altre full obert
+        const ocupat = document.getElementById('splashScreen') || document.querySelector('.fe-sheet-overlay.open');
+        if (ocupat && intents++ < 60) return setTimeout(espera, 300);
+        setTimeout(nvObrir, 250);
+    })();
+})();
 </script>
 
 </html>
