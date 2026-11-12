@@ -5318,12 +5318,216 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 }
 
+
+/* ============================================================
+   FASE 1 · SISTEMA DE DISSENY
+   Capa final: tokens semàntics, icones SVG i components
+   unificats. Va al final perquè guanyi per ordre, sense
+   !important, i no toca cap lògica JS.
+   ============================================================ */
+:root {
+    /* Estats semàntics */
+    --success:     #15803d;  --success-lt: #ecfdf3;
+    --warning:     #d97706;  --warning-lt: #fff7e6;
+    --danger:      #dc2626;  --danger-lt:  #fef2f2;
+    --info:        var(--accent-blue); --info-lt: var(--accent-blue-lt);
+
+    /* Escala tipogràfica */
+    --fs-xs:   0.75rem;
+    --fs-sm:   0.875rem;
+    --fs-base: 1rem;
+    --fs-lg:   1.125rem;
+    --fs-xl:   1.375rem;
+    --fs-2xl:  1.75rem;
+
+    /* Espaiat (base 4px) */
+    --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+    --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+    /* Moviment */
+    --ease:     cubic-bezier(.2,.8,.2,1);
+    --dur-fast: .12s;
+    --dur:      .22s;
+
+    /* Focus accessible (teclat / lector) */
+    --focus-ring: 0 0 0 3px rgba(29,78,216,.35);
+
+    --radius-card: 16px;
+    --radius-btn:  10px;
+}
+
+/* ── Icones ─────────────────────────────────────────────────── */
+.ico {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: -0.15em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+#fab-foto-rapida .ico { font-size: 27px; stroke-width: 1.9; }
+
+/* ── Tons de color per a les targetes ───────────────────────── */
+.tone-red    { --tone: var(--primary);   --tone-lt: #fdecef; }
+.tone-blue   { --tone: #1d4ed8;          --tone-lt: #eef3ff; }
+.tone-green  { --tone: #15803d;          --tone-lt: #ebf8ef; }
+.tone-amber  { --tone: #d97706;          --tone-lt: #fff4e0; }
+.tone-violet { --tone: #7c3aed;          --tone-lt: #f3edff; }
+.tone-brown  { --tone: #9a3412;          --tone-lt: #fdefe6; }
+.tone-teal   { --tone: #0f766e;          --tone-lt: #e6f6f4; }
+.tone-slate  { --tone: #334155;          --tone-lt: #eef1f5; }
+
+/* ── Targetes d'acció (Inici, Centre de Gestió, Descàrregues) ─ */
+.action-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--dur-fast) var(--ease),
+                box-shadow var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                background-color var(--dur) var(--ease);
+    -webkit-user-select: none;
+    user-select: none;
+}
+.action-card:active { transform: scale(0.97); }
+
+.action-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    line-height: 1;
+    background: var(--tone-lt, var(--surface-2));
+    color: var(--tone, var(--primary));
+}
+.action-icon .ico { stroke-width: 2.1; }
+
+.action-card.primary .action-icon,
+.action-card.blue .action-icon {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+}
+.action-card:not(.primary):not(.blue) .action-label { color: var(--dark); }
+.action-desc { opacity: 1; color: var(--text-muted); }
+.action-card.primary .action-desc,
+.action-card.blue .action-desc { color: rgba(255,255,255,0.85); }
+
+/* Hover només en dispositius amb ratolí (al mòbil no queda enganxat) */
+@media (hover: hover) {
+    .action-card:not(.primary):not(.blue):hover {
+        border-color: var(--tone, var(--primary));
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+}
+@media (hover: none) {
+    .action-card:hover { transform: none; }
+}
+
+/* ── Capçalera de pantalla ──────────────────────────────────── */
+.screen-header h3 { font-size: 1.3rem; }
+.screen-header h3 .ico {
+    color: var(--primary);
+    margin-right: 9px;
+    vertical-align: -0.17em;
+    stroke-width: 2.2;
+}
+
+.btn-back {
+    background: var(--surface);
+    color: var(--dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+    font-size: 1.35rem;
+}
+.btn-back:hover  { background: var(--surface-2); border-color: var(--text-light); }
+.btn-back:active { transform: scale(0.92); background: var(--bg-alt); }
+
+/* ── Botons ─────────────────────────────────────────────────── */
+.btn { border-radius: var(--radius-btn); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:focus-visible,
+.btn-back:focus-visible,
+.nav-item:focus-visible,
+#fab-foto-rapida:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* Botons "Tornar…" al peu de les pantalles: secundaris però visibles */
+.screen > .btn.btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border-dark);
+}
+.screen > .btn.btn-ghost:active { background: var(--bg-alt); }
+
+/* ── Mòbil ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .action-card  { padding: 14px 12px; gap: 9px; border-radius: 14px; }
+    .action-icon  { width: 40px; height: 40px; border-radius: 11px; font-size: 23px; }
+    .btn-back     { font-size: 1.35rem; }
+    .action-label { font-size: 0.92rem; }
+    .action-desc  { font-size: 0.75rem; line-height: 1.35; }
+    .screen-header h3 { font-size: 1.15rem; }
+}
+@media (max-width: 390px) {
+    .action-card { padding: 12px 10px; }
+}
+
+/* ── Accessibilitat: respecta "reduir moviment" del sistema ─── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
     <link rel="preload" href="/senales_catalogo.js" as="script">
 </head>
 <body>
+<!-- ============================================================
+     ICONES (sprite SVG intern · Fase 1 sistema de disseny)
+     ============================================================ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15.5l-5-5L5 21"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.5h7.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 20h15"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 20.5v-11M7.5 14l4.5-4.5 4.5 4.5M4.5 4h15"/></symbol>
+  <symbol id="i-road" viewBox="0 0 24 24"><path d="M5 21L9 3M19 21L15 3M12 4.5v2.5M12 10.5v3M12 17v3"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3.5v17M8 20.5h8M5 7h14M12 5.5"/><path d="M5 7l-3 6.5a3.2 3.2 0 0 0 6 0zM19 7l-3 6.5a3.2 3.2 0 0 0 6 0z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9v11h4.5v-6h4v6h4.5V9"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4.5L3.5 6.5v13l5.5-2 6 2 5.5-2v-13l-5.5 2z"/><path d="M9 4.5v13M15 6.5v13"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6.5h9M17 6.5h3M4 12h3M11 12h9M4 17.5h11M19 17.5h1"/><circle cx="15" cy="6.5" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17.5" r="2"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6M12 17h.01"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M20.5 7.5L12 3 3.5 7.5v9L12 21l8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></symbol>
+  <symbol id="i-cone" viewBox="0 0 24 24"><path d="M10 3.5h4l4.5 15h-13z"/><path d="M8 11h8M6.8 15h10.4M3.5 20.5h17"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="5.8" r="1.8"/><circle cx="14" cy="5.8" r="1.8"/><circle cx="17.5" cy="10" r="1.8"/><path d="M12 11c-2.6 0-5.2 3.3-5.2 5.6 0 1.7 1.4 2.4 2.8 2.2 1-.1 1.6-.6 2.4-.6s1.4.5 2.4.6c1.4.2 2.8-.5 2.8-2.2 0-2.3-2.6-5.6-5.2-5.6z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3.5H6.5A2 2 0 0 0 4.5 5.5v13a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V9z"/><path d="M14 3.5V9h5.5M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.2M12 17.2h.01"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M14.5 7.5l3 3"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+</svg>
 <!-- ══ SPLASH SCREEN ══════════════════════════════════════════ -->
 <div id="splashScreen" style="
     position:fixed;inset:0;z-index:9999;
@@ -5454,18 +5658,18 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="brand-sub">Gestió de Carreteres</div>
     </div>
     <div style="padding:12px;">
-        <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon">🏠</span> Inici</button>
-        <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon">🖼️</span> Galeria</button>
-        <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon">📂</span> Centre de Gestió</button>
-        <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon">🗺️</span> Mapa</button>
-        <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon">🛣️</span> PK Mapa</button>
-        <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon">📥</span> Descàrregues</button>
-        <button class="nav-item" onclick="mobileNavTo('pantallaAjustos')"><span class="nav-icon">⚙️</span> Configuració</button>
-        <button class="nav-item" onclick="mobileNavTo('helpScreen')"><span class="nav-icon">❓</span> Ajuda</button>
+        <button class="nav-item" onclick="mobileNavTo('home')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span> Inici</button>
+        <button class="nav-item highlight" onclick="mobileNavToFoto()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></span> Galeria</button>
+        <button class="nav-item" onclick="mobileNavTo('list')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió</button>
+        <button class="nav-item" onclick="closeMobileNav();abrirMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa</button>
+        <button class="nav-item" onclick="closeMobileNav();abrirPKMapa()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></span> PK Mapa</button>
+        <button class="nav-item" onclick="mobileNavTo('downloads')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Descàrregues</button>
+        <button class="nav-item" onclick="mobileNavTo('pantallaAjustos')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></span> Configuració</button>
+        <button class="nav-item" onclick="mobileNavTo('helpScreen')"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-help"/></svg></span> Ajuda</button>
         <div style="border-top:1px solid rgba(255,255,255,0.07);margin:10px 0 6px;"></div>
         <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.25);padding:0 12px 6px;">Còpies de Seguretat</div>
-        <button class="nav-item" onclick="closeMobileNav();exportarBackup()"><span class="nav-icon">📤</span> Exportar Backup</button>
-        <button class="nav-item" onclick="closeMobileNav();document.getElementById('importFileMob').click()"><span class="nav-icon">📥</span> Importar Backup</button>
+        <button class="nav-item" onclick="closeMobileNav();exportarBackup()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg></span> Exportar Backup</button>
+        <button class="nav-item" onclick="closeMobileNav();document.getElementById('importFileMob').click()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Importar Backup</button>
         <input type="file" id="importFileMob" accept="application/json" hidden onchange="importarBackup(this)">
         <div class="sidebar-credit" style="margin-top:8px;">Creat per N.Arroyo</div>
     </div>
@@ -5486,42 +5690,42 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="sidebar-section">
             <div class="sidebar-section-label">Principal</div>
             <button class="nav-item active" id="nav-home" onclick="ir('home')">
-                <span class="nav-icon">🏠</span> Inici
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></span> Inici
             </button>
             <button class="nav-item highlight" id="nav-foto" onclick="abrirGaleria()">
-                <span class="nav-icon">🖼️</span> Galeria
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></span> Galeria
             </button>
         </div>
         
         <div class="sidebar-section">
             <div class="sidebar-section-label">Projectes</div>
             <button class="nav-item" id="nav-list" onclick="historial()">
-                <span class="nav-icon">📂</span> Centre de Gestió
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></span> Centre de Gestió
             </button>
             <button class="nav-item" id="nav-map" onclick="abrirMapa()">
-                <span class="nav-icon">🗺️</span> Mapa
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg></span> Mapa
             </button>
             <button class="nav-item" id="nav-pkmapa" onclick="abrirPKMapa()">
-                <span class="nav-icon">🛣️</span> PK Mapa
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></span> PK Mapa
             </button>
             <button class="nav-item" id="nav-downloads" onclick="ir('downloads')">
-                <span class="nav-icon">📥</span> Descàrregues
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Descàrregues
             </button>
         </div>
         
         <div class="sidebar-section">
             <div class="sidebar-section-label">Sistema</div>
             <button class="nav-item" id="nav-settings" onclick="ir('pantallaAjustos')">
-                <span class="nav-icon">⚙️</span> Configuració
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg></span> Configuració
             </button>
             <button class="nav-item" id="nav-help" onclick="ir('helpScreen')">
-                <span class="nav-icon">❓</span> Ajuda
+                <span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-help"/></svg></span> Ajuda
             </button>
         </div>
         
         <div class="sidebar-footer">
-            <button class="nav-item" onclick="exportarBackup()"><span class="nav-icon">📤</span> Exportar Backup</button>
-            <button class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">📥</span> Importar Backup</button>
+            <button class="nav-item" onclick="exportarBackup()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg></span> Exportar Backup</button>
+            <button class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Importar Backup</button>
             <input type="file" id="importFile" accept="application/json" hidden onchange="importarBackup(this)">
             <div class="sidebar-credit">Creat per N.Arroyo</div>
         </div>
@@ -5623,32 +5827,32 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                 <div class="action-grid">
                     <div class="action-card primary" onclick="openProjectModal()">
-                        <div class="action-icon">➕</div>
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></div>
                         <div class="action-label">Nou Projecte</div>
                         <div class="action-desc">Crea un inventari nou o seguiment d'obra</div>
                     </div>
                     <div class="action-card blue" onclick="abrirGaleria()">
-                        <div class="action-icon">🖼️</div>
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></div>
                         <div class="action-label">Galeria</div>
                         <div class="action-desc">Fotos ràpides capturades a camp</div>
                     </div>
-                    <div class="action-card" onclick="historial()">
-                        <div class="action-icon">📂</div>
+                    <div class="action-card tone-slate" onclick="historial()">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></div>
                         <div class="action-label">Centre de Gestió</div>
                         <div class="action-desc">Inventaris, Obres, Fitxes Animals i ITC</div>
                     </div>
-                    <div class="action-card" onclick="ir('downloads')">
-                        <div class="action-icon">📥</div>
+                    <div class="action-card tone-green" onclick="ir('downloads')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></div>
                         <div class="action-label">Descàrregues</div>
                         <div class="action-desc">Genera PDF, Excel i ZIP de fotos</div>
                     </div>
-                    <div class="action-card" onclick="abrirPKMapa()" style="border-left:3px solid #f59e0b;">
-                        <div class="action-icon">🛣️</div>
+                    <div class="action-card tone-amber" onclick="abrirPKMapa()">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg></div>
                         <div class="action-label">PK Mapa</div>
                         <div class="action-desc">Consulta PKs sobre satèl·lit, mesures i Street View</div>
                     </div>
-                    <div class="action-card" onclick="ir('normativa')" style="border-left:3px solid #7c3aed;">
-                        <div class="action-icon">⚖️</div>
+                    <div class="action-card tone-violet" onclick="ir('normativa')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg></div>
                         <div class="action-label">Normativa</div>
                         <div class="action-desc">Cerca articles de la Llei i el Reglament de carreteres</div>
                     </div>
@@ -5674,7 +5878,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="normativa" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>⚖️ Normativa de Carreteres</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg>Normativa de Carreteres</h3>
                 </div>
 
                 <div class="dl-topbar">
@@ -5828,7 +6032,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="config" class="screen screen-form">
                 <div class="screen-header">
                     <button class="btn-back" id="configBackBtn" onclick="configTornar()">←</button>
-                    <h3>🛠️ <span id="configTitolH">Disseny del Formulari</span></h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg><span id="configTitolH">Disseny del Formulari</span></h3>
                 </div>
 
                 <div id="fieldList"><p style="color:var(--text-light);text-align:center;padding:12px;">Formulari buit — afegeix camps</p></div>
@@ -5922,7 +6126,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="puntsLlistat" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="goBackFromPunts()">&#8592;</button>
-                    <h3>&#128205; Punts Recollits</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Punts Recollits</h3>
                     <button class="annex-chip-btn" onclick="obrirEditorAnnex(curId)">📝 ＋ Annex</button>
                 </div>
                 <div id="regList"></div>
@@ -5943,27 +6147,27 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="list" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">&#8592;</button>
-                    <h3>&#128194; Centre de Gestió</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Centre de Gestió</h3>
                 </div>
 
                 <div class="action-grid">
-                    <div class="action-card" onclick="obrirGestioTipus('inventari')">
-                        <div class="action-icon">📦</div>
+                    <div class="action-card tone-blue" onclick="obrirGestioTipus('inventari')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg></div>
                         <div class="action-label">Inventaris</div>
                         <div class="action-desc" id="gestioStatInventaris">—</div>
                     </div>
-                    <div class="action-card" onclick="obrirGestioTipus('obra')">
-                        <div class="action-icon">🚧</div>
+                    <div class="action-card tone-green" onclick="obrirGestioTipus('obra')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-cone"/></svg></div>
                         <div class="action-label">Seguiment d'Obra</div>
                         <div class="action-desc" id="gestioStatObra">—</div>
                     </div>
-                    <div class="action-card" onclick="anarADescarrega('dlFitxaAnimal','list')" style="border-left:3px solid #b45309;">
-                        <div class="action-icon">🐾</div>
+                    <div class="action-card tone-brown" onclick="anarADescarrega('dlFitxaAnimal','list')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
                         <div class="action-label">Fitxes Animals</div>
                         <div class="action-desc" id="gestioStatAnimals">—</div>
                     </div>
-                    <div class="action-card" onclick="anarADescarrega('dlITC','list')">
-                        <div class="action-icon">📝</div>
+                    <div class="action-card tone-teal" onclick="anarADescarrega('dlITC','list')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></div>
                         <div class="action-label">ITC</div>
                         <div class="action-desc" id="gestioStatITC">—</div>
                     </div>
@@ -5979,7 +6183,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="gestioLlista" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('list')">&#8592;</button>
-                    <h3 id="gestioLlistaTitle">&#128230; Inventaris</h3>
+                    <h3 id="gestioLlistaTitle"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventaris</h3>
                 </div>
 
                 <div class="search-bar" style="margin-bottom:12px;">
@@ -6010,7 +6214,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="mapScreen" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">&#8592;</button>
-                    <h3>&#128506;&#65039; Mapa de Registres</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg>Mapa de Registres</h3>
                 </div>
 
                 <!-- Filter controls -->
@@ -6042,27 +6246,27 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="downloads" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">&#8592;</button>
-                    <h3>&#128229; Desc&#224;rregues</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>Desc&#224;rregues</h3>
                 </div>
 
                 <div class="action-grid">
-                    <div class="action-card" onclick="ir('dlInventaris')">
-                        <div class="action-icon">📦</div>
+                    <div class="action-card tone-blue" onclick="ir('dlInventaris')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg></div>
                         <div class="action-label">Inventaris</div>
                         <div class="action-desc">PDF, Excel, ZIP i backups de projectes</div>
                     </div>
-                    <div class="action-card" onclick="ir('dlIncidencies')">
-                        <div class="action-icon">🚧</div>
+                    <div class="action-card tone-red" onclick="ir('dlIncidencies')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg></div>
                         <div class="action-label">Incidències</div>
                         <div class="action-desc">Informes d'incidències de camp</div>
                     </div>
-                    <div class="action-card" onclick="anarADescarrega('dlFitxaAnimal','downloads')" style="border-left:3px solid #b45309;">
-                        <div class="action-icon">🐾</div>
+                    <div class="action-card tone-brown" onclick="anarADescarrega('dlFitxaAnimal','downloads')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg></div>
                         <div class="action-label">Fitxa Animal</div>
                         <div class="action-desc">Fitxes completes d'atropellament</div>
                     </div>
-                    <div class="action-card" onclick="anarADescarrega('dlITC','downloads')">
-                        <div class="action-icon">📝</div>
+                    <div class="action-card tone-teal" onclick="anarADescarrega('dlITC','downloads')">
+                        <div class="action-icon"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></div>
                         <div class="action-label">ITC</div>
                         <div class="action-desc">Informes tècnics de carreteres</div>
                     </div>
@@ -6077,7 +6281,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="dlInventaris" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
-                    <h3>&#128230; Inventaris</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventaris</h3>
                 </div>
 
                 <!-- Search + stats row -->
@@ -6110,7 +6314,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="dlIncidencies" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('downloads')">&#8592;</button>
-                    <h3>&#128679; Incidències</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg>Incidències</h3>
                 </div>
 
                 <div class="dl-topbar">
@@ -6243,7 +6447,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="dlFitxaAnimal" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="tornarDlOrigen()">&#8592;</button>
-                    <h3>&#128062; Fitxa Animal</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-paw"/></svg>Fitxa Animal</h3>
                 </div>
 
                 <div class="dl-topbar">
@@ -6266,7 +6470,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="dlITC" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="tornarDlOrigen()">&#8592;</button>
-                    <h3>&#128221; ITC</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>ITC</h3>
                 </div>
 
                 <div class="dl-topbar">
@@ -6292,7 +6496,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="pantallaAjustos" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>⚙️ Configuració</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg>Configuració</h3>
                 </div>
 
                 <!-- DADES DEL TÈCNIC ──────────────────────────── -->
@@ -6428,7 +6632,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="helpScreen" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>❓ Guia i Consells</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-help"/></svg>Guia i Consells</h3>
                 </div>
 
                 <div class="tip-card yellow">
@@ -6475,7 +6679,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="galeriaFotos" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">←</button>
-                    <h3>🖼️ Galeria de Fotos</h3>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg>Galeria de Fotos</h3>
                 </div>
 
                 <!-- Capa fora per tancar menú -->
@@ -6780,8 +6984,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ============================================================
      FAB — FOTO RÀPIDA (visible only on home dashboard)
      ============================================================ -->
-<button id="fab-foto-rapida" onclick="modeFotoDirecta()" title="Foto Ràpida">
-    📷
+<button id="fab-foto-rapida" onclick="modeFotoDirecta()" title="Foto Ràpida" aria-label="Foto Ràpida">
+    <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg>
 </button>
 
 <!-- ============================================================
@@ -8104,7 +8308,9 @@ function renderGestioHubStats() {
 function obrirGestioTipus(tipus) {
     gestioTipusActual = tipus;
     ir('gestioLlista');
-    const label = tipus === 'obra' ? "&#128679; Seguiment d'Obra" : '&#128230; Inventaris';
+    const label = tipus === 'obra'
+        ? '<svg class="ico" aria-hidden="true"><use href="#i-cone"/></svg>Seguiment d\'Obra'
+        : '<svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventaris';
     const titleEl = document.getElementById('gestioLlistaTitle');
     if (titleEl) titleEl.innerHTML = label;
     const tb = document.getElementById('topbarTitle');
