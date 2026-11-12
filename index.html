@@ -5651,110 +5651,182 @@ input:checked + .slider:before { transform: translateX(20px); }
   <symbol id="i-excl" viewBox="0 0 24 24"><path d="M12 6.5v8M12 18.5h.01"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.8-2.5h6.4L17 8h3a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
 </svg>
-<!-- ══ SPLASH SCREEN ══════════════════════════════════════════ -->
-<div id="splashScreen" style="
-    position:fixed;inset:0;z-index:9999;
-    background:#fff;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:0;
-    transition:opacity 0.5s ease, visibility 0.5s ease;
-">
-    <!-- Logo Generalitat -->
-    <img id="splashLogo"
-         src="https://raw.githubusercontent.com/noelarsu-gif/DataCamp/main/territori_h3.png"
-         alt="Generalitat de Catalunya — Departament de Territori"
-         onerror="this.style.display='none'"
-         style="
-             max-width:260px;width:80%;height:auto;
-             margin-bottom:32px;
-             opacity:0;
-             transform:translateY(-8px);
-             transition:opacity 0.5s ease 0s, transform 0.5s ease 0s;
-         ">
+<!-- ══ SPLASH SCREEN ══════════════════════════════════════════
+     Benvinguda: marca + marca vial animada + salutació segons
+     l'hora + missatge d'ànim que canvia segons dia i franja.
+     Toca la pantalla per saltar-la. Sense recursos externs.
+     ═══════════════════════════════════════════════════════════ -->
+<style>
+#splashScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #fff;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+    cursor: pointer;
+    -webkit-user-select: none; user-select: none;
+}
+#splashScreen.sp-out { opacity: 0; transform: scale(1.03); pointer-events: none; }
+.sp-center { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 340px; }
+.sp-word {
+    font-family: 'Barlow Condensed', Barlow, system-ui, sans-serif;
+    font-size: 2.9rem; font-weight: 900; line-height: 1;
+    color: #c60c30; letter-spacing: 4px;
+    animation: spWord .7s cubic-bezier(.2,.8,.2,1) both;
+}
+.sp-road {
+    position: relative; width: 168px; height: 4px; margin: 18px 0 26px;
+    border-radius: 2px; overflow: hidden;
+    background: #e5e7eb;
+    transform-origin: center;
+    animation: spRoad .55s cubic-bezier(.2,.8,.2,1) .25s both;
+}
+.sp-road::before {
+    content: ''; position: absolute; inset: 0; width: 200%;
+    background: repeating-linear-gradient(90deg, #c60c30 0 22px, transparent 22px 36px);
+    animation: spDrive .9s linear infinite;
+}
+.sp-hello {
+    font-family: Barlow, system-ui, sans-serif;
+    font-size: 1.65rem; font-weight: 700; color: #111827; line-height: 1.2;
+    max-width: 100%; overflow-wrap: anywhere;
+    animation: spUp .55s cubic-bezier(.2,.8,.2,1) .45s both;
+}
+.sp-msg {
+    font-family: Barlow, system-ui, sans-serif;
+    font-size: 1rem; font-weight: 400; color: #6b7280; line-height: 1.45;
+    margin-top: 10px; max-width: 300px; min-height: 2.9em;
+    animation: spUp .55s cubic-bezier(.2,.8,.2,1) .65s both;
+}
+.sp-foot {
+    position: absolute; left: 0; right: 0; bottom: max(22px, env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    animation: spFade .6s ease .8s both;
+}
+.sp-foot img { max-height: 34px; max-width: 150px; object-fit: contain; opacity: .9; }
+.sp-foot span {
+    font-family: 'Barlow Condensed', Barlow, sans-serif;
+    font-size: .72rem; font-weight: 600; letter-spacing: 1.6px;
+    text-transform: uppercase; color: #9ca3af;
+}
+@keyframes spWord  { from { opacity: 0; transform: translateY(10px); letter-spacing: 12px; } to { opacity: 1; transform: none; letter-spacing: 4px; } }
+@keyframes spRoad  { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes spDrive { from { transform: translateX(-36px); } to { transform: translateX(0); } }
+@keyframes spUp    { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes spFade  { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+    .sp-road::before { animation: none; }
+}
+</style>
 
-    <!-- Salutació -->
-    <div id="splashGreeting" style="
-        font-family:'Barlow Condensed',Barlow,sans-serif;
-        font-size:2.2rem;font-weight:800;
-        text-transform:uppercase;letter-spacing:2px;
-        color:#1a1a1a;
-        opacity:0;
-        transform:translateY(-10px);
-        transition:opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
-        text-align:center;
-        max-width:88vw;
-        width:100%;
-        padding:0 12px;
-        box-sizing:border-box;
-        word-break:break-word;
-        line-height:1.15;
-    "></div>
-
-    <!-- Línia divisòria suau -->
-    <div style="
-        width:48px;height:2px;
-        background:linear-gradient(90deg,transparent,#c60c30,transparent);
-        margin:28px 0 24px;
-        opacity:0;
-        transition:opacity 0.5s ease 0.25s;
-    " id="splashDivider"></div>
-
-    <!-- Subtítol -->
-    <div id="splashSub" style="
-        text-align:center;
-        opacity:0;
-        transform:translateY(8px);
-        transition:opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
-    ">
-        <div style="font-family:'Barlow Condensed',Barlow,sans-serif;font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#1a1a1a;margin-bottom:6px;">Benvingut a DATACAMP</div>
-        <div style="font-family:'Barlow Condensed',Barlow,sans-serif;font-size:0.85rem;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:#888;">Eina de recollida de dades en camp</div>
+<div id="splashScreen" role="status" aria-live="polite" aria-label="Benvinguda a DataCamp">
+    <div class="sp-center">
+        <div class="sp-word">DATACAMP</div>
+        <div class="sp-road" aria-hidden="true"></div>
+        <div class="sp-hello" id="splashGreeting"></div>
+        <div class="sp-msg" id="splashMsg"></div>
+    </div>
+    <div class="sp-foot">
+        <img id="splashLogo" alt="" hidden>
+        <span>Eina de recollida de dades en camp</span>
     </div>
 </div>
 
 <script>
-(function(){
-    const h = new Date().getHours();
-    let salut = h < 6 ? 'Bona nit' : h < 13 ? 'Bon dia' : h < 21 ? 'Bona tarda' : 'Bona nit';
+(function () {
+    const ara = new Date();
+    const h = ara.getHours();
+    const dia = ara.getDay();               // 0 = diumenge
+    const dd = ara.getDate(), mm = ara.getMonth() + 1;
+    const diaAny = Math.floor((ara - new Date(ara.getFullYear(), 0, 0)) / 864e5);
+
+    /* ── Salutació ───────────────────────────────────────── */
+    let salut = (h >= 5 && h < 13) ? 'Bon dia' : (h >= 13 && h < 21) ? 'Bona tarda' : 'Bona nit';
     try {
         const raw = localStorage.getItem('tecnic_dades');
-        const nomComplet = raw ? (JSON.parse(raw).nom || '').trim() : '';
-        if (nomComplet) salut += ', ' + nomComplet.split(' ')[0];
+        const nom = raw ? (JSON.parse(raw).nom || '').trim().split(/\s+/)[0] : '';
+        if (nom) salut += ', ' + nom;
     } catch (e) {}
+
+    /* ── Missatges d'ànim ────────────────────────────────── */
+    const FRANGES = {
+        matinada: [   // 5–7
+            'Els primers a la carretera. Gràcies per fer-la més segura.',
+            'Matinada de feina: armilla posada i sense presses.',
+            'Encara és fosc. Llums, visibilitat i calma.',
+        ],
+        mati: [       // 7–13
+            'Cada PK que revises fa la carretera una mica més segura.',
+            'Bon ritme avui, que la feina ben feta no té pressa.',
+            'Avui també hi haurà qui arribi a casa gràcies a la teva feina.',
+            'Que el dia vagi tan fluid com el trànsit d’un diumenge.',
+            'Ulls oberts i bona feina. Endavant.',
+        ],
+        migdia: [     // 13–16
+            'Mig dia fet. Recorda fer una pausa i beure aigua.',
+            'Bona feina fins ara. La tarda també compta.',
+            'Un moment per recarregar i tornem-hi.',
+        ],
+        tarda: [      // 16–21
+            'Últim tram del dia. Atenció als detalls.',
+            'Ja queda menys. Acaba amb la mateixa cura que has començat.',
+            'Quan cau el sol, la visibilitat primer.',
+        ],
+        nit: [        // 21–5
+            'Torn de nit: amb calma i ben visible.',
+            'Que la nit sigui tranquil·la a la via.',
+            'Gràcies per vetllar per la carretera mentre altres dormen.',
+        ],
+    };
+    const ESPECIALS = {
+        '1-1':   'Bon any nou! Que sigui un any sense incidències.',
+        '6-1':   'Bon dia de Reis!',
+        '23-4':  'Bon Sant Jordi! Un llibre i una rosa després de la feina.',
+        '24-6':  'Bona revetlla! Compte amb els petards a la via.',
+        '24-12': 'Bona Nit de Nadal! Gràcies per treballar avui.',
+        '25-12': 'Bon Nadal! Gràcies per treballar avui.',
+        '26-12': 'Bon Sant Esteve!',
+        '31-12': 'Últim dia de l’any. Gràcies per tota la feina feta.',
+    };
+
+    function triaMissatge() {
+        const esp = ESPECIALS[dd + '-' + mm];
+        if (esp) return esp;
+        if (dia === 1 && h >= 5 && h < 13) return 'Dilluns: setmana nova, carretera nova. Som-hi!';
+        if (dia === 5 && h >= 13)          return 'Divendres a la tarda. Una última empenta i cap de setmana!';
+        if ((dia === 0 || dia === 6) && h >= 6 && h < 21)
+            return diaAny % 2 ? 'Treballar en cap de setmana té mèrit. Gràcies.'
+                              : 'Cap de setmana a la carretera. Bona feina i bon descans després.';
+        const franja = h < 5 ? 'nit' : h < 7 ? 'matinada' : h < 13 ? 'mati' : h < 16 ? 'migdia' : h < 21 ? 'tarda' : 'nit';
+        const llista = FRANGES[franja];
+        return llista[(diaAny + h) % llista.length];   // canvia segons dia i hora
+    }
+
     document.getElementById('splashGreeting').textContent = salut;
+    document.getElementById('splashMsg').textContent = triaMissatge();
 
-    // Ajusta la mida de la lletra perquè noms llargs sempre quedin centrats i ben encaixats
-    (function ajustarMidaSalutacio(){
-        const el = document.getElementById('splashGreeting');
-        if (!el) return;
-        const len = salut.length;
-        let mida;
-        if (len <= 14) mida = 2.2;
-        else if (len <= 20) mida = 1.8;
-        else if (len <= 28) mida = 1.45;
-        else if (len <= 36) mida = 1.2;
-        else mida = 1.0;
-        el.style.fontSize = mida + 'rem';
-        el.style.letterSpacing = (len > 20 ? 1 : 2) + 'px';
-    })();
+    /* ── Mida de lletra si el nom és llarg ───────────────── */
+    if (salut.length > 22) document.getElementById('splashGreeting').style.fontSize = '1.3rem';
+    else if (salut.length > 17) document.getElementById('splashGreeting').style.fontSize = '1.45rem';
 
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const logo = document.getElementById('splashLogo');
-            if (logo) { logo.style.opacity = '1'; logo.style.transform = 'translateY(0)'; }
-            document.getElementById('splashGreeting').style.opacity = '1';
-            document.getElementById('splashGreeting').style.transform = 'translateY(0)';
-            document.getElementById('splashDivider').style.opacity = '1';
-            document.getElementById('splashSub').style.opacity = '1';
-            document.getElementById('splashSub').style.transform = 'translateY(0)';
-        });
-    });
+    /* ── Logo corporatiu del client (si n'hi ha) ─────────── */
+    try {
+        const logo = localStorage.getItem('logo_corp');
+        if (logo) { const img = document.getElementById('splashLogo'); img.src = logo; img.hidden = false; }
+    } catch (e) {}
 
-    setTimeout(() => {
-        const s = document.getElementById('splashScreen');
-        s.style.opacity = '0';
-        s.style.visibility = 'hidden';
-        setTimeout(() => s.remove(), 500);
-    }, 2000);
+    /* ── Sortida: automàtica o tocant la pantalla ────────── */
+    const s = document.getElementById('splashScreen');
+    let tancat = false;
+    function tancar() {
+        if (tancat) return; tancat = true;
+        s.classList.add('sp-out');
+        setTimeout(() => s.remove(), 480);
+    }
+    s.addEventListener('click', tancar);
+    const reduit = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(tancar, reduit ? 1600 : 2600);
 })();
 </script>
 
