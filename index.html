@@ -5773,6 +5773,32 @@ body.pd-noscroll { overflow: hidden; }
 .pd-pal-color.sel { box-shadow: 0 0 0 3px var(--dark); }
 
 .pd-accions { display: grid; gap: 8px; }
+
+/* Accés a «Les meves carreteres» */
+.pd-configura {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+    padding: 12px 14px; border-radius: 12px;
+    background: var(--primary-light); border: 1.5px dashed var(--primary); color: var(--primary);
+    font-family: var(--font);
+}
+.pd-configura > .ico { font-size: 22px; flex-shrink: 0; }
+.pd-configura span { flex: 1; min-width: 0; }
+.pd-configura b { display: block; font-size: .95rem; font-weight: 700; }
+.pd-configura small { display: block; font-size: .8rem; color: var(--text); margin-top: 2px; line-height: 1.35; }
+.pd-configura:active { transform: scale(0.98); }
+.pd-configura-gran { margin-bottom: 14px; padding: 14px 16px; border-style: solid; }
+.pd-meves {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer;
+    margin-bottom: 14px; padding: 10px 12px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border); font-family: var(--font);
+}
+.pd-meves:active { transform: scale(0.98); }
+.pd-meves-tit { font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); flex-shrink: 0; width: 92px; line-height: 1.2; letter-spacing: .6px !important; }
+.pd-meves-plaques { flex: 1; min-width: 0; display: flex; gap: 5px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.pd-meves-plaques .road-plate { flex-shrink: 0; }
+.pd-meves-ed { font-size: .85rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+.pd-label-fila { display: flex; align-items: baseline; justify-content: space-between; }
+.pd-link-acc { color: var(--primary); padding: 4px 0; }
 .pd-accions .btn .ico { font-size: 1.15em; }
 
 /* Fulls inferiors */
@@ -6796,12 +6822,10 @@ body.pd-noscroll { overflow: hidden; }
                     </button>
                 </div>
 
+                <div id="pdMeves"></div>
                 <div id="pdLlista" class="pd-llista"></div>
 
                 <div class="pd-accions">
-                    <button class="btn btn-ghost" onclick="pdObrirCarreteres()">
-                        <svg class="ico" aria-hidden="true"><use href="#i-road"/></svg> Les meves carreteres
-                    </button>
                     <button class="btn btn-primary" onclick="pdObrirExportar()">
                         <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Exportar al calendari
                     </button>
@@ -18006,7 +18030,8 @@ function pkmBack() {
 
         <div id="pdBlocTreball">
             <div class="pd-camp">
-                <label>Carreteres fetes</label>
+                <div class="pd-label-fila"><label>Carreteres fetes</label>
+                    <button type="button" class="pd-link pd-link-acc" id="pdEditarMeves" onclick="pdObrirCarreteres()">Editar les meves</button></div>
                 <div id="pdChips" class="pd-chips"></div>
                 <div id="pdTrams" class="pd-trams"></div>
             </div>
@@ -18331,7 +18356,24 @@ function pdTancarAvis() {
 function pdCanviarSetmana(delta) { pdDilluns = pdSumaDies(pdDilluns || pdDillunsDe(new Date()), 7 * delta); pdRenderSetmana(); }
 function pdAnarAvui() { pdDilluns = pdDillunsDe(new Date()); pdRenderSetmana(); }
 
+function pdRenderMeves() {
+    const box = document.getElementById('pdMeves');
+    if (!box) return;
+    const l = pdLlista();
+    if (!l.length) {
+        box.innerHTML = '<button type="button" class="pd-configura pd-configura-gran" onclick="pdObrirCarreteres()">'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>'
+            + '<span><b>Configura les teves carreteres</b><small>Les que fas habitualment, amb el seu tram i color. Després cada dia només caldrà marcar-les.</small></span>'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
+        return;
+    }
+    box.innerHTML = '<button type="button" class="pd-meves" onclick="pdObrirCarreteres()">'
+        + '<span class="pd-meves-tit">Les meves carreteres</span>'
+        + '<span class="pd-meves-plaques">' + l.map(c => '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>').join('') + '</span>'
+        + '<span class="pd-meves-ed">Editar</span></button>';
+}
 function pdRenderSetmana() {
+    pdRenderMeves();
     const cont = document.getElementById('pdLlista');
     if (!cont) return;
     if (!pdDilluns) pdDilluns = pdDillunsDe(new Date());
@@ -18413,10 +18455,14 @@ function pdSetTipus(t) {
 function pdRenderChips() {
     const cont = document.getElementById('pdChips');
     const llista = pdLlista();
+    const ed = document.getElementById('pdEditarMeves'); if (ed) ed.hidden = !llista.length;
     const extres = [...pdEdicio.marcades].filter(c => !llista.includes(c));
     const totes = [...llista, ...extres];
     if (!totes.length) {
-        cont.innerHTML = '<p class="pd-ajuda">Encara no tens carreteres habituals. Escriu-ne una a sota o desa-les a «Les meves carreteres».</p>';
+        cont.innerHTML = '<button type="button" class="pd-configura" onclick="pdObrirCarreteres()">'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>'
+            + '<span><b>Configura les teves carreteres</b><small>Així cada dia només caldrà marcar-les. També pots escriure\u2019n una a sota.</small></span>'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
         pdRenderTrams([]);
         return;
     }
@@ -18528,7 +18574,7 @@ function pdObrirCarreteres() {
     pdRenderLlista();
     pdObreSheet('pdCarrSheet');
 }
-function pdTancarCarreteres() { pdTancaSheet('pdCarrSheet'); if (pdEdicio) pdRenderChips(); }
+function pdTancarCarreteres() { pdTancaSheet('pdCarrSheet'); pdRenderMeves(); if (pdEdicio) pdRenderChips(); }
 function pdAfegirALlista(txt, desDelDia) {
     const c = pdNormalitza(txt);
     if (!c) return;
