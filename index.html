@@ -16985,11 +16985,40 @@ function pkmObrirMaps() {
     if (!pkmUltimResultat) return;
     window.open(`https://maps.google.com/?q=${pkmUltimResultat.lat},${pkmUltimResultat.lon}`, '_blank');
 }
+/* Rumb de la carretera (graus des del nord, en sentit de PK creixent) a partir del catàleg offline */
+function pkmRumbCarretera(carretera, pk) {
+    try {
+        if (typeof PK_SEED === 'undefined' || !carretera || !isFinite(pk)) return null;
+        const clau = String(carretera).toUpperCase();
+        const k = PK_SEED[carretera] ? carretera : Object.keys(PK_SEED).find(x => x.toUpperCase() === clau);
+        const pts = k ? PK_SEED[k] : null;
+        if (!pts || pts.length < 2) return null;
+        let a = null, b = null;                       // punt anterior i posterior al PK (a menys de 2 km)
+        pts.forEach(p => {
+            if (p[0] <= pk && pk - p[0] < 2 && (!a || p[0] > a[0])) a = p;
+            if (p[0] > pk && p[0] - pk < 2 && (!b || p[0] < b[0])) b = p;
+        });
+        if (!a || !b) {                               // al principi o al final: els dos punts més propers
+            const ord = pts.slice().sort((x, y) => Math.abs(x[0] - pk) - Math.abs(y[0] - pk)).slice(0, 2).sort((x, y) => x[0] - y[0]);
+            [a, b] = ord;
+            if (!a || !b || a[0] === b[0] || Math.abs(a[0] - pk) > 2) return null;
+        }
+        const r = Math.PI / 180, f1 = a[1] * r, f2 = b[1] * r, dl = (b[2] - a[2]) * r;
+        const y = Math.sin(dl) * Math.cos(f2), x = Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl);
+        return Math.round((Math.atan2(y, x) / r + 360) % 360);
+    } catch (e) { return null; }
+}
 function pkmAbrirStreetView() {
     const r = pkmUltimResultat;
     const ll = r ? [r.lat, r.lon] : (pkmMap ? [pkmMap.getCenter().lat, pkmMap.getCenter().lng] : null);
     if (!ll) { showToast('⚠️ Sense posició per a Street View', 'warn'); return; }
-    window.open(`https://maps.google.com/?q=${ll[0]},${ll[1]}&layer=c&cbll=${ll[0]},${ll[1]}`, '_blank');
+    /* Format oficial de Google (Maps URLs, map_action=pano). L'antic «?layer=c&cbll=» no està documentat:
+       Google l'ha de redirigir i, el primer cop, el visor pot quedar-se en negre. */
+    const lat = Number(ll[0]).toFixed(6), lon = Number(ll[1]).toFixed(6);
+    let url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`;
+    const rumb = r ? pkmRumbCarretera(r.carretera, Number(r.km) + Number(r.m) / 1000) : null;
+    if (rumb !== null) url += `&heading=${rumb}&pitch=0&fov=90`;
+    window.open(url, '_blank');
 }
 async function pkmCompartirWA() {
     if (!pkmUltimResultat) return;
