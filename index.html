@@ -20626,10 +20626,18 @@ function mouPantalles(vell, nou, dir, o) {
         vell.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); });
         pare.appendChild(vell);
     } else if (!vell.isConnected || vell.parentElement !== pare) return;
+    // Les dues pantalles ocupen també el marge interior de .page-content: així cap tros de l'anterior
+    // queda visible a les vores mentre llisquen (en ordinador el marge és de 24-32 px).
+    const pcs = getComputedStyle(pare), pl = parseFloat(pcs.paddingLeft) || 0, pr = parseFloat(pcs.paddingRight) || 0;
+    const ample = (el) => {
+        const cs = getComputedStyle(el);
+        return { l: (parseFloat(cs.paddingLeft) || 0) + pl, r: (parseFloat(cs.paddingRight) || 0) + pr };
+    };
+    const an = ample(nou), av = ample(vell), w = nou.offsetWidth;
     vell.classList.add('mou-fantasma');
-    vell.style.top = (nou.offsetTop - (o.sy || 0)) + 'px';
-    vell.style.left = nou.offsetLeft + 'px'; vell.style.width = nou.offsetWidth + 'px';
+    Object.assign(vell.style, { top: (nou.offsetTop - (o.sy || 0)) + 'px', left: (nou.offsetLeft - pl) + 'px', width: (w + pl + pr) + 'px', paddingLeft: av.l + 'px', paddingRight: av.r + 'px', maxWidth: 'none' });
     nou.classList.add('mou-actiu');
+    Object.assign(nou.style, { marginLeft: -pl + 'px', marginRight: -pr + 'px', width: (w + pl + pr) + 'px', paddingLeft: an.l + 'px', paddingRight: an.r + 'px', maxWidth: 'none' });
     document.documentElement.classList.add('mou-anim');
     const opt = { duration: MOU_DUR, easing: MOU_CORBA, fill: 'both' };
     const ombra = '-12px 0 28px rgba(0,0,0,.10)';
@@ -20649,7 +20657,7 @@ function mouPantalles(vell, nou, dir, o) {
     }
     const neteja = () => {
         vell.classList.remove('mou-fantasma'); nou.classList.remove('mou-actiu');
-        ['top', 'left', 'width', 'zIndex'].forEach(k => { vell.style[k] = ''; nou.style[k] = ''; });
+        ['top', 'left', 'width', 'zIndex', 'paddingLeft', 'paddingRight', 'marginLeft', 'marginRight', 'maxWidth'].forEach(k => { vell.style[k] = ''; nou.style[k] = ''; });
         anims.forEach(a => { try { a.cancel(); } catch (e) {} });
         if (o.separat) vell.remove();
         document.documentElement.classList.remove('mou-anim');
