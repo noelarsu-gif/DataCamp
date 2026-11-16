@@ -6129,6 +6129,40 @@ body.pe-obert { overflow: hidden; }
 .itc-sel-buit { grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: .9rem; }
 .itc-sel-peu-bar { padding: 10px 12px max(12px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); }
 .itc-sel-peu-bar .btn { margin: 0 !important; width: 100%; }
+/* ══ Moviment: transicions estil iOS ═════════════════════════ */
+.page-content { position: relative; }
+html.mou-anim, html.mou-anim body { overflow-x: hidden; }
+html.mou-anim .screen { animation: none; }
+.screen.mou-fantasma { display: block !important; position: absolute; pointer-events: none; background: var(--bg); will-change: transform; }
+.screen.mou-actiu { position: relative; background: var(--bg); min-height: calc(100vh - 120px); will-change: transform; }
+.mou-clon { position: fixed; z-index: 10070; overflow: hidden; pointer-events: none; box-shadow: 0 12px 34px rgba(0,0,0,.28); will-change: left, top, width, height; }
+.mou-clon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Fulls inferiors: pugen amb la corba d'iOS i baixen en tancar */
+.fe-sheet-overlay {
+    display: flex; visibility: hidden; pointer-events: none; background: rgba(0,0,0,0);
+    transition: background-color .28s ease, visibility 0s linear .3s;
+}
+.fe-sheet-overlay.open { visibility: visible; pointer-events: auto; background: rgba(0,0,0,.45); transition: background-color .32s ease, visibility 0s; }
+.fe-sheet { animation: none; transform: translateY(105%); transition: transform .3s cubic-bezier(.4,0,1,1); will-change: transform; }
+.fe-sheet-overlay.open .fe-sheet { transform: none; transition: transform .46s cubic-bezier(.32,.72,0,1); }
+.fe-sheet-handle { position: relative; touch-action: none; cursor: grab; }
+.fe-sheet-handle::after { content: ''; position: absolute; left: -90px; right: -90px; top: -14px; bottom: -14px; }
+/* Finestres modals */
+.modal { animation: mouFons .28s ease; }
+.modal-box { animation: mouModal .42s cubic-bezier(.32,.72,0,1); }
+@keyframes mouFons { from { background-color: rgba(0,0,0,0); backdrop-filter: blur(0); } }
+@keyframes mouModal { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+/* Editor, selector de fotos */
+#peEditor.open { animation: mouZoom .34s cubic-bezier(.32,.72,0,1); }
+#itcSelector.open { animation: mouPuja .46s cubic-bezier(.32,.72,0,1); }
+@keyframes mouZoom { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+@keyframes mouPuja { from { transform: translateY(100%); } to { transform: none; } }
+/* Resposta al toc, suau */
+.itc-targeta, .pd-conf, .pd-dia, .action-card, .pd-ruta-chip, .itc-foto, .itc-sel-foto { transition: transform .22s cubic-bezier(.32,.72,0,1); }
+@media (prefers-reduced-motion: reduce) {
+    .fe-sheet-overlay, .fe-sheet, .fe-sheet-overlay.open .fe-sheet { transition: none; }
+    .modal, .modal-box, #peEditor.open, #itcSelector.open { animation: none; }
+}
 /* Avís de privacitat */
 .pd-avis-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .pd-avis-cap h4 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
@@ -7953,7 +7987,7 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
 
 <div id="galeriaVisor">
     <div class="visor-topbar">
-        <button class="visor-close" onclick="tancarVisor()" title="Tancar">✕</button>
+        <button class="visor-close" onclick="tancarVisorAnimat()" title="Tancar">✕</button>
         <div class="visor-title" id="visorTitle">Foto Ràpida</div>
         <div class="visor-topbar-actions">
             <button class="visor-menu-btn visor-edit-btn" onclick="visorEditarFoto()" title="Editar la foto (retallar, girar, marcar)" aria-label="Editar la foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
@@ -20534,6 +20568,248 @@ async function itcEnvia(mode) {
     }, k * 700));
     showToast(fitxers.length === 1 ? 'Descarregat: ' + fitxers[0].name : '2 fitxers descarregats');
 }
+
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   MOVIMENT — transicions estil iOS
+   · Pantalles: «push / pop» (la nova entra per la dreta i l'anterior es
+     desplaça una mica cap a l'esquerra; enrere, a l'inrevés).
+   · Fotos: s'obren ampliant-se des de la miniatura i hi tornen en tancar.
+   · Fulls inferiors: pugen amb la corba d'iOS, baixen en tancar i es
+     poden tancar arrossegant cap avall.
+   Tot respecta «Reduir el moviment» del sistema.
+   ══════════════════════════════════════════════════════════════════ */
+const MOU_CORBA = 'cubic-bezier(.32,.72,0,1)';
+const MOU_DUR = 440;
+function mouReduit() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+
+/* ── 1. Pantalles ─────────────────────────────────────────── */
+const MOU_SENSE_ANIM = new Set(['pkMapaScreen', 'mapScreen']);   // pantalles amb elements fixos a pantalla completa
+let _navPila = ['home'];
+let _mouPant = null;
+function mouDireccio(desDe, cap) {
+    if (!desDe || desDe === cap) return null;
+    if (cap === 'home') { _navPila = ['home']; return 'enrere'; }
+    const k = _navPila.lastIndexOf(cap);
+    if (k >= 0) { _navPila = _navPila.slice(0, k + 1); return 'enrere'; }
+    _navPila.push(cap);
+    return 'endavant';
+}
+function mouAcabaPantalles() {
+    if (!_mouPant) return;
+    _mouPant.anims.forEach(a => { try { a.cancel(); } catch (e) {} });
+    _mouPant.neteja();
+    _mouPant = null;
+}
+/** Anima el canvi de pantalla. El canvi ja s'ha fet (síncron): l'anterior es manté uns instants com a «fantasma». */
+function mouPantalles(vell, nou, dir) {
+    mouAcabaPantalles();
+    if (mouReduit() || !vell || !nou || vell === nou || !vell.isConnected) return;
+    if (MOU_SENSE_ANIM.has(vell.id) || MOU_SENSE_ANIM.has(nou.id)) return;
+    const pare = nou.parentElement;
+    if (!pare || vell.parentElement !== pare) return;
+    const top = vell.dataset.mouTop != null ? Number(vell.dataset.mouTop) : nou.offsetTop;
+    vell.classList.add('mou-fantasma');
+    vell.style.top = top + 'px'; vell.style.left = nou.offsetLeft + 'px'; vell.style.width = nou.offsetWidth + 'px';
+    nou.classList.add('mou-actiu');
+    document.documentElement.classList.add('mou-anim');
+    const opt = { duration: MOU_DUR, easing: MOU_CORBA, fill: 'both' };
+    const ombra = '-12px 0 28px rgba(0,0,0,.10)';
+    let anims;
+    if (dir === 'endavant') {
+        nou.style.zIndex = 2; vell.style.zIndex = 1;
+        anims = [
+            nou.animate([{ transform: 'translateX(100%)', boxShadow: ombra }, { transform: 'translateX(0)', boxShadow: '0 0 0 transparent' }], opt),
+            vell.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(-26%)', opacity: .55 }], opt)
+        ];
+    } else {
+        nou.style.zIndex = 1; vell.style.zIndex = 2;
+        anims = [
+            vell.animate([{ transform: 'translateX(0)', boxShadow: ombra }, { transform: 'translateX(100%)', boxShadow: ombra }], opt),
+            nou.animate([{ transform: 'translateX(-26%)', opacity: .55 }, { transform: 'translateX(0)', opacity: 1 }], opt)
+        ];
+    }
+    const neteja = () => {
+        vell.classList.remove('mou-fantasma'); nou.classList.remove('mou-actiu');
+        ['top', 'left', 'width', 'zIndex'].forEach(k => { vell.style[k] = ''; nou.style[k] = ''; });
+        anims.forEach(a => { try { a.cancel(); } catch (e) {} });
+        document.documentElement.classList.remove('mou-anim');
+    };
+    _mouPant = { anims, neteja };
+    Promise.all(anims.map(a => a.finished)).then(() => { if (_mouPant && _mouPant.anims === anims) { neteja(); _mouPant = null; } }).catch(() => {});
+}
+(function mouEmbolcallaIr() {
+    if (typeof ir !== 'function' || ir._mou) return;
+    const original = ir;
+    const nou = function (id) {
+        const vell = document.querySelector('.page-content > .screen.active');
+        const dir = mouDireccio(vell && vell.id, id);
+        if (vell) vell.dataset.mouTop = vell.offsetTop;
+        original.apply(this, arguments);
+        const desti = document.getElementById(id);
+        if (dir && vell && desti && desti.classList.contains('active')) mouPantalles(vell, desti, dir);
+        if (vell) delete vell.dataset.mouTop;
+    };
+    nou._mou = true;
+    ir = nou;
+})();
+/* Pantalles creades al moment (formulari ITC, fitxa d'animal…): també entren per la dreta */
+function mouEntraPantallaNova(el) {
+    if (!el || mouReduit()) return;
+    el.animate([{ transform: 'translateX(100%)', boxShadow: '-12px 0 28px rgba(0,0,0,.10)' }, { transform: 'translateX(0)', boxShadow: '0 0 0 transparent' }],
+        { duration: MOU_DUR, easing: MOU_CORBA });
+}
+(function mouObservaPantallesNoves() {
+    const inicia = () => {
+        const pc = document.querySelector('.page-content');
+        if (!pc) return;
+        new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
+            if (n.nodeType === 1 && n.classList.contains('screen') && n.classList.contains('active')) {
+                if (n.id && !_navPila.includes(n.id)) _navPila.push(n.id);
+                mouEntraPantallaNova(n);
+            }
+        }))).observe(pc, { childList: true });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia); else inicia();
+})();
+
+/* ── 2. Fotos: ampliar des de la miniatura («hero») ───────── */
+let _mouUltimaMini = null;
+document.addEventListener('pointerdown', e => {
+    const img = e.target.closest && (e.target.closest('img') || e.target.closest('.itc-foto, .photo-item, .galeria-thumb')?.querySelector('img'));
+    if (img && !img.closest('#fpvVista, #peEditor, #galeriaVisor')) _mouUltimaMini = { el: img, t: performance.now() };
+}, true);
+function mouMiniRecent() { return _mouUltimaMini && performance.now() - _mouUltimaMini.t < 1500 && _mouUltimaMini.el.isConnected ? _mouUltimaMini.el : null; }
+function mouRectVisible(el) {
+    if (!el || !el.isConnected) return null;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height || r.bottom < 0 || r.top > innerHeight) return null;
+    return r;
+}
+function mouRectContingut(img) {          // rectangle real de la foto dins d'un <img> amb object-fit: contain
+    const r = img.getBoundingClientRect(), nw = img.naturalWidth, nh = img.naturalHeight;
+    if (!nw || !nh || getComputedStyle(img).objectFit !== 'contain') return r;
+    const s = Math.min(r.width / nw, r.height / nh), w = nw * s, h = nh * s;
+    return { left: r.left + (r.width - w) / 2, top: r.top + (r.height - h) / 2, width: w, height: h };
+}
+function mouCarregada(img) {
+    return img.complete && img.naturalWidth ? Promise.resolve()
+        : new Promise(res => { img.addEventListener('load', res, { once: true }); img.addEventListener('error', res, { once: true }); setTimeout(res, 700); });
+}
+function mouClon(src, r, radi) {
+    const c = document.createElement('div');
+    c.className = 'mou-clon';
+    c.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${radi}px`;
+    const i = document.createElement('img'); i.src = src; i.alt = '';
+    c.appendChild(i); document.body.appendChild(c);
+    return c;
+}
+const _mouVol = (c, a, b, ra, rb, dur) => c.animate([
+    { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px', borderRadius: ra + 'px' },
+    { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px', borderRadius: rb + 'px' }
+], { duration: dur, easing: MOU_CORBA, fill: 'forwards' });
+/** Obre: la foto vola des de `mini` fins a `img` (que ja és dins de la vista oberta `capa`) */
+async function mouHeroObre(mini, img, capa) {
+    if (mouReduit()) return;
+    const r0 = mouRectVisible(mini);
+    capa.getAnimations().forEach(a => a.cancel());
+    capa.animate([{ opacity: 0 }, { opacity: 1 }], { duration: r0 ? 300 : 220, easing: 'ease-out' });
+    if (!r0) { img.animate([{ transform: 'scale(.94)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320, easing: MOU_CORBA }); return; }
+    await mouCarregada(img);
+    const r1 = mouRectContingut(img);
+    if (!r1.width) return;
+    img.style.visibility = 'hidden';
+    const c = mouClon(img.src, r0, 8);
+    try { await _mouVol(c, r0, r1, 8, 2, MOU_DUR).finished; } catch (e) {}
+    img.style.visibility = ''; c.remove();
+}
+/** Tanca: la foto torna a la miniatura (si encara es veu) i després es crida `fet()` */
+async function mouHeroTanca(mini, img, capa, fet) {
+    const r0 = !mouReduit() && img && img.src ? mouRectVisible(mini) : null;
+    if (mouReduit() || !img || !img.naturalWidth) { fet(); return; }
+    const r1 = mouRectContingut(img);
+    if (!r0) {
+        await capa.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.97)' }], { duration: 200, easing: 'ease-in' }).finished.catch(() => {});
+        fet(); return;
+    }
+    const c = mouClon(img.src, r1, 2);
+    img.style.visibility = 'hidden';
+    const fade = capa.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+    try { await _mouVol(c, r1, r0, 2, 8, 380).finished; } catch (e) {}
+    fet();
+    img.style.visibility = ''; fade.cancel();
+    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120 }).finished.then(() => c.remove(), () => c.remove());
+}
+
+/* Galeria: el visor s'obre des de la miniatura i hi torna */
+(function mouGaleria() {
+    if (typeof galeriaObrirVisor !== 'function') return;
+    const obre = galeriaObrirVisor;
+    galeriaObrirVisor = function (id) {
+        const jaObert = document.getElementById('galeriaVisor')?.classList.contains('open');
+        obre.apply(this, arguments);
+        if (jaObert) return;
+        const mini = document.querySelector(`.galeria-thumb[data-id="${id}"] img`) || mouMiniRecent();
+        mouHeroObre(mini, document.getElementById('visorImg'), document.getElementById('galeriaVisor'));
+    };
+})();
+function tancarVisorAnimat() {
+    const v = document.getElementById('galeriaVisor'), img = document.getElementById('visorImg');
+    if (!v || !v.classList.contains('open')) return;
+    const mini = visorCurrentId ? document.querySelector(`.galeria-thumb[data-id="${visorCurrentId}"] img`) : null;
+    mouHeroTanca(mini, img, v, tancarVisor);
+}
+
+/* Vista prèvia comuna (inventari, annex): ampliar des de la miniatura */
+(function mouVistaPrevia() {
+    if (typeof fpvObrir !== 'function') return;
+    const obre = fpvObrir, tanca = fpvTanca;
+    let mini = null;
+    fpvObrir = function () {
+        const jaOberta = document.getElementById('fpvVista')?.classList.contains('open');
+        mini = jaOberta ? mini : mouMiniRecent();
+        obre.apply(this, arguments);
+        if (!jaOberta) mouHeroObre(mini, document.getElementById('fpvImg'), document.getElementById('fpvVista'));
+    };
+    fpvTanca = function () {
+        const v = document.getElementById('fpvVista'), img = document.getElementById('fpvImg');
+        const args = arguments, self = this;
+        if (!v || !v.classList.contains('open')) return tanca.apply(self, args);
+        const m = mini; mini = null;
+        mouHeroTanca(m, img, v, () => tanca.apply(self, args));
+    };
+})();
+
+/* ── 3. Fulls inferiors: arrossegar cap avall per tancar ──── */
+(function mouArrossegaFulls() {
+    let d = null;
+    document.addEventListener('pointerdown', e => {
+        const asa = e.target.closest && e.target.closest('.fe-sheet-handle');
+        if (!asa) return;
+        const sh = asa.closest('.fe-sheet'), ov = sh && sh.closest('.fe-sheet-overlay.open');
+        if (!ov) return;
+        d = { sh, ov, y0: e.clientY, t0: performance.now(), dy: 0 };
+        try { asa.setPointerCapture(e.pointerId); } catch (x) {}
+        sh.style.transition = 'none';
+    });
+    document.addEventListener('pointermove', e => {
+        if (!d) return;
+        const dy = e.clientY - d.y0;
+        d.dy = dy > 0 ? dy : dy / 6;              // cap amunt, amb resistència
+        d.sh.style.transform = `translateY(${d.dy}px)`;
+    });
+    const solta = () => {
+        if (!d) return;
+        const { sh, ov, dy, t0 } = d; d = null;
+        const v = dy / Math.max(1, performance.now() - t0);
+        sh.style.transition = ''; sh.style.transform = '';
+        if (dy > 110 || (dy > 30 && v > 0.55)) ov.click();   // el clic al fons és el que ja tanca cada full
+    };
+    document.addEventListener('pointerup', solta);
+    document.addEventListener('pointercancel', solta);
+})();
 
 </script>
 
