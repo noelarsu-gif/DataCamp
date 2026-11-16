@@ -5901,6 +5901,77 @@ body.pd-noscroll { overflow: hidden; }
 .pd-li-acc button:disabled { opacity: .35; cursor: default; }
 .pd-li-acc .pd-x { color: var(--danger); }
 
+/* Comunicat: trams (carretera + marge + PK), rutes favorites i dades */
+.pd-confs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.pd-conf {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0;
+    padding: 10px 10px 9px; border-radius: 12px; cursor: pointer; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); font-family: var(--font);
+}
+.pd-conf .ico { font-size: 20px; color: var(--primary); margin-bottom: 4px; }
+.pd-conf b { font-size: .86rem; font-weight: 700; color: var(--dark); line-height: 1.15; }
+.pd-conf small { font-size: .74rem; color: var(--text-muted); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pd-conf.pendent { background: var(--primary-light); border: 1.5px dashed var(--primary); }
+.pd-conf.pendent small { color: var(--primary); font-weight: 700; }
+.pd-conf:active { transform: scale(0.97); }
+.pd-accions-tit { font-size: .72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+.pd-accions-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pd-accions-fila .btn { margin: 0 !important; width: 100%; }
+.pd-files { display: grid; gap: 8px; }
+.pd-files-buit { font-size: .85rem; color: var(--text-muted); padding: 12px; border: 1.5px dashed var(--border-dark); border-radius: 10px; margin: 0; text-align: center; }
+.pd-fila { padding: 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2, #f8fafc); display: grid; gap: 8px; }
+.pd-fila.nova { animation: pdFilaNova .9s var(--ease, ease-out); }
+@keyframes pdFilaNova { from { box-shadow: 0 0 0 3px var(--primary); } to { box-shadow: 0 0 0 0 transparent; } }
+.pd-fila-cap { display: flex; align-items: center; gap: 6px; }
+.pd-fila-cap .road-plate { min-width: 60px; justify-content: center; flex-shrink: 0; }
+.pd-marge { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(3, 1fr); border: 1.5px solid var(--border-dark); border-radius: 8px; overflow: hidden; }
+.pd-marge button {
+    min-height: 36px; border: 0; border-left: 1px solid var(--border-dark); background: var(--surface); cursor: pointer;
+    font-family: var(--font); font-size: .78rem; font-weight: 600; color: var(--text); padding: 0 2px;
+}
+.pd-marge button:first-child { border-left: 0; }
+.pd-marge button.on { background: var(--dark); color: #fff; }
+.pd-fila-x { width: 36px; height: 36px; flex-shrink: 0; display: grid; place-items: center; border: 0; background: none; color: var(--danger); cursor: pointer; font-size: 18px; border-radius: 8px; }
+.pd-fila-x:active { background: var(--danger-lt); }
+.pd-chip-n { min-width: 20px; height: 20px; border-radius: 10px; background: rgba(255,255,255,.9); color: var(--dark); font-size: .75rem; display: grid; place-items: center; padding: 0 5px; }
+.pd-afegir-sota { margin-top: 10px; }
+.pd-rutes-dia { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.pd-rutes-dia::-webkit-scrollbar { display: none; }
+.pd-rutes-dia .pd-configura { flex: 1; }
+.pd-ruta-chip {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px;
+    border-radius: 22px; cursor: pointer; border: 1.5px solid var(--dark); background: var(--surface); color: var(--dark);
+    font-family: var(--font);
+}
+.pd-ruta-chip .ico { font-size: 17px; color: var(--primary); }
+.pd-ruta-chip b { font-size: .92rem; font-weight: 700; white-space: nowrap; }
+.pd-ruta-chip small { font-size: .72rem; font-weight: 700; color: var(--text-muted); background: var(--surface-2, #f1f5f9); border-radius: 9px; padding: 1px 7px; }
+.pd-ruta-chip:active { transform: scale(0.96); background: var(--dark); color: #fff; }
+.pd-rutes-llista { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.pd-rutes-llista li { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.pd-rutes-llista li.pd-ajuda { border: 0; padding: 0; background: none; }
+.pd-ruta-li { flex: 1; min-width: 0; display: grid; gap: 6px; background: none; border: 0; padding: 2px 0; cursor: pointer; text-align: left; font-family: var(--font); }
+.pd-ruta-li-cap { display: flex; align-items: baseline; gap: 8px; }
+.pd-ruta-li-cap b { font-size: 1rem; color: var(--dark); }
+.pd-ruta-li-cap small { font-size: .78rem; color: var(--text-muted); }
+.pd-mes-n { font-size: .75rem; font-weight: 700; color: var(--text-muted); align-self: center; }
+.pd-tag-festiu { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: #fde2b0; color: #854f0b; align-self: center; }
+.pd-camps-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+.pd-camps-2 > div { min-width: 0; }
+.pd-camps-2 label { margin-bottom: 6px; }
+.pd-sheet input[type="time"] {
+    width: 100%; padding: 11px 12px; font-family: var(--font); font-size: 1rem; color: var(--dark);
+    border: 1.5px solid var(--border-dark); border-radius: 10px; background: var(--surface); box-sizing: border-box;
+}
+.pd-check-festiu { margin-bottom: 0 !important; min-height: 46px; padding: 0 10px; border: 1.5px solid var(--border-dark); border-radius: 10px; flex-wrap: wrap; row-gap: 0; }
+.pd-check-festiu small { flex-basis: 100%; margin: -8px 0 4px 28px; font-size: .72rem; color: var(--text-muted); font-weight: 500; }
+.pd-pdf-dia { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.pd-pdf-dia[hidden] { display: none; }
+.pd-pdf-dia .btn { margin: 0 !important; width: 100%; }
+.pd-vig-fitxer { font-size: .82rem; color: var(--text-muted); margin: 0 0 14px; }
+.pd-vig-fitxer b { color: var(--dark); font-family: var(--font-cond); letter-spacing: .3px; word-break: break-all; }
+#pdDesarComRuta { display: inline-flex; align-items: center; gap: 6px; }
+#pdDesarComRuta[hidden], #pdBuidarFiles[hidden], #pdGestionarRutes[hidden] { display: none; }
 /* Avís de privacitat */
 .pd-avis-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .pd-avis-cap h4 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
@@ -6851,7 +6922,16 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                 <div id="pdLlista" class="pd-llista"></div>
 
                 <div class="pd-accions">
-                    <button class="btn btn-primary" onclick="pdObrirExportar()">
+                    <span class="pd-accions-tit">Comunicats de la setmana en PDF</span>
+                    <div class="pd-accions-fila">
+                        <button class="btn btn-primary" onclick="pdPdfSetmana('compartir')">
+                            <svg class="ico" aria-hidden="true"><use href="#i-file"/></svg> Compartir
+                        </button>
+                        <button class="btn btn-ghost" onclick="pdPdfSetmana('descarregar')">
+                            <svg class="ico" aria-hidden="true"><use href="#i-download"/></svg> Descarregar
+                        </button>
+                    </div>
+                    <button class="btn btn-ghost" onclick="pdObrirExportar()">
                         <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg> Exportar al calendari
                     </button>
                 </div>
@@ -18057,34 +18137,127 @@ function pkmBack() {
 
         <div id="pdBlocTreball">
             <div class="pd-camp">
-                <div class="pd-label-fila"><label>Carreteres fetes</label>
+                <div class="pd-label-fila"><label>Carregar una ruta</label>
+                    <button type="button" class="pd-link pd-link-acc" id="pdGestionarRutes" onclick="pdObrirRutes()">Gestionar rutes</button></div>
+                <div id="pdRutesDia" class="pd-rutes-dia"></div>
+            </div>
+
+            <div class="pd-camp">
+                <div class="pd-label-fila"><label>Recorreguts realitzats</label>
+                    <button type="button" class="pd-link pd-link-perill" id="pdBuidarFiles" onclick="pdBuidarFiles()" hidden>Treure-ho tot</button></div>
+                <div id="pdFiles" class="pd-files"></div>
+                <button type="button" class="pd-link pd-link-acc" id="pdDesarComRuta" onclick="pdDesarComRuta()" hidden>
+                    <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg> Desar aquests trams com a ruta favorita
+                </button>
+            </div>
+
+            <div class="pd-camp">
+                <div class="pd-label-fila"><label>Afegir carretera</label>
                     <button type="button" class="pd-link pd-link-acc" id="pdEditarMeves" onclick="pdObrirCarreteres()">Editar les meves</button></div>
                 <div id="pdChips" class="pd-chips"></div>
-                <div id="pdTrams" class="pd-trams"></div>
-            </div>
-            <div class="pd-camp">
-                <label for="pdAltraInput">Afegir una altra</label>
-                <div class="pd-afegir">
+                <div class="pd-afegir pd-afegir-sota">
                     <input type="text" id="pdAltraInput" autocomplete="off" autocapitalize="characters"
-                           placeholder="C-26, LV-3022…" oninput="pdSuggerir('pdAltraInput','pdAltraSug',pdAfegirAlDia)"
-                           onkeydown="if(event.key==='Enter'){event.preventDefault();pdAfegirAlDia(this.value);}">
-                    <button type="button" class="btn btn-ghost btn-sm" onclick="pdAfegirAlDia(document.getElementById('pdAltraInput').value)">Afegir</button>
+                           placeholder="Una altra: C-26, LV-3022…" oninput="pdSuggerir('pdAltraInput','pdAltraSug',t=>pdAfegirFila('dia',t))"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();pdAfegirFila('dia',this.value);}">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="pdAfegirFila('dia',document.getElementById('pdAltraInput').value)">Afegir</button>
                 </div>
                 <div id="pdAltraSug" class="pd-sug"></div>
                 <div id="pdDesarLlista" class="pd-desar-llista" hidden></div>
             </div>
+
+            <div class="pd-camp pd-camps-2">
+                <div>
+                    <label for="pdHores">Hores</label>
+                    <input type="time" id="pdHores" value="07:00">
+                </div>
+                <label class="pd-check pd-check-festiu"><input type="checkbox" id="pdFestiu"> Festiu <small>dia festiu treballat</small></label>
+            </div>
+            <div class="pd-camp">
+                <label for="pdIncid">Incidència diària</label>
+                <input type="text" id="pdIncid" autocomplete="off" placeholder="Opcional">
+            </div>
         </div>
 
         <div class="pd-camp">
-            <label for="pdObs">Observacions (opcional)</label>
-            <textarea id="pdObs" rows="2" placeholder="Zona de company, incidències del dia…"></textarea>
+            <label for="pdObs" id="pdObsLabel">Anotacions incidències</label>
+            <textarea id="pdObs" rows="2" placeholder="Opcional"></textarea>
         </div>
 
         <button class="btn btn-primary btn-block" onclick="pdDesarDia()">Desar</button>
+        <div class="pd-pdf-dia" id="pdPdfDia">
+            <button type="button" class="btn btn-ghost" onclick="pdPdfDelDia('compartir')"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg> Compartir PDF</button>
+            <button type="button" class="btn btn-ghost" onclick="pdPdfDelDia('descarregar')"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg> Descarregar</button>
+        </div>
         <div class="pd-sheet-peu">
             <button type="button" class="pd-link pd-link-perill" id="pdEsborrarBtn" onclick="pdEsborrarDia()">Esborrar aquest dia</button>
             <button type="button" class="pd-link" onclick="pdTancarDia()">Cancel·lar</button>
         </div>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdRutesSheet" onclick="if(event.target===this)pdTancarRutes()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdRutesTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdRutesTitol">Les meves rutes</h4>
+        <p class="pd-ajuda">Les rutes que fas sovint, amb el nom que vulguis. Al comunicat de cada dia en tries una i s’omplen tots els trams de cop; després només cal tocar el que hagi canviat.</p>
+        <ul id="pdRutesLlista" class="pd-rutes-llista"></ul>
+        <button class="btn btn-ghost btn-block" onclick="pdEditarRuta(null)"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg> Nova ruta</button>
+        <button class="btn btn-primary btn-block" onclick="pdTancarRutes()">Fet</button>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdRutaSheet" onclick="if(event.target===this)pdTancarRuta()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdRutaTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdRutaTitol">Nova ruta</h4>
+        <div class="pd-camp">
+            <label for="pdRutaNom">Nom de la ruta</label>
+            <input type="text" id="pdRutaNom" autocomplete="off" maxlength="40" placeholder="Ex.: Ruta nord, Dilluns, Bàsica…">
+        </div>
+        <div class="pd-camp">
+            <label>Trams de la ruta</label>
+            <div id="pdRutaFiles" class="pd-files"></div>
+        </div>
+        <div class="pd-camp">
+            <label>Afegir carretera</label>
+            <div id="pdRutaChips" class="pd-chips"></div>
+            <div class="pd-afegir pd-afegir-sota">
+                <input type="text" id="pdRutaInput" autocomplete="off" autocapitalize="characters"
+                       placeholder="C-26, LV-3022…" oninput="pdSuggerir('pdRutaInput','pdRutaSug',t=>pdAfegirFila('ruta',t))"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();pdAfegirFila('ruta',this.value);}">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="pdAfegirFila('ruta',document.getElementById('pdRutaInput').value)">Afegir</button>
+            </div>
+            <div id="pdRutaSug" class="pd-sug"></div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="pdDesarRuta()">Desar ruta</button>
+        <div class="pd-sheet-peu">
+            <button type="button" class="pd-link pd-link-perill" id="pdRutaEsborrar" onclick="pdEsborrarRuta()">Esborrar ruta</button>
+            <button type="button" class="pd-link" onclick="pdTancarRuta()">Cancel·lar</button>
+        </div>
+    </div>
+</div>
+
+<div class="fe-sheet-overlay pd-overlay" id="pdVigSheet" onclick="if(event.target===this)pdTancarVig()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdVigTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="pdVigTitol">Les meves dades</h4>
+        <p class="pd-ajuda">Surten a la capçalera del comunicat oficial. Només cal posar-les un cop.</p>
+        <div class="pd-camp pd-camps-2">
+            <div><label for="pdVigNom">Nom</label><input type="text" id="pdVigNom" autocomplete="given-name" oninput="pdVigPrevia()"></div>
+            <div><label for="pdVigCognoms">Cognoms</label><input type="text" id="pdVigCognoms" autocomplete="family-name" oninput="pdVigPrevia()"></div>
+        </div>
+        <div class="pd-camp">
+            <label for="pdVigCategoria">Categoria</label>
+            <input type="text" id="pdVigCategoria" autocomplete="off" placeholder="Ex.: Tècnic explotació" list="pdVigCategories">
+            <datalist id="pdVigCategories"><option value="Tècnic explotació"></option></datalist>
+        </div>
+        <div class="pd-camp pd-camps-2">
+            <div><label for="pdVigVehicle">Vehicle (matrícula)</label><input type="text" id="pdVigVehicle" autocomplete="off" autocapitalize="characters" placeholder="0000ABC"></div>
+            <div><label for="pdVigHores">Hores laborals</label><input type="time" id="pdVigHores" value="07:00"></div>
+        </div>
+        <p class="pd-vig-fitxer">Els PDF es diran: <b id="pdVigFitxer">—</b></p>
+        <button class="btn btn-primary btn-block" onclick="pdDesarVig()">Desar</button>
+        <div class="pd-sheet-peu"><span></span><button type="button" class="pd-link" onclick="pdTancarVig()">Cancel·lar</button></div>
     </div>
 </div>
 
@@ -18320,7 +18493,7 @@ function pdNetejaTrams(o) {
     return net;
 }
 function pdSnapshotBackup() {
-    return { dies: [...pdDies.values()], carreteres: pdLlista(), colors: pdColors(), trams: pdTramsLlista() };
+    return { dies: [...pdDies.values()], carreteres: pdLlista(), colors: pdColors(), trams: pdTramsLlista(), rutes: pdRutes(), vigilant: pdVig() };
 }
 async function pdImportarBackup(obj) {
     if (!obj || typeof obj !== 'object') return 0;
@@ -18328,11 +18501,18 @@ async function pdImportarBackup(obj) {
     let n = 0;
     for (const r of (Array.isArray(obj.dies) ? obj.dies : [])) {
         if (!r || !/^\d{4}-\d{2}-\d{2}$/.test(r.data)) continue;
-        await pdGuarda({
-            data: r.data,
-            tipus: r.tipus === 'festa' ? 'festa' : 'treball',
+        const tipus = r.tipus === 'festa' ? 'festa' : 'treball';
+        const files = tipus === 'festa' ? [] : pdNetejaFiles(pdFilesDe({
+            files: r.files,
             carreteres: Array.isArray(r.carreteres) ? r.carreteres.map(pdNormalitza).filter(Boolean) : [],
-            trams: pdNetejaTrams(r.trams),
+            trams: pdNetejaTrams(r.trams)
+        }));
+        await pdGuarda({
+            data: r.data, tipus, files,
+            carreteres: [...new Set(files.map(f => f.c))],
+            festiu: !!r.festiu,
+            hores: /^\d{2}:\d{2}$/.test(r.hores || '') ? r.hores : '',
+            incid: String(r.incid || ''),
             obs: String(r.obs || ''),
             updatedAt: Number(r.updatedAt) || Date.now()
         });
@@ -18352,6 +18532,22 @@ async function pdImportarBackup(obj) {
         const cols = pdColors();
         Object.entries(obj.colors).forEach(([c, k]) => { if (PD_COLORS[k]) cols[pdNormalitza(c)] = k; });
         pdDesaColors(cols);
+    }
+    if (Array.isArray(obj.rutes)) {
+        const rutes = pdRutes();
+        obj.rutes.forEach(r => {
+            if (!r || !String(r.nom || '').trim()) return;
+            const net = { id: String(r.id || ('r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5))), nom: String(r.nom).trim().slice(0, 40),
+                files: pdNetejaFiles(r.files).map(({ c, ini, fi, marge }) => ({ c, ini, fi, marge })) };
+            if (!net.files.length) return;
+            const i = rutes.findIndex(x => x.id === net.id || x.nom.toLowerCase() === net.nom.toLowerCase());
+            if (i >= 0) rutes[i] = net; else rutes.push(net);
+        });
+        pdDesaRutes(rutes);
+    }
+    if (obj.vigilant && typeof obj.vigilant === 'object' && !pdVigComplet()) {
+        const v = obj.vigilant, t = x => String(x || '').trim().slice(0, 60);
+        pdDesaVig({ nom: t(v.nom), cognoms: t(v.cognoms), categoria: t(v.categoria), vehicle: t(v.vehicle).toUpperCase(), hores: /^\d{2}:\d{2}$/.test(v.hores || '') ? v.hores : '07:00' });
     }
     pdRenderHomeCard();
     pdPintaLocalitzador();
@@ -18386,18 +18582,15 @@ function pdAnarAvui() { pdDilluns = pdDillunsDe(new Date()); pdRenderSetmana(); 
 function pdRenderMeves() {
     const box = document.getElementById('pdMeves');
     if (!box) return;
-    const l = pdLlista();
-    if (!l.length) {
-        box.innerHTML = '<button type="button" class="pd-configura pd-configura-gran" onclick="pdObrirCarreteres()">'
-            + '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>'
-            + '<span><b>Configura les teves carreteres</b><small>Les que fas habitualment, amb el seu tram i color. Després cada dia només caldrà marcar-les.</small></span>'
-            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
-        return;
-    }
-    box.innerHTML = '<button type="button" class="pd-meves" onclick="pdObrirCarreteres()">'
-        + '<span class="pd-meves-tit">Les meves carreteres</span>'
-        + '<span class="pd-meves-plaques">' + l.map(c => '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>').join('') + '</span>'
-        + '<span class="pd-meves-ed">Editar</span></button>';
+    const nR = pdRutes().length, nC = pdLlista().length, vOk = pdVigComplet();
+    const v = pdVig();
+    const tile = (cls, fn, ico, tit, sub) => '<button type="button" class="pd-conf' + cls + '" onclick="' + fn + '()">'
+        + '<svg class="ico" aria-hidden="true"><use href="#' + ico + '"/></svg><b>' + tit + '</b><small>' + sub + '</small></button>';
+    box.innerHTML = '<div class="pd-confs">'
+        + tile(nR ? '' : ' pendent', 'pdObrirRutes', 'i-map', 'Rutes', nR ? nR + (nR === 1 ? ' ruta' : ' rutes') : 'Crea-les')
+        + tile(nC ? '' : ' pendent', 'pdObrirCarreteres', 'i-road', 'Carreteres', nC ? nC + ' meves' : 'Configura')
+        + tile(vOk ? '' : ' pendent', 'pdObrirVig', 'i-edit', 'Les meves dades', vOk ? pdEsc(v.nom) : 'Falten')
+        + '</div>';
 }
 function pdRenderSetmana() {
     pdRenderMeves();
@@ -18420,9 +18613,10 @@ function pdRenderSetmana() {
         if (r && r.tipus === 'festa') {
             cls += ' festa';
             cos = '<span class="pd-tag-festa">Festa</span>' + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
-        } else if (r && r.carreteres.length) {
-            cos = '<span class="pd-plaques">' + r.carreteres.map(c => '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>').join('') + '</span>'
-                + (r.obs ? '<span class="pd-obs">' + pdEsc(r.obs) + '</span>' : '');
+        } else if (r && pdFilesDe(r).length) {
+            const fl = pdFilesDe(r);
+            cos = '<span class="pd-plaques">' + (r.festiu ? '<span class="pd-tag-festiu">Festiu</span>' : '') + pdPlaquesMini(fl, 8) + '</span>'
+                + '<span class="pd-obs">' + fl.length + (fl.length === 1 ? ' tram' : ' trams') + (r.obs ? ' · ' + pdEsc(r.obs) : '') + '</span>';
         } else {
             cls += ' buit';
             cos = '<span class="pd-buit">' + (esAvui ? 'Toca per afegir la ruta d\u2019avui' : 'Sense registre') + '</span>';
@@ -18449,27 +18643,468 @@ function pdRenderHomeCard() {
     else { el.textContent = 'Encara no has apuntat la ruta d\u2019avui'; card?.classList.remove('fet'); }
 }
 
+/* ── Comunicat diari de vigilància: PDF oficial ─────────────────
+   Reprodueix el formulari «Form_comunicats» (Access) de la Direcció
+   General de Carreteres: A4 apaisat, mateixes mides, colors i logo.
+   Coordenades en punts (pt), mesurades sobre un comunicat original. */
+const CT_CAP_RECTS = [[18.0,18.0,802.68,59.64,[198,217,241]],[21.0,21.0,280.56,0.96,[160,160,160]],[21.0,21.0,0.96,51.0,[160,160,160]],[300.48,21.96,1.08,50.04,[255,255,255]],[21.96,71.04,279.6,0.96,[255,255,255]],[21.96,21.96,278.52,1.08,[100,100,100]],[21.96,21.96,1.08,49.08,[100,100,100]],[299.52,23.04,0.96,48.0,[240,240,240]],[23.04,69.96,277.44,1.08,[240,240,240]],[23.04,23.04,276.48,46.92,[255,255,255]],[306.72,83.64,8.04,8.16,[255,255,255]],[306.6,83.52,8.16,8.28,null,[0,0,0],0.38],[360.48,79.56,458.28,0.96,[160,160,160]],[360.48,79.56,1.08,47.28,[160,160,160]],[817.8,80.52,0.96,46.32,[255,255,255]],[361.56,125.88,457.2,0.96,[255,255,255]],[361.56,80.52,456.24,0.96,[255,255,255]],[361.56,80.52,0.96,45.36,[255,255,255]],[816.72,81.48,1.08,44.4,[160,160,160]],[362.52,124.92,455.28,0.96,[160,160,160]],[360.96,133.44,456.36,0.12,[166,166,166]],[817.2,133.44,0.12,15.96,[166,166,166]],[360.96,149.28,456.36,0.12,[166,166,166]],[360.96,133.44,0.12,15.96,[166,166,166]],[443.4,85.8,83.64,15.72,[255,255,255]],[527.16,85.8,1.2,15.72,[255,255,255]],[443.28,85.68,85.2,0.12,[166,166,166]],[528.36,85.68,0.12,15.96,[166,166,166]],[443.28,101.52,85.2,0.12,[166,166,166]],[443.28,85.68,0.12,15.96,[166,166,166]]];
+const CT_COLS = [21.0, 56.04, 101.04, 148.44, 191.04, 236.04, 270.96];   // HORA · PK INICI · CRTRA · MARGE · PK FINAL · HORA
+const CT_FILA = 15.48, CT_TAULA_Y = 181.56, CT_PEU_Y = 572;
+const CT_GRIS_ETQ = [127, 127, 127], CT_GRIS_VAL = [64, 64, 64], CT_BLAU_NOM = [16, 37, 63];
+
+let _ctAssetsPromesa = null;
+function ctCarregaAssets() {
+    if (window.CT_ASSETS) return Promise.resolve(window.CT_ASSETS);
+    if (_ctAssetsPromesa) return _ctAssetsPromesa;
+    _ctAssetsPromesa = new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = './lib/comunicat/comunicat_assets.js';
+        s.onload = () => window.CT_ASSETS ? res(window.CT_ASSETS) : rej(new Error('assets'));
+        s.onerror = () => { _ctAssetsPromesa = null; rej(new Error('No s’han pogut carregar els recursos del PDF')); };
+        document.head.appendChild(s);
+    });
+    return _ctAssetsPromesa;
+}
+
+/** PK intern «120+350» → format del comunicat «120,350» */
+function ctPK(v) {
+    const m = /^(\d+)\+(\d{1,3})$/.exec(String(v || '').trim());
+    return m ? Number(m[1]) + ',' + m[2].padStart(3, '0') : String(v || '');
+}
+/** 'AAAA-MM-DD' → 'DD/MM/AAAA' (format del formulari oficial) */
+function ctData(iso) { const [a, m, d] = iso.split('-'); return d + '/' + m + '/' + a; }
+
+/**
+ * Dibuixa un comunicat a `doc` (pàgina actual).
+ * dia: { data, festiu, hores, incid, obs, files:[{c, ini, fi, marge, hi, hf}] }
+ * vig: { nom, cognoms, categoria, vehicle, hores }
+ */
+function ctDibuixa(doc, dia, vig, logo) {
+    const txt = (s, x, top, mida, color, opts) => {
+        doc.setFontSize(mida); doc.setTextColor(color[0], color[1], color[2]);
+        doc.text(String(s), x, top + mida * 0.75, Object.assign({ baseline: 'alphabetic' }, opts || {}));
+    };
+    const encaixa = (s, ample, mida, min) => {   // redueix la lletra si el text no hi cap
+        let m = mida; doc.setFontSize(m);
+        while (m > min && doc.getTextWidth(String(s)) > ample) { m -= 0.5; doc.setFontSize(m); }
+        return m;
+    };
+    const rect = (x, y, w, h, fill, stroke, lw) => {
+        if (fill) { doc.setFillColor(fill[0], fill[1], fill[2]); doc.rect(x, y, w, h, 'F'); }
+        else { doc.setDrawColor(stroke[0], stroke[1], stroke[2]); doc.setLineWidth(lw); doc.rect(x, y, w, h, 'S'); }
+    };
+    const paginaCap = () => {
+        CT_CAP_RECTS.forEach(r => rect(r[0], r[1], r[2], r[3], r[4], r[5], r[6]));
+        doc.addImage(logo, 'JPEG', 24.72, 25.56, 273.72, 42.72, 'logoDGC', 'NONE');
+        txt('GESTIÓ SISTEMATITZADA DE MANTENIMENT', 816.02, 22.03, 14, CT_GRIS_ETQ, { align: 'right' });
+        txt('COMUNICAT DIARI DE VIGILÀNCIA', 816.15, 41.62, 12, CT_GRIS_ETQ, { align: 'right' });
+        // Esquerra: data, festiu, hores, signatura
+        txt('Data', 29.76, 86.87, 11, CT_GRIS_ETQ);
+        txt(ctData(dia.data), 87.00, 86.87, 11, CT_GRIS_VAL);
+        txt('Festiu', 264.48, 86.87, 11, CT_GRIS_ETQ);
+        if (dia.festiu) {
+            doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.9);
+            doc.line(308.2, 87.9, 310.2, 90.1); doc.line(310.2, 90.1, 313.4, 85.2);
+        }
+        txt('Hores', 264.48, 104.99, 11, CT_GRIS_ETQ);
+        if (dia.hores) txt(dia.hores, 301.44, 103.91, 11, CT_GRIS_VAL);
+        txt('Signatura:', 21.24, 106.31, 11, CT_GRIS_ETQ);
+        // Requadre del vigilant
+        txt('Vigilant', 381.48, 89.03, 11, CT_GRIS_ETQ);
+        if (vig.nom) txt(vig.nom, 443.88, 89.15, encaixa(vig.nom, 82, 11, 7), CT_BLAU_NOM);
+        if (vig.cognoms) txt(vig.cognoms, 554.16, 89.87, encaixa(vig.cognoms, 116, 11, 7), CT_GRIS_VAL);
+        txt('Categoria', 675.48, 89.87, 11, CT_GRIS_ETQ);
+        if (vig.categoria) txt(vig.categoria, 727.20, 90.11, encaixa(vig.categoria, 88, 11, 7), CT_GRIS_VAL);
+        txt('Hores laborals', 556.56, 109.67, 11, CT_GRIS_ETQ);
+        if (vig.hores) txt(vig.hores, 633.96, 109.79, 11, CT_GRIS_VAL);
+        txt('Vehicle', 675.48, 109.31, 11, CT_GRIS_ETQ);
+        if (vig.vehicle) txt(vig.vehicle, 720.96, 109.43, encaixa(vig.vehicle, 94, 11, 7), CT_GRIS_VAL);
+        // Incidència diària
+        txt('Incidencia diaria', 276.48, 136.91, 11, CT_GRIS_ETQ);
+        if (dia.incid) txt(dia.incid, 364.5, 136.91, encaixa(dia.incid, 449, 11, 7), CT_GRIS_VAL);
+        txt('RECORREGUTS REALITZATS', 21.48, 159.83, 11, CT_GRIS_ETQ);
+        txt('ANOTACIONS INCIDÈNCIES', 290.76, 159.47, 11, CT_GRIS_ETQ);
+    };
+    const taula = (files) => {
+        const n = files.length, x0 = CT_COLS[0], ample = CT_COLS[6] - CT_COLS[0];
+        const alt = 12.96 + n * CT_FILA + 0.24;
+        rect(x0, 168.6, ample, alt, [255, 255, 255]);
+        for (let i = 1; i < n; i += 2) rect(x0, CT_TAULA_Y + i * CT_FILA + 0.12, ample, CT_FILA, [242, 242, 242]);
+        // Capçalera de columnes
+        const capX = [[21.12, 34.92], [56.16, 44.88], [101.16, 47.28], [148.68, 42.36], [191.16, 44.88], [236.16, 34.8]];
+        capX.forEach(([x, w]) => rect(x, 168.6, w, 12.96, [240, 240, 240]));
+        [56.04, 101.04, 148.44, 191.04, 236.04].forEach(x => rect(x, 168.6, 0.48, 12.96, [177, 181, 186]));
+        ['HORA', 'PK INICI', 'CRTRA', 'MARGE', 'PK FINAL', 'HORA'].forEach((t, i) =>
+            txt(t, (CT_COLS[i] + CT_COLS[i + 1]) / 2 + 0.24, 171.72, 10, [0, 0, 0], { align: 'center' }));
+        // Quadrícula
+        rect(x0, 181.08, ample, 0.48, [127, 127, 127]);
+        for (let i = 1; i <= n; i++) rect(x0, CT_TAULA_Y + i * CT_FILA - 0.0, ample, 0.48, [127, 127, 127]);
+        [56.04, 101.04, 148.44, 191.04, 236.04].forEach(x => rect(x, CT_TAULA_Y, 0.48, n * CT_FILA + 0.24, [127, 127, 127]));
+        // Vora exterior
+        const vora = [177, 181, 186];
+        rect(x0, 168.6, ample + 0.48, 0.48, vora);
+        rect(CT_COLS[6], 168.6, 0.48, alt + 0.6, vora);
+        rect(x0, 168.6 + alt, ample + 0.48, 0.6, vora);
+        rect(x0, 168.6, 0.6, alt + 0.6, vora);
+        // Contingut
+        files.forEach((f, i) => {
+            const top = CT_TAULA_Y + i * CT_FILA + 3.24;
+            const cel = (s, col) => { if (!s) return; const w = CT_COLS[col + 1] - CT_COLS[col] - 3;
+                txt(s, (CT_COLS[col] + CT_COLS[col + 1]) / 2 + 0.24, top, encaixa(s, w, 10, 6.5), [0, 0, 0], { align: 'center' }); };
+            cel(f.hi, 0); cel(ctPK(f.ini), 1); cel(f.c, 2); cel(f.marge, 3); cel(ctPK(f.fi), 4); cel(f.hf, 5);
+        });
+    };
+    const anotacions = (linies) => {
+        linies.forEach((l, i) => txt(l, 290.76, 176 + i * 13, 10, CT_GRIS_VAL));
+    };
+
+    // Paginació: si hi ha més files o anotacions de les que caben, es continua a una altra pàgina
+    const maxFiles = Math.floor((CT_PEU_Y - CT_TAULA_Y) / CT_FILA);
+    doc.setFontSize(10);
+    const linies = dia.obs ? doc.splitTextToSize(String(dia.obs), 526) : [];
+    const maxLinies = Math.floor((CT_PEU_Y - 176) / 13);
+    const files = dia.files || [];
+    const pagines = Math.max(1, Math.ceil(files.length / maxFiles), Math.ceil(linies.length / maxLinies));
+    for (let p = 0; p < pagines; p++) {
+        if (p > 0) doc.addPage('a4', 'landscape');
+        paginaCap();
+        taula(files.slice(p * maxFiles, (p + 1) * maxFiles));
+        anotacions(linies.slice(p * maxLinies, (p + 1) * maxLinies));
+    }
+}
+
+/** Crea el PDF d'un dia. Retorna un Blob. */
+async function ctPdfDia(dia, vig) {
+    const A = await ctCarregaAssets();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'landscape', compress: true });
+    doc.addFileToVFS('Carlito-Regular.ttf', A.font);
+    doc.addFont('Carlito-Regular.ttf', 'Carlito', 'normal');
+    doc.setFont('Carlito', 'normal');
+    doc.setProperties({ title: 'Form_comunicats', subject: 'Comunicat diari de vigilància', author: [vig.cognoms, vig.nom].filter(Boolean).join(', '), creator: 'DataCamp' });
+    ctDibuixa(doc, dia, vig, A.logo);
+    return doc.output('blob');
+}
+
+/** Nom oficial del fitxer: AAAAMMDD_COGNOM.pdf (primer cognom, en majúscules) */
+function ctNomFitxer(iso, vig) {
+    const base = String((vig.cognoms || '').trim().split(/\s+/)[0] || vig.nom || 'VIGILANT');
+    const net = base.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9Ç·\-]/g, '');
+    return iso.replace(/-/g, '') + '_' + (net || 'VIGILANT') + '.pdf';
+}
+
+/* ── Dades del vigilant (capçalera del comunicat oficial) ──── */
+const PD_KEY_VIG = 'pd_vigilant';
+function pdVig() {
+    try { const v = JSON.parse(localStorage.getItem(PD_KEY_VIG) || '{}'); return (v && typeof v === 'object') ? v : {}; }
+    catch (e) { return {}; }
+}
+function pdDesaVig(o) { try { localStorage.setItem(PD_KEY_VIG, JSON.stringify(o)); } catch (e) {} }
+function pdVigComplet(v) { v = v || pdVig(); return !!(String(v.nom || '').trim() && String(v.cognoms || '').trim()); }
+function pdHoresDefecte() { return pdVig().hores || '07:00'; }
+let pdPdfPendent = null;            // acció de PDF que espera que s'omplin les dades
+
+function pdObrirVig() {
+    const v = pdVig();
+    let nom = v.nom || '', cognoms = v.cognoms || '';
+    if (!nom && !cognoms) {         // primer cop: aprofita el nom del tècnic de l'app
+        try {
+            const t = JSON.parse(localStorage.getItem('tecnic_dades') || 'null');
+            if (t && t.nom) { const p = String(t.nom).trim().split(/\s+/); nom = p.shift() || ''; cognoms = p.join(' '); }
+        } catch (e) {}
+    }
+    document.getElementById('pdVigNom').value = nom;
+    document.getElementById('pdVigCognoms').value = cognoms;
+    document.getElementById('pdVigCategoria').value = v.categoria || '';
+    document.getElementById('pdVigVehicle').value = v.vehicle || '';
+    document.getElementById('pdVigHores').value = v.hores || '07:00';
+    pdVigPrevia();
+    pdObreSheet('pdVigSheet');
+}
+function pdTancarVig() { pdTancaSheet('pdVigSheet'); pdPdfPendent = null; }
+function pdLlegeixVig() {
+    const v = id => document.getElementById(id).value.trim();
+    return {
+        nom: v('pdVigNom'), cognoms: v('pdVigCognoms'), categoria: v('pdVigCategoria'),
+        vehicle: v('pdVigVehicle').toUpperCase().replace(/[\s-]+/g, ''), hores: v('pdVigHores') || '07:00'
+    };
+}
+function pdVigPrevia() { document.getElementById('pdVigFitxer').textContent = ctNomFitxer(pdISO(new Date()), pdLlegeixVig()); }
+function pdDesarVig() {
+    const v = pdLlegeixVig();
+    if (!v.nom || !v.cognoms) { showToast('Cal el nom i els cognoms: surten al comunicat i al nom del PDF'); return; }
+    pdDesaVig(v);
+    pdTancaSheet('pdVigSheet');
+    pdRenderMeves();
+    showToast('Dades desades');
+    const f = pdPdfPendent; pdPdfPendent = null;
+    if (f) f();
+}
+
+/* ── Trams del comunicat: carretera + marge + PK inici / fi ──── */
+const PD_MARGES = ['Dreta', 'Esquerra', 'Ambdós'];
+const pdEd = { dia: null, ruta: null };     // editors oberts: { files: [...] }
+const PD_ED_DOM = {
+    dia:  { files: 'pdFiles',     chips: 'pdChips',     input: 'pdAltraInput', sug: 'pdAltraSug' },
+    ruta: { files: 'pdRutaFiles', chips: 'pdRutaChips', input: 'pdRutaInput',  sug: 'pdRutaSug' }
+};
+function pdMarge(m) {
+    const t = String(m || '').trim().toLowerCase();
+    return t.startsWith('d') ? 'Dreta' : t.startsWith('e') ? 'Esquerra' : 'Ambdós';
+}
+/** Files d'un registre (els comunicats antics només tenien carreteres + trams) */
+function pdFilesDe(r) {
+    if (!r) return [];
+    if (Array.isArray(r.files)) return r.files;
+    return (r.carreteres || []).map(c => {
+        const t = (r.trams || {})[c] || {};
+        return { c, ini: t.ini || '', fi: t.fi || '', marge: 'Ambdós', hi: '', hf: '' };
+    });
+}
+function pdNetejaFiles(arr) {
+    const hora = h => /^\d{2}:\d{2}$/.test(String(h || '')) ? h : '';
+    return (Array.isArray(arr) ? arr : []).map(f => f && typeof f === 'object' ? {
+        c: pdNormalitza(f.c), ini: pdParsePK(f.ini) || '', fi: pdParsePK(f.fi) || '',
+        marge: pdMarge(f.marge), hi: hora(f.hi), hf: hora(f.hf)
+    } : null).filter(f => f && f.c);
+}
+function pdNovaFila(c) { const t = pdTramDefecte(c); return { c, ini: t.ini, fi: t.fi, marge: 'Ambdós', hi: '', hf: '' }; }
+
+function pdRenderFiles(k) {
+    const ed = pdEd[k], box = document.getElementById(PD_ED_DOM[k].files);
+    if (!ed || !box) return;
+    if (!ed.files.length) {
+        box.innerHTML = '<p class="pd-files-buit">' + (k === 'dia'
+            ? 'Encara no hi ha cap tram. Carrega una ruta o afegeix carreteres a sota.'
+            : 'Afegeix a sota les carreteres que fas en aquesta ruta.') + '</p>';
+    } else {
+        box.innerHTML = ed.files.map((f, i) => {
+            const nom = pdEsc(f.c);
+            const inp = (q, ph) => '<input type="text" inputmode="decimal" autocomplete="off" class="pd-pk-inp" data-ed="' + k + '" data-i="' + i + '" data-k="' + q + '"'
+                + ' value="' + pdEsc(f[q] || '') + '" placeholder="' + ph + '" aria-label="' + ph + ' de ' + nom + ' (tram ' + (i + 1) + ')"'
+                + ' oninput="this.classList.remove(\'err\')" onchange="pdFilaPK(this)">';
+            return '<div class="pd-fila">'
+                + '<div class="pd-fila-cap">'
+                + '<span class="road-plate"' + pdEstilPlaca(f.c) + '>' + nom + '</span>'
+                + '<span class="pd-marge" role="group" aria-label="Marge de ' + nom + '">'
+                + PD_MARGES.map(m => '<button type="button"' + (f.marge === m ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"')
+                    + ' onclick="pdFilaMarge(\'' + k + '\',' + i + ',\'' + m + '\')">' + m + '</button>').join('')
+                + '</span>'
+                + '<button type="button" class="pd-fila-x" aria-label="Treure ' + nom + '" onclick="pdFilaTreu(\'' + k + '\',' + i + ')"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>'
+                + '</div>'
+                + '<div class="pd-tram-ins">' + inp('ini', 'PK inici') + '<span class="pd-tram-fl">→</span>' + inp('fi', 'PK final') + '</div>'
+                + '</div>';
+        }).join('');
+    }
+    pdRenderAfegir(k);
+    if (k === 'dia') {
+        const hi = ed.files.length > 0;
+        document.getElementById('pdBuidarFiles').hidden = !hi;
+        document.getElementById('pdDesarComRuta').hidden = !hi;
+    }
+}
+/** Xips de «Les meves carreteres»: un toc afegeix un tram (es pot repetir amb un altre marge) */
+function pdRenderAfegir(k) {
+    const cont = document.getElementById(PD_ED_DOM[k].chips);
+    const llista = pdLlista();
+    if (k === 'dia') { const ed = document.getElementById('pdEditarMeves'); if (ed) ed.hidden = !llista.length; }
+    if (!llista.length) {
+        cont.innerHTML = '<button type="button" class="pd-configura" onclick="pdObrirCarreteres()">'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>'
+            + '<span><b>Configura les teves carreteres</b><small>Així només caldrà tocar-les per afegir-les. També pots escriure’n una a sota.</small></span>'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
+        return;
+    }
+    const compte = {};
+    (pdEd[k] ? pdEd[k].files : []).forEach(f => { compte[f.c] = (compte[f.c] || 0) + 1; });
+    cont.innerHTML = llista.map(c => {
+        const n = compte[c] || 0;
+        return '<button type="button" class="pd-chip' + (n ? ' on' : '') + '"' + pdEstilPlaca(c) + ' aria-label="Afegir ' + pdEsc(c) + '" onclick="pdAfegirFila(\'' + k + '\',\'' + pdEsc(c) + '\')">'
+            + (n ? '<span class="pd-chip-n">' + n + '</span>' : '<svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>') + pdEsc(c) + '</button>';
+    }).join('');
+}
+function pdFilaMarge(k, i, m) {
+    if (!pdEd[k] || !pdEd[k].files[i]) return;
+    pdLlegeixFiles(k, true);
+    pdEd[k].files[i].marge = pdMarge(m);
+    pdRenderFiles(k);
+}
+function pdFilaTreu(k, i) {
+    if (!pdEd[k]) return;
+    pdLlegeixFiles(k, true);
+    pdEd[k].files.splice(i, 1);
+    pdRenderFiles(k);
+}
+function pdFilaPK(el, silenci) {
+    const v = pdParsePK(el.value);
+    if (v === null) { el.classList.add('err'); if (!silenci) showToast('PK no vàlid. Exemple: 120+350'); return false; }
+    el.classList.remove('err');
+    el.value = v;
+    const ed = pdEd[el.dataset.ed];
+    if (ed && ed.files[+el.dataset.i]) ed.files[+el.dataset.i][el.dataset.k] = v;
+    return true;
+}
+/** Llegeix els PK escrits (encara que no s'hagi disparat «change»). Retorna false si n'hi ha cap de malament */
+function pdLlegeixFiles(k, silenci) {
+    let ok = true;
+    document.querySelectorAll('#' + PD_ED_DOM[k].files + ' .pd-pk-inp').forEach(el => { if (!pdFilaPK(el, true)) ok = false; });
+    if (!ok && !silenci) showToast('Revisa els PK marcats en vermell (ex.: 120+350)');
+    return ok;
+}
+function pdAfegirFila(k, txt) {
+    const c = pdNormalitza(txt);
+    if (!c || !pdEd[k]) return;
+    pdLlegeixFiles(k, true);
+    pdEd[k].files.push(pdNovaFila(c));
+    const d = PD_ED_DOM[k];
+    document.getElementById(d.input).value = '';
+    document.getElementById(d.sug).innerHTML = '';
+    pdRenderFiles(k);
+    const files = document.querySelectorAll('#' + d.files + ' .pd-fila');
+    const ult = files[files.length - 1];
+    if (ult) { ult.classList.add('nova'); try { ult.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
+    if (k === 'dia') {
+        const box = document.getElementById('pdDesarLlista');
+        if (!pdLlista().includes(c)) {
+            box.innerHTML = '<span>Vols desar <span class="road-plate">' + pdEsc(c) + '</span> a les teves carreteres?</span>'
+                + '<button type="button" class="pd-link" onclick="pdAfegirALlista(\'' + pdEsc(c) + '\',true)">Desar-la</button>';
+            box.hidden = false;
+        } else box.hidden = true;
+    }
+}
+
+/* ── Rutes favorites (amb nom) ─────────────────────────────── */
+const PD_KEY_RUTES = 'pd_rutes';
+function pdRutes() {
+    try { const v = JSON.parse(localStorage.getItem(PD_KEY_RUTES) || '[]'); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+}
+function pdDesaRutes(a) { try { localStorage.setItem(PD_KEY_RUTES, JSON.stringify(a)); } catch (e) {} }
+function pdPlaquesMini(files, max) {
+    const uniq = [...new Set(files.map(f => f.c))];
+    return uniq.slice(0, max).map(c => '<span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>').join('')
+        + (uniq.length > max ? '<span class="pd-mes-n">+' + (uniq.length - max) + '</span>' : '');
+}
+function pdRenderRutesDia() {
+    const box = document.getElementById('pdRutesDia');
+    if (!box) return;
+    const rutes = pdRutes();
+    document.getElementById('pdGestionarRutes').hidden = !rutes.length;
+    if (!rutes.length) {
+        box.innerHTML = '<button type="button" class="pd-configura" onclick="pdObrirRutes()">'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-map"/></svg>'
+            + '<span><b>Crea les teves rutes favorites</b><small>Posa-li el nom que vulguis i, cada dia, carrega tots els trams d’un toc.</small></span>'
+            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
+        return;
+    }
+    box.innerHTML = rutes.map(r => '<button type="button" class="pd-ruta-chip" onclick="pdCarregaRuta(\'' + pdEsc(r.id) + '\')">'
+        + '<svg class="ico" aria-hidden="true"><use href="#i-map"/></svg><b>' + pdEsc(r.nom) + '</b><small>' + r.files.length + '</small></button>').join('');
+}
+function pdCarregaRuta(id) {
+    const r = pdRutes().find(x => x.id === id);
+    if (!r || !pdEd.dia) return;
+    pdLlegeixFiles('dia', true);
+    const abans = pdEd.dia.files.length;
+    pdEd.dia.files.push(...pdNetejaFiles(r.files));
+    pdRenderFiles('dia');
+    showToast(abans ? 'Afegits els ' + r.files.length + ' trams de «' + r.nom + '»' : 'Ruta «' + r.nom + '» carregada');
+}
+function pdBuidarFiles() {
+    if (!pdEd.dia || !pdEd.dia.files.length) return;
+    if (!confirm('Vols treure tots els trams d’aquest dia?')) return;
+    pdEd.dia.files = [];
+    pdRenderFiles('dia');
+}
+function pdObrirRutes() { pdRenderLlistaRutes(); pdObreSheet('pdRutesSheet'); }
+function pdTancarRutes() { pdTancaSheet('pdRutesSheet'); pdRenderMeves(); if (pdEd.dia) pdRenderRutesDia(); }
+function pdRenderLlistaRutes() {
+    const ul = document.getElementById('pdRutesLlista');
+    const rutes = pdRutes();
+    if (!rutes.length) { ul.innerHTML = '<li class="pd-ajuda">Encara no en tens cap.</li>'; return; }
+    ul.innerHTML = rutes.map((r, i) => '<li>'
+        + '<button type="button" class="pd-ruta-li" onclick="pdEditarRuta(\'' + pdEsc(r.id) + '\')">'
+        + '<span class="pd-ruta-li-cap"><b>' + pdEsc(r.nom) + '</b><small>' + r.files.length + (r.files.length === 1 ? ' tram' : ' trams') + '</small></span>'
+        + '<span class="pd-plaques">' + pdPlaquesMini(r.files, 6) + '</span></button>'
+        + '<span class="pd-li-acc">'
+        + '<button type="button" aria-label="Pujar «' + pdEsc(r.nom) + '»" onclick="pdMoureRuta(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '><svg class="ico" aria-hidden="true"><use href="#i-chev-up"/></svg></button>'
+        + '<button type="button" aria-label="Editar «' + pdEsc(r.nom) + '»" onclick="pdEditarRuta(\'' + pdEsc(r.id) + '\')"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>'
+        + '</span></li>').join('');
+}
+function pdMoureRuta(i, d) {
+    const a = pdRutes(), j = i + d;
+    if (j < 0 || j >= a.length) return;
+    [a[i], a[j]] = [a[j], a[i]]; pdDesaRutes(a); pdRenderLlistaRutes();
+}
+function pdEditarRuta(id, filesInicials) {
+    const r = id ? pdRutes().find(x => x.id === id) : null;
+    pdEd.ruta = { id: r ? r.id : null, files: r ? pdNetejaFiles(r.files) : (filesInicials || []) };
+    document.getElementById('pdRutaNom').value = r ? r.nom : '';
+    document.getElementById('pdRutaTitol').textContent = r ? 'Editar ruta' : 'Nova ruta';
+    document.getElementById('pdRutaEsborrar').hidden = !r;
+    document.getElementById('pdRutaInput').value = '';
+    document.getElementById('pdRutaSug').innerHTML = '';
+    pdRenderFiles('ruta');
+    pdObreSheet('pdRutaSheet');
+    if (!r) setTimeout(() => document.getElementById('pdRutaNom').focus(), 250);
+}
+function pdTancarRuta() { pdTancaSheet('pdRutaSheet'); pdEd.ruta = null; }
+function pdDesarRuta() {
+    const ed = pdEd.ruta;
+    if (!ed) return;
+    const nom = document.getElementById('pdRutaNom').value.trim().replace(/\s+/g, ' ');
+    if (!nom) { showToast('Posa un nom a la ruta'); document.getElementById('pdRutaNom').focus(); return; }
+    if (!pdLlegeixFiles('ruta')) return;
+    if (!ed.files.length) { showToast('Afegeix almenys una carretera a la ruta'); return; }
+    const rutes = pdRutes();
+    if (rutes.some(x => x.id !== ed.id && x.nom.toLowerCase() === nom.toLowerCase())) { showToast('Ja tens una ruta amb aquest nom'); return; }
+    const reg = { id: ed.id || ('r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)), nom, files: pdNetejaFiles(ed.files).map(({ c, ini, fi, marge }) => ({ c, ini, fi, marge })) };
+    const i = rutes.findIndex(x => x.id === reg.id);
+    if (i >= 0) rutes[i] = reg; else rutes.push(reg);
+    pdDesaRutes(rutes);
+    pdTancarRuta();
+    pdRenderLlistaRutes();
+    pdRenderRutesDia();
+    pdRenderMeves();
+    showToast('Ruta «' + nom + '» desada');
+}
+function pdEsborrarRuta() {
+    const ed = pdEd.ruta;
+    if (!ed || !ed.id) return;
+    const r = pdRutes().find(x => x.id === ed.id);
+    if (!confirm('Vols esborrar la ruta «' + (r ? r.nom : '') + '»? Els comunicats ja desats no canvien.')) return;
+    pdDesaRutes(pdRutes().filter(x => x.id !== ed.id));
+    pdTancarRuta();
+    pdRenderLlistaRutes();
+    pdRenderRutesDia();
+    pdRenderMeves();
+}
+function pdDesarComRuta() {
+    if (!pdEd.dia || !pdEd.dia.files.length) return;
+    if (!pdLlegeixFiles('dia')) return;
+    pdEditarRuta(null, pdNetejaFiles(pdEd.dia.files));
+}
+
 /* ── Editar un dia ───────────────────────────────────────── */
 function pdEditar(iso) {
     const r = pdDies.get(iso);
-    pdEdicio = {
-        original: r ? iso : null,
-        tipus: r ? r.tipus : 'treball',
-        marcades: new Set(r ? r.carreteres : []),
-        trams: r && r.trams ? JSON.parse(JSON.stringify(r.trams)) : {},
-    };
+    pdEdicio = { original: r ? iso : null, tipus: r ? r.tipus : 'treball' };
+    pdEd.dia = { files: pdNetejaFiles(pdFilesDe(r)) };
     document.getElementById('pdData').value = iso;
     document.getElementById('pdObs').value = r ? (r.obs || '') : '';
+    document.getElementById('pdIncid').value = r ? (r.incid || '') : '';
+    document.getElementById('pdHores').value = (r && r.hores) || pdHoresDefecte();
+    document.getElementById('pdFestiu').checked = !!(r && r.festiu);
     document.getElementById('pdAltraInput').value = '';
     document.getElementById('pdAltraSug').innerHTML = '';
     document.getElementById('pdDesarLlista').hidden = true;
     document.getElementById('pdEsborrarBtn').hidden = !r;
     document.getElementById('pdDiaTitol').textContent = 'Comunicat del ' + pdDMA(iso);
     pdSetTipus(pdEdicio.tipus);
-    pdRenderChips();
+    pdRenderRutesDia();
+    pdRenderFiles('dia');
     pdObreSheet('pdDiaSheet');
 }
-function pdTancarDia() { pdTancaSheet('pdDiaSheet'); pdEdicio = null; }
+function pdTancarDia() { pdTancaSheet('pdDiaSheet'); pdEdicio = null; pdEd.dia = null; }
 
 function pdSetTipus(t) {
     if (!pdEdicio) return;
@@ -18477,73 +19112,13 @@ function pdSetTipus(t) {
     document.getElementById('pdTipusTreball').classList.toggle('actiu', t === 'treball');
     document.getElementById('pdTipusFesta').classList.toggle('actiu', t === 'festa');
     document.getElementById('pdBlocTreball').hidden = t === 'festa';
+    document.getElementById('pdPdfDia').hidden = t === 'festa';
+    document.getElementById('pdObsLabel').textContent = t === 'festa' ? 'Observacions (opcional)' : 'Anotacions incidències';
 }
 
-function pdRenderChips() {
-    const cont = document.getElementById('pdChips');
-    const llista = pdLlista();
-    const ed = document.getElementById('pdEditarMeves'); if (ed) ed.hidden = !llista.length;
-    const extres = [...pdEdicio.marcades].filter(c => !llista.includes(c));
-    const totes = [...llista, ...extres];
-    if (!totes.length) {
-        cont.innerHTML = '<button type="button" class="pd-configura" onclick="pdObrirCarreteres()">'
-            + '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>'
-            + '<span><b>Configura les teves carreteres</b><small>Així cada dia només caldrà marcar-les. També pots escriure\u2019n una a sota.</small></span>'
-            + '<svg class="ico" aria-hidden="true"><use href="#i-chev-right"/></svg></button>';
-        pdRenderTrams([]);
-        return;
-    }
-    pdRenderTrams(totes);
-    cont.innerHTML = totes.map(c => {
-        const on = pdEdicio.marcades.has(c);
-        return '<button type="button" class="pd-chip' + (on ? ' on' : '') + '"' + pdEstilPlaca(c) + ' aria-pressed="' + on + '" onclick="pdToggle(\'' + pdEsc(c) + '\')">'
-            + (on ? '<svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>' : '') + pdEsc(c) + '</button>';
-    }).join('');
-}
-function pdRenderTrams(ordre) {
-    const box = document.getElementById('pdTrams');
-    if (!box || !pdEdicio) return;
-    const marcades = ordre.filter(c => pdEdicio.marcades.has(c));
-    if (!marcades.length) { box.innerHTML = ''; return; }
-    box.innerHTML = '<label>Tram de PK</label>' + marcades.map(c => {
-        if (!pdEdicio.trams[c]) { const d = pdTramDefecte(c); pdEdicio.trams[c] = { ini: d.ini, fi: d.fi }; }
-        const t = pdEdicio.trams[c];
-        const inp = (k, v, ph) => '<input type="text" inputmode="decimal" autocomplete="off" class="pd-pk-inp" data-c="' + pdEsc(c) + '" data-k="' + k + '"'
-            + ' value="' + pdEsc(v || '') + '" placeholder="' + ph + '" aria-label="PK ' + ph.toLowerCase() + ' de ' + pdEsc(c) + '" oninput="this.classList.remove(\'err\')" onchange="pdSetTram(this)">';
-        return '<div class="pd-tram-row"><span class="road-plate"' + pdEstilPlaca(c) + '>' + pdEsc(c) + '</span>'
-            + '<span class="pd-tram-ins">' + inp('ini', t.ini, 'Inici') + '<span class="pd-tram-fl">→</span>' + inp('fi', t.fi, 'Fi') + '</span></div>';
-    }).join('') + '<p class="pd-nota">Per defecte surt el tram de «Les meves carreteres». Si el canvies aquí, només afecta aquest dia.</p>';
-}
-function pdSetTram(el) {
-    if (!pdEdicio) return;
-    const v = pdParsePK(el.value);
-    if (v === null) { el.classList.add('err'); showToast('PK no vàlid. Exemple: 120+350'); return; }
-    el.classList.remove('err');
-    el.value = v;
-    const c = el.dataset.c;
-    pdEdicio.trams[c] = pdEdicio.trams[c] || { ini: '', fi: '' };
-    pdEdicio.trams[c][el.dataset.k] = v;
-}
-function pdToggle(c) {
-    if (!pdEdicio) return;
-    if (pdEdicio.marcades.has(c)) pdEdicio.marcades.delete(c); else pdEdicio.marcades.add(c);
-    pdRenderChips();
-}
-
-function pdAfegirAlDia(txt) {
-    const c = pdNormalitza(txt);
-    if (!c || !pdEdicio) return;
-    pdEdicio.marcades.add(c);
-    document.getElementById('pdAltraInput').value = '';
-    document.getElementById('pdAltraSug').innerHTML = '';
-    pdRenderChips();
-    const box = document.getElementById('pdDesarLlista');
-    if (!pdLlista().includes(c)) {
-        box.innerHTML = '<span>Vols desar <span class="road-plate">' + pdEsc(c) + '</span> a les teves carreteres?</span>'
-            + '<button type="button" class="pd-link" onclick="pdAfegirALlista(\'' + pdEsc(c) + '\',true)">Desar-la</button>';
-        box.hidden = false;
-    } else box.hidden = true;
-}
+/* Compatibilitat: noms antics que encara poden cridar-se des d'altres llocs */
+function pdRenderChips() { if (pdEd.dia) pdRenderFiles('dia'); }
+function pdAfegirAlDia(txt) { pdAfegirFila('dia', txt); }
 
 /* Suggeriments: primer les pròpies, després el catàleg offline */
 function pdSuggerir(inputId, sugId, onTria) {
@@ -18561,28 +19136,49 @@ function pdSuggerir(inputId, sugId, onTria) {
     box.querySelectorAll('.pd-sug-item').forEach(b => b.onclick = () => box._onTria(b.dataset.c));
 }
 
-async function pdDesarDia() {
-    if (!pdEdicio) return;
+/** Construeix el registre a partir del full. Retorna null (amb avís) si falta alguna cosa */
+function pdRegistreDelFull() {
     const data = document.getElementById('pdData').value;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del comunicat'); return; }
-    const carreteres = pdEdicio.tipus === 'festa' ? [] : [...pdEdicio.marcades];
-    if (pdEdicio.tipus === 'treball' && !carreteres.length) { showToast('Marca almenys una carretera, o tria «Festa»'); return; }
-    // Llegeix els trams que hi hagi escrits (encara que no s'hagi disparat «change»)
-    let pkMal = false;
-    document.querySelectorAll('#pdTrams .pd-pk-inp').forEach(el => { pdSetTram(el); if (el.classList.contains('err')) pkMal = true; });
-    if (pkMal && pdEdicio.tipus === 'treball') { showToast('Revisa els PK marcats en vermell (ex.: 120+350)'); return; }
-    const trams = {};
-    carreteres.forEach(c => { const t = pdEdicio.trams[c] || pdTramDefecte(c); trams[c] = { ini: t.ini || '', fi: t.fi || '' }; });
-    const ocupat = pdDies.get(data);
-    if (data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(data) + ' ja té un comunicat. Vols substituir-lo?')) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { showToast('Indica la data del comunicat'); return null; }
+    const tipus = pdEdicio.tipus;
+    let files = [];
+    if (tipus === 'treball') {
+        if (!pdLlegeixFiles('dia')) return null;
+        files = pdNetejaFiles(pdEd.dia.files);
+        if (!files.length) { showToast('Afegeix almenys un tram (o carrega una ruta), o tria «Festa»'); return null; }
+    }
+    const hores = document.getElementById('pdHores').value;
+    return {
+        data, tipus, files,
+        carreteres: [...new Set(files.map(f => f.c))],
+        festiu: tipus === 'treball' && document.getElementById('pdFestiu').checked,
+        hores: tipus === 'treball' ? (/^\d{2}:\d{2}$/.test(hores) ? hores : '') : '',
+        incid: tipus === 'treball' ? document.getElementById('pdIncid').value.trim() : '',
+        obs: document.getElementById('pdObs').value.trim(),
+        updatedAt: Date.now()
+    };
+}
+async function pdDesarDia(opts) {
+    if (!pdEdicio) return null;
+    const reg = pdRegistreDelFull();
+    if (!reg) return null;
+    const ocupat = pdDies.get(reg.data);
+    if (reg.data !== pdEdicio.original && ocupat && !confirm('El ' + pdDMA(reg.data) + ' ja té un comunicat. Vols substituir-lo?')) return null;
     await pdInitDB();
-    if (pdEdicio.original && pdEdicio.original !== data) await pdEsborra(pdEdicio.original);
-    await pdGuarda({ data, tipus: pdEdicio.tipus, carreteres, trams, obs: document.getElementById('pdObs').value.trim(), updatedAt: Date.now() });
-    pdTancarDia();
-    pdDilluns = pdDillunsDe(pdDeISO(data));
+    if (pdEdicio.original && pdEdicio.original !== reg.data) await pdEsborra(pdEdicio.original);
+    await pdGuarda(reg);
+    pdDilluns = pdDillunsDe(pdDeISO(reg.data));
     pdRenderSetmana();
     pdRenderHomeCard();
-    showToast('Comunicat del ' + pdDMA(data) + ' desat');
+    if (opts && opts.mantenir) {
+        pdEdicio.original = reg.data;
+        document.getElementById('pdEsborrarBtn').hidden = false;
+        document.getElementById('pdDiaTitol').textContent = 'Comunicat del ' + pdDMA(reg.data);
+    } else {
+        pdTancarDia();
+        showToast('Comunicat del ' + pdDMA(reg.data) + ' desat');
+    }
+    return reg;
 }
 async function pdEsborrarDia() {
     if (!pdEdicio || !pdEdicio.original) return;
@@ -18594,6 +19190,76 @@ async function pdEsborrarDia() {
     showToast('Comunicat esborrat');
 }
 
+/* ── PDF oficial: un dia o tota la setmana ───────────────── */
+function pdDiaPerPdf(r) {
+    return { data: r.data, festiu: !!r.festiu, hores: r.hores || '', incid: r.incid || '', obs: r.obs || '', files: pdFilesDe(r) };
+}
+function pdBaixa(blob, nom) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nom;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+let pdGenerant = false;
+async function pdEntregaPdfs(regs, mode, nomZip) {
+    if (pdGenerant) return;
+    pdGenerant = true;
+    const vig = pdVig();
+    try {
+        showToast(regs.length > 1 ? 'Generant ' + regs.length + ' comunicats…' : 'Generant el comunicat…');
+        const fitxers = [];
+        for (const r of regs) {
+            const blob = await ctPdfDia(pdDiaPerPdf(r), vig);
+            fitxers.push(new File([blob], ctNomFitxer(r.data, vig), { type: 'application/pdf' }));
+        }
+        if (mode !== 'descarregar' && navigator.canShare && navigator.canShare({ files: fitxers })) {
+            try { await navigator.share({ files: fitxers, title: fitxers.length > 1 ? 'Comunicats de treball' : fitxers[0].name }); return; }
+            catch (e) { if (e && e.name === 'AbortError') return; }
+        }
+        if (fitxers.length > 1 && typeof JSZip !== 'undefined') {
+            const zip = new JSZip();
+            fitxers.forEach(f => zip.file(f.name, f));
+            pdBaixa(await zip.generateAsync({ type: 'blob' }), nomZip || 'comunicats.zip');
+            showToast(fitxers.length + ' comunicats descarregats (' + (nomZip || 'comunicats.zip') + ')');
+        } else {
+            fitxers.forEach((f, i) => setTimeout(() => pdBaixa(f, f.name), i * 500));
+            showToast(fitxers.length === 1 ? 'Descarregat: ' + fitxers[0].name : fitxers.length + ' comunicats descarregats');
+        }
+    } catch (e) {
+        console.error('[Comunicat PDF]', e);
+        showToast(navigator.onLine ? 'No s’ha pogut crear el PDF' : 'Per fer el primer PDF cal connexió (després ja funciona sense)');
+    } finally { pdGenerant = false; }
+}
+async function pdPdfDelDia(mode) {
+    if (!pdEdicio) return;
+    if (pdEdicio.tipus === 'festa') { showToast('Els dies de festa no porten comunicat'); return; }
+    if (!pdRegistreDelFull()) return;           // primer, que el comunicat estigui bé
+    if (!pdVigComplet()) {
+        pdPdfPendent = () => pdPdfDelDia(mode);
+        showToast('Primer posa les teves dades: surten a la capçalera del comunicat');
+        pdObrirVig();
+        return;
+    }
+    const reg = await pdDesarDia({ mantenir: true });
+    if (reg) await pdEntregaPdfs([reg], mode);
+}
+async function pdPdfSetmana(mode) {
+    if (!pdVigComplet()) {
+        pdPdfPendent = () => pdPdfSetmana(mode);
+        showToast('Primer posa les teves dades: surten a la capçalera del comunicat');
+        pdObrirVig();
+        return;
+    }
+    await pdInitDB();
+    const dl = pdDilluns || pdDillunsDe(new Date());
+    const a = pdISO(dl), b = pdISO(pdSumaDies(dl, 6));
+    const regs = [...pdDies.values()].filter(r => r.data >= a && r.data <= b && r.tipus === 'treball' && pdFilesDe(r).length)
+        .sort((x, y) => x.data.localeCompare(y.data));
+    if (!regs.length) { showToast('Aquesta setmana encara no hi ha cap comunicat de treball'); return; }
+    const cog = ctNomFitxer(a, pdVig()).replace(/^\d+_/, '').replace(/\.pdf$/, '');
+    await pdEntregaPdfs(regs, mode, 'comunicats_setmana-' + pdNumSetmana(dl) + '_' + cog + '.zip');
+}
+
 /* ── Les meves carreteres ────────────────────────────────── */
 function pdObrirCarreteres() {
     document.getElementById('pdCarrInput').value = '';
@@ -18601,7 +19267,7 @@ function pdObrirCarreteres() {
     pdRenderLlista();
     pdObreSheet('pdCarrSheet');
 }
-function pdTancarCarreteres() { pdTancaSheet('pdCarrSheet'); pdRenderMeves(); if (pdEdicio) pdRenderChips(); }
+function pdTancarCarreteres() { pdTancaSheet('pdCarrSheet'); pdRenderMeves(); if (pdEd.dia) pdRenderFiles('dia'); if (pdEd.ruta) pdRenderFiles('ruta'); }
 function pdAfegirALlista(txt, desDelDia) {
     const c = pdNormalitza(txt);
     if (!c) return;
@@ -18609,7 +19275,7 @@ function pdAfegirALlista(txt, desDelDia) {
     if (!llista.includes(c)) { llista.push(c); pdDesaLlista(llista); _pdCatalegCache = null; }
     if (desDelDia) {
         document.getElementById('pdDesarLlista').hidden = true;
-        pdRenderChips();
+        if (pdEd.dia) pdRenderFiles('dia');
         showToast(c + ' desada a les teves carreteres');
         return;
     }
@@ -18716,7 +19382,7 @@ function pdGeneraICS(registres) {
         const fi = pdISO(pdSumaDies(pdDeISO(r.data), 1)).replace(/-/g, '');
         const titol = r.tipus === 'festa' ? 'Festa' : 'Ruta: ' + r.carreteres.join(', ');
         const linies = r.tipus === 'festa' ? ['Dia de festa']
-            : r.carreteres.map(c => { const t = (r.trams || {})[c]; return c + (t && (t.ini || t.fi) ? ' (' + pdTramTxt(t) + ')' : ''); });
+            : pdFilesDe(r).map(f => f.c + ' ' + f.marge + (f.ini || f.fi ? ' (' + pdTramTxt(f) + ')' : ''));
         const desc = [...linies, r.obs ? 'Observacions: ' + r.obs : '', 'Registrat a DataCamp'].filter(Boolean).join('\n');
         L.push('BEGIN:VEVENT',
             'UID:part-' + ini + '-' + uid + '@datacamp',
@@ -18734,7 +19400,7 @@ function pdGeneraICS(registres) {
 }
 async function pdExportarICS(abast) {
     await pdInitDB();
-    let regs = [...pdDies.values()].filter(r => r.tipus === 'festa' || r.carreteres.length);
+    let regs = [...pdDies.values()].filter(r => r.tipus === 'festa' || pdFilesDe(r).length);
     let nomAbast = 'tot';
     if (abast === 'setmana') {
         const dl = pdDilluns || pdDillunsDe(new Date());
@@ -18812,13 +19478,15 @@ pdInitDB().then(pdRenderHomeCard);
 <script>
 /* Per a la propera actualització: canvia NV_VERSIO i la llista NV_ITEMS. */
 const NV_VERSIO = '2026.11';
-const NV_DATA   = '12-11-2026';
+const NV_DATA   = '16-11-2026';
 const NV_KEY    = 'dc_novetats_vistes';
 const NV_ITEMS = [
-    { ico: 'i-file',     to: 'tone-red',   nou: true, t: 'Comunicats de treball',
-      d: "Registra cada dia les carreteres que has fet, marca els dies de festa i exporta-ho al calendari d'Apple o Google." },
-    { ico: 'i-road',     to: 'tone-blue',  nou: true, t: 'Les meves carreteres',
-      d: 'Les de sempre, preparades per marcar amb un toc, amb el seu color i el tram de PK inicial i final.' },
+    { ico: 'i-file',     to: 'tone-red',   nou: true, t: 'Comunicat oficial en PDF',
+      d: "El comunicat diari de vigilància amb el mateix format, logo i nom de fitxer que l'oficial. Es comparteix o es descarrega d'un toc, d'un dia o de tota la setmana." },
+    { ico: 'i-map',      to: 'tone-blue',  nou: true, t: 'Rutes favorites',
+      d: 'Desa les teves rutes amb el nom que vulguis i, cada dia, carrega tots els trams de cop.' },
+    { ico: 'i-road',     to: 'tone-teal',  nou: true, t: 'Comunicats de treball',
+      d: "Apunta cada dia els trams fets (carretera, marge i PK), els dies de festa i exporta-ho al calendari." },
     { ico: 'i-shield',   to: 'tone-green', t: 'Sense seguiment GPS',
       d: "Els comunicats només guarden el que escrius tu. La teva ubicació no es registra mai." },
     { ico: 'i-pin',      to: 'tone-amber', t: 'Localitzador de PK renovat',
@@ -18826,7 +19494,7 @@ const NV_ITEMS = [
     { ico: 'i-spark',    to: 'tone-violet', t: 'Disseny nou',
       d: "Icones professionals, línia de carretera a la capçalera i una benvinguda que et saluda segons l'hora." },
     { ico: 'i-download', to: 'tone-slate', t: 'Còpia de seguretat completa',
-      d: 'El backup ara també desa els comunicats, les teves carreteres, els colors i els trams.' }
+      d: 'El backup ara també desa els comunicats, les rutes, les teves carreteres i les teves dades.' }
 ];
 
 function nvRender() {

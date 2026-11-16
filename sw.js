@@ -3,7 +3,7 @@
    BASE: arrel '/' — Vercel serveix des de l'arrel, no /DataCamp/
    ================================================================ */
 
-const CACHE_NAME    = 'datacamp-v7';
+const CACHE_NAME    = 'datacamp-v8';
 const BASE          = '/';
 const OFFLINE_URL   = BASE + 'offline.html';
 
@@ -43,6 +43,9 @@ const APP_SHELL = [
 
     /* ── SheetJS (xlsx) ──────────────────────────────── */
     BASE + 'lib/xlsx/xlsx.full.min.js',
+
+    /* ── Comunicat diari de vigilància (logo + lletra del PDF oficial) ── */
+    BASE + 'lib/comunicat/comunicat_assets.js',
 
     /* ── JSZip ───────────────────────────────────────── */
     BASE + 'lib/jszip/jszip.min.js',
