@@ -3245,6 +3245,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 .galeria-thumb {
     position: relative;
     aspect-ratio: 4/3;
+    content-visibility: auto;          /* amb milers de fotos, només es pinten les visibles */
+    contain-intrinsic-size: auto 100px;
     border-radius: var(--radius-sm);
     overflow: hidden;
     cursor: pointer;
@@ -6585,7 +6587,7 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
         <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.25);padding:0 12px 6px;">Còpies de Seguretat</div>
         <button class="nav-item" onclick="closeMobileNav();exportarBackup()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg></span> Exportar Backup</button>
         <button class="nav-item" onclick="closeMobileNav();document.getElementById('importFileMob').click()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Importar Backup</button>
-        <input type="file" id="importFileMob" accept="application/json" hidden onchange="importarBackup(this)">
+        <input type="file" id="importFileMob" accept="application/json" multiple hidden onchange="importarBackup(this)">
         <div class="sidebar-credit" style="margin-top:8px;">Creat per N.Arroyo</div>
     </div>
 </div>
@@ -6644,7 +6646,7 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
         <div class="sidebar-footer">
             <button class="nav-item" onclick="exportarBackup()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg></span> Exportar Backup</button>
             <button class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg></span> Importar Backup</button>
-            <input type="file" id="importFile" accept="application/json" hidden onchange="importarBackup(this)">
+            <input type="file" id="importFile" accept="application/json" multiple hidden onchange="importarBackup(this)">
             <div class="sidebar-credit">Creat per N.Arroyo</div>
         </div>
     </nav>
@@ -8229,6 +8231,9 @@ req.onupgradeneeded = e => {
 };
 req.onsuccess = e => {
     db = e.target.result;
+    // Demana que les dades siguin persistents: sense això, el navegador pot esborrar-les
+    // totes si el mòbil va just d'espai (amb milers de fotos és un risc real)
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(p => { if (!p) navigator.storage.persist(); }); } catch (x) {}
     // Migrate from V4 if needed
     const v4req = indexedDB.open("GencatDinaV4", 1);
     v4req.onsuccess = ev => {
@@ -8243,10 +8248,10 @@ req.onsuccess = e => {
         }
     };
     /* Populate recents and preload cache as soon as DB is ready */
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        allProjectsCache = e.target.result || [];
+    projectesLleugers().then(l => {
+        allProjectsCache = l;
         setTimeout(renderRecents, 50);
-    };
+    });
 };
 
 /* Load logo from storage */
@@ -8441,8 +8446,8 @@ function renderRecents() {
     const container = document.getElementById('recentsContainer');
     if (!container || !db) return;
 
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = e => {
-        let all = (e.target.result || [])
+    projectesLleugers().then(llista => {
+        let all = (llista || [])
             .filter(p => (p.tipusEntrada || 'inventari') !== 'captura')
             .sort((a,b) => (b.timestamp||0) - (a.timestamp||0))
             .slice(0, 3);
@@ -8510,7 +8515,7 @@ function renderRecents() {
                 </button>
             </div>`;
         }).join('');
-    };
+    });
 }
 
 function navTo(screenId) {
@@ -9211,8 +9216,8 @@ function actualizarDB(t) {
     };
     db.transaction("projects","readwrite").objectStore("projects").put(record);
     const idx = allProjectsCache.findIndex(p => p.id === curId);
-    if (idx > -1) allProjectsCache[idx] = record;
-    else allProjectsCache.push(record);
+    if (idx > -1) allProjectsCache[idx] = pjLleuger(record);
+    else allProjectsCache.push(pjLleuger(record));
 }
 
 /* ============================================================
@@ -9286,20 +9291,20 @@ function switchHistTab(tab) {
 function historial() {
     ir('list');
     if (!db) return;
-    db.transaction("projects").objectStore("projects").getAll().onsuccess = (e) => {
-        allProjectsCache = e.target.result || [];
+    projectesLleugers().then(l => {
+        allProjectsCache = l;
         renderGestioHubStats();
-    };
+    });
     if (db.objectStoreNames.contains('animalsIncidencies')) {
-        db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
-            const n = (e.target.result || []).length;
+        db.transaction('animalsIncidencies').objectStore('animalsIncidencies').count().onsuccess = e => {
+            const n = e.target.result || 0;
             const el = document.getElementById('gestioStatAnimals');
             if (el) el.textContent = n === 0 ? 'Cap fitxa encara' : `${n} fitxa${n !== 1 ? 'es' : ''} completa${n !== 1 ? 'es' : ''}`;
         };
     }
     if (db.objectStoreNames.contains('itcInformes')) {
-        db.transaction('itcInformes').objectStore('itcInformes').getAll().onsuccess = e => {
-            const n = (e.target.result || []).length;
+        db.transaction('itcInformes').objectStore('itcInformes').count().onsuccess = e => {
+            const n = e.target.result || 0;
             const el = document.getElementById('gestioStatITC');
             if (el) el.textContent = n === 0 ? 'Cap informe encara' : `${n} informe${n !== 1 ? 's' : ''}`;
         };
@@ -9433,7 +9438,7 @@ function obrirDetallProjecte(id, origin) {
         if (db) {
             db.transaction("projects").objectStore("projects").get(id).onsuccess = e => {
                 if (e.target.result) {
-                    allProjectsCache.push(e.target.result);
+                    allProjectsCache.push(pjLleuger(e.target.result));
                     obrirDetallProjecte(id, origin);
                 }
             };
@@ -9603,19 +9608,19 @@ function actualitzarProgres(id) {
     const num = Math.min(100, Math.max(0, parseInt(val)||0));
     const idx = allProjectsCache.findIndex(p => p.id === id);
     if (idx < 0) return;
-    allProjectsCache[idx].porcentaje_progreso = num;
-    db.transaction("projects","readwrite").objectStore("projects").put(allProjectsCache[idx]);
-    showToast(`Progrés actualitzat: ${num}%`);
-    obrirDetallProjecte(id);
+    pjModifica(id, { porcentaje_progreso: num }).then(() => {
+        showToast(`Progrés actualitzat: ${num}%`);
+        obrirDetallProjecte(id);
+    });
 }
 
 function actualitzarDataFi(id, newDate) {
     const idx = allProjectsCache.findIndex(p => p.id === id);
     if (idx < 0) return;
-    allProjectsCache[idx].fecha_fin_estimada = newDate;
-    db.transaction("projects","readwrite").objectStore("projects").put(allProjectsCache[idx]);
-    showToast('Data fi actualitzada');
-    obrirDetallProjecte(id);
+    pjModifica(id, { fecha_fin_estimada: newDate }).then(() => {
+        showToast('Data fi actualitzada');
+        obrirDetallProjecte(id);
+    });
 }
 
 function finalitzarObra(id) {
@@ -9623,12 +9628,10 @@ function finalitzarObra(id) {
     const idx = allProjectsCache.findIndex(p => p.id === id);
     if (idx < 0) return;
     const avui = new Date().toISOString().slice(0,10);
-    allProjectsCache[idx].estat_obra_tancada = true;
-    allProjectsCache[idx].fecha_cierre_real  = avui;
-    allProjectsCache[idx].porcentaje_progreso = 100;
-    db.transaction("projects","readwrite").objectStore("projects").put(allProjectsCache[idx]);
-    showToast('Obra finalitzada i bloquejada');
-    obrirDetallProjecte(id);
+    pjModifica(id, { estat_obra_tancada: true, fecha_cierre_real: avui, porcentaje_progreso: 100 }).then(() => {
+        showToast('Obra finalitzada i bloquejada');
+        obrirDetallProjecte(id);
+    });
 }
 
 function afegirHito(id) {
@@ -10134,9 +10137,7 @@ function carregarLlistaDescargues() {
 
     /* Sempre fa la query a DB per tenir dades actualitzades */
     try {
-        const tx = db.transaction("projects");
-        tx.objectStore("projects").getAll().onsuccess = e => _renderDl(e.target.result || []);
-        tx.onerror = err => console.error('[DL] DB transaction error:', err);
+        projectesLleugers().then(l => _renderDl(l)).catch(err => console.error('[DL] DB error:', err));
     } catch(e) {
         console.error('[DL] DB error:', e);
         /* Si DB falla però tenim cache, ja s'ha renderitzat dalt */
@@ -10288,7 +10289,7 @@ function carregarVistaIncidencies() {
     const container = document.getElementById('listaIncidencies');
     if (!container || !db) { if (!db) setTimeout(carregarVistaIncidencies, 300); return; }
 
-    galeriaLlegirTotes(items => {
+    galeriaLlegirLleugeres().then(items => {
         const incidencies = _dlIncItemsFiltrats(items);
         const q = (document.getElementById('dlSearchInc')?.value || '').toLowerCase().trim();
 
@@ -10309,7 +10310,7 @@ function carregarVistaIncidencies() {
                 const icon = INC_TIPUS_ICONS[it.tipusIncidencia] || '⚠️';
                 return `<label class="dl-inc-check-item">
                     <input type="checkbox" ${checked ? 'checked' : ''} onchange="dlIncToggleSeleccio('${it.id}', this.checked)">
-                    ${it.imgData ? `<img src="${it.imgData}" loading="lazy">` : ''}
+                    <img src="${galeriaSrcMini(it)}" loading="lazy" decoding="async" alt="">
                     <span style="flex:1;">${icon} ${it.carr || '—'} · PK ${it.pk || '—'}${it.marge ? (' · ' + it.marge) : ''}</span>
                 </label>`;
             }).join('');
@@ -10356,7 +10357,7 @@ async function _dlIncDescarregarZip(incidencies, titolBase, date) {
 /* Botó principal "Generar informe": aplica tots els filtres del panell i genera PDF (+ ZIP/Excel si toca) */
 async function dlIncGenerarInforme() {
     if (!db) { alert('La base de dades encara no està llesta, torna-ho a provar en un moment.'); return; }
-    galeriaLlegirTotes(async (items) => {
+    galeriaLlegirFiltrades(ll => { const f = _dlIncItemsFiltrats(ll); return dlIncAlcance === 'algunes' ? f.filter(it => dlIncSeleccioIds.has(it.id)) : f; }, async (items) => {
         let incidencies = _dlIncItemsFiltrats(items);
         if (dlIncAlcance === 'algunes') {
             incidencies = incidencies.filter(it => dlIncSeleccioIds.has(it.id));
@@ -10416,8 +10417,8 @@ function _renderFitxesAnimals(q) {
     if (!wrap || !db) return;
     if (!db.objectStoreNames.contains('animalsIncidencies')) return;
 
-    db.transaction('animalsIncidencies').objectStore('animalsIncidencies').getAll().onsuccess = e => {
-        let fitxes = e.target.result || [];
+    indexLleuger('animalsIncidencies').then(llista => {
+        let fitxes = llista || [];
         if (q) {
             fitxes = fitxes.filter(f =>
                 (f.carretera || '').toLowerCase().includes(q) ||
@@ -10460,7 +10461,7 @@ function _renderFitxesAnimals(q) {
         });
 
         wrap.innerHTML = html;
-    };
+    });
 }
 
 function _animalActionBtns() {
@@ -11182,8 +11183,8 @@ function carregarVistaITC() {
 
     const q = (document.getElementById('dlSearchITC')?.value || '').toLowerCase().trim();
 
-    db.transaction('itcInformes').objectStore('itcInformes').getAll().onsuccess = e => {
-        let informes = e.target.result || [];
+    indexLleuger('itcInformes').then(llista => {
+        let informes = llista || [];
         if (q) {
             informes = informes.filter(it =>
                 (it.expedient || '').toLowerCase().includes(q) ||
@@ -11218,7 +11219,7 @@ function carregarVistaITC() {
                     <button class="dl-btn dl-btn-zip" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;" title="Eliminar informe" onclick="eliminarInformeITC('${f.id}')">🗑️ Eliminar</button>
                 </div>
             </div>`).join('');
-    };
+    });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -11440,7 +11441,7 @@ function _buildProjecteVirtualIncidencies(items, titol) {
 async function exportarIncidenciesPDF(tipusFiltre, format) {
     const cleanType = format === 'excel' ? 'EXCEL' : format.toUpperCase();
     showSpinner(`GENERANT ${cleanType}...`);
-    galeriaLlegirTotes(async (items) => {
+    galeriaLlegirFiltrades(ll => ll.filter(it => it.tipusIncidencia && (!tipusFiltre || it.tipusIncidencia === tipusFiltre)), async (items) => {
         try {
             let incidencies = (items || []).filter(it => it.tipusIncidencia);
             if (tipusFiltre) incidencies = incidencies.filter(it => it.tipusIncidencia === tipusFiltre);
@@ -11971,37 +11972,143 @@ function generarBlobExcel(p) {
 /* ============================================================
    BACKUP
    ============================================================ */
-function exportarBackup() {
+/* La còpia s'escriu a trossos (un registre per línia) i es llegeix igual:
+   així funciona encara que l'app tingui milers de fotos i diversos GB.
+   (Un sol JSON gegant fallava a partir d'uns 500 MB: «Invalid string length».)
+   Si passa de ~150 MB es reparteix en diversos fitxers (_1, _2…): els navegadors
+   cancel·len les descàrregues massa grans. Per restaurar, se seleccionen tots junts. */
+let BK_MIDA_FITXER = 150e6;   // (let: les proves el poden baixar)
+async function exportarBackup() {
     if (!db) return alert("Base de dades no disponible");
     const stores = ["projects", "galeriaFotos", "animalsIncidencies", "itcInformes"].filter(s => db.objectStoreNames.contains(s));
-    const tx = db.transaction(stores, "readonly");
-    const result = {};
-    let pending = stores.length;
-    stores.forEach(s => {
-        tx.objectStore(s).getAll().onsuccess = e => {
-            result[s] = e.target.result || [];
-            pending--;
-            if (pending === 0) {
-                const payload = {
-                    __datacampBackup: true,
-                    version: 2,
-                    exportedAt: new Date().toISOString(),
-                    stores: result,
-                    partsDiaris: (typeof pdSnapshotBackup === 'function') ? pdSnapshotBackup() : undefined
-                };
-                const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `backup_datacamp_${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                const totalFotosGaleria = (result.galeriaFotos || []).length;
-                showToast(`📤 Backup complet exportat (projectes + ${totalFotosGaleria} fotos galeria + fitxes)`);
-            }
+    showSpinner('PREPARANT CÒPIA...');
+    try {
+        if (typeof pdInitDB === 'function') await pdInitDB();   // els comunicats han d'estar carregats
+        const dia = new Date().toISOString().slice(0, 10), ara = new Date().toISOString();
+        const diaris = (typeof pdSnapshotBackup === 'function') ? pdSnapshotBackup() : undefined;
+        let parts = [], buf = [], mida = 0, midaF = 0, primerItem = true, storesAlFitxer = 0, nFitxers = 0, pendent = null, total = 0, n = 0;
+        // Una descàrrega rere l'altra, amb pausa: si se'n llancen moltes de cop el navegador cancel·la les últimes
+        const descarrega = async (blob, nom) => {
+            const sp = document.getElementById('spinnerText'); if (sp) sp.textContent = `DESANT ${nom.replace('backup_datacamp_', '').replace('.json', '')}...`;
+            const a = document.createElement("a");
+            const url = URL.createObjectURL(blob); a.href = url; a.download = nom;
+            document.body.appendChild(a); a.click(); a.remove();
+            await new Promise(r => setTimeout(r, 1500 + blob.size / 1048576 * 25));
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
         };
-    });
+        const buida = () => { if (buf.length) { parts.push(new Blob(buf)); buf = []; mida = 0; } };
+        const afegeix = t => { buf.push(t); mida += t.length; midaF += t.length; if (mida > 8e6) buida(); };
+        const capcal = () => {
+            const c = JSON.stringify({ __datacampBackup: true, version: 3, exportedAt: ara, part: nFitxers + 1, partsDiaris: nFitxers === 0 ? diaris : undefined });
+            afegeix(c.slice(0, -1) + ',"stores":{');
+            storesAlFitxer = 0;
+        };
+        const obreStore = st => { afegeix((storesAlFitxer ? '\n],' : '') + '\n' + JSON.stringify(st) + ':['); storesAlFitxer++; primerItem = true; };
+        const tancaFitxer = async () => {
+            afegeix((storesAlFitxer ? '\n]' : '') + '}}\n'); buida();
+            const blob = new Blob(parts, { type: "application/json" }); parts = []; midaF = 0; nFitxers++; total += blob.size;
+            // El primer es guarda fins a saber si n'hi haurà més (llavors porta _1 al nom)
+            if (nFitxers === 1) pendent = blob;
+            else { if (pendent) { await descarrega(pendent, `backup_datacamp_${dia}_1.json`); pendent = null; } await descarrega(blob, `backup_datacamp_${dia}_${nFitxers}.json`); }
+        };
+        capcal();
+        const compte = {};
+        for (const st of stores) {
+            obreStore(st);
+            // D'un en un (cada registre en la seva lectura): així es pot fer pausa entre fitxers
+            const claus = await new Promise((res, rej) => { const q = db.transaction(st).objectStore(st).getAllKeys(); q.onsuccess = e => res(e.target.result || []); q.onerror = e => rej(e.target.error); });
+            let k = 0;
+            for (const clau of claus) {
+                const v = await idbGet(st, clau);
+                if (!v) continue;
+                const j = JSON.stringify(v);
+                if (!primerItem && midaF + j.length > BK_MIDA_FITXER) { await tancaFitxer(); capcal(); obreStore(st); }
+                afegeix((primerItem ? '' : ',') + '\n' + j);
+                primerItem = false; k++; n++;
+                if (n % 25 === 0) { const sp = document.getElementById('spinnerText'); if (sp) sp.textContent = `PREPARANT CÒPIA... ${n}`; }
+            }
+            compte[st] = k;
+        }
+        await tancaFitxer();
+        if (pendent) await descarrega(pendent, `backup_datacamp_${dia}.json`);
+        hideSpinner();
+        const mb = total / 1048576, txtMida = mb >= 1024 ? (mb / 1024).toFixed(1) + ' GB' : Math.round(mb) + ' MB';
+        if (nFitxers > 1) alert(`📤 Còpia de seguretat feta (${txtMida}).\n\nCom que és gran, s'ha desat en ${nFitxers} fitxers (backup_datacamp_${dia}_1 … _${nFitxers}). Guarda'ls tots: per restaurar-la, a «Importar Backup» selecciona'ls tots alhora.`);
+        else showToast(`📤 Backup complet exportat (${compte.galeriaFotos || 0} fotos galeria + projectes i fitxes · ${txtMida})`);
+    } catch (err) {
+        hideSpinner();
+        alert("Error exportant la còpia: " + (err && err.message || err));
+    }
 }
 
-function importarBackup(input) {
+/* Importació per trossos del format v3 (sense carregar tot el fitxer a memòria).
+   Retorna quantes fotos de galeria hi havia. */
+async function _importarBackupV3(file, etiqueta) {
+    const dec = new TextDecoder();
+    const TROS = 8 * 1048576;
+    let resta = '', cap = null, store = null, lot = [], nFotos = 0, n = 0;
+    const desa = async () => {
+        if (!lot.length || !store) { lot = []; return; }
+        const items = lot, s = store; lot = [];
+        await new Promise((res, rej) => {
+            const tx = db.transaction(s, 'readwrite'); const st = tx.objectStore(s);
+            items.forEach(it => st.put(it));
+            tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+        });
+        const sp = document.getElementById('spinnerText'); if (sp) sp.textContent = `IMPORTANT${etiqueta || ''}... ${n}`;
+    };
+    const linia = async l => {
+        if (!l) return;
+        if (cap === null) { cap = JSON.parse(l + '}}'); return; }
+        const m = /^"([^"]+)":\[$/.exec(l);
+        if (m) { await desa(); store = db.objectStoreNames.contains(m[1]) ? m[1] : null; return; }
+        if (l === '],' || l === ']}}' || l === ']' || l === '}}') { await desa(); return; }
+        if (!store) return;
+        let item; try { item = JSON.parse(l.endsWith(',') ? l.slice(0, -1) : l); } catch (e) { return; }
+        if (!item) return;
+        if (store === 'projects' && Array.isArray(item.registros)) item.registros = item.registros.filter(r => r);
+        if (store === 'galeriaFotos') nFotos++;
+        lot.push(item); n++;
+        if (lot.length >= 20) await desa();
+    };
+    for (let pos = 0; pos < file.size; pos += TROS) {
+        const txt = resta + dec.decode(await file.slice(pos, pos + TROS).arrayBuffer(), { stream: pos + TROS < file.size });
+        const ls = txt.split('\n'); resta = ls.pop();
+        for (const l of ls) await linia(l);
+    }
+    await linia(resta + dec.decode()); await desa();
+    if (cap && cap.partsDiaris && typeof pdImportarBackup === 'function') await pdImportarBackup(cap.partsDiaris);
+    return nFotos;
+}
+async function _importarBackupsV3(fitxers) {
+    showSpinner('IMPORTANT...');
+    try {
+        let nFotos = 0;
+        for (let i = 0; i < fitxers.length; i++) nFotos += await _importarBackupV3(fitxers[i], fitxers.length > 1 ? ` ${i + 1}/${fitxers.length}` : '');
+        hideSpinner();
+        historial();
+        if (typeof renderGaleria === 'function') renderGaleria();
+        showToast(`Backup importat correctament (${nFotos} fotos de galeria${fitxers.length > 1 ? ' · ' + fitxers.length + ' fitxers' : ''})`, 'ok', 2500);
+    } catch (err) {
+        hideSpinner();
+        alert("Error important el backup: " + (err && err.message || err));
+    }
+}
+
+async function importarBackup(input) {
+    const fitxers = Array.from(input.files || []);
+    if (!fitxers.length) return;
+    try {   // format v3 (per trossos, un o diversos fitxers)
+        const v3 = [];
+        for (const f of fitxers) if (/^\{"__datacampBackup":true,"version":3,/.test(await f.slice(0, 200).text())) v3.push(f);
+        if (v3.length) {
+            input.value = '';
+            if (v3.length < fitxers.length) alert('Alguns fitxers no són còpies de DataCamp i no s\u2019importaran.');
+            // per ordre de part (_1, _2…)
+            v3.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+            return _importarBackupsV3(v3);
+        }
+    } catch (e) { /* continua amb el format antic */ }
     const fr = new FileReader();
     fr.onload = e => {
         showSpinner('IMPORTANT...');
@@ -12048,10 +12155,7 @@ function importarBackup(input) {
                     });
                 };
                 txRep.oncomplete = () => {
-                    db.transaction("projects").objectStore("projects").getAll().onsuccess = ev2 => {
-                        allProjectsCache = ev2.target.result || [];
-                        historial();
-                    };
+                    projectesLleugers().then(l => { allProjectsCache = l; historial(); });
                 };
                 if (typeof renderGaleria === 'function') renderGaleria();
                 const avis = !storesData.galeriaFotos
@@ -12194,6 +12298,244 @@ function _galeriaQueueSeguent() {
     obrirEditorFotoDirecta(nextImg);
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   ÍNDEX LLEUGER DE PROJECTES
+   Els llistats (inici, Centre de Gestió, Descàrregues, calendari...) només
+   necessiten les dades dels projectes, no les fotos. allProjectsCache guarda
+   una còpia «lleugera» (cada foto és '' però el compte es manté) llegida
+   d'una base de dades a part, i el projecte sencer es llegeix quan cal.
+   Abans s'hi carregaven totes les fotos de tots els projectes en arrencar.
+   ══════════════════════════════════════════════════════════════════ */
+let _pjDb = null;
+/* store original → { idx: magatzem de l'índex, lleu: com fer-ne la còpia lleugera } */
+const PJ_FONTS = {
+    projects:           { idx: 'projectes', lleu: p => ({ ...p, _lleuger: true, registros: (p.registros || []).map(r => r ? { ...r, fotos: (r.fotos || []).map(() => '') } : r) }) },
+    itcInformes:        { idx: 'itc',       lleu: r => ({ ...r, _lleuger: true, fotos: (r.fotos || []).map(() => ''), signatura: r.signatura ? '1' : '',
+                                                         annex: Array.isArray(r.annex) ? r.annex.map(pt => pt ? { ...pt, fotos: (pt.fotos || []).map(f => ({ ...f, img: '' })) } : pt) : r.annex }) },
+    animalsIncidencies: { idx: 'animals',   lleu: r => ({ ...r, _lleuger: true, fotos: (r.fotos || []).map(() => '') }) },
+};
+const _pjCua = new Set();     // 'store\u0001id'
+let _pjTreballant = null;
+function pjObre() {
+    return new Promise(res => {
+        if (_pjDb) return res(_pjDb);
+        let q; try { q = indexedDB.open('DataCampIndex', 1); } catch (e) { return res(null); }
+        q.onupgradeneeded = e => { const d = e.target.result; Object.values(PJ_FONTS).forEach(f => { if (!d.objectStoreNames.contains(f.idx)) d.createObjectStore(f.idx, { keyPath: 'id' }); }); };
+        q.onsuccess = e => { _pjDb = e.target.result; _pjDb.onversionchange = () => { _pjDb.close(); _pjDb = null; }; res(_pjDb); };
+        q.onerror = () => res(null);
+    });
+}
+function pjLleuger(p, store) { if (!p || p._lleuger) return p; return PJ_FONTS[store || 'projects'].lleu(p); }
+function _pjIdb(d, st, mode, fn) {
+    return new Promise((res, rej) => { const tx = d.transaction(st, mode); const r = fn(tx.objectStore(st)); tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error); });
+}
+function idbGet(store, id) {
+    return new Promise(res => { const q = db.transaction(store).objectStore(store).get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); });
+}
+function pjComplet(id) { return idbGet('projects', id); }
+const _pjClaus = new Map();   // clau de cua → [store, id]
+function pjAvisa(id, store) { if (id == null) return; store = store || 'projects'; const k = store + '\u0001' + typeof id + '\u0001' + id; _pjClaus.set(k, [store, id]); _pjCua.add(k); pjTreballa(); }
+function pjTreballa() {
+    if (_pjTreballant) return _pjTreballant;
+    _pjTreballant = (async () => {
+        const d = await pjObre();
+        while (d && _pjCua.size && typeof db !== 'undefined' && db) {
+            const k = _pjCua.values().next().value; _pjCua.delete(k);
+            const [store, id] = _pjClaus.get(k); _pjClaus.delete(k);
+            const f = PJ_FONTS[store];
+            try {
+                const full = await idbGet(store, id);
+                if (!full) await _pjIdb(d, f.idx, 'readwrite', st => st.delete(id));
+                else await _pjIdb(d, f.idx, 'readwrite', st => st.put(f.lleu(full)));
+            } catch (e) { console.warn('[index]', store, id, e); }
+        }
+    })().finally(() => { _pjTreballant = null; if (_pjCua.size) pjTreballa(); });
+    return _pjTreballant;
+}
+/* Tots els registres d'un magatzem en versió lleugera (l'índex es crea sol el primer cop) */
+async function indexLleuger(store) {
+    const f = PJ_FONTS[store];
+    if (!db || !db.objectStoreNames.contains(store)) return [];
+    const d = await pjObre();
+    if (!d) return await new Promise(res => { db.transaction(store).objectStore(store).getAll().onsuccess = e => res((e.target.result || []).map(f.lleu)); });
+    const claus = await new Promise(res => { const q = db.transaction(store).objectStore(store).getAllKeys(); q.onsuccess = e => res(e.target.result || []); q.onerror = () => res([]); });
+    const tenim = new Set((await _pjIdb(d, f.idx, 'readonly', st => st.getAllKeys())) || []);
+    const hiSon = new Set(claus);
+    const sobren = [...tenim].filter(k => !hiSon.has(k));
+    if (sobren.length) await _pjIdb(d, f.idx, 'readwrite', st => sobren.forEach(k => st.delete(k)));
+    claus.filter(k => !tenim.has(k)).forEach(k => pjAvisa(k, store));
+    await pjTreballa();
+    return (await _pjIdb(d, f.idx, 'readonly', st => st.getAll())) || [];
+}
+function projectesLleugers() { return indexLleuger('projects'); }
+/* Canvia camps d'un projecte sobre el registre sencer (mai sobre la còpia lleugera) */
+async function pjModifica(id, canvis) {
+    const full = await pjComplet(id);
+    if (!full) return null;
+    Object.assign(full, canvis);
+    await new Promise((res, rej) => { const tx = db.transaction('projects', 'readwrite'); tx.objectStore('projects').put(full); tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+    const k = allProjectsCache.findIndex(p => p.id === id);
+    if (k >= 0) allProjectsCache[k] = pjLleuger(full);
+    return full;
+}
+(function () {
+    const P = IDBObjectStore.prototype, put0 = P.put, add0 = P.add, del0 = P.delete, clr0 = P.clear;
+    const despres = (st, fn) => { try { st.transaction.addEventListener('complete', fn); } catch (e) {} };
+    const vigilat = st => PJ_FONTS[st.name] && st.transaction.db.name === 'GencatDinaV5';
+    // Si el mòbil es queda sense espai, avisa (abans l'error es perdia i la foto no es desava sense dir res)
+    let _avisatPle = 0;
+    const miraPle = st => { try { st.transaction.addEventListener('abort', ev => {
+        const e = st.transaction.error || ev.target.error;
+        if (e && e.name === 'QuotaExceededError' && Date.now() - _avisatPle > 15000) {
+            _avisatPle = Date.now();
+            setTimeout(() => { try { hideSpinner(); } catch (x) {} alert('⚠️ No queda espai al mòbil per desar més dades a DataCamp.\n\nNo s\u2019ha pogut desar l\u2019últim canvi. Allibera espai (o fes una còpia de seguretat i esborra fotos antigues) i torna-ho a provar.'); }, 0);
+        } }); } catch (x) {} };
+    P.put = function (v) {
+        miraPle(this);
+        if (vigilat(this) && v && v._lleuger) {
+            // Xarxa de seguretat: una còpia lleugera no pot sobreescriure mai les fotos.
+            // Es copien només els camps sense fotos sobre el registre sencer.
+            console.warn('[index] put d’una còpia lleugera convertit en actualització:', this.name, v.id);
+            const st = this, q = st.get(v.id), nom = this.name;
+            q.addEventListener('success', () => {
+                const f = q.result; if (!f) return;
+                const { registros, fotos, annex, signatura, _lleuger, ...camps } = v;
+                put0.call(st, Object.assign(f, camps));
+            });
+            despres(this, () => pjAvisa(v.id, nom));
+            return q;
+        }
+        const r = put0.apply(this, arguments);
+        if (vigilat(this) && v && v.id != null) { const id = v.id, nom = this.name; despres(this, () => pjAvisa(id, nom)); }
+        return r;
+    };
+    P.add = function (v) { const r = add0.apply(this, arguments); if (vigilat(this) && v && v.id != null) { const id = v.id, nom = this.name; despres(this, () => pjAvisa(id, nom)); } return r; };
+    P.delete = function (k) { const r = del0.apply(this, arguments); if (vigilat(this) && (typeof k === 'string' || typeof k === 'number')) { const nom = this.name; despres(this, () => pjAvisa(k, nom)); } return r; };
+    P.clear = function () { const r = clr0.apply(this, arguments); if (vigilat(this)) { const f = PJ_FONTS[this.name]; despres(this, async () => { const d = await pjObre(); if (d) await _pjIdb(d, f.idx, 'readwrite', st => st.clear()); }); } return r; };
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   MINIATURES DE LA GALERIA
+   Cada foto de la galeria (≈0,5 MB) té una miniatura petita (≈25 KB) i les
+   seves dades en una base de dades a part. La graella, el selector de l'annex
+   i els filtres només llegeixen això; la foto gran només es llegeix quan cal
+   (visor, compartir, PDF...). Així la galeria s'obre igual de ràpid amb
+   10 fotos que amb milers, i no s'omple la memòria del mòbil.
+   Les miniatures es mantenen soles: qualsevol put/delete/clear sobre
+   «galeriaFotos» (sigui des d'on sigui) n'avisa la cua.
+   ══════════════════════════════════════════════════════════════════ */
+let _gmDb = null;
+const _gmCua = new Set();
+let _gmTreballant = null;
+const _gmUrls = new Map();     // id → { blob, url }
+function gmObre() {
+    return new Promise(res => {
+        if (_gmDb) return res(_gmDb);
+        let q; try { q = indexedDB.open('DataCampMinis', 1); } catch (e) { return res(null); }
+        q.onupgradeneeded = e => { const d = e.target.result; if (!d.objectStoreNames.contains('minis')) d.createObjectStore('minis', { keyPath: 'id' }); };
+        q.onsuccess = e => { _gmDb = e.target.result; _gmDb.onversionchange = () => { _gmDb.close(); _gmDb = null; }; res(_gmDb); };
+        q.onerror = () => res(null);
+    });
+}
+function gmMeta(item) { const m = { ...item }; delete m.imgData; delete m.imgRaw; return m; }
+async function gmFesMini(src) {
+    const blob = await (await fetch(src)).blob();
+    let bmp;
+    try { bmp = await createImageBitmap(blob); } catch (e) { const i = await peCarregaImatge(src); bmp = i; }
+    const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight;
+    const f = Math.min(1, 420 / Math.max(w0, h0));
+    const cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(w0 * f)); cv.height = Math.max(1, Math.round(h0 * f));
+    const cx = cv.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(bmp, 0, 0, cv.width, cv.height);
+    if (bmp.close) bmp.close();
+    return await new Promise(r => cv.toBlob(b => r(b), 'image/jpeg', 0.72));
+}
+function _gmIdb(d, mode, fn) {
+    return new Promise((res, rej) => { const tx = d.transaction('minis', mode); const r = fn(tx.objectStore('minis')); tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error); });
+}
+function gmAvisa(id) { if (id == null) return; _gmCua.add(id); gmTreballa(); }
+function gmTreballa() {
+    if (_gmTreballant) return _gmTreballant;
+    // Dos fils alhora: mentre un descodifica una foto, l'altre ja en llegeix la següent
+    const fil = async () => {
+        const d = await gmObre();
+        while (d && _gmCua.size && typeof db !== 'undefined' && db) {
+            const id = _gmCua.values().next().value; _gmCua.delete(id);
+            try {
+                const full = await new Promise(res => { const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); });
+                if (!full || !full.imgData) { await _gmIdb(d, 'readwrite', st => st.delete(id)); _gmRevoca(id); continue; }
+                const mini = await gmFesMini(full.imgData);
+                await _gmIdb(d, 'readwrite', st => st.put({ id: full.id, meta: gmMeta(full), mini, v: Date.now() + Math.random() }));
+                _gmRevoca(id);
+                if (_gmProgres) _gmProgres();
+            } catch (e) { console.warn('[minis]', id, e); }
+        }
+    };
+    _gmTreballant = Promise.all([fil(), fil()]).finally(() => { _gmTreballant = null; if (_gmCua.size) gmTreballa(); });
+    return _gmTreballant;
+}
+let _gmProgres = null;
+function _gmRevoca(id) { const u = _gmUrls.get(id); if (u) { URL.revokeObjectURL(u.url); _gmUrls.delete(id); } }
+function gmUrl(it) {
+    if (!it || !it._mini) return '';
+    // Es reaprofita l'adreça mentre la miniatura sigui la mateixa (v): crear-ne milers cada cop és lent
+    const u = _gmUrls.get(it.id);
+    if (u && u.v === it._mv) return u.url;
+    if (u) URL.revokeObjectURL(u.url);
+    const url = URL.createObjectURL(it._mini); _gmUrls.set(it.id, { v: it._mv, url }); return url;
+}
+/* Posa al dia les miniatures (crea les que falten — p. ex. fotos d'abans d'aquesta versió — i treu les sobrants) */
+async function galeriaMinisSincronitza(onProgres) {
+    const d = await gmObre();
+    if (!d || !db || !db.objectStoreNames.contains('galeriaFotos')) return;
+    const claus = await new Promise(res => { const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').getAllKeys(); q.onsuccess = e => res(e.target.result || []); q.onerror = () => res([]); });
+    const tenim = new Set((await _gmIdb(d, 'readonly', st => st.getAllKeys())) || []);
+    const hiSon = new Set(claus);
+    const falten = claus.filter(k => !tenim.has(k));
+    const sobren = [...tenim].filter(k => !hiSon.has(k));
+    if (sobren.length) { await _gmIdb(d, 'readwrite', st => sobren.forEach(k => st.delete(k))); sobren.forEach(_gmRevoca); }
+    if (falten.length) {
+        let fets = 0; const total = falten.length;
+        _gmProgres = () => { fets++; if (onProgres) onProgres(fets, total); };
+        falten.forEach(k => _gmCua.add(k));
+    }
+    await gmTreballa();
+    _gmProgres = null;
+}
+/* Llista lleugera: dades de cada foto + miniatura (sense les fotos grans) */
+async function galeriaLlegirLleugeres(onProgres) {
+    await galeriaMinisSincronitza(onProgres);
+    const d = await gmObre();
+    if (!d) {   // sense la base de miniatures (navegador molt antic): llegeix les fotos senceres
+        return await new Promise(res => galeriaLlegirTotes(items => res(items.map(x => ({ ...gmMeta(x), _src: x.imgData })))));
+    }
+    const recs = (await _gmIdb(d, 'readonly', st => st.getAll())) || [];
+    return recs.map(r => ({ ...r.meta, _mini: r.mini, _mv: r.v }));
+}
+/* Filtra amb la llista lleugera i només llegeix senceres les fotos que passen el filtre */
+function galeriaLlegirFiltrades(filtre, callback) {
+    galeriaLlegirLleugeres().then(async lleu => {
+        const tria = filtre(lleu) || [];
+        const fulls = [];
+        for (const it of tria) { const f = await galeriaComplet(it.id); if (f) fulls.push(f); }
+        callback(fulls);
+    });
+}
+function galeriaSrcMini(it) { return it._src || gmUrl(it); }
+/* La foto sencera (amb imgData / imgRaw) d'una foto de la galeria */
+function galeriaComplet(id) {
+    return new Promise(res => { const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); });
+}
+/* Intercepta les escriptures a «galeriaFotos» per mantenir les miniatures al dia */
+(function () {
+    const P = IDBObjectStore.prototype, put0 = P.put, add0 = P.add, del0 = P.delete, clr0 = P.clear;
+    const despres = (st, fn) => { try { st.transaction.addEventListener('complete', fn); } catch (e) {} };
+    P.put = function (v) { const r = put0.apply(this, arguments); if (this.name === 'galeriaFotos' && this.transaction.db.name === 'GencatDinaV5' && v && v.id != null) { const id = v.id; despres(this, () => gmAvisa(id)); } return r; };
+    P.add = function (v) { const r = add0.apply(this, arguments); if (this.name === 'galeriaFotos' && v && v.id != null) { const id = v.id; despres(this, () => gmAvisa(id)); } return r; };
+    P.delete = function (k) { const r = del0.apply(this, arguments); if (this.name === 'galeriaFotos' && (typeof k === 'string' || typeof k === 'number')) { despres(this, () => gmAvisa(k)); } return r; };
+    P.clear = function () { const r = clr0.apply(this, arguments); if (this.name === 'galeriaFotos') { despres(this, async () => { const d = await gmObre(); if (d) await _gmIdb(d, 'readwrite', st => st.clear()); _gmUrls.forEach(u => URL.revokeObjectURL(u.url)); _gmUrls.clear(); }); } return r; };
+})();
+
 /* Llegeix totes les fotos de la galeria */
 function galeriaLlegirTotes(callback) {
     if (!db.objectStoreNames.contains("galeriaFotos")) { callback([]); return; }
@@ -12208,8 +12550,19 @@ let galeriaFCarr   = 'TOTES'; // filtre carretera actiu
 let galeriaFiltratsActuals = []; // llista filtrada+ordenada actual (per swipe al visor)
 let galeriaFIncidencia = '';   // filtre tipus incidència ('' = totes)
 
+let _galeriaRenderN = 0;
+const _galFmtDia = new Intl.DateTimeFormat('ca-ES', { day: '2-digit', month: '2-digit' });   // un sol formatador (crear-lo per cada foto era lent)
 function renderGaleria() {
-    galeriaLlegirTotes(items => {
+    const n = ++_galeriaRenderN;
+    const grid0 = document.getElementById('galeriaGrid');
+    let avisat = false;
+    galeriaLlegirLleugeres((fets, total) => {
+        if (n !== _galeriaRenderN || !grid0 || total < 8) return;
+        if (!avisat) { avisat = true; grid0.innerHTML = '<div id="galeriaOptimitza" style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:0.88rem;"></div>'; }
+        const el = document.getElementById('galeriaOptimitza');
+        if (el) el.textContent = `Preparant les miniatures de la galeria… ${fets} de ${total} (només el primer cop)`;
+    }).then(items => {
+        if (n !== _galeriaRenderN) return;
         // Guardar tots per filtres
         galeriaItems = items;
 
@@ -12253,10 +12606,10 @@ function renderGaleria() {
             const roadLabel = item.carr || '—';
             const pkLabel   = item.pk   ? `PK ${item.pk}` : '';
             const sel       = galeriaSeleccio.has(item.id) ? 'selected' : '';
-            const dateStr   = item.ts ? new Date(item.ts).toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit'}) : '';
+            const dateStr   = item.ts ? _galFmtDia.format(item.ts) : '';
             return `
             <div class="galeria-thumb ${sel}" data-id="${item.id}" onclick="galeriaThumbnailClick('${item.id}')">
-                <img src="${item.imgData}" loading="lazy" alt="${roadLabel}">
+                <img src="${galeriaSrcMini(item)}" loading="lazy" decoding="async" alt="${roadLabel}">
                 <div class="galeria-thumb-check">${sel ? '✓' : ''}</div>
                 ${item.reparada ? '<div class="galeria-thumb-reparada" title="Reparada">✓</div>' : ''}
                 <div class="galeria-thumb-info">
@@ -12556,7 +12909,7 @@ function _galeriaTextCompartir(item) {
 async function galeriaCompartirSeleccio() {
     if (galeriaSeleccio.size === 0) { showToast('Cap foto seleccionada'); return; }
     const ids   = Array.from(galeriaSeleccio);
-    const items = galeriaItems.filter(i => ids.includes(i.id));
+    const items = (await Promise.all(ids.map(galeriaComplet))).filter(Boolean);
     try {
         const files = await Promise.all(items.map(async (item, idx) => {
             const res  = await fetch(item.imgData);
@@ -12591,6 +12944,28 @@ async function galeriaCompartirSeleccio() {
 }
 
 /* ──── VISOR ─────────────────────────────────────────────── */
+let _visorFull = null;
+function _visorCarregaComplet(id) {
+    if (_visorFull && _visorFull.id === id) return Promise.resolve(_visorFull);
+    return galeriaComplet(id).then(async f => {
+        if (!f || visorCurrentId !== id) return f;
+        _visorFull = f;
+        const pre = new Image(); pre.src = f.imgData;
+        try { await pre.decode(); } catch (e) {}
+        const img = document.getElementById('visorImg');
+        if (visorCurrentId === id && img) img.src = f.imgData;
+        // Si les dades de la miniatura no coincideixen (p. ex. editades amb l'app tancada a mig fer), es refà
+        const l = galeriaItems.find(i => i.id === id);
+        if (l && ['carr', 'pk', 'marge', 'tipusIncidencia', 'reparada', 'editadaTs', 'animalFitxaId'].some(k => (l[k] ?? null) !== (f[k] ?? null))) gmAvisa(id);
+        return f;
+    });
+}
+/* La foto del visor, sencera (per editar, compartir, descarregar, PDF...) */
+async function visorItemComplet() {
+    if (!visorCurrentId) return null;
+    if (_visorFull && _visorFull.id === visorCurrentId) return _visorFull;
+    return (await _visorCarregaComplet(visorCurrentId)) || null;
+}
 function galeriaObrirVisor(id) {
     const item = galeriaItems.find(i => i.id === id);
     if (!item) return;
@@ -12599,7 +12974,10 @@ function galeriaObrirVisor(id) {
     const img   = document.getElementById('visorImg');
     const title = document.getElementById('visorTitle');
     if (typeof window.visorResetZoom === 'function') window.visorResetZoom();
-    img.src = item.imgData;
+    // Primer la miniatura (al moment) i, quan és a punt, la foto sencera
+    if (!(_visorFull && _visorFull.id === id)) { _visorFull = null; img.src = galeriaSrcMini(item); }
+    else img.src = _visorFull.imgData;
+    _visorCarregaComplet(id);
     let t = item.carr || 'Foto Ràpida';
     if (item.pk) t += ` — PK ${item.pk}`;
     if (item.marge) t += ` (${item.marge})`;
@@ -12787,6 +13165,7 @@ function tancarVisor() {
     document.getElementById('visorImg').src = '';
     document.body.style.overflow = '';
     visorCurrentId = null;
+    _visorFull = null;
     document.getElementById('visorMenuDropdown')?.classList.remove('open');
     if (typeof window.visorResetZoom === 'function') window.visorResetZoom();
 }
@@ -12803,8 +13182,8 @@ document.addEventListener('click', e => {
     }
 });
 
-function visorEditarDades() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+async function visorEditarDades() {
+    const item = await visorItemComplet();
     if (!item) return;
     _fdEditId = item.id;
     _fdEditOriginal = { ...item };
@@ -12815,7 +13194,7 @@ function visorEditarDades() {
 /* Edita la foto (retallar, girar, marcar). Si té peu de foto, s'edita l'original
    i es torna a posar el peu, perquè no es perdi en canviar després les dades. */
 async function visorEditarFoto() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    const item = await visorItemComplet();
     if (!item) return;
     document.getElementById('visorMenuDropdown')?.classList.remove('open');
     const ambPeu = !!(item.wmAplicat && item.imgRaw);
@@ -12840,8 +13219,10 @@ async function visorEditarFoto() {
             act.imgData = await aplicarMarcaAigua(nova, parts.join(' \u2022 '));
         } else act.imgData = nova;
         await new Promise((res, rej) => { const tx = db.transaction('galeriaFotos', 'readwrite'); tx.objectStore('galeriaFotos').put(act); tx.oncomplete = res; tx.onerror = e => rej(e.target.error); });
-        if (r.copia) { galeriaItems.push(act); visorCurrentId = act.id; }
-        else { const k = galeriaItems.findIndex(i => i.id === item.id); if (k >= 0) galeriaItems[k] = act; }
+        const lleu = { ...gmMeta(act), _src: act.imgData };
+        if (r.copia) { galeriaItems.push(lleu); visorCurrentId = act.id; }
+        else { const k = galeriaItems.findIndex(i => i.id === item.id); if (k >= 0) galeriaItems[k] = lleu; }
+        _visorFull = act;
         document.getElementById('visorImg').src = act.imgData;
         renderGaleria();
         showToast(r.copia ? 'Còpia desada: tens les dues fotos' : 'Foto desada');
@@ -12849,8 +13230,8 @@ async function visorEditarFoto() {
     hideSpinner();
 }
 
-function visorFitxaAnimal() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+async function visorFitxaAnimal() {
+    const item = await visorItemComplet();
     if (!item) return;
     tancarVisor();
     if (item.animalFitxaId) {
@@ -12868,7 +13249,7 @@ function visorFitxaAnimal() {
 }
 
 async function visorCompartir() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    const item = await visorItemComplet();
     if (!item) return;
     try {
         const res  = await fetch(item.imgData);
@@ -12888,8 +13269,8 @@ async function visorCompartir() {
     }
 }
 
-function visorDescarregar() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+async function visorDescarregar() {
+    const item = await visorItemComplet();
     if (!item) return;
     const name = item.carr
         ? `${item.carr}_PK${item.pk}_${item.marge || ''}.jpg`.replace(/[^a-z0-9_.-]/gi,'_')
@@ -12930,7 +13311,7 @@ function visorEliminar() {
 
 /* Genera un informe PDF (Fitxa) d'una sola foto, des del visor a pantalla completa */
 async function visorGenerarInformePDF() {
-    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    const item = await visorItemComplet();
     if (!item) return;
     showSpinner('GENERANT INFORME PDF...');
     try {
@@ -14109,7 +14490,7 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
             tipusEntrada: 'captura'
         };
         db.transaction("projects","readwrite").objectStore("projects").put(projecteCaptura);
-        allProjectsCache.push(projecteCaptura);
+        allProjectsCache.push(pjLleuger(projecteCaptura));
     };
 
     try {
@@ -14152,6 +14533,7 @@ async function generarInformeObraPDF(id) {
 
     /* ── Resolve project: try cache first, then DB ──────────── */
     let p = allProjectsCache.find(x => x.id === id);
+    if (p && p._lleuger) p = null;   // cal el projecte sencer (amb fotos)
     if (!p && db) {
         /* Cache miss — load directly from IndexedDB */
         p = await new Promise(resolve => {
@@ -15067,7 +15449,7 @@ function captureGeoForProject(projectId, callback) {
             const idx = allProjectsCache.findIndex(p => p.id === projectId);
             if (idx > -1 && !allProjectsCache[idx].coordenades) {
                 allProjectsCache[idx].coordenades = coordStr;
-                db.transaction("projects","readwrite").objectStore("projects").put(allProjectsCache[idx]);
+                pjModifica(projectId, { coordenades: coordStr });
             }
             callback(coordStr);
         },
@@ -20341,7 +20723,7 @@ function itcMargeCurt(m) { const t = String(m || '').toUpperCase(); return t ===
 
 /* ── Base de dades ─────────────────────────────────────── */
 function itcGet(id) { return new Promise(res => { const q = db.transaction('itcInformes').objectStore('itcInformes').get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); }); }
-function itcTots() { return new Promise(res => { const q = db.transaction('itcInformes').objectStore('itcInformes').getAll(); q.onsuccess = e => res(e.target.result || []); q.onerror = () => res([]); }); }
+function itcTots() { return indexLleuger('itcInformes'); }   // còpies lleugeres (sense fotos): només per llistar i cercar
 function itcPut(r) { return new Promise((res, rej) => { const tx = db.transaction('itcInformes', 'readwrite'); tx.objectStore('itcInformes').put(r); tx.oncomplete = () => res(r); tx.onerror = e => rej(e.target.error); }); }
 function itcDesarAviat() {             // desat automàtic (sense botó) en editar l'annex
     clearTimeout(_itcDesarT);
@@ -20571,12 +20953,10 @@ async function itcObrirSelector(i) {
     const ov = document.getElementById('itcSelector');
     ov.classList.add('open'); document.body.classList.add('pe-obert');
     document.getElementById('itcSelGraella').innerHTML = '<p class="itc-sel-buit">Carregant…</p>';
-    itcSel.items = await new Promise(res => {
-        if (!db.objectStoreNames.contains('galeriaFotos')) return res([]);
-        const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').getAll();
-        q.onsuccess = e => res((e.target.result || []).filter(x => x.imgData).sort((a, b) => (b.ts || 0) - (a.ts || 0)));
-        q.onerror = () => res([]);
-    });
+    const g0 = document.getElementById('itcSelGraella');
+    itcSel.items = (await galeriaLlegirLleugeres((fets, total) => {
+        if (total >= 8 && g0) g0.innerHTML = `<p class="itc-sel-buit">Preparant les miniatures… ${fets} de ${total} (només el primer cop)</p>`;
+    })).sort((a, b) => (b.ts || 0) - (a.ts || 0));
     // Si cap foto és d'aquesta carretera, comencem sense el filtre
     if (itcSel.carr && !itcSel.items.some(x => String(x.carr || '').toUpperCase().replace(/\s+/g, '') === itcSel.carr)) itcSel.carr = '';
     itcRenderSelector();
@@ -20607,7 +20987,7 @@ function itcRenderSelector() {
         g.innerHTML = llista.map(x => {
             const n = itcSel.tria.indexOf(x.id) + 1, d = x.ts ? new Date(x.ts) : null;
             return `<button type="button" class="itc-sel-foto ${n ? 'on' : ''} ${jaDins.has(x.id) ? 'ja' : ''}" data-id="${itcEsc(x.id)}" aria-pressed="${!!n}">
-                <img src="${x.imgData}" alt="" loading="lazy" decoding="async">
+                <img src="${galeriaSrcMini(x)}" alt="" loading="lazy" decoding="async">
                 <span class="itc-sel-n"${n ? '' : ' hidden'}>${n || ''}</span>
                 ${jaDins.has(x.id) ? '<span class="itc-sel-ja">A l’annex</span>' : ''}
                 <span class="itc-sel-peu"><b>${x.carr ? itcEsc(x.carr) : '—'}</b><small>${x.pk ? 'PK ' + itcEsc(x.pk) : ''}${x.pk && d ? ' · ' : ''}${d ? String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear() : ''}</small></span>
@@ -20649,9 +21029,10 @@ document.addEventListener('pointerdown', e => {
     if (b) { b._sx = e.clientX; b._sy = e.clientY; }
 });
 async function itcSelAfegir() {
-    const items = itcSel.tria.map(id => itcSel.items.find(x => x.id === id)).filter(Boolean)
-        .map(x => ({ img: x.imgData, ts: x.ts, carr: x.carr, pk: x.pk, marge: x.marge, galId: x.id }));
+    const tria = itcSel.tria.slice();
     itcTancaSelector();
+    const items = (await Promise.all(tria.map(galeriaComplet))).filter(x => x && x.imgData)
+        .map(x => ({ img: x.imgData, ts: x.ts, carr: x.carr, pk: x.pk, marge: x.marge, galId: x.id }));
     await itcAfegeixFotos(itcSel.punt, items);
 }
 
@@ -21062,7 +21443,7 @@ const NV_ITEMS = [
     { ico: 'i-spark',    to: 'tone-violet', t: 'Disseny nou',
       d: "Icones professionals, línia de carretera a la capçalera i una benvinguda que et saluda segons l'hora." },
     { ico: 'i-download', to: 'tone-slate', t: 'Còpia de seguretat completa',
-      d: 'El backup ara també desa els comunicats, les rutes, les teves carreteres i les teves dades.' }
+      d: 'El backup ara també desa els comunicats, les rutes, les teves carreteres i les teves dades, i funciona encara que tinguis milers de fotos.' }
 ];
 
 function nvRender() {
