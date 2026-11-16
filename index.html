@@ -6135,17 +6135,24 @@ body.pe-obert { overflow: hidden; }
 .itc-xip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1.5px solid var(--border-dark); background: var(--surface); font: 600 .85rem var(--font); color: var(--text); cursor: pointer; }
 .itc-xip .ico { font-size: 15px; }
 .itc-xip.on { background: var(--dark); border-color: var(--dark); color: #fff; }
-.itc-sel-graella { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 4px; padding: 0 4px 12px; align-content: start; }
-.itc-sel-foto { position: relative; aspect-ratio: 1; padding: 0; border: 0; overflow: hidden; cursor: pointer; background: #ddd; }
-.itc-sel-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .15s; }
-.itc-sel-foto.on img { transform: scale(.88); }
-.itc-sel-foto.on { background: var(--primary); }
-.itc-sel-foto.ja { opacity: .55; }
-.itc-sel-n { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; font-size: .85rem; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
-.itc-sel-ja { position: absolute; top: 6px; left: 6px; font-size: .65rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; }
-.itc-sel-peu { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; font-size: .7rem; text-align: left; line-height: 1.25; }
-.itc-sel-peu b { font-family: var(--font-cond); font-size: .8rem; }
-.itc-sel-peu small { display: block; opacity: .8; font-size: .62rem; }
+.itc-sel-graella { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: max-content; gap: 10px; padding: 2px 12px 16px; align-content: start; }
+@media (max-width: 768px) { .itc-sel-graella { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 2px 8px 14px; } }
+@media (max-width: 390px) { .itc-sel-graella { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Mateixa miniatura que la galeria: 4:3, cantonades arrodonides, peu amb carretera i PK */
+.itc-sel-foto { position: relative; display: block; width: 100%; height: auto; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: var(--radius-sm, 8px); overflow: hidden; cursor: pointer;
+    background: var(--bg-alt, #e5e7eb); box-shadow: var(--shadow-sm); touch-action: manipulation; -webkit-tap-highlight-color: transparent; align-self: start; }
+.itc-sel-foto::before { content: ''; display: block; padding-top: 75%; }
+.itc-sel-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.itc-sel-foto::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 0 var(--primary); transition: box-shadow .12s ease; pointer-events: none; }
+.itc-sel-foto.on::after { box-shadow: inset 0 0 0 3px var(--primary); background: rgba(198,12,48,.14); }
+.itc-sel-foto.ja img { opacity: .5; }
+.itc-sel-n { position: absolute; top: 5px; right: 5px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,.25); box-shadow: 0 0 0 2px #fff; color: #fff; font-weight: 800; font-size: .8rem; display: grid; place-items: center; }
+.itc-sel-foto.on .itc-sel-n { background: var(--primary); }
+.itc-sel-n[hidden] { display: none; }
+.itc-sel-ja { position: absolute; top: 5px; left: 5px; z-index: 2; font-size: .6rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; }
+.itc-sel-peu { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 12px 5px 4px; background: linear-gradient(to top, rgba(0,0,0,.62), rgba(0,0,0,0)); color: rgba(255,255,255,.92); text-align: left; line-height: 1.1; pointer-events: none; }
+.itc-sel-peu b { display: block; font-family: var(--font-cond); font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .2px; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.itc-sel-peu small { display: block; font-family: var(--font-cond); font-size: .52rem; color: rgba(255,255,255,.68); text-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .itc-sel-buit { grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: .9rem; }
 .itc-sel-peu-bar { padding: 10px 12px max(12px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); }
 .itc-sel-peu-bar .btn { margin: 0 !important; width: 100%; }
@@ -6179,7 +6186,7 @@ html.mou-anim .page-content { overflow: hidden; overflow: clip; }
 @keyframes mouZoom { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 @keyframes mouPuja { from { transform: translateY(100%); } to { transform: none; } }
 /* Resposta al toc, suau */
-.itc-targeta, .pd-conf, .pd-dia, .action-card, .pd-ruta-chip, .itc-foto, .itc-sel-foto { transition: transform .22s cubic-bezier(.32,.72,0,1); }
+.itc-targeta, .pd-conf, .pd-dia, .action-card, .pd-ruta-chip, .itc-foto { transition: transform .22s cubic-bezier(.32,.72,0,1); }
 @media (prefers-reduced-motion: reduce) {
     .fe-sheet-overlay, .fe-sheet, .fe-sheet-overlay.open .fe-sheet { transition: none; }
     .modal, .modal-box, #peEditor.open, #itcSelector.open { animation: none; }
@@ -11030,9 +11037,7 @@ function _itcRenderFotosGrid() {
 }
 
 function _itcAfegirFotos(files) {
-    const restant = 3 - _itcFotos.length;
-    if (restant <= 0) { showToast('⚠️ Màxim 3 fotos per informe'); return; }
-    const arr = Array.from(files).slice(0, restant);
+    const arr = Array.from(files);
     Promise.all(arr.map(f => new Promise(res => {
         const reader = new FileReader();
         reader.onload = e => res(e.target.result);
@@ -11049,7 +11054,6 @@ function _itcVeureFoto(i) {
         titol: 'Foto ' + (i + 1) + ' de ' + _itcFotos.length,
         editar: nova => { _itcFotos[i] = nova; _itcRenderFotosGrid(); },
         copia: nova => { _itcFotos.splice(i + 1, 0, nova); _itcRenderFotosGrid(); _itcVeureFoto(i + 1); showToast('Còpia desada: tens les dues fotos'); },
-        copiaNo: () => _itcFotos.length >= 3 ? 'No hi caben: màxim 3 fotos per informe' : '',
         descarregar: src => descarregarFoto(src, 'foto_' + (i + 1) + '.jpg'),
         eliminar: () => { _itcFotos.splice(i, 1); _itcRenderFotosGrid(); return true; }
     });
@@ -20602,11 +20606,11 @@ function itcRenderSelector() {
     } else {
         g.innerHTML = llista.map(x => {
             const n = itcSel.tria.indexOf(x.id) + 1, d = x.ts ? new Date(x.ts) : null;
-            return `<button type="button" class="itc-sel-foto ${n ? 'on' : ''} ${jaDins.has(x.id) ? 'ja' : ''}" onclick="itcSelToggle('${x.id}')" aria-pressed="${!!n}">
-                <img src="${x.imgData}" alt="" loading="lazy">
-                ${n ? `<span class="itc-sel-n">${n}</span>` : ''}
+            return `<button type="button" class="itc-sel-foto ${n ? 'on' : ''} ${jaDins.has(x.id) ? 'ja' : ''}" data-id="${itcEsc(x.id)}" aria-pressed="${!!n}">
+                <img src="${x.imgData}" alt="" loading="lazy" decoding="async">
+                <span class="itc-sel-n"${n ? '' : ' hidden'}>${n || ''}</span>
                 ${jaDins.has(x.id) ? '<span class="itc-sel-ja">A l’annex</span>' : ''}
-                <span class="itc-sel-peu">${x.carr ? '<b>' + itcEsc(x.carr) + '</b> ' : ''}${x.pk ? 'PK ' + itcEsc(x.pk) : ''}<small>${d ? String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear() : ''}</small></span>
+                <span class="itc-sel-peu"><b>${x.carr ? itcEsc(x.carr) : '—'}</b><small>${x.pk ? 'PK ' + itcEsc(x.pk) : ''}${x.pk && d ? ' · ' : ''}${d ? String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear() : ''}</small></span>
             </button>`;
         }).join('');
     }
@@ -20614,11 +20618,36 @@ function itcRenderSelector() {
     bt.disabled = !n;
     bt.textContent = n ? 'Afegir ' + n + (n === 1 ? ' foto' : ' fotos') : 'Tria les fotos';
 }
+/* Tocar una foto: només es canvia la marca (sense tornar a pintar la graella) → resposta immediata */
 function itcSelToggle(id) {
     const k = itcSel.tria.indexOf(id);
     if (k >= 0) itcSel.tria.splice(k, 1); else itcSel.tria.push(id);
-    itcRenderSelector();
+    itcSelMarques();
 }
+function itcSelMarques() {
+    document.querySelectorAll('#itcSelGraella .itc-sel-foto').forEach(b => {
+        const n = itcSel.tria.indexOf(b.dataset.id) + 1, nb = b.querySelector('.itc-sel-n');
+        b.classList.toggle('on', !!n); b.setAttribute('aria-pressed', String(!!n));
+        nb.hidden = !n; nb.textContent = n || '';
+    });
+    const n = itcSel.tria.length, bt = document.getElementById('itcSelAfegir');
+    bt.disabled = !n;
+    bt.textContent = n ? 'Afegir ' + n + (n === 1 ? ' foto' : ' fotos') : 'Tria les fotos';
+}
+document.addEventListener('pointerup', e => {           // resposta al moment d'aixecar el dit
+    const b = e.target.closest && e.target.closest('#itcSelGraella .itc-sel-foto');
+    if (!b || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (b._sx != null && Math.abs(e.clientY - b._sy) + Math.abs(e.clientX - b._sx) > 10) return;   // era un desplaçament
+    itcSelToggle(b.dataset.id);
+});
+document.addEventListener('click', e => {              // teclat (Intro / espai)
+    const b = e.detail === 0 && e.target.closest && e.target.closest('#itcSelGraella .itc-sel-foto');
+    if (b) itcSelToggle(b.dataset.id);
+});
+document.addEventListener('pointerdown', e => {
+    const b = e.target.closest && e.target.closest('#itcSelGraella .itc-sel-foto');
+    if (b) { b._sx = e.clientX; b._sy = e.clientY; }
+});
 async function itcSelAfegir() {
     const items = itcSel.tria.map(id => itcSel.items.find(x => x.id === id)).filter(Boolean)
         .map(x => ({ img: x.imgData, ts: x.ts, carr: x.carr, pk: x.pk, marge: x.marge, galId: x.id }));
