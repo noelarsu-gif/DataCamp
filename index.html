@@ -256,7 +256,6 @@ html, body {
    ============================================================ */
 .screen {
     display: none;
-    animation: fadeSlide 0.28s cubic-bezier(.4,0,.2,1);
     width: 100%;
     box-sizing: border-box;
     min-width: 0;
@@ -3265,8 +3264,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     -webkit-user-drag: none;
     pointer-events: none;
 }
-.galeria-thumb:hover img { transform: scale(1.04); }
-.galeria-thumb:hover { box-shadow: var(--shadow-md); }
+@media (hover: hover) and (pointer: fine) {
+    .galeria-thumb:hover img { transform: scale(1.04); }
+    .galeria-thumb:hover { box-shadow: var(--shadow-md); }
+}
 .galeria-thumb.selected {
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 3px rgba(29,78,216,0.30);
@@ -6133,9 +6134,10 @@ body.pe-obert { overflow: hidden; }
 .page-content { position: relative; }
 html.mou-anim, html.mou-anim body { overflow-x: hidden; }
 html.mou-anim .screen { animation: none; }
+html.mou-anim .page-content { overflow: hidden; overflow: clip; }
 .screen.mou-fantasma { display: block !important; position: absolute; pointer-events: none; background: var(--bg); will-change: transform; }
 .screen.mou-actiu { position: relative; background: var(--bg); min-height: calc(100vh - 120px); will-change: transform; }
-.mou-clon { position: fixed; z-index: 10070; overflow: hidden; pointer-events: none; box-shadow: 0 12px 34px rgba(0,0,0,.28); will-change: left, top, width, height; }
+.mou-clon { position: fixed; z-index: 10070; overflow: hidden; pointer-events: none; will-change: left, top, width, height; }
 .mou-clon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* Fulls inferiors: pugen amb la corba d'iOS i baixen en tancar */
 .fe-sheet-overlay {
@@ -20603,16 +20605,30 @@ function mouAcabaPantalles() {
     _mouPant.neteja();
     _mouPant = null;
 }
-/** Anima el canvi de pantalla. El canvi ja s'ha fet (síncron): l'anterior es manté uns instants com a «fantasma». */
-function mouPantalles(vell, nou, dir) {
+let _mouActual = null;                     // pantalla visible ara (també les creades al moment)
+let _mouScrollY = 0;                       // últim desplaçament conegut (abans que el canvi el posi a 0)
+function mouScrollTop() { return Math.max(window.scrollY || 0, document.body ? document.body.scrollTop : 0, document.documentElement.scrollTop || 0); }
+function mouScrollAlCap() { try { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; if (document.body) document.body.scrollTop = 0; } catch (e) {} _mouScrollY = 0; }
+document.addEventListener('scroll', () => { _mouScrollY = mouScrollTop(); }, { passive: true, capture: true });
+/** Anima el canvi de pantalla. El canvi ja s'ha fet (síncron): l'anterior es manté uns instants com a «fantasma».
+ *  o.sy: desplaçament vertical que tenia l'anterior · o.separat: l'anterior ja s'havia tret del DOM */
+function mouPantalles(vell, nou, dir, o) {
+    o = o || {};
     mouAcabaPantalles();
-    if (mouReduit() || !vell || !nou || vell === nou || !vell.isConnected) return;
+    if (mouReduit() || !vell || !nou || vell === nou) return;
     if (MOU_SENSE_ANIM.has(vell.id) || MOU_SENSE_ANIM.has(nou.id)) return;
     const pare = nou.parentElement;
-    if (!pare || vell.parentElement !== pare) return;
-    const top = vell.dataset.mouTop != null ? Number(vell.dataset.mouTop) : nou.offsetTop;
+    if (!pare) return;
+    if (o.separat) {
+        // Pantalla creada al moment i ja eliminada: la tornem a posar només com a imatge (sense ids ni noms)
+        vell.classList.remove('active');
+        vell.removeAttribute('id');
+        vell.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); });
+        pare.appendChild(vell);
+    } else if (!vell.isConnected || vell.parentElement !== pare) return;
     vell.classList.add('mou-fantasma');
-    vell.style.top = top + 'px'; vell.style.left = nou.offsetLeft + 'px'; vell.style.width = nou.offsetWidth + 'px';
+    vell.style.top = (nou.offsetTop - (o.sy || 0)) + 'px';
+    vell.style.left = nou.offsetLeft + 'px'; vell.style.width = nou.offsetWidth + 'px';
     nou.classList.add('mou-actiu');
     document.documentElement.classList.add('mou-anim');
     const opt = { duration: MOU_DUR, easing: MOU_CORBA, fill: 'both' };
@@ -20635,6 +20651,7 @@ function mouPantalles(vell, nou, dir) {
         vell.classList.remove('mou-fantasma'); nou.classList.remove('mou-actiu');
         ['top', 'left', 'width', 'zIndex'].forEach(k => { vell.style[k] = ''; nou.style[k] = ''; });
         anims.forEach(a => { try { a.cancel(); } catch (e) {} });
+        if (o.separat) vell.remove();
         document.documentElement.classList.remove('mou-anim');
     };
     _mouPant = { anims, neteja };
@@ -20644,13 +20661,18 @@ function mouPantalles(vell, nou, dir) {
     if (typeof ir !== 'function' || ir._mou) return;
     const original = ir;
     const nou = function (id) {
-        const vell = document.querySelector('.page-content > .screen.active');
-        const dir = mouDireccio(vell && vell.id, id);
-        if (vell) vell.dataset.mouTop = vell.offsetTop;
+        let vell = document.querySelector('.page-content > .screen.active'), separat = false;
+        if (!vell && _mouActual && !_mouActual.isConnected && _mouActual.id !== id) { vell = _mouActual; separat = true; }
+        let dir = mouDireccio(vell && vell.id, id);
+        if (!dir && separat) dir = 'enrere';
+        const sy = mouScrollTop();
         original.apply(this, arguments);
+        mouScrollAlCap();                  // la pantalla nova sempre comença a dalt (el cos és qui fa scroll)
         const desti = document.getElementById(id);
-        if (dir && vell && desti && desti.classList.contains('active')) mouPantalles(vell, desti, dir);
-        if (vell) delete vell.dataset.mouTop;
+        if (desti && desti.classList.contains('active')) {
+            if (dir && vell) mouPantalles(vell, desti, dir, { sy, separat });
+            _mouActual = desti;
+        }
     };
     nou._mou = true;
     ir = nou;
@@ -20665,11 +20687,15 @@ function mouEntraPantallaNova(el) {
     const inicia = () => {
         const pc = document.querySelector('.page-content');
         if (!pc) return;
+        _mouActual = pc.querySelector(':scope > .screen.active');
         new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
-            if (n.nodeType === 1 && n.classList.contains('screen') && n.classList.contains('active')) {
-                if (n.id && !_navPila.includes(n.id)) _navPila.push(n.id);
-                mouEntraPantallaNova(n);
-            }
+            if (n.nodeType !== 1 || !n.classList.contains('screen') || !n.classList.contains('active') || n.classList.contains('mou-fantasma')) return;
+            if (n.id && !_navPila.includes(n.id)) _navPila.push(n.id);
+            const vell = _mouActual;
+            if (vell && vell !== n && vell.isConnected && vell.parentElement === n.parentElement && !vell.classList.contains('active'))
+            { const sy = _mouScrollY; mouScrollAlCap(); mouPantalles(vell, n, 'endavant', { sy }); }
+            else mouEntraPantallaNova(n);
+            _mouActual = n;
         }))).observe(pc, { childList: true });
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia); else inicia();
@@ -20682,11 +20708,22 @@ document.addEventListener('pointerdown', e => {
     if (img && !img.closest('#fpvVista, #peEditor, #galeriaVisor')) _mouUltimaMini = { el: img, t: performance.now() };
 }, true);
 function mouMiniRecent() { return _mouUltimaMini && performance.now() - _mouUltimaMini.t < 1500 && _mouUltimaMini.el.isConnected ? _mouUltimaMini.el : null; }
-function mouRectVisible(el) {
-    if (!el || !el.isConnected) return null;
+/** Caixa visible d'una miniatura: el contenidor que la retalla (sense la vora), amb el seu radi i ombra */
+function mouCaixa(mini) {
+    if (!mini || !mini.isConnected) return null;
+    let el = mini, clip = mini.parentElement;
+    if (clip && getComputedStyle(clip).overflow !== 'visible') el = clip;
     const r = el.getBoundingClientRect();
     if (!r.width || !r.height || r.bottom < 0 || r.top > innerHeight) return null;
-    return r;
+    const cs = getComputedStyle(el);
+    const bl = el === clip ? el.clientLeft : 0, bt = el === clip ? el.clientTop : 0;
+    const w = el === clip ? el.clientWidth : r.width, h = el === clip ? el.clientHeight : r.height;
+    const esc = el.offsetWidth ? r.width / el.offsetWidth : 1;          // per si la miniatura està escalada (tocant-la)
+    return {
+        left: r.left + bl * esc, top: r.top + bt * esc, width: w * esc, height: h * esc,
+        radi: Math.max(0, (parseFloat(cs.borderTopLeftRadius) || 0) - bl) * esc,
+        ombra: cs.boxShadow && cs.boxShadow !== 'none' ? cs.boxShadow : '0 0 0 rgba(0,0,0,0)'
+    };
 }
 function mouRectContingut(img) {          // rectangle real de la foto dins d'un <img> amb object-fit: contain
     const r = img.getBoundingClientRect(), nw = img.naturalWidth, nh = img.naturalHeight;
@@ -20702,45 +20739,83 @@ function mouClon(src, r, radi) {
     const c = document.createElement('div');
     c.className = 'mou-clon';
     c.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${radi}px`;
-    const i = document.createElement('img'); i.src = src; i.alt = '';
+    const i = document.createElement('img'); i.src = src; i.alt = ''; i.decoding = 'sync';
     c.appendChild(i); document.body.appendChild(c);
     return c;
 }
-const _mouVol = (c, a, b, ra, rb, dur) => c.animate([
-    { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px', borderRadius: ra + 'px' },
-    { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px', borderRadius: rb + 'px' }
+const MOU_OMBRA_GRAN = '0 14px 36px rgba(0,0,0,.30)';
+const _mouVol = (c, a, b, ra, rb, sa, sb, dur) => c.animate([
+    { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px', borderRadius: ra + 'px', boxShadow: sa },
+    { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px', borderRadius: rb + 'px', boxShadow: sb }
 ], { duration: dur, easing: MOU_CORBA, fill: 'forwards' });
+/** Amaga la miniatura mentre la foto vola; mostra() la torna exactament al mateix fotograma */
+function mouAmagaMini(mini) {
+    const altres = mini.parentElement && mini.parentElement !== document.body ? [...mini.parentElement.children].filter(e => e !== mini && e.className !== 'mou-clon') : [];
+    const prevO = altres.map(e => e.style.opacity);
+    mini.style.visibility = 'hidden';
+    altres.forEach(e => { e.style.opacity = '0'; });
+    return {
+        mostra(suau) {
+            mini.style.visibility = '';
+            altres.forEach((e, k) => {
+                e.style.opacity = prevO[k];
+                if (suau && e.isConnected && getComputedStyle(e).display !== 'none') e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+            });
+        }
+    };
+}
+let _mouHero = null;                       // vol en curs (per acabar-lo si se n'inicia un altre)
+function mouAcabaHero() { if (_mouHero) { const f = _mouHero; _mouHero = null; f(); } }
 /** Obre: la foto vola des de `mini` fins a `img` (que ja és dins de la vista oberta `capa`) */
 async function mouHeroObre(mini, img, capa) {
+    mouAcabaHero();
     if (mouReduit()) return;
-    const r0 = mouRectVisible(mini);
+    const caixa = mouCaixa(mini);
     capa.getAnimations().forEach(a => a.cancel());
-    capa.animate([{ opacity: 0 }, { opacity: 1 }], { duration: r0 ? 300 : 220, easing: 'ease-out' });
-    if (!r0) { img.animate([{ transform: 'scale(.94)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320, easing: MOU_CORBA }); return; }
+    capa.animate([{ opacity: 0 }, { opacity: 1 }], { duration: caixa ? 300 : 220, easing: 'ease-out' });
+    if (!caixa) { img.animate([{ transform: 'scale(.94)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320, easing: MOU_CORBA }); return; }
+    img.style.visibility = 'hidden';
+    const amaga = mouAmagaMini(mini);
     await mouCarregada(img);
     const r1 = mouRectContingut(img);
-    if (!r1.width) return;
-    img.style.visibility = 'hidden';
-    const c = mouClon(img.src, r0, 8);
-    try { await _mouVol(c, r0, r1, 8, 2, MOU_DUR).finished; } catch (e) {}
-    img.style.visibility = ''; c.remove();
+    if (!r1.width) { img.style.visibility = ''; amaga.mostra(); return; }
+    const radiImg = parseFloat(getComputedStyle(img).borderTopLeftRadius) || 0;
+    const c = mouClon(img.src, caixa, caixa.radi);
+    let fet = false;
+    const acaba = () => { if (fet) return; fet = true; img.style.visibility = ''; amaga.mostra(); c.remove(); };
+    _mouHero = acaba;
+    try { await _mouVol(c, caixa, r1, caixa.radi, radiImg, caixa.ombra, MOU_OMBRA_GRAN, MOU_DUR).finished; } catch (e) {}
+    if (_mouHero === acaba) _mouHero = null;
+    acaba();
 }
-/** Tanca: la foto torna a la miniatura (si encara es veu) i després es crida `fet()` */
+/** Tanca: la foto torna a la miniatura (si encara es veu) i després es crida `fet()`.
+ *  L'últim fotograma del vol és exactament la miniatura: es canvia l'una per l'altra sense salt. */
 async function mouHeroTanca(mini, img, capa, fet) {
-    const r0 = !mouReduit() && img && img.src ? mouRectVisible(mini) : null;
+    mouAcabaHero();
     if (mouReduit() || !img || !img.naturalWidth) { fet(); return; }
-    const r1 = mouRectContingut(img);
-    if (!r0) {
+    const caixa = mouCaixa(mini);
+    if (!caixa) {
         await capa.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.97)' }], { duration: 200, easing: 'ease-in' }).finished.catch(() => {});
         fet(); return;
     }
-    const c = mouClon(img.src, r1, 2);
+    const r1 = mouRectContingut(img);
+    const radiImg = parseFloat(getComputedStyle(img).borderTopLeftRadius) || 0;
+    const c = mouClon(img.src, r1, radiImg);
     img.style.visibility = 'hidden';
-    const fade = capa.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
-    try { await _mouVol(c, r1, r0, 2, 8, 380).finished; } catch (e) {}
-    fet();
-    img.style.visibility = ''; fade.cancel();
-    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120 }).finished.then(() => c.remove(), () => c.remove());
+    const amaga = mouAmagaMini(mini);
+    const fade = capa.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'forwards' });
+    let acabat = false;
+    const acaba = () => {
+        if (acabat) return; acabat = true;
+        fet();
+        img.style.visibility = ''; fade.cancel();
+        amaga.mostra(true);
+        c.remove();
+    };
+    _mouHero = acaba;
+    try { await _mouVol(c, r1, caixa, radiImg, caixa.radi, MOU_OMBRA_GRAN, caixa.ombra, 420).finished; } catch (e) {}
+    if (_mouHero === acaba) _mouHero = null;
+    acaba();
 }
 
 /* Galeria: el visor s'obre des de la miniatura i hi torna */
