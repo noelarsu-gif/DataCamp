@@ -5972,6 +5972,163 @@ body.pd-noscroll { overflow: hidden; }
 .pd-vig-fitxer b { color: var(--dark); font-family: var(--font-cond); letter-spacing: .3px; word-break: break-all; }
 #pdDesarComRuta { display: inline-flex; align-items: center; gap: 6px; }
 #pdDesarComRuta[hidden], #pdBuidarFiles[hidden], #pdGestionarRutes[hidden] { display: none; }
+/* ══ Editor de fotos (estil iPhone) ══════════════════════════ */
+body.pe-obert { overflow: hidden; }
+#peEditor {
+    position: fixed; inset: 0; z-index: 10050; display: none; flex-direction: column;
+    background: #000; color: #fff; font-family: var(--font); user-select: none; -webkit-user-select: none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+}
+#peEditor.open { display: flex; }
+.pe-top { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 8px; flex-shrink: 0; }
+.pe-top-mig { display: flex; gap: 6px; }
+.pe-txtbtn { background: none; border: 0; color: #fff; font-family: var(--font); font-size: 1.02rem; font-weight: 500; padding: 10px 10px; cursor: pointer; min-height: 44px; }
+.pe-fet { color: #ffd60a; font-weight: 700; }
+.pe-reset { font-size: .85rem; color: #ffd60a; padding: 6px 4px; flex-shrink: 0; }
+.pe-ico { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: #fff; cursor: pointer; border-radius: 50%; }
+.pe-ico svg { width: 23px; height: 23px; }
+.pe-ico:disabled { opacity: .3; cursor: default; }
+.pe-ico:not(:disabled):active { background: rgba(255,255,255,.12); }
+.pe-zona { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+#peCanvas { display: block; touch-action: none; }
+.pe-text-inp {
+    position: absolute; width: 220px; padding: 8px 10px; font: 700 1.1rem var(--font); text-align: center;
+    background: rgba(0,0,0,.55); border: 1.5px solid rgba(255,255,255,.7); border-radius: 8px; outline: none;
+}
+.pe-text-inp[hidden] { display: none; }
+.pe-eines { flex-shrink: 0; padding: 6px 12px 2px; display: grid; gap: 8px; }
+.pe-eines[hidden] { display: none; }
+.pe-fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pe-dial { display: flex; align-items: center; gap: 10px; font-size: .8rem; color: #bbb; }
+.pe-dial input { flex: 1; min-width: 0; width: 100%; accent-color: #ffd60a; height: 30px; }
+.pe-eines { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.pe-eines > * { min-width: 0; }
+.pe-dial b { width: 40px; text-align: right; color: #ffd60a; font-variant-numeric: tabular-nums; }
+.pe-props { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.pe-props::-webkit-scrollbar { display: none; }
+.pe-props button { flex-shrink: 0; min-height: 34px; padding: 0 12px; border-radius: 17px; border: 0; background: #2c2c2e; color: #fff; font: 600 .8rem var(--font); cursor: pointer; }
+.pe-props button.on { background: #ffd60a; color: #000; }
+.pe-fila-eines { justify-content: space-around; }
+.pe-eina { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 56px; padding: 6px 4px; background: none; border: 0; color: #aaa; border-radius: 12px; cursor: pointer; font-family: var(--font); }
+.pe-eina svg { width: 26px; height: 26px; }
+.pe-eina small { font-size: .68rem; }
+.pe-eina.on { color: #ffd60a; background: rgba(255,214,10,.12); }
+.pe-colors { display: flex; gap: 10px; }
+.pe-color { width: 30px; height: 30px; border-radius: 50%; background: var(--c); border: 2px solid rgba(255,255,255,.35); cursor: pointer; padding: 0; }
+.pe-color.on { box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff; }
+.pe-gruix { width: 52px; height: 34px; border-radius: 17px; background: #2c2c2e; border: 0; display: grid; place-items: center; cursor: pointer; }
+.pe-gruix i { display: block; width: 26px; border-radius: 4px; }
+.pe-modes { display: flex; justify-content: center; gap: 36px; padding: 8px 0 max(10px, env(safe-area-inset-bottom)); flex-shrink: 0; }
+.pe-modes button { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; color: #8e8e93; font: 600 .72rem var(--font); letter-spacing: .3px; cursor: pointer; min-width: 70px; padding: 4px; }
+.pe-modes button svg { width: 24px; height: 24px; }
+.pe-modes button.on { color: #ffd60a; }
+@media (orientation: landscape) and (max-height: 520px) {
+    .pe-top { height: 42px; }
+    .pe-eines:not([hidden]) { display: flex; align-items: center; gap: 14px; padding: 2px 14px; }
+    .pe-eines > * { flex: 1; min-width: 0; }
+    .pe-fila-eines { justify-content: flex-start; gap: 4px; flex: 0 0 auto !important; }
+    .pe-eina { min-width: 44px; padding: 6px; }
+    .pe-eina small { display: none; }
+    .pe-eina svg { width: 24px; height: 24px; }
+    .pe-color { width: 26px; height: 26px; }
+    .pe-colors { gap: 8px; }
+    .pe-dial { flex: 1.2 !important; }
+    .pe-modes { padding: 2px 0 max(6px, env(safe-area-inset-bottom)); gap: 28px; }
+    .pe-modes button { flex-direction: row; gap: 6px; }
+    .pe-modes button svg { width: 20px; height: 20px; }
+}
+
+/* ══ Vista prèvia de foto (comuna) ═══════════════════════════ */
+#fpvVista { position: fixed; inset: 0; z-index: 10040; display: none; flex-direction: column; background: #000; color: #fff; padding-top: env(safe-area-inset-top); }
+#fpvVista.open { display: flex; }
+.fpv-top { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; height: 52px; }
+.fpv-tanca { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: #fff; cursor: pointer; margin-left: 4px; }
+.fpv-tanca svg { width: 24px; height: 24px; }
+.fpv-tit { text-align: center; font: 600 .9rem var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fpv-img { flex: 1; min-height: 0; display: grid; place-items: center; padding: 8px; }
+.fpv-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.fpv-baix { display: flex; justify-content: space-around; padding: 8px 8px max(12px, env(safe-area-inset-bottom)); }
+.fpv-acc { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 64px; padding: 6px; background: none; border: 0; color: #fff; font: 600 .72rem var(--font); cursor: pointer; border-radius: 12px; }
+.fpv-acc svg { width: 25px; height: 25px; }
+.fpv-acc.fpv-prim { color: #ffd60a; }
+.fpv-acc.fpv-perill { color: #ff6961; }
+.fpv-acc:active { background: rgba(255,255,255,.1); }
+.visor-edit-btn svg { width: 20px; height: 20px; }
+.photo-item img { cursor: pointer; }
+.photo-item .photo-edit-ind { position: absolute; left: 4px; bottom: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; pointer-events: none; }
+.photo-item .photo-edit-ind svg { width: 13px; height: 13px; }
+
+/* ══ Expedient ITC ═══════════════════════════════════════════ */
+.itc-cap { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; margin-bottom: 12px; border-radius: var(--radius-card); background: var(--dark); color: #fff; border-bottom: 3px solid var(--primary); }
+.itc-cap-et { font-size: .7rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: .7; }
+.itc-cap b { font-family: var(--font-cond); font-size: 1.7rem; letter-spacing: .5px; line-height: 1.1; }
+.itc-cap small { font-size: .78rem; opacity: .75; word-break: break-all; }
+.itc-targeta { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: 10px; padding: 14px; border-radius: var(--radius-card); border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-family: var(--font); box-shadow: var(--shadow-sm); }
+.itc-targeta:active { transform: scale(.98); }
+.itc-targeta .action-icon { width: 44px; height: 44px; flex-shrink: 0; margin: 0; display: grid; place-items: center; border-radius: 12px; }
+.itc-targeta-txt { flex: 1; min-width: 0; }
+.itc-targeta-txt b { display: block; font-size: 1rem; color: var(--dark); }
+.itc-targeta-txt small { display: block; font-size: .8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.itc-estat { flex-shrink: 0; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 10px; background: var(--warning-lt, #fff4e0); color: #b45309; }
+.itc-estat.fet { background: var(--success-lt, #ebf8ef); color: var(--success, #15803d); }
+.itc-mini { display: flex; gap: 6px; overflow-x: auto; margin: -2px 0 14px; scrollbar-width: none; }
+.itc-mini img { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.itc-envia { padding: 14px; border-radius: var(--radius-card); background: var(--surface-2, #f8fafc); border: 1px solid var(--border); display: grid; gap: 10px; margin-bottom: 8px; }
+.itc-envia-tit { font-size: .72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+.itc-quins { display: grid; grid-template-columns: repeat(3, 1fr); border: 1.5px solid var(--border-dark); border-radius: 10px; overflow: hidden; }
+.itc-quins button { min-height: 42px; border: 0; border-left: 1px solid var(--border-dark); background: var(--surface); font: 600 .9rem var(--font); color: var(--text); cursor: pointer; }
+.itc-quins button:first-child { border-left: 0; }
+.itc-quins button.on { background: var(--dark); color: #fff; }
+.itc-envia-fitxers { display: grid; gap: 2px; font-size: .74rem; color: var(--text-muted); word-break: break-all; font-family: var(--font-cond); letter-spacing: .2px; }
+.itc-envia-bots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.itc-envia-bots .btn { margin: 0 !important; width: 100%; }
+.itc-elimina { display: block; margin: 6px auto 0; }
+.itc-punt { padding: 14px; border-radius: var(--radius-card); border: 1px solid var(--border); background: var(--surface); margin-bottom: 12px; display: grid; gap: 10px; }
+.itc-punt-cap { display: flex; justify-content: space-between; align-items: center; }
+.itc-punt-cap b { font-size: .78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+.itc-punt-camps { display: grid; grid-template-columns: 1.1fr 1fr .9fr; gap: 8px; }
+.itc-punt label { display: grid; gap: 4px; font-size: .72rem !important; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin: 0 !important; }
+.itc-punt input, .itc-punt select, .itc-punt textarea { width: 100%; box-sizing: border-box; min-width: 0; text-transform: none; font-weight: 500; letter-spacing: 0; }
+.itc-fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
+.itc-fotos:empty { display: none; }
+.itc-foto { position: relative; aspect-ratio: 4 / 3; padding: 0; border: 0; border-radius: 8px; overflow: hidden; cursor: pointer; background: #111; }
+.itc-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.itc-foto span { position: absolute; top: 4px; left: 4px; min-width: 20px; height: 20px; border-radius: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: .7rem; font-weight: 700; display: grid; place-items: center; }
+.itc-afegir { display: grid; grid-template-columns: 1fr 52px 52px; gap: 8px; }
+.itc-afegir .btn { margin: 0 !important; width: 100%; padding-left: 0; padding-right: 0; }
+.itc-nou-punt { width: 100%; }
+/* Full «codi de l'expedient» */
+.itc-exp-inp { width: 100%; box-sizing: border-box; padding: 14px; font: 700 1.05rem var(--font-cond); letter-spacing: .4px; border: 1.5px solid var(--border-dark); border-radius: 10px; }
+.itc-exp-previa { font-size: .8rem; color: var(--text-muted); line-height: 1.5; margin: 8px 0 14px; word-break: break-all; }
+.itc-exp-previa b { color: var(--dark); }
+.itc-recents-tit { display: block; font-size: .72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin: 14px 0 6px; }
+.itc-recent { display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); cursor: pointer; font-family: var(--font); }
+.itc-recent b { font-family: var(--font-cond); font-size: 1rem; color: var(--dark); flex-shrink: 0; }
+.itc-recent small { font-size: .78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Selector de la galeria de l'app */
+#itcSelector { position: fixed; inset: 0; z-index: 10030; display: none; flex-direction: column; background: var(--bg, #f4f5f7); padding-top: env(safe-area-inset-top); }
+#itcSelector.open { display: flex; }
+.itc-sel-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.itc-sel-top b { font-size: 1rem; color: var(--dark); }
+.itc-sel-filtres { display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px; scrollbar-width: none; flex-shrink: 0; }
+.itc-sel-filtres::-webkit-scrollbar { display: none; }
+.itc-xip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1.5px solid var(--border-dark); background: var(--surface); font: 600 .85rem var(--font); color: var(--text); cursor: pointer; }
+.itc-xip .ico { font-size: 15px; }
+.itc-xip.on { background: var(--dark); border-color: var(--dark); color: #fff; }
+.itc-sel-graella { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 4px; padding: 0 4px 12px; align-content: start; }
+.itc-sel-foto { position: relative; aspect-ratio: 1; padding: 0; border: 0; overflow: hidden; cursor: pointer; background: #ddd; }
+.itc-sel-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .15s; }
+.itc-sel-foto.on img { transform: scale(.88); }
+.itc-sel-foto.on { background: var(--primary); }
+.itc-sel-foto.ja { opacity: .55; }
+.itc-sel-n { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; font-size: .85rem; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+.itc-sel-ja { position: absolute; top: 6px; left: 6px; font-size: .65rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; }
+.itc-sel-peu { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; font-size: .7rem; text-align: left; line-height: 1.25; }
+.itc-sel-peu b { font-family: var(--font-cond); font-size: .8rem; }
+.itc-sel-peu small { display: block; opacity: .8; font-size: .62rem; }
+.itc-sel-buit { grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: .9rem; }
+.itc-sel-peu-bar { padding: 10px 12px max(12px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); }
+.itc-sel-peu-bar .btn { margin: 0 !important; width: 100%; }
 /* Avís de privacitat */
 .pd-avis-cap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .pd-avis-cap h4 { margin: 0; text-transform: none; letter-spacing: 0; font-size: 1.2rem; }
@@ -6899,6 +7056,25 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                  COMUNICATS DE TREBALL — registre manual de la ruta de cada dia
                  (sense GPS: només el que escriu el treballador)
                  ================================================ -->
+            <!-- ================================================
+                 EXPEDIENT ITC — informe tècnic de camp + annex fotogràfic
+                 ================================================ -->
+            <div id="itcExp" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="ir('home')">&#8592;</button>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Expedient ITC</h3>
+                </div>
+                <div id="itcExpCos"></div>
+            </div>
+            <div id="itcAnnex" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="itcTornarAnnex()">&#8592;</button>
+                    <h3><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg><span id="itcAnnexTit">Annex</span></h3>
+                </div>
+                <div id="itcAnnexCos"></div>
+                <button class="btn btn-primary" style="margin-top:6px;" onclick="itcTornarAnnex()">Fet</button>
+            </div>
+
             <div id="partsDiaris" class="screen">
                 <div class="screen-header">
                     <button class="btn-back" onclick="ir('home')">&#8592;</button>
@@ -7780,6 +7956,7 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
         <button class="visor-close" onclick="tancarVisor()" title="Tancar">✕</button>
         <div class="visor-title" id="visorTitle">Foto Ràpida</div>
         <div class="visor-topbar-actions">
+            <button class="visor-menu-btn visor-edit-btn" onclick="visorEditarFoto()" title="Editar la foto (retallar, girar, marcar)" aria-label="Editar la foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <button class="visor-menu-btn" onclick="visorMenuToggle()" title="Més opcions">⋮</button>
             <div id="visorMenuDropdown" class="visor-menu-dropdown">
                 <button class="visor-menu-item" onclick="visorMenuToggle(); visorCompartir()">📲 Compartir</button>
@@ -7819,8 +7996,8 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
         <button class="btn btn-primary" onclick="closeModal(); obrirFitxaAnimal(null, null, null)" style="background:#b45309;">
             &#128062; Fitxa Animal
         </button>
-        <button class="btn btn-primary" onclick="closeModal(); obrirInformeITC(null, null)" style="background:#7c3aed;">
-            &#128221; Informe ITC
+        <button class="btn btn-primary" onclick="closeModal(); itcNouExpedient()" style="background:#7c3aed;">
+            &#128221; Informe ITC + Annex
         </button>
         <button class="btn btn-ghost" onclick="closeModal()">Cancel&middot;lar</button>
     </div>
@@ -8078,6 +8255,8 @@ const screenTitles = {
     'dlIncidencies': 'Descàrregues · Incidències',
     'dlFitxaAnimal': 'Descàrregues · Fitxa Animal',
     'dlITC':         'Descàrregues · ITC',
+    'itcExp':        'Expedient ITC',
+    'itcAnnex':      'Annex fotogràfic',
     'pantallaAjustos':'Configuració',
     'helpScreen':    'Ajuda',
     'projectDetail': 'Detall del Projecte',
@@ -8852,10 +9031,23 @@ function renderPreview() {
     if (!preview) return;
     preview.innerHTML = tmpFotos.map((f, i) => `
         <div class="photo-item">
-            <img src="${f}" alt="" draggable="false">
-            <button type="button" class="zoom-icon" onclick="obrirVisor(${i}); event.stopPropagation();" title="Veure">🔍</button>
+            <img src="${f}" alt="Foto ${i + 1}" draggable="false" onclick="previewObrirFoto(${i}); event.stopPropagation();">
+            <span class="photo-edit-ind" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
             <button type="button" class="btn-del-photo" onclick="eliminarFoto(event,${i})" title="Eliminar">✕</button>
         </div>`).join('');
+}
+function previewObrirFoto(i) {
+    if (!tmpFotos[i]) return;
+    const titol = document.getElementById('titulo')?.value || 'Projecte';
+    const carr  = document.querySelector('.dyn-input[data-idx="0"]')?.value || 'SC';
+    const pk    = document.querySelector('.pk-km')?.value || '0';
+    const marge = document.querySelector('.dyn-marge')?.value || 'Eix';
+    fpvObrir(tmpFotos[i], {
+        titol: 'Foto ' + (i + 1) + ' de ' + tmpFotos.length,
+        editar: nova => { tmpFotos[i] = nova; renderPreview(); },
+        descarregar: src => descarregarFoto(src, `${titol}_${carr}_PK${pk}_${marge}.jpg`.replace(/[^a-z0-9.]/gi, '_')),
+        eliminar: () => { tmpFotos.splice(i, 1); renderPreview(); return true; }
+    });
 }
 
 function obrirVisor(index) {
@@ -10714,8 +10906,8 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
     screen.className = 'screen screen-form active';
     screen.innerHTML = `
         <div class="screen-header">
-            <button class="btn-back" onclick="_itcEditId=null; _itcFitxaOriginal=null; _itcFotos=[]; _itcSignaturaDataURL=''; this.closest('.screen').remove(); ir('home')">←</button>
-            <h3>📝 ${_itcEditId ? 'Editar' : 'Nou'} Informe ITC</h3>
+            <button class="btn-back" onclick="const _id=_itcEditId; _itcEditId=null; _itcFitxaOriginal=null; _itcFotos=[]; _itcSignaturaDataURL=''; itcTornarDelFormulari(_id)">←</button>
+            <h3>📝 Informe ITC${r.expedient ? ' · ' + r.expedient : ''}</h3>
         </div>
 
         <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin-bottom:10px; font-size:0.85rem;">Dades de l'expedient</div>
@@ -10764,7 +10956,7 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
         <div class="form-group"><label>Descripció de l'obra</label><textarea id="itc_descripcio" rows="4" style="width:100%;">${r.descripcio || ''}</textarea></div>
         <div class="form-group"><label>Incidències o afectacions importants</label><textarea id="itc_incidencies" rows="4" style="width:100%;">${r.incidencies || ''}</textarea></div>
 
-        <button class="btn btn-primary" onclick="guardarInformeITC()" style="margin-top:14px; background:#7c3aed;">💾 ${_itcEditId ? 'DESAR CANVIS' : 'DESAR INFORME'}</button>
+        <button class="btn btn-primary" onclick="guardarInformeITC()" style="margin-top:14px; background:#7c3aed;">💾 DESAR INFORME</button>
     `;
 
     document.querySelector('.page-content').appendChild(screen);
@@ -10872,19 +11064,20 @@ async function guardarInformeITC() {
         if (!confirm("No has emplenat l'expedient ni el títol de l'obra. Vols desar-lo igualment?")) return;
     }
 
+    // Conserva el que no és del formulari (codi de l'expedient, annex…)
+    const final = { ...(_itcFitxaOriginal || {}), ...registre };
     showSpinner('DESANT INFORME...');
     try {
         const tx = db.transaction('itcInformes', 'readwrite');
-        tx.objectStore('itcInformes').put(registre);
+        tx.objectStore('itcInformes').put(final);
         tx.oncomplete = () => {
             hideSpinner();
             _itcEditId = null;
             _itcFitxaOriginal = null;
             _itcFotos = [];
             _itcSignaturaDataURL = '';
-            document.getElementById('screen-informe-itc')?.remove();
-            ir('home');
-            showToast('✅ Informe ITC desat');
+            itcTornarDelFormulari(final.id);
+            showToast('✅ Informe desat');
         };
         tx.onerror = e => { hideSpinner(); alert('Error desant l\'informe: ' + e.target.error); };
     } catch (err) {
@@ -10934,7 +11127,7 @@ function carregarVistaITC() {
             wrap.innerHTML = `<div style='text-align:center;padding:44px 20px;color:var(--text-muted);'>
                 <div style='font-size:2.5rem;margin-bottom:12px;'>📝</div>
                 <div style='font-weight:600;'>Cap informe ITC encara</div>
-                <div style='font-size:0.82rem;margin-top:6px;'>Crea&apos;n un des de "Nou Projecte" → "Informe ITC"</div>
+                <div style='font-size:0.82rem;margin-top:6px;'>Crea&apos;n un des de "Nou Projecte" → "Informe ITC + Annex"</div>
             </div>`;
             return;
         }
@@ -10944,12 +11137,12 @@ function carregarVistaITC() {
                 <div class="dl-card-header">
                     <div style="min-width:0;flex:1;">
                         <div class="dl-card-title">📝 ${f.expedient || 'Sense expedient'} — ${f.carretera || '—'}</div>
-                        <div class="dl-card-meta">${f.data || '—'} · ${f.titolObra || 'Sense títol'}</div>
+                        <div class="dl-card-meta">${f.data || '—'} · ${f.titolObra || 'Sense títol'}${itcNFotos(f) ? ' · Annex: ' + itcNFotos(f) + ' fotos' : ''}</div>
                     </div>
                 </div>
                 <div class="dl-actions" style="margin-top:8px;">
                     <button class="dl-btn dl-btn-pdf" title="PDF d'aquest informe" onclick="exportarInformeITCIndividual('${f.id}')">&#128196; PDF</button>
-                    <button class="dl-btn" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;" title="Editar informe" onclick="editarInformeITC('${f.id}')">✏️ Editar</button>
+                    <button class="dl-btn" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;" title="Obrir l'expedient (informe i annex)" onclick="itcObrirExpedient('${f.id}')">📂 Obrir</button>
                     <button class="dl-btn dl-btn-zip" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;" title="Eliminar informe" onclick="eliminarInformeITC('${f.id}')">🗑️ Eliminar</button>
                 </div>
             </div>`).join('');
@@ -11112,7 +11305,7 @@ async function exportarInformeITCIndividual(id) {
             const slug = (f.expedient || 'ITC').replace(/[^a-z0-9]/gi, '_').slice(0, 40);
             const date = new Date().toISOString().slice(0, 10);
             currentBlob = blob;
-            currentFileName = `ITC_${slug}_${date}.pdf`;
+            currentFileName = itcNomITC(f);
             document.getElementById('exportTitle').innerText = 'PDF';
             document.getElementById('exportName').innerText = currentFileName;
             document.getElementById('btnShare').onclick = () => {
@@ -12545,6 +12738,35 @@ function visorEditarDades() {
     _fdEditOriginal = { ...item };
     tancarVisor();
     obrirEditorFotoDirecta(item.imgData);
+}
+
+/* Edita la foto (retallar, girar, marcar). Si té peu de foto, s'edita l'original
+   i es torna a posar el peu, perquè no es perdi en canviar després les dades. */
+async function visorEditarFoto() {
+    const item = visorCurrentId ? galeriaItems.find(i => i.id === visorCurrentId) : null;
+    if (!item) return;
+    document.getElementById('visorMenuDropdown')?.classList.remove('open');
+    const ambPeu = !!(item.wmAplicat && item.imgRaw);
+    const nova = await peObrir(ambPeu ? item.imgRaw : item.imgData);
+    if (!nova) return;
+    showSpinner('DESANT LA FOTO...');
+    try {
+        const act = { ...item, imgRaw: nova, editadaTs: Date.now() };
+        if (ambPeu) {
+            let parts = [`${item.carr || ''} \u2022 PK ${item.pk || ''} \u2022 ${item.marge || ''}`];
+            if (item.wmDatetime && item.ts) {
+                const d = new Date(item.ts);
+                parts.push(`${d.toLocaleDateString('ca-ES')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
+            }
+            act.imgData = await aplicarMarcaAigua(nova, parts.join(' \u2022 '));
+        } else act.imgData = nova;
+        await new Promise((res, rej) => { const tx = db.transaction('galeriaFotos', 'readwrite'); tx.objectStore('galeriaFotos').put(act); tx.oncomplete = res; tx.onerror = e => rej(e.target.error); });
+        const k = galeriaItems.findIndex(i => i.id === item.id); if (k >= 0) galeriaItems[k] = act;
+        document.getElementById('visorImg').src = act.imgData;
+        renderGaleria();
+        showToast('Foto desada');
+    } catch (e) { console.error(e); showToast('No s\u2019ha pogut desar la foto'); }
+    hideSpinner();
 }
 
 function visorFitxaAnimal() {
@@ -18224,6 +18446,31 @@ function pkmBack() {
     </div>
 </div>
 
+<div class="fe-sheet-overlay pd-overlay" id="itcExpSheet" onclick="if(event.target===this)itcTancaFullExp()">
+    <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="itcExpTitol">
+        <div class="fe-sheet-handle"></div>
+        <h4 id="itcExpTitol">Nou expedient ITC</h4>
+        <label for="itcExpCodi">Codi de l'expedient</label>
+        <input type="text" id="itcExpCodi" class="itc-exp-inp" autocomplete="off" autocapitalize="characters" spellcheck="false"
+               placeholder="MB00147_2026_AUTO_20085_2_1" oninput="itcPreviaCodi()" onkeydown="if(event.key==='Enter'){event.preventDefault();itcCrearExpedient();}">
+        <p class="itc-exp-previa" id="itcExpPrevia"></p>
+        <button class="btn btn-primary btn-block" onclick="itcCrearExpedient()">Continuar</button>
+        <div id="itcExpRecents"></div>
+        <div class="pd-sheet-peu"><span></span><button type="button" class="pd-link" onclick="itcTancaFullExp()">Cancel·lar</button></div>
+    </div>
+</div>
+
+<div id="itcSelector" role="dialog" aria-modal="true" aria-label="Fotos de la galeria de l'app">
+    <div class="itc-sel-top">
+        <button type="button" class="pd-link" onclick="itcTancaSelector()">Cancel·lar</button>
+        <b>Galeria de l'app</b>
+        <span style="width:72px"></span>
+    </div>
+    <div class="itc-sel-filtres" id="itcSelFiltres"></div>
+    <div class="itc-sel-graella" id="itcSelGraella"></div>
+    <div class="itc-sel-peu-bar"><button type="button" class="btn btn-primary" id="itcSelAfegir" onclick="itcSelAfegir()" disabled>Tria les fotos</button></div>
+</div>
+
 <div class="fe-sheet-overlay pd-overlay" id="pdRutesSheet" onclick="if(event.target===this)pdTancarRutes()">
     <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="pdRutesTitol">
         <div class="fe-sheet-handle"></div>
@@ -19485,6 +19732,811 @@ function pdPintaLocalitzador() {
 pdInitDB().then(pdRenderHomeCard);
 </script>
 
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   EDITOR DE FOTOS (estil Fotos d'iPhone)
+   · Retallar: girar 90°, redreçar (±45°), proporcions, nanses.
+   · Marcar: llapis, fletxa, cercle, rectangle i text, amb colors i gruix.
+   · Desfer / refer. Funciona en vertical i en horitzontal.
+   Ús: const nova = await peObrir(dataURL);  // null si es cancel·la
+   Les marques es desen en coordenades de la foto original, de manera
+   que segueixen la imatge encara que després es giri o es retalli.
+   ══════════════════════════════════════════════════════════════════ */
+const PE_COLORS = ['#ff3b30', '#ffcc00', '#34c759', '#0a84ff', '#ffffff', '#111111'];
+const PE_GRUIX = [0.004, 0.0075, 0.012];          // fracció del costat llarg del resultat
+const PE_PROP = [['lliure', 'Lliure'], ['orig', 'Original'], ['1', 'Quadrat'], ['4:3', '4:3'], ['3:4', '3:4'], ['16:9', '16:9']];
+const PE = { st: null, hist: [], fut: [], img: null, W: 0, H: 0, mode: 'marcar', eina: 'ell', color: PE_COLORS[0], gruix: 1,
+             resolve: null, vista: null, drag: null, temp: null, canvia: false, el: null };
+
+function peSvg(d, extra) { return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' + (extra || '') + '>' + d + '</svg>'; }
+const PE_ICO = {
+    crop:  peSvg('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>'),
+    marca: peSvg('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
+    rot:   peSvg('<rect x="3" y="10" width="11" height="11" rx="1.5"/><path d="M8 6.5h5.5A5.5 5.5 0 0 1 19 12v2"/><path d="m16 11.5 3 3 3-3"/>'),
+    undo:  peSvg('<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'),
+    redo:  peSvg('<path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/>'),
+    pen:   peSvg('<path d="M3 17c3-1 4-6 7-6s2 5 5 5 4-3 6-4"/>'),
+    arrow: peSvg('<path d="M5 19 19 5"/><path d="M10 5h9v9"/>'),
+    ell:   peSvg('<ellipse cx="12" cy="12" rx="9" ry="6.5"/>'),
+    rect:  peSvg('<rect x="3.5" y="6" width="17" height="12" rx="1.5"/>'),
+    text:  peSvg('<path d="M5 6V4h14v2"/><path d="M12 4v16"/><path d="M9 20h6"/>'),
+    reset: peSvg('<path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 3v6h6"/>'),
+};
+const PE_EINES = [['pen', 'Llapis'], ['arrow', 'Fletxa'], ['ell', 'Cercle'], ['rect', 'Requadre'], ['text', 'Text']];
+
+function peCrearDom() {
+    if (PE.el) return PE.el;
+    const el = document.createElement('div');
+    el.id = 'peEditor';
+    el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Editor de fotos');
+    el.innerHTML = `
+        <div class="pe-top">
+            <button type="button" class="pe-txtbtn" onclick="peCancelar()">Cancel·lar</button>
+            <div class="pe-top-mig">
+                <button type="button" class="pe-ico" id="peUndo" aria-label="Desfer" onclick="peDesfer()">${PE_ICO.undo}</button>
+                <button type="button" class="pe-ico" id="peRedo" aria-label="Refer" onclick="peRefer()">${PE_ICO.redo}</button>
+            </div>
+            <button type="button" class="pe-txtbtn pe-fet" onclick="peFet()">Fet</button>
+        </div>
+        <div class="pe-zona" id="peZona"><canvas id="peCanvas"></canvas><input type="text" id="peTextInp" class="pe-text-inp" enterkeyhint="done" autocomplete="off" hidden></div>
+        <div class="pe-eines" id="peEinesRetall">
+            <div class="pe-dial"><span>Redreçar</span><input type="range" id="peFine" min="-45" max="45" step="0.5" value="0" oninput="peSetFine(this.value,false)" onchange="peSetFine(this.value,true)"><b id="peFineVal">0°</b></div>
+            <div class="pe-fila">
+                <button type="button" class="pe-ico" aria-label="Girar 90°" onclick="peGirar()">${PE_ICO.rot}</button>
+                <div class="pe-props" id="peProps">${PE_PROP.map(([k, t]) => `<button type="button" data-p="${k}" onclick="peSetProp('${k}')">${t}</button>`).join('')}</div>
+                <button type="button" class="pe-txtbtn pe-reset" onclick="peRestablir()">Restablir</button>
+            </div>
+        </div>
+        <div class="pe-eines" id="peEinesMarca">
+            <div class="pe-fila pe-fila-eines">${PE_EINES.map(([k, t]) => `<button type="button" class="pe-eina" data-e="${k}" aria-label="${t}" onclick="peSetEina('${k}')">${PE_ICO[k]}<small>${t}</small></button>`).join('')}</div>
+            <div class="pe-fila">
+                <div class="pe-colors">${PE_COLORS.map(c => `<button type="button" class="pe-color" data-c="${c}" style="--c:${c}" aria-label="Color ${c}" onclick="peSetColor('${c}')"></button>`).join('')}</div>
+                <button type="button" class="pe-gruix" id="peGruix" aria-label="Gruix del traç" onclick="peSetGruix()"><i></i></button>
+            </div>
+        </div>
+        <div class="pe-modes">
+            <button type="button" data-m="retallar" onclick="peSetMode('retallar')">${PE_ICO.crop}<span>Retallar</span></button>
+            <button type="button" data-m="marcar" onclick="peSetMode('marcar')">${PE_ICO.marca}<span>Marcar</span></button>
+        </div>`;
+    document.body.appendChild(el);
+    PE.el = el;
+    const cv = el.querySelector('#peCanvas');
+    cv.addEventListener('pointerdown', pePointerDown);
+    cv.addEventListener('pointermove', pePointerMove);
+    cv.addEventListener('pointerup', pePointerUp);
+    cv.addEventListener('pointercancel', pePointerUp);
+    const ti = el.querySelector('#peTextInp');
+    ti.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); peTextConfirma(); } if (e.key === 'Escape') { ti.hidden = true; PE.temp = null; } });
+    ti.addEventListener('blur', () => setTimeout(peTextConfirma, 0));
+    window.addEventListener('resize', () => { if (PE.st) peDibuixa(); });
+    return el;
+}
+
+/* ── Geometria ─────────────────────────────────────────── */
+function peWS() { const r = ((PE.st.rot % 360) + 360) % 360; return (r === 90 || r === 270) ? { w: PE.H, h: PE.W } : { w: PE.W, h: PE.H }; }
+function peCobertura() {   // escala perquè la foto redreçada cobreixi tot l'espai sense racons buits
+    const ws = peWS(), a = Math.abs(PE.st.fine) * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return Math.max((ws.w * c + ws.h * s) / ws.w, (ws.w * s + ws.h * c) / ws.h);
+}
+function peMatriu() {      // coordenades de la foto original → espai de treball (girat)
+    const ws = peWS();
+    return new DOMMatrix().translate(ws.w / 2, ws.h / 2).rotate(PE.st.rot + PE.st.fine).scale(peCobertura()).translate(-PE.W / 2, -PE.H / 2);
+}
+function peRegio() { return PE.mode === 'retallar' ? { x: 0, y: 0, w: peWS().w, h: peWS().h } : PE.st.crop; }
+function peCalcVista() {
+    const cv = document.getElementById('peCanvas'), zona = document.getElementById('peZona');
+    const dpr = window.devicePixelRatio || 1, zw = zona.clientWidth, zh = zona.clientHeight;
+    cv.width = Math.round(zw * dpr); cv.height = Math.round(zh * dpr);
+    cv.style.width = zw + 'px'; cv.style.height = zh + 'px';
+    const reg = peRegio(), marge = PE.mode === 'retallar' ? 28 : 12;
+    const k = Math.min((zw - marge * 2) / reg.w, (zh - marge * 2) / reg.h);
+    PE.vista = { k, ox: (zw - reg.w * k) / 2, oy: (zh - reg.h * k) / 2, reg, dpr };
+}
+function peAPantalla(wx, wy) { const v = PE.vista; return [v.ox + (wx - v.reg.x) * v.k, v.oy + (wy - v.reg.y) * v.k]; }
+function peAWS(sx, sy) { const v = PE.vista; return [(sx - v.ox) / v.k + v.reg.x, (sy - v.oy) / v.k + v.reg.y]; }
+function peABase(wx, wy) { const p = peMatriu().inverse().transformPoint(new DOMPoint(wx, wy)); return [p.x, p.y]; }
+
+/* ── Dibuix ────────────────────────────────────────────── */
+function peDibuixaObj(ctx, o) {
+    ctx.strokeStyle = o.c; ctx.fillStyle = o.c; ctx.lineWidth = o.lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if (o.t === 'pen') {
+        if (!o.pts.length) return;
+        ctx.beginPath(); ctx.moveTo(o.pts[0][0], o.pts[0][1]);
+        o.pts.forEach(p => ctx.lineTo(p[0], p[1]));
+        if (o.pts.length === 1) ctx.lineTo(o.pts[0][0] + 0.1, o.pts[0][1]);
+        ctx.stroke();
+    } else if (o.t === 'arrow') {
+        const [x1, y1] = o.a, [x2, y2] = o.b, ang = Math.atan2(y2 - y1, x2 - x1), cap = o.lw * 4.2;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(ang) * cap * 0.6, y2 - Math.sin(ang) * cap * 0.6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - cap * Math.cos(ang - 0.45), y2 - cap * Math.sin(ang - 0.45));
+        ctx.lineTo(x2 - cap * Math.cos(ang + 0.45), y2 - cap * Math.sin(ang + 0.45));
+        ctx.closePath(); ctx.fill();
+    } else if (o.t === 'ell' || o.t === 'rect') {
+        ctx.save(); ctx.translate(o.p[0], o.p[1]); ctx.rotate(o.ang * Math.PI / 180);
+        ctx.beginPath();
+        if (o.t === 'ell') ctx.ellipse(0, 0, Math.max(1, o.rx), Math.max(1, o.ry), 0, 0, Math.PI * 2);
+        else ctx.rect(-o.rx, -o.ry, o.rx * 2, o.ry * 2);
+        ctx.stroke(); ctx.restore();
+    } else if (o.t === 'text') {
+        ctx.save(); ctx.translate(o.p[0], o.p[1]); ctx.rotate(o.ang * Math.PI / 180);
+        ctx.font = '700 ' + o.mida + 'px Barlow, "Helvetica Neue", Arial, sans-serif';
+        ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+        ctx.lineWidth = o.mida * 0.16; ctx.strokeStyle = (o.c === '#ffffff' || o.c === '#ffcc00') ? 'rgba(0,0,0,.75)' : 'rgba(255,255,255,.9)';
+        ctx.strokeText(o.txt, 0, 0); ctx.fillText(o.txt, 0, 0); ctx.restore();
+    }
+}
+function peDibuixaFoto(ctx) {
+    const M = peMatriu();
+    ctx.save(); ctx.transform(M.a, M.b, M.c, M.d, M.e, M.f);
+    ctx.drawImage(PE.img, 0, 0, PE.W, PE.H);
+    PE.st.objs.forEach(o => peDibuixaObj(ctx, o));
+    if (PE.temp && PE.temp.t !== 'text') peDibuixaObj(ctx, PE.temp);
+    ctx.restore();
+}
+function peDibuixa() {
+    if (!PE.st) return;
+    peCalcVista();
+    const cv = document.getElementById('peCanvas'), ctx = cv.getContext('2d'), v = PE.vista;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.setTransform(v.dpr, 0, 0, v.dpr, 0, 0);
+    ctx.save(); ctx.translate(v.ox, v.oy); ctx.scale(v.k, v.k); ctx.translate(-v.reg.x, -v.reg.y);
+    ctx.beginPath(); ctx.rect(v.reg.x, v.reg.y, v.reg.w, v.reg.h); ctx.clip();
+    peDibuixaFoto(ctx);
+    ctx.restore();
+    if (PE.mode === 'retallar') {
+        const c = PE.st.crop, [x1, y1] = peAPantalla(c.x, c.y), [x2, y2] = peAPantalla(c.x + c.w, c.y + c.h);
+        const zw = cv.width / v.dpr, zh = cv.height / v.dpr;
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.beginPath(); ctx.rect(0, 0, zw, zh); ctx.rect(x1, y1, x2 - x1, y2 - y1); ctx.fill('evenodd');
+        ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.2; ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 0.8; ctx.beginPath();
+        for (let i = 1; i < 3; i++) {
+            ctx.moveTo(x1 + (x2 - x1) * i / 3, y1); ctx.lineTo(x1 + (x2 - x1) * i / 3, y2);
+            ctx.moveTo(x1, y1 + (y2 - y1) * i / 3); ctx.lineTo(x2, y1 + (y2 - y1) * i / 3);
+        }
+        ctx.stroke();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineCap = 'butt';
+        const L = Math.min(22, (x2 - x1) / 3, (y2 - y1) / 3);
+        [[x1, y1, 1, 1], [x2, y1, -1, 1], [x1, y2, 1, -1], [x2, y2, -1, -1]].forEach(([x, y, dx, dy]) => {
+            ctx.beginPath(); ctx.moveTo(x + dx * L, y - dy * 2); ctx.lineTo(x - dx * 2, y - dy * 2); ctx.lineTo(x - dx * 2, y + dy * L); ctx.stroke();
+        });
+    }
+    peActualitzaUI();
+}
+
+/* ── Estat i historial ─────────────────────────────────── */
+function peSnap() { return JSON.stringify(PE.st); }
+function peDesaHist() { PE.hist.push(peSnap()); if (PE.hist.length > 60) PE.hist.shift(); PE.fut = []; PE.canvia = true; }
+function peDesfer() { if (!PE.hist.length) return; PE.fut.push(peSnap()); PE.st = JSON.parse(PE.hist.pop()); peSincronitzaControls(); peDibuixa(); }
+function peRefer() { if (!PE.fut.length) return; PE.hist.push(peSnap()); PE.st = JSON.parse(PE.fut.pop()); peSincronitzaControls(); peDibuixa(); }
+function peSincronitzaControls() { document.getElementById('peFine').value = PE.st.fine; document.getElementById('peFineVal').textContent = Math.round(PE.st.fine) + '°'; }
+function peActualitzaUI() {
+    const el = PE.el;
+    el.querySelector('#peUndo').disabled = !PE.hist.length;
+    el.querySelector('#peRedo').disabled = !PE.fut.length;
+    el.querySelectorAll('.pe-modes button').forEach(b => b.classList.toggle('on', b.dataset.m === PE.mode));
+    el.querySelector('#peEinesRetall').hidden = PE.mode !== 'retallar';
+    el.querySelector('#peEinesMarca').hidden = PE.mode !== 'marcar';
+    el.querySelectorAll('.pe-eina').forEach(b => b.classList.toggle('on', b.dataset.e === PE.eina));
+    el.querySelectorAll('.pe-color').forEach(b => b.classList.toggle('on', b.dataset.c === PE.color));
+    el.querySelectorAll('#peProps button').forEach(b => b.classList.toggle('on', b.dataset.p === PE.st.prop));
+    const g = el.querySelector('#peGruix i'); g.style.height = (3 + PE.gruix * 3) + 'px'; g.style.background = PE.color;
+}
+
+function peSetMode(m) { peTextConfirma(); PE.mode = m; peDibuixa(); }
+function peSetEina(e) { peTextConfirma(); PE.eina = e; peActualitzaUI(); }
+function peSetColor(c) { PE.color = c; peActualitzaUI(); }
+function peSetGruix() { PE.gruix = (PE.gruix + 1) % PE_GRUIX.length; peActualitzaUI(); }
+function peLW() { const c = PE.st.crop; return PE_GRUIX[PE.gruix] * Math.max(c.w, c.h) / peCobertura(); }
+
+function peSetFine(v, final) {
+    if (final) { if (PE._fineAbans != null) { PE.hist.push(PE._fineAbans); PE.fut = []; PE.canvia = true; } PE._fineAbans = null; }
+    else if (PE._fineAbans == null) PE._fineAbans = peSnap();
+    PE.st.fine = Number(v);
+    document.getElementById('peFineVal').textContent = Math.round(PE.st.fine) + '°';
+    peDibuixa();
+}
+function peGirar() {          // 90° en sentit antihorari, com l'iPhone
+    peDesaHist();
+    const ws = peWS(), c = PE.st.crop;
+    PE.st.crop = { x: c.y, y: ws.w - (c.x + c.w), w: c.h, h: c.w };
+    PE.st.rot = (PE.st.rot - 90 + 360) % 360;
+    if (PE.st.prop && PE.st.prop.includes(':')) { const [a, b] = PE.st.prop.split(':'); PE.st.prop = b + ':' + a; }
+    peDibuixa();
+}
+function peRatio(p) {
+    if (!p || p === 'lliure') return null;
+    if (p === 'orig') { const ws = peWS(); return ws.w / ws.h; }
+    if (p === '1') return 1;
+    const [a, b] = p.split(':').map(Number); return a / b;
+}
+function peSetProp(p) {
+    peDesaHist();
+    PE.st.prop = p;
+    const r = peRatio(p);
+    if (r) {                  // retall centrat més gran possible amb aquesta proporció
+        const ws = peWS(), c = PE.st.crop, cx = c.x + c.w / 2, cy = c.y + c.h / 2;
+        let w = c.w, h = w / r; if (h > c.h) { h = c.h; w = h * r; }
+        if (w < 40) { w = Math.min(ws.w, ws.h * r); h = w / r; }
+        let x = Math.min(Math.max(0, cx - w / 2), ws.w - w), y = Math.min(Math.max(0, cy - h / 2), ws.h - h);
+        PE.st.crop = { x, y, w, h };
+    }
+    peDibuixa();
+}
+function peRestablir() {
+    peDesaHist();
+    PE.st.rot = 0; PE.st.fine = 0; PE.st.prop = 'lliure';
+    PE.st.crop = { x: 0, y: 0, w: PE.W, h: PE.H };
+    peSincronitzaControls(); peDibuixa();
+}
+
+/* ── Gestos ────────────────────────────────────────────── */
+function pePos(e) { const r = e.target.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function pePointerDown(e) {
+    if (!PE.st) return;
+    e.preventDefault();
+    try { e.target.setPointerCapture(e.pointerId); } catch (x) {}
+    const [sx, sy] = pePos(e);
+    if (PE.mode === 'retallar') {
+        const c = PE.st.crop, [x1, y1] = peAPantalla(c.x, c.y), [x2, y2] = peAPantalla(c.x + c.w, c.y + c.h), T = 26;
+        const prop = (a, b) => Math.abs(a - b) < T;
+        let h = '';
+        if (sy > y1 - T && sy < y2 + T) { if (prop(sx, x1)) h += 'l'; else if (prop(sx, x2)) h += 'r'; }
+        if (sx > x1 - T && sx < x2 + T) { if (prop(sy, y1)) h += 't'; else if (prop(sy, y2)) h += 'b'; }
+        if (!h && sx > x1 && sx < x2 && sy > y1 && sy < y2) h = 'm';
+        if (!h) return;
+        PE.drag = { h, s: [sx, sy], c0: { ...c }, abans: peSnap() };
+        return;
+    }
+    const [wx, wy] = peAWS(sx, sy), c = PE.st.crop;
+    if (wx < c.x || wy < c.y || wx > c.x + c.w || wy > c.y + c.h) return;
+    const b = peABase(wx, wy), ang = -(PE.st.rot + PE.st.fine);
+    if (PE.eina === 'text') { peTextObre(sx, sy, b, ang); return; }
+    PE.drag = { s: [sx, sy], w0: [wx, wy] };
+    const base = { c: PE.color, lw: peLW() };
+    if (PE.eina === 'pen') PE.temp = { t: 'pen', pts: [b], ...base };
+    else if (PE.eina === 'arrow') PE.temp = { t: 'arrow', a: b, b: b, ...base };
+    else PE.temp = { t: PE.eina, p: b, rx: 0, ry: 0, ang, ...base };
+    peDibuixa();
+}
+function pePointerMove(e) {
+    if (!PE.drag) return;
+    e.preventDefault();
+    const [sx, sy] = pePos(e);
+    if (PE.mode === 'retallar') { peMouRetall(sx, sy); peDibuixa(); return; }
+    const [wx, wy] = peAWS(sx, sy), b = peABase(wx, wy);
+    if (PE.temp.t === 'pen') PE.temp.pts.push(b);
+    else if (PE.temp.t === 'arrow') PE.temp.b = b;
+    else {                      // el·lipse / requadre alineats amb la pantalla
+        const [ax, ay] = PE.drag.w0, cx = (ax + wx) / 2, cy = (ay + wy) / 2, s = peCobertura();
+        PE.temp.p = peABase(cx, cy); PE.temp.rx = Math.abs(wx - ax) / 2 / s; PE.temp.ry = Math.abs(wy - ay) / 2 / s;
+    }
+    peDibuixa();
+}
+function pePointerUp() {
+    if (!PE.drag) return;
+    if (PE.mode === 'retallar') {
+        if (JSON.stringify(PE.drag.c0) !== JSON.stringify(PE.st.crop)) { PE.hist.push(PE.drag.abans); PE.fut = []; PE.canvia = true; }
+    } else if (PE.temp) {
+        const t = PE.temp, petit = (t.t === 'arrow' && Math.hypot(t.a[0] - t.b[0], t.a[1] - t.b[1]) < t.lw * 2)
+            || ((t.t === 'ell' || t.t === 'rect') && t.rx + t.ry < t.lw * 2);
+        if (!petit) { peDesaHist(); PE.st.objs.push(t); }
+        PE.temp = null;
+    }
+    PE.drag = null;
+    peDibuixa();
+}
+function peMouRetall(sx, sy) {
+    const d = PE.drag, ws = peWS(), k = PE.vista.k, dx = (sx - d.s[0]) / k, dy = (sy - d.s[1]) / k, min = Math.max(30, 70 / k);
+    let { x, y, w, h } = d.c0;
+    if (d.h === 'm') {
+        x = Math.min(Math.max(0, x + dx), ws.w - w); y = Math.min(Math.max(0, y + dy), ws.h - h);
+        PE.st.crop = { x, y, w, h }; return;
+    }
+    let x1 = x, y1 = y, x2 = x + w, y2 = y + h;
+    if (d.h.includes('l')) x1 = Math.min(Math.max(0, x + dx), x2 - min);
+    if (d.h.includes('r')) x2 = Math.max(Math.min(ws.w, x + w + dx), x1 + min);
+    if (d.h.includes('t')) y1 = Math.min(Math.max(0, y + dy), y2 - min);
+    if (d.h.includes('b')) y2 = Math.max(Math.min(ws.h, y + h + dy), y1 + min);
+    const r = peRatio(PE.st.prop);
+    if (r) {                    // manté la proporció fixant la cantonada oposada
+        let nw = x2 - x1, nh = y2 - y1;
+        if (d.h === 't' || d.h === 'b') nw = nh * r; else if (d.h === 'l' || d.h === 'r') nh = nw / r;
+        else if (nw / nh > r) nw = nh * r; else nh = nw / r;
+        const ax = d.h.includes('l') ? x2 : x1, ay = d.h.includes('t') ? y2 : y1;
+        const maxW = d.h.includes('l') ? ax : ws.w - ax, maxH = d.h.includes('t') ? ay : ws.h - ay;
+        if (nw > maxW) { nw = maxW; nh = nw / r; } if (nh > maxH) { nh = maxH; nw = nh * r; }
+        x1 = d.h.includes('l') ? ax - nw : (d.h === 't' || d.h === 'b' ? Math.min(Math.max(0, x + w / 2 - nw / 2), ws.w - nw) : ax);
+        y1 = d.h.includes('t') ? ay - nh : (d.h === 'l' || d.h === 'r' ? Math.min(Math.max(0, y + h / 2 - nh / 2), ws.h - nh) : ay);
+        x2 = x1 + nw; y2 = y1 + nh;
+    }
+    PE.st.crop = { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+}
+
+/* ── Text ──────────────────────────────────────────────── */
+function peTextObre(sx, sy, b, ang) {
+    const inp = document.getElementById('peTextInp');
+    PE.temp = { t: 'text', p: b, ang, c: PE.color, txt: '', mida: Math.max(PE.st.crop.w, PE.st.crop.h) * 0.045 / peCobertura() };
+    inp.value = ''; inp.hidden = false;
+    inp.style.left = Math.max(8, Math.min(sx - 110, PE.vista.ox + PE.vista.reg.w * PE.vista.k - 230)) + 'px';
+    inp.style.top = Math.max(8, sy - 22) + 'px';
+    inp.style.color = PE.color;
+    setTimeout(() => inp.focus(), 30);
+}
+function peTextConfirma() {
+    const inp = document.getElementById('peTextInp');
+    if (!inp || inp.hidden) return;
+    inp.hidden = true;
+    const txt = inp.value.trim();
+    if (txt && PE.temp && PE.temp.t === 'text') { peDesaHist(); PE.temp.txt = txt; PE.st.objs.push(PE.temp); }
+    PE.temp = null;
+    peDibuixa();
+}
+
+/* ── Obrir / tancar ────────────────────────────────────── */
+function peCarregaImatge(src) {
+    return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+}
+async function peObrir(src) {
+    peCrearDom();
+    PE.img = await peCarregaImatge(src);
+    PE.W = PE.img.naturalWidth; PE.H = PE.img.naturalHeight;
+    PE.st = { rot: 0, fine: 0, prop: 'lliure', crop: { x: 0, y: 0, w: PE.W, h: PE.H }, objs: [] };
+    PE.hist = []; PE.fut = []; PE.canvia = false; PE.temp = null; PE.drag = null; PE._fineAbans = null;
+    PE.mode = 'marcar';
+    peSincronitzaControls();
+    PE.el.classList.add('open');
+    document.body.classList.add('pe-obert');
+    requestAnimationFrame(peDibuixa);
+    return new Promise(res => { PE.resolve = res; });
+}
+function peTanca(valor) {
+    PE.el.classList.remove('open');
+    document.body.classList.remove('pe-obert');
+    document.getElementById('peTextInp').hidden = true;
+    const r = PE.resolve; PE.resolve = null; PE.st = null; PE.img = null;
+    if (r) r(valor);
+}
+function peCancelar() {
+    if (PE.canvia && !confirm('Vols descartar els canvis de la foto?')) return;
+    peTanca(null);
+}
+/** Renderitza el resultat a mida completa (costat llarg màxim 2400 px) */
+function peExporta(maxCostat) {
+    const c = PE.st.crop, f = Math.min(1, (maxCostat || 2400) / Math.max(c.w, c.h));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(c.w * f); cv.height = Math.round(c.h * f);
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.scale(f, f); ctx.translate(-c.x, -c.y);
+    peDibuixaFoto(ctx);
+    return cv.toDataURL('image/jpeg', 0.9);
+}
+function peFet() {
+    peTextConfirma();
+    if (!PE.canvia) { peTanca(null); return; }
+    let out;
+    try { out = peExporta(); } catch (e) { console.error(e); showToast('No s’ha pogut desar la foto'); return; }
+    peTanca(out);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VISTA PRÈVIA DE FOTO (comuna: galeria, inventari i annex)
+   Toca una miniatura → foto gran + accions a baix (Editar sempre).
+   ══════════════════════════════════════════════════════════════════ */
+let _fpv = null;
+function fpvObrir(src, o) {
+    o = o || {};
+    let el = document.getElementById('fpvVista');
+    if (!el) {
+        el = document.createElement('div'); el.id = 'fpvVista';
+        el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+        document.body.appendChild(el);
+    }
+    _fpv = { o, src };
+    const b = (id, ico, txt, cls) => `<button type="button" class="fpv-acc ${cls || ''}" data-a="${id}">${ico}<span>${txt}</span></button>`;
+    el.innerHTML = `
+        <div class="fpv-top"><button type="button" class="fpv-tanca" aria-label="Tancar" data-a="tanca">${peSvg('<path d="M18 6 6 18M6 6l12 12"/>')}</button><span class="fpv-tit">${(o.titol || '').replace(/</g, '&lt;')}</span><span></span></div>
+        <div class="fpv-img"><img id="fpvImg" alt=""></div>
+        <div class="fpv-baix">
+            ${o.moure ? b('esq', peSvg('<path d="m15 18-6-6 6-6"/>'), 'Abans') : ''}
+            ${o.editar ? b('editar', PE_ICO.marca, 'Editar', 'fpv-prim') : ''}
+            ${o.descarregar ? b('baixa', peSvg('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>'), 'Desar') : ''}
+            ${o.eliminar ? b('elimina', peSvg('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 15h10l1-15"/>'), 'Eliminar', 'fpv-perill') : ''}
+            ${o.moure ? b('dre', peSvg('<path d="m9 18 6-6-6-6"/>'), 'Després') : ''}
+        </div>`;
+    el.querySelector('#fpvImg').src = src;
+    el.onclick = async e => {
+        const a = e.target.closest('[data-a]')?.dataset.a;
+        if (!a) return;
+        if (a === 'tanca') return fpvTanca();
+        if (a === 'editar') {
+            const nova = await peObrir(_fpv.src);
+            if (nova) { _fpv.src = nova; el.querySelector('#fpvImg').src = nova; try { await o.editar(nova); } catch (x) { console.error(x); } }
+        }
+        if (a === 'baixa') o.descarregar(_fpv.src);
+        if (a === 'elimina') { if (await o.eliminar()) fpvTanca(); }
+        if (a === 'esq' || a === 'dre') o.moure(a === 'esq' ? -1 : 1);
+    };
+    el.classList.add('open');
+    document.body.classList.add('pe-obert');
+}
+function fpvTanca() {
+    document.getElementById('fpvVista')?.classList.remove('open');
+    if (!document.getElementById('peEditor')?.classList.contains('open')) document.body.classList.remove('pe-obert');
+    if (_fpv && _fpv.o.onTanca) _fpv.o.onTanca();
+    _fpv = null;
+}
+
+/* Redueix una foto (costat llarg màxim) i la torna en JPEG */
+async function fotoRedueix(src, max, q) {
+    const img = await peCarregaImatge(src);
+    const f = Math.min(1, (max || 1600) / Math.max(img.naturalWidth, img.naturalHeight));
+    if (f === 1 && /^data:image\/jpeg/.test(src)) return src;
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.naturalWidth * f); cv.height = Math.round(img.naturalHeight * f);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    return cv.toDataURL('image/jpeg', q || 0.85);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXPEDIENT ITC = Informe tècnic de camp + Annex fotogràfic
+   · Primer es demana el codi de l'expedient (p. ex. MB00147_2026_AUTO_20085_2_1).
+     A l'informe hi surt la forma curta (2026_20085); el codi complet dona
+     nom als fitxers, com es lliuren ara:
+       <codi>_Informe_tecnic_camp.pdf · <codi>_Informe_tecnic_camp_annex.pdf
+   · Tot es desa al mateix registre d'«itcInformes» (camps codi i annex),
+     que ja entra a la còpia de seguretat.
+   ══════════════════════════════════════════════════════════════════ */
+let itcActual = null;          // registre obert
+let itcPunt = 0;               // registre de l'annex on s'afegeixen fotos
+let _itcDesarT = null;
+
+function itcEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function itcNetejaCodi(t) { return String(t || '').trim().replace(/[\s\/\\]+/g, '_').replace(/[^A-Za-z0-9_.\-]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, ''); }
+/** «MB00147_2026_AUTO_20085_2_1» → «2026_20085»; si ja és curt, es manté */
+function itcExpCurt(codi) {
+    const c = itcNetejaCodi(codi);
+    let m = /(?:^|_)((?:19|20)\d{2})_[A-Za-z]+_(\d{3,})/.exec(c); if (m) return m[1] + '_' + m[2];
+    m = /^((?:19|20)\d{2})[_\-](\d+)$/.exec(c); if (m) return m[1] + '_' + m[2];
+    return c;
+}
+function itcCodiDe(r) { return itcNetejaCodi(r.codi || r.expedient || 'ITC') || 'ITC'; }
+function itcNomITC(r) { return itcCodiDe(r) + '_Informe_tecnic_camp.pdf'; }
+function itcNomAnnex(r) { return itcCodiDe(r) + '_Informe_tecnic_camp_annex.pdf'; }
+function itcAnnexDe(r) { return Array.isArray(r.annex) ? r.annex : []; }
+function itcNFotos(r) { return itcAnnexDe(r).reduce((n, p) => n + (p.fotos || []).length, 0); }
+function itcNouPunt(d) { return { id: 'pt_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), carretera: '', pk: '', marge: '', obs: '', fotos: [], ...(d || {}) }; }
+function itcMargeCurt(m) { const t = String(m || '').toUpperCase(); return t === 'MD' || t === 'ME' ? t : (t.startsWith('AMB') ? 'Ambdós' : String(m || '')); }
+
+/* ── Base de dades ─────────────────────────────────────── */
+function itcGet(id) { return new Promise(res => { const q = db.transaction('itcInformes').objectStore('itcInformes').get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); }); }
+function itcTots() { return new Promise(res => { const q = db.transaction('itcInformes').objectStore('itcInformes').getAll(); q.onsuccess = e => res(e.target.result || []); q.onerror = () => res([]); }); }
+function itcPut(r) { return new Promise((res, rej) => { const tx = db.transaction('itcInformes', 'readwrite'); tx.objectStore('itcInformes').put(r); tx.oncomplete = () => res(r); tx.onerror = e => rej(e.target.error); }); }
+function itcDesarAviat() {             // desat automàtic (sense botó) en editar l'annex
+    clearTimeout(_itcDesarT);
+    _itcDesarT = setTimeout(() => { if (itcActual) itcPut(itcActual).catch(e => showToast('No s’ha pogut desar: ' + e)); }, 350);
+}
+async function itcDesarAra() { clearTimeout(_itcDesarT); if (itcActual) await itcPut(itcActual); }
+
+/* ── 1. Nou expedient: només el codi ───────────────────── */
+async function itcNouExpedient() {
+    const inp = document.getElementById('itcExpCodi');
+    inp.value = '';
+    itcPreviaCodi();
+    const tots = (await itcTots()).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 4);
+    document.getElementById('itcExpRecents').innerHTML = tots.length
+        ? '<span class="itc-recents-tit">Obrir un de recent</span>' + tots.map(r =>
+            `<button type="button" class="itc-recent" onclick="itcTancaFullExp(); itcObrirExpedient('${itcEsc(r.id)}')"><b>${itcEsc(r.expedient || itcExpCurt(itcCodiDe(r)))}</b><small>${itcEsc(r.carretera || '')} ${itcEsc(r.titolObra || '')}</small></button>`).join('')
+        : '';
+    pdObreSheet('itcExpSheet');
+    setTimeout(() => inp.focus(), 250);
+}
+function itcTancaFullExp() { pdTancaSheet('itcExpSheet'); }
+function itcPreviaCodi() {
+    const c = itcNetejaCodi(document.getElementById('itcExpCodi').value);
+    document.getElementById('itcExpPrevia').innerHTML = c
+        ? `A l'informe: <b>${itcEsc(itcExpCurt(c))}</b><br>Fitxers: <b>${itcEsc(c)}_Informe_tecnic_camp.pdf</b> i <b>…_annex.pdf</b>`
+        : 'Enganxa el codi complet (p. ex. MB00147_2026_AUTO_20085_2_1): dona nom als fitxers.';
+}
+async function itcCrearExpedient() {
+    const codi = itcNetejaCodi(document.getElementById('itcExpCodi').value);
+    if (!codi) { showToast('Escriu el codi de l’expedient'); document.getElementById('itcExpCodi').focus(); return; }
+    const curt = itcExpCurt(codi);
+    const ja = (await itcTots()).find(r => itcCodiDe(r).toLowerCase() === codi.toLowerCase());
+    if (ja) { itcTancaFullExp(); showToast('Aquest expedient ja existia: l’obrim'); itcObrirExpedient(ja.id); return; }
+    const tecnic = (typeof _carregarDadesTecnic === 'function' ? _carregarDadesTecnic() : {}) || {};
+    const ara = new Date();
+    const r = {
+        id: 'itc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), ts: Date.now(),
+        codi, expedient: curt,
+        data: String(ara.getDate()).padStart(2, '0') + '-' + String(ara.getMonth() + 1).padStart(2, '0') + '-' + ara.getFullYear(),
+        vigilant: tecnic.nom || '', fotos: [], signatura: '', annex: []
+    };
+    await itcPut(r);
+    itcTancaFullExp();
+    itcObrirExpedient(r.id);
+}
+
+/* ── 2. Pantalla de l'expedient ────────────────────────── */
+async function itcObrirExpedient(id) {
+    const r = await itcGet(id);
+    if (!r) { showToast('No s’ha trobat l’expedient'); return; }
+    itcActual = r;
+    if (!itcActual.annex) itcActual.annex = [];
+    itcRenderHub();
+    ir('itcExp');
+}
+function itcEstatITC(r) {
+    const camps = ['peticionari', 'carretera', 'pkInici', 'termeMunicipal', 'titolObra', 'descripcio'];
+    const n = camps.filter(k => String(r[k] || '').trim()).length;
+    return { n, total: camps.length, fet: n >= 4 };
+}
+function itcRenderHub() {
+    const r = itcActual, e = itcEstatITC(r), nf = itcNFotos(r), np = itcAnnexDe(r).length;
+    const resum = [r.carretera, r.pkInici ? 'PK ' + r.pkInici + (r.pkFinal ? ' – ' + r.pkFinal : '') : '', r.titolObra].filter(Boolean).join(' · ');
+    document.getElementById('itcExpCos').innerHTML = `
+        <div class="itc-cap">
+            <span class="itc-cap-et">Expedient</span>
+            <b>${itcEsc(r.expedient || itcExpCurt(itcCodiDe(r)))}</b>
+            <small>${itcEsc(itcCodiDe(r))}</small>
+        </div>
+        <button type="button" class="itc-targeta" onclick="itcObrirFormulari()">
+            <span class="action-icon tone-violet"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></span>
+            <span class="itc-targeta-txt"><b>Informe tècnic de camp</b><small>${resum ? itcEsc(resum) : 'Toca per omplir-lo'}</small></span>
+            <span class="itc-estat ${e.fet ? 'fet' : ''}">${e.fet ? 'Omplert' : 'Pendent'}</span>
+        </button>
+        <button type="button" class="itc-targeta" onclick="itcObrirAnnex()">
+            <span class="action-icon tone-blue"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg></span>
+            <span class="itc-targeta-txt"><b>Annex fotogràfic</b><small>${nf ? nf + (nf === 1 ? ' foto' : ' fotos') + (np > 1 ? ' · ' + np + ' registres' : '') : 'Afegeix les fotos de la galeria de l’app'}</small></span>
+            <span class="itc-estat ${nf ? 'fet' : ''}">${nf ? 'Amb fotos' : 'Buit'}</span>
+        </button>
+        ${nf ? `<div class="itc-mini">${itcAnnexDe(r).flatMap(p => p.fotos || []).slice(0, 8).map(f => `<img src="${f.img}" alt="">`).join('')}</div>` : ''}
+        <div class="itc-envia">
+            <span class="itc-envia-tit">Enviar</span>
+            <div class="itc-quins" role="group" aria-label="Què vols enviar">
+                <button type="button" data-q="itc">Informe</button>
+                <button type="button" data-q="annex">Annex</button>
+                <button type="button" data-q="tot">Tots dos</button>
+            </div>
+            <div class="itc-envia-fitxers" id="itcEnviaFitxers"></div>
+            <div class="itc-envia-bots">
+                <button type="button" class="btn btn-primary" onclick="itcEnvia('compartir')"><svg class="ico" aria-hidden="true"><use href="#i-upload"/></svg> Compartir</button>
+                <button type="button" class="btn btn-ghost" onclick="itcEnvia('descarregar')"><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg> Descarregar</button>
+            </div>
+        </div>
+        <button type="button" class="pd-link pd-link-perill itc-elimina" onclick="itcEliminarExpedient()">Eliminar l'expedient</button>`;
+    document.querySelectorAll('#itcExpCos .itc-quins button').forEach(b => b.onclick = () => itcSetQuins(b.dataset.q));
+    itcSetQuins(nf ? 'tot' : 'itc');
+}
+let itcQuins = 'tot';
+function itcSetQuins(q) {
+    itcQuins = q;
+    document.querySelectorAll('#itcExpCos .itc-quins button').forEach(b => b.classList.toggle('on', b.dataset.q === q));
+    const r = itcActual, f = [];
+    if (q !== 'annex') f.push(itcNomITC(r));
+    if (q !== 'itc') f.push(itcNomAnnex(r));
+    document.getElementById('itcEnviaFitxers').innerHTML = f.map(n => '<span>' + itcEsc(n) + '</span>').join('');
+}
+function itcObrirFormulari() {
+    _itcFitxaOriginal = itcActual;
+    obrirInformeITC(null, itcActual);
+}
+/** Es crida en sortir del formulari (enrere o després de desar) */
+async function itcTornarDelFormulari(id) {
+    document.getElementById('screen-informe-itc')?.remove();
+    if (id) { await itcObrirExpedient(id); return; }
+    ir('home');
+}
+async function itcEliminarExpedient() {
+    const r = itcActual; if (!r) return;
+    if (!confirm('Vols eliminar l’expedient ' + (r.expedient || itcCodiDe(r)) + ' amb l’informe i l’annex? No es pot desfer.')) return;
+    await new Promise(res => { const tx = db.transaction('itcInformes', 'readwrite'); tx.objectStore('itcInformes').delete(r.id); tx.oncomplete = res; tx.onerror = res; });
+    itcActual = null;
+    showToast('Expedient eliminat');
+    ir('home');
+}
+
+/* ── 3. Annex ──────────────────────────────────────────── */
+function itcObrirAnnex() {
+    if (!itcAnnexDe(itcActual).length) {   // primer registre: dades del mateix ITC
+        itcActual.annex = [itcNouPunt({ carretera: itcActual.carretera || '', pk: itcActual.pkInici || '', marge: itcMargeCurt(itcActual.marge), obs: '' })];
+    }
+    itcPunt = 0;
+    itcRenderAnnex();
+    ir('itcAnnex');
+}
+function itcRenderAnnex() {
+    const r = itcActual, punts = itcAnnexDe(r);
+    document.getElementById('itcAnnexTit').textContent = 'Annex · ' + (r.expedient || itcExpCurt(itcCodiDe(r)));
+    document.getElementById('itcAnnexCos').innerHTML = punts.map((p, i) => `
+        <section class="itc-punt" data-i="${i}">
+            <div class="itc-punt-cap"><b>Registre ${i + 1}${punts.length > 1 ? ' de ' + punts.length : ''}</b>
+                ${punts.length > 1 ? `<button type="button" class="pd-link pd-link-perill" onclick="itcTreurePunt(${i})">Treure</button>` : ''}</div>
+            <div class="itc-punt-camps">
+                <label>Carretera<input type="text" value="${itcEsc(p.carretera)}" autocapitalize="characters" oninput="itcSetPunt(${i},'carretera',this.value)"></label>
+                <label>PK<input type="text" inputmode="decimal" value="${itcEsc(p.pk)}" placeholder="0+000" oninput="itcSetPunt(${i},'pk',this.value)"></label>
+                <label>Marge<select onchange="itcSetPunt(${i},'marge',this.value)">${['', 'MD', 'ME', 'Ambdós', 'Eix'].map(m => `<option value="${m}" ${p.marge === m ? 'selected' : ''}>${m || '—'}</option>`).join('')}</select></label>
+            </div>
+            <label class="itc-punt-obs">Observacions<textarea rows="2" oninput="itcSetPunt(${i},'obs',this.value)" placeholder="Opcional">${itcEsc(p.obs)}</textarea></label>
+            <div class="itc-fotos">${(p.fotos || []).map((f, j) => `<button type="button" class="itc-foto" onclick="itcVeureFoto(${i},${j})" aria-label="Foto ${j + 1}"><img src="${f.img}" alt=""><span>${j + 1}</span></button>`).join('')}</div>
+            <div class="itc-afegir">
+                <button type="button" class="btn btn-primary" onclick="itcObrirSelector(${i})"><svg class="ico" aria-hidden="true"><use href="#i-image"/></svg> Galeria de l'app</button>
+                <button type="button" class="btn btn-ghost" aria-label="Fer una foto" onclick="itcAfegirDelMobil(${i},true)"><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg></button>
+                <button type="button" class="btn btn-ghost" aria-label="Fotos del mòbil" onclick="itcAfegirDelMobil(${i},false)"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg></button>
+            </div>
+        </section>`).join('')
+        + `<button type="button" class="btn btn-ghost itc-nou-punt" onclick="itcAfegirPunt()"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg> Afegir un altre registre</button>`;
+}
+function itcSetPunt(i, k, v) { const p = itcAnnexDe(itcActual)[i]; if (!p) return; p[k] = v; itcDesarAviat(); }
+function itcAfegirPunt() { itcActual.annex.push(itcNouPunt()); itcDesarAviat(); itcRenderAnnex(); const s = document.querySelectorAll('.itc-punt'); s[s.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function itcTreurePunt(i) {
+    const p = itcActual.annex[i];
+    if ((p.fotos || []).length && !confirm('Aquest registre té ' + p.fotos.length + ' fotos. Vols treure’l?')) return;
+    itcActual.annex.splice(i, 1); itcDesarAviat(); itcRenderAnnex();
+}
+async function itcTornarAnnex() { await itcDesarAra(); itcRenderHub(); ir('itcExp'); }
+
+/** Afegeix fotos a un registre. Si el registre no té carretera/PK, agafa les de la primera foto */
+async function itcAfegeixFotos(i, items) {
+    const p = itcAnnexDe(itcActual)[i]; if (!p || !items.length) return;
+    showSpinner(items.length > 1 ? 'AFEGINT ' + items.length + ' FOTOS...' : 'AFEGINT LA FOTO...');
+    try {
+        for (const it of items) p.fotos.push({ id: 'f_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), img: await fotoRedueix(it.img, 1600, 0.85), ts: it.ts || Date.now(), galId: it.galId || null });
+        const pri = items.find(x => x.carr || x.pk);
+        if (pri) {
+            if (!p.carretera && pri.carr) p.carretera = pri.carr;
+            if (!p.pk && pri.pk) p.pk = pri.pk;
+            if (!p.marge && pri.marge) p.marge = itcMargeCurt(pri.marge);
+        }
+        await itcDesarAra();
+    } catch (e) { console.error(e); showToast('Error afegint les fotos'); }
+    hideSpinner();
+    itcRenderAnnex();
+    showToast(items.length === 1 ? 'Foto afegida a l’annex' : items.length + ' fotos afegides a l’annex');
+}
+function itcAfegirDelMobil(i, camera) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    if (camera) inp.capture = 'environment'; else inp.multiple = true;
+    inp.onchange = async () => {
+        const fitxers = Array.from(inp.files || []);
+        const items = await Promise.all(fitxers.map(f => new Promise(res => { const rd = new FileReader(); rd.onload = e => res({ img: e.target.result, ts: f.lastModified || Date.now() }); rd.onerror = () => res(null); rd.readAsDataURL(f); })));
+        itcAfegeixFotos(i, items.filter(Boolean));
+    };
+    inp.click();
+}
+function itcVeureFoto(i, j) {
+    const p = itcAnnexDe(itcActual)[i]; if (!p || !p.fotos[j]) return;
+    let idx = j;
+    fpvObrir(p.fotos[idx].img, {
+        titol: 'Registre ' + (i + 1) + ' · foto ' + (idx + 1) + ' de ' + p.fotos.length,
+        editar: async nova => { p.fotos[idx].img = await fotoRedueix(nova, 1600, 0.88); await itcDesarAra(); },
+        eliminar: async () => {
+            if (!confirm('Vols treure aquesta foto de l’annex? (A la galeria de l’app no s’esborra.)')) return false;
+            p.fotos.splice(idx, 1); await itcDesarAra(); return true;
+        },
+        moure: d => {
+            const k = idx + d; if (k < 0 || k >= p.fotos.length) return;
+            [p.fotos[idx], p.fotos[k]] = [p.fotos[k], p.fotos[idx]]; idx = k; itcDesarAviat();
+            document.querySelector('#fpvVista .fpv-tit').textContent = 'Registre ' + (i + 1) + ' · foto ' + (idx + 1) + ' de ' + p.fotos.length;
+            showToast('Foto ' + (idx + 1) + ' de ' + p.fotos.length);
+        },
+        onTanca: () => itcRenderAnnex()
+    });
+}
+
+/* ── 4. Selector de la galeria de l'app ────────────────── */
+let itcSel = { punt: 0, items: [], tria: [], periode: 'tot', carr: '' };
+async function itcObrirSelector(i) {
+    itcSel = { punt: i, items: [], tria: [], periode: 'tot', carr: '' };
+    const p = itcAnnexDe(itcActual)[i] || {};
+    itcSel.carr = String(p.carretera || itcActual.carretera || '').toUpperCase().replace(/\s+/g, '');
+    const ov = document.getElementById('itcSelector');
+    ov.classList.add('open'); document.body.classList.add('pe-obert');
+    document.getElementById('itcSelGraella').innerHTML = '<p class="itc-sel-buit">Carregant…</p>';
+    itcSel.items = await new Promise(res => {
+        if (!db.objectStoreNames.contains('galeriaFotos')) return res([]);
+        const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').getAll();
+        q.onsuccess = e => res((e.target.result || []).filter(x => x.imgData).sort((a, b) => (b.ts || 0) - (a.ts || 0)));
+        q.onerror = () => res([]);
+    });
+    // Si cap foto és d'aquesta carretera, comencem sense el filtre
+    if (itcSel.carr && !itcSel.items.some(x => String(x.carr || '').toUpperCase().replace(/\s+/g, '') === itcSel.carr)) itcSel.carr = '';
+    itcRenderSelector();
+}
+function itcTancaSelector() { document.getElementById('itcSelector').classList.remove('open'); if (!document.querySelector('#fpvVista.open,#peEditor.open')) document.body.classList.remove('pe-obert'); }
+function itcSelFiltrats() {
+    const ara = Date.now(), avui = new Date(); avui.setHours(0, 0, 0, 0);
+    return itcSel.items.filter(x => {
+        if (itcSel.carr && String(x.carr || '').toUpperCase().replace(/\s+/g, '') !== itcSel.carr) return false;
+        if (itcSel.periode === 'avui' && (x.ts || 0) < avui.getTime()) return false;
+        if (itcSel.periode === 'set' && (x.ts || 0) < ara - 7 * 864e5) return false;
+        return true;
+    });
+}
+function itcRenderSelector() {
+    const llista = itcSelFiltrats(), p = itcAnnexDe(itcActual)[itcSel.punt] || { fotos: [] };
+    const jaDins = new Set((p.fotos || []).map(f => f.galId).filter(Boolean));
+    const xip = (k, t, on, fn) => `<button type="button" class="itc-xip ${on ? 'on' : ''}" onclick="${fn}">${t}</button>`;
+    document.getElementById('itcSelFiltres').innerHTML =
+        (itcSel.carr ? xip('c', '<svg class="ico" aria-hidden="true"><use href="#i-road"/></svg>' + itcEsc(itcSel.carr) + ' ✕', true, "itcSel.carr='';itcRenderSelector()") : '')
+        + xip('tot', 'Totes', itcSel.periode === 'tot', "itcSel.periode='tot';itcRenderSelector()")
+        + xip('avui', 'Avui', itcSel.periode === 'avui', "itcSel.periode='avui';itcRenderSelector()")
+        + xip('set', '7 dies', itcSel.periode === 'set', "itcSel.periode='set';itcRenderSelector()");
+    const g = document.getElementById('itcSelGraella');
+    if (!llista.length) {
+        g.innerHTML = '<p class="itc-sel-buit">' + (itcSel.items.length ? 'Cap foto amb aquest filtre.' : 'Encara no hi ha fotos a la galeria de l’app. Fes-les amb el botó de càmera.') + '</p>';
+    } else {
+        g.innerHTML = llista.map(x => {
+            const n = itcSel.tria.indexOf(x.id) + 1, d = x.ts ? new Date(x.ts) : null;
+            return `<button type="button" class="itc-sel-foto ${n ? 'on' : ''} ${jaDins.has(x.id) ? 'ja' : ''}" onclick="itcSelToggle('${x.id}')" aria-pressed="${!!n}">
+                <img src="${x.imgData}" alt="" loading="lazy">
+                ${n ? `<span class="itc-sel-n">${n}</span>` : ''}
+                ${jaDins.has(x.id) ? '<span class="itc-sel-ja">A l’annex</span>' : ''}
+                <span class="itc-sel-peu">${x.carr ? '<b>' + itcEsc(x.carr) + '</b> ' : ''}${x.pk ? 'PK ' + itcEsc(x.pk) : ''}<small>${d ? String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear() : ''}</small></span>
+            </button>`;
+        }).join('');
+    }
+    const n = itcSel.tria.length, bt = document.getElementById('itcSelAfegir');
+    bt.disabled = !n;
+    bt.textContent = n ? 'Afegir ' + n + (n === 1 ? ' foto' : ' fotos') : 'Tria les fotos';
+}
+function itcSelToggle(id) {
+    const k = itcSel.tria.indexOf(id);
+    if (k >= 0) itcSel.tria.splice(k, 1); else itcSel.tria.push(id);
+    itcRenderSelector();
+}
+async function itcSelAfegir() {
+    const items = itcSel.tria.map(id => itcSel.items.find(x => x.id === id)).filter(Boolean)
+        .map(x => ({ img: x.imgData, ts: x.ts, carr: x.carr, pk: x.pk, marge: x.marge, galId: x.id }));
+    itcTancaSelector();
+    await itcAfegeixFotos(itcSel.punt, items);
+}
+
+/* ── 5. PDF i enviament ────────────────────────────────── */
+async function itcBlobAnnex(r) {
+    const punts = itcAnnexDe(r).filter(p => (p.fotos || []).length || p.carretera || p.obs);
+    if (!punts.length || !itcNFotos(r)) throw new Error('L’annex encara no té fotos');
+    const p = {   // mateix format que el PDF «Fitxa» que ja es lliura
+        titulo: 'EXP. ' + (r.expedient || itcExpCurt(itcCodiDe(r))),
+        fields: [{ label: 'Carretera' }, { label: 'PK' }, { label: 'Marge' }, { label: 'Observacions' }],
+        registros: punts.map(pt => ({
+            values: [{ label: 'Carretera', val: pt.carretera }, { label: 'PK', val: pt.pk }, { label: 'Marge', val: pt.marge }, { label: 'Observacions', val: pt.obs }],
+            fotos: (pt.fotos || []).map(f => f.img)
+        }))
+    };
+    return await generarBlobPDF(p, 'Fitxa');
+}
+async function itcFitxers(r, quins) {
+    const f = [];
+    if (quins !== 'annex') f.push(new File([await generarPDFOficialITC(r)], itcNomITC(r), { type: 'application/pdf' }));
+    if (quins !== 'itc') f.push(new File([await itcBlobAnnex(r)], itcNomAnnex(r), { type: 'application/pdf' }));
+    return f;
+}
+async function itcEnvia(mode) {
+    const r = itcActual; if (!r) return;
+    if (itcQuins !== 'itc' && !itcNFotos(r)) { showToast('L’annex encara no té fotos'); return; }
+    if (itcQuins !== 'annex' && !itcEstatITC(r).n && !confirm('L’informe encara està buit. Vols generar-lo igualment?')) return;
+    showSpinner('GENERANT PDF...');
+    let fitxers;
+    try { fitxers = await itcFitxers(r, itcQuins); }
+    catch (e) { hideSpinner(); showToast(e.message || 'Error generant el PDF'); console.error(e); return; }
+    hideSpinner();
+    if (mode === 'compartir' && navigator.canShare && navigator.canShare({ files: fitxers })) {
+        try { await navigator.share({ files: fitxers, title: 'Expedient ' + (r.expedient || '') }); return; }
+        catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    fitxers.forEach((f, k) => setTimeout(() => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }, k * 700));
+    showToast(fitxers.length === 1 ? 'Descarregat: ' + fitxers[0].name : '2 fitxers descarregats');
+}
+
+</script>
+
 <!-- ============================================================
      NOVETATS DE LA VERSIÓ — surt un sol cop per versió
      ============================================================ -->
@@ -19512,6 +20564,10 @@ const NV_KEY    = 'dc_novetats_vistes';
 const NV_ITEMS = [
     { ico: 'i-file',     to: 'tone-red',   nou: true, t: 'Comunicat oficial en PDF',
       d: "El comunicat diari de vigilància amb el mateix format, logo i nom de fitxer que l'oficial. Es comparteix o es descarrega d'un toc, d'un dia o de tota la setmana." },
+    { ico: 'i-folder',   to: 'tone-violet', nou: true, t: 'Expedients ITC amb annex',
+      d: "Poses el codi de l'expedient un cop i hi tens l'informe i l'annex fotogràfic junts. Les fotos s'agafen de la galeria de l'app amb el seu PK, i s'envien amb el nom oficial." },
+    { ico: 'i-edit',     to: 'tone-amber', nou: true, t: 'Editor de fotos',
+      d: 'Retalla, gira, redreça i marca les fotos amb cercles, fletxes, requadres i text. Toca qualsevol miniatura i prem «Editar».' },
     { ico: 'i-map',      to: 'tone-blue',  nou: true, t: 'Rutes favorites',
       d: 'Desa les teves rutes amb el nom que vulguis i, cada dia, carrega tots els trams de cop.' },
     { ico: 'i-road',     to: 'tone-teal',  nou: true, t: 'Comunicats de treball',
