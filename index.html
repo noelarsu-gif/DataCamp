@@ -86,9 +86,6 @@ html, body {
     overflow-x: hidden;     /* belt-and-suspenders */
 }
 
-/* ============================================================
-   LAYOUT — DESKTOP DASHBOARD
-   ============================================================ */
 
 /* SIDEBAR */
 .sidebar {
@@ -475,17 +472,6 @@ html, body {
 /* ============================================================
    BLACKLIST DE CARRETERES — Configuració
    ============================================================ */
-.blacklist-input-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-.blacklist-input-row input {
-    flex: 1;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
 .blacklist-chips {
     display: flex;
     flex-wrap: wrap;
@@ -602,12 +588,6 @@ html, body {
     margin-bottom: 14px;
 }
 
-.util-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
 /* ============================================================
    CARDS & SURFACES
    ============================================================ */
@@ -681,9 +661,6 @@ html, body {
     border: 1.5px solid #fecdd3;
 }
 .btn-danger:hover { background: #ffe4e6; }
-
-.btn-blue  { background: var(--accent-blue); color: white; }
-.btn-blue:hover  { background: #1a44c2; }
 
 .btn-green { background: #16a34a; color: white; }
 .btn-green:hover { background: #15803d; }
@@ -1050,44 +1027,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .btn-del-photo:hover { background: var(--primary-dark); }
 
 /* ── FOTO RÀPIDA — fila PK amb botó Auto-PK integrat ────── */
-.fd-pk-row {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 8px;
-    align-items: end;
-    margin-bottom: 18px;
-}
-.fd-pk-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-}
-.fd-pk-group label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 0.3px;
-}
-.fd-pk-input-wrap {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    border: 1.5px solid var(--border-dark);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    background: var(--surface);
-}
-.fd-pk-input-wrap input {
-    border: none !important;
-    border-radius: 0 !important;
-    flex: 1;
-    min-width: 0;
-    padding: 10px 10px;
-    font-size: 1rem;
-    background: transparent;
-    outline: none;
-}
 .btn-autopk-foto {
     display: flex;
     align-items: center;
@@ -1111,28 +1050,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     opacity: 0.55;
     cursor: not-allowed;
     transform: none;
-}
-.fd-marge-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-}
-.fd-marge-group label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 0.3px;
-}
-.fd-marge-group select {
-    height: 44px;
-    border: 1.5px solid var(--border-dark);
-    border-radius: var(--radius-sm);
-    padding: 0 10px;
-    font-size: 0.95rem;
-    background: var(--surface);
-    color: var(--text);
-    width: 100%;
 }
 
 .zoom-icon {
@@ -1282,9 +1199,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .actions button:hover { background: var(--bg-alt); }
 
-/* ============================================================
-   HISTORIAL / DOWNLOADS CARDS — fully fluid, mobile-first
-   ============================================================ */
 
 /* ---- Project card ---- */
 .project-card {
@@ -1345,70 +1259,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .project-card-actions .pca-clone  { flex: 2 1 0; min-width: 0; }
 .project-card-actions .pca-delete { flex: 0 0 44px; width: 44px; padding: 0; }
 
-/* ---- Download card ---- */
-.download-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 15px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow-sm);
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-.download-card-header {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-.download-card-title {
-    font-weight: 700;
-    color: var(--dark);
-    font-size: 1rem;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
-    max-width: 100%;
-}
-.download-card-meta {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-/* PDF button: full-width on mobile */
-.download-card-header .btn-fitxa {
-    width: 100%;
-    justify-content: center;
-    min-height: 48px;
-    font-size: 0.9rem;
-}
-/* Secondary row under card */
-.download-card-secondary {
-    margin-bottom: 8px;
-}
-.download-card-secondary .btn {
-    width: 100%;
-    min-height: 44px;
-    font-size: 0.82rem;
-}
-
-.extra-options {
-    display: none;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-}
-.extra-options .btn {
-    width: 100%;
-    min-height: 44px;
-    font-size: 0.8rem;
-    margin: 0;
-}
 
 /* Desktop overrides */
 @media (min-width: 769px) {
@@ -1416,12 +1266,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .project-card-actions .pca-open  { flex: 0 0 auto; }
     .project-card-actions .pca-clone { flex: 0 0 auto; }
     .project-card-actions .pca-delete{ flex: 0 0 auto; width: auto; padding: 10px 14px; }
-
-    .download-card-header { flex-direction: row; align-items: center; justify-content: space-between; }
-    .download-card-header .btn-fitxa { width: auto; min-height: 42px; }
-
-    .extra-options { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
-    .extra-options .btn { min-height: 38px; }
 }
 
 /* ============================================================
@@ -1481,384 +1325,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     outline: none;
 }
 
-/* ============================================================
-   HISTORIAL TABS
-   ============================================================ */
-.hist-tabs {
-    display: flex;
-    gap: 4px;
-    background: var(--bg-alt);
-    padding: 4px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 16px;
-    width: 100%;          /* never wider than parent */
-    box-sizing: border-box;
-    overflow: hidden;     /* clip any child that tries to escape */
-}
-.hist-tab {
-    flex: 1;
-    min-width: 0;          /* allow shrink below content width */
-    padding: 9px 8px;
-    border: none;
-    border-radius: 5px;
-    font-family: var(--font);
-    font-size: 0.82rem;   /* slightly smaller so 3 tabs fit */
-    font-weight: 600;
-    cursor: pointer;
-    background: transparent;
-    color: var(--text-muted);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.hist-tab.active {
-    background: var(--surface);
-    color: var(--dark);
-    box-shadow: var(--shadow-sm);
-}
-.hist-tab:hover:not(.active) { color: var(--text); }
-
-.hist-panel { display: none; }
-.hist-panel.active { display: block; animation: fadeSlide 0.25s ease; }
-
-/* ============================================================
-   FILTER PILLS
-   ============================================================ */
-.filter-pills {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-}
-.pill {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border-dark);
-    background: var(--surface);
-    font-family: var(--font);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: var(--transition);
-    white-space: nowrap;
-}
-.pill:hover { border-color: var(--primary); color: var(--primary); }
-.pill.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-}
-
-/* ============================================================
-   QUICK CAPTURE BADGE on project cards
-   ============================================================ */
-.capture-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.capture-badge.inventari {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-color: #fecdd3;
-}
-
-/* ============================================================
-   CALENDAR — dot-only, zero text in cells
-   ============================================================ */
-.cal-filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-}
-/* legend */
-.cal-legend {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 9px 12px;
-    background: var(--surface-2);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    width: 100%;
-    box-sizing: border-box;
-}
-.cal-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: opacity 0.18s;
-    user-select: none;
-    white-space: nowrap;
-}
-.cal-legend-item.active { opacity: 1; }
-.cal-legend-item:not(.active) { opacity: 0.35; }
-.cal-legend-item:hover { opacity: 0.8; }
-.cal-legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-.cal-legend-dot.cat-captura   { background: var(--cat-captura); }
-.cal-legend-dot.cat-inventari { background: var(--cat-inventari); }
-.cal-legend-dot.cat-obra      { background: var(--cat-obra); }
-
-/* nav */
-.cal-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
-}
-.cal-nav-btn {
-    width: 40px; height: 40px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border-dark);
-    background: var(--surface);
-    font-size: 1.4rem;
-    cursor: pointer;
-    color: var(--text);
-    transition: var(--transition);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.cal-nav-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
-.cal-month-label {
-    font-family: var(--font-cond);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--dark);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* grid wrapper: allow horizontal scroll on very small screens */
-.cal-grid-wrap {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: var(--shadow-sm);
-}
-.cal-dow-row,
-.cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(38px, 1fr));
-    min-width: 266px; /* 7 × 38px — never collapses below this */
-}
-.cal-dow-row { background: var(--dark); }
-.cal-dow {
-    text-align: center;
-    padding: 7px 2px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.6);
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-/* ── day cell ── */
-.cal-cell {
-    min-height: 64px;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 5px 3px 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    cursor: default;
-    transition: background 0.12s;
-    box-sizing: border-box;
-    /* ensure cells never grow wider than their column */
-    overflow: hidden;
-}
-.cal-cell:nth-child(7n) { border-right: none; }
-.cal-cell.other-month   { background: var(--surface-2); }
-.cal-cell.other-month .cal-day-num { color: var(--text-light); }
-.cal-cell.today         { background: #fef9e7; }
-.cal-cell.has-events    { cursor: pointer; }
-.cal-cell.has-events:hover  { background: var(--accent-blue-lt); }
-.cal-cell.selected      { background: var(--accent-blue-lt); outline: 2px solid var(--accent-blue); outline-offset: -2px; }
-
-/* day number circle */
-.cal-day-num {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text);
-    width: 22px; height: 22px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    flex-shrink: 0;
-    line-height: 1;
-}
-.cal-cell.today .cal-day-num {
-    background: var(--primary);
-    color: white;
-    font-weight: 700;
-}
-
-/* ── event dot strip — pure circles, NO text ── */
-.cal-events {
-    display: flex;
-    flex-wrap: wrap;         /* wrap if many dots */
-    gap: 2px;
-    justify-content: center;
-    align-items: center;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-/* The actual dot: 8px circle, colour set via class */
-.cal-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: transform 0.1s;
-}
-.cal-dot.cat-captura   { background: var(--cat-captura); }
-.cal-dot.cat-inventari { background: var(--cat-inventari); }
-.cal-dot.cat-obra      { background: var(--cat-obra); }
-
-/* Obra spans: square pill instead of circle to hint at duration */
-.cal-dot.cat-obra {
-    border-radius: 2px;
-    width: 14px;
-    height: 7px;
-}
-
-/* "+N more" overflow indicator */
-.cal-more {
-    font-size: 0.58rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    line-height: 1;
-    white-space: nowrap;
-}
-
-/* ── Day detail panel (replaces modal) ── */
-.cal-day-panel {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    margin-top: 14px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    animation: fadeSlide 0.2s ease;
-}
-.cal-day-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--dark);
-    color: white;
-}
-.cal-day-panel-title {
-    font-family: var(--font-cond);
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.cal-day-panel-close {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.6);
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0 4px;
-    line-height: 1;
-}
-.cal-day-panel-close:hover { color: white; }
-.cal-day-panel-list { padding: 0 14px 6px; }
-
-.cal-day-entry {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-}
-.cal-day-entry:last-child { border-bottom: none; }
-.cal-day-entry-bar {
-    width: 4px;
-    border-radius: 4px;
-    align-self: stretch;
-    flex-shrink: 0;
-    min-height: 36px;
-}
-.cal-day-entry-info { flex: 1; min-width: 0; }
-.cal-day-entry-title {
-    font-weight: 700;
-    color: var(--dark);
-    font-size: 0.9rem;
-    word-break: break-word;
-}
-.cal-day-entry-meta {
-    font-size: 0.76rem;
-    color: var(--text-muted);
-    margin-top: 3px;
-    line-height: 1.4;
-}
-.cal-day-entry-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-}
 
 /* ── responsive tweaks ── */
-@media (max-width: 599px) {
-    /* Ultra-short day labels: only first letter */
-    .cal-dow { font-size: 0.62rem; padding: 6px 1px; letter-spacing: 0; }
-    .cal-cell { min-height: 52px; padding: 4px 2px 3px; gap: 2px; }
-    .cal-day-num { font-size: 0.65rem; width: 18px; height: 18px; }
-    .cal-dot { width: 6px; height: 6px; }
-    .cal-dot.cat-obra { width: 11px; height: 6px; }
-    .cal-month-label { font-size: 1rem; }
-    .cal-nav-btn { width: 36px; height: 36px; font-size: 1.2rem; }
-}
-
-@media (max-width: 768px) {
-    .cal-filters { flex-direction: column; gap: 8px; }
-    .cal-filters .sort-select { width: 100%; }
-    .cal-legend { gap: 10px; }
-}
 
 /* ============================================================
    MODALS
@@ -1923,17 +1391,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-    text-align: center;
-    box-shadow: var(--shadow-lg);
-    animation: modalIn 0.25s cubic-bezier(.34,1.56,.64,1);
-}
-.export-title {
-    font-family: var(--font-cond);
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: var(--primary);
-    margin-bottom: 6px;
 }
 .export-name {
     font-size: 0.78rem;
@@ -2094,24 +1551,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-size: 0.78rem; line-height: 1.5; color: #9a4d0a;
 }
 
-/* Full image modal */
-.full-img-modal {
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.92);
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-}
-.full-img-modal img {
-    max-width: 92%;
-    max-height: 75%;
-    object-fit: contain;
-    border: 2px solid rgba(255,255,255,0.15);
-    border-radius: var(--radius-sm);
-}
 
 /* ============================================================
    SPINNER / LOADING
@@ -2609,7 +2048,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 
     /* === HISTORIAL === */
-    #list, .hist-panel, .hist-panel.active {
+    #list {
         width: 100%;
         overflow-x: hidden;
     }
@@ -2617,13 +2056,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         max-width: 100%;
         box-sizing: border-box;
     }
-    .hist-tabs { width: 100%; overflow: hidden; }
-    .hist-tab  { font-size: 0.74rem; padding: 8px 4px; gap: 2px; }
-
-    .legend-filter-row { width: 100%; gap: 5px; }
-    .legend-filter-label { width: 100%; font-size: 0.62rem; margin-bottom: 4px; }
-    .legend-pill { font-size: 0.7rem; padding: 5px 9px; }
-    .legend-pill .lpill-dot { width: 7px; height: 7px; }
 
     /* === SEARCH BAR === */
     .search-bar { width: 100%; gap: 6px; }
@@ -2660,27 +2092,8 @@ input:checked + .slider:before { transform: translateX(20px); }
         min-height: 44px;
     }
 
-    /* === DOWNLOAD CARDS === */
-    .download-card { padding: 14px 12px; }
-    .download-card-header { flex-direction: column; gap: 10px; }
-    .download-card-header .btn-fitxa { width: 100% !important; min-height: 48px; }
-    .download-card-secondary .btn { width: 100%; min-height: 44px; }
-    .extra-options .btn           { width: 100%; min-height: 42px; }
-
-    /* === CALENDAR === */
-    .cal-filters { flex-direction: column; gap: 8px; width: 100%; }
-    .cal-filters .sort-select { width: 100% !important; }
-    .cal-legend  { width: 100%; gap: 8px; }
-    .cal-nav     { width: 100%; }
-    .cal-nav-btn { width: 36px; height: 36px; font-size: 1.1rem; }
-    .cal-month-label { font-size: 0.9rem; }
-    .cal-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .cal-day-panel { width: 100%; box-sizing: border-box; }
 
     /* === DASHBOARD === */
-    .dashboard-hero { padding: 18px 14px; margin-bottom: 14px; }
-    .hero-title { font-size: 1.4rem; }
-    .hero-sub   { font-size: 0.8rem; }
     .action-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .action-card { padding: 14px 10px; gap: 8px; }
     .action-icon  { font-size: 1.4rem; }
@@ -2705,16 +2118,11 @@ input:checked + .slider:before { transform: translateX(20px); }
         margin: 0 !important;
     }
     /* Override for card action buttons inside those screens */
-    .project-card-actions .btn,
-    .download-card-header .btn,
-    .cal-day-entry-actions .btn {
+    .project-card-actions .btn {
         width: auto !important;
         margin: 0 !important;
     }
 
-    /* === UTIL ROW === */
-    .util-row      { flex-direction: column; gap: 8px; }
-    .util-row .btn { width: 100%; }
 
     /* === FORMS === */
     input[type="text"], input[type="number"],
@@ -2764,7 +2172,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .scroll-btns { bottom: 16px; right: 12px; }
     .btn-scroll  { width: 40px; height: 40px; }
     .watermark-row { padding: 12px; }
-    .capture-badge { font-size: 0.62rem; padding: 2px 7px; }
     .cat-badge { font-size: 0.62rem; padding: 2px 7px; }
     .detail-stats  { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .detail-stat   { padding: 10px 6px; }
@@ -2782,8 +2189,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .action-card  { padding: 12px 8px; }
     .photo-grid   { grid-template-columns: repeat(2, 1fr); }
     .sort-select  { width: 76px !important; }
-    .hist-tab     { font-size: 0.66rem; padding: 7px 3px; }
-    .legend-pill  { font-size: 0.62rem; padding: 4px 7px; }
 }
 
 /* ============================================================
@@ -2807,19 +2212,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* topbar buttons are always auto-width */
 .topbar-actions .btn { width: auto; margin: 0; }
 
-/* ============================================================
-   PDF SIGNATURE SECTION (kept functional)
-   ============================================================ */
-#signatureCanvas {
-    border: 2px solid var(--border-dark);
-    border-radius: var(--radius-sm);
-    background: white;
-    cursor: crosshair;
-    touch-action: none;
-    width: 100%;
-    height: 160px;
-    display: block;
-}
 
 /* ============================================================
    FOTO DIRECTA SCREEN
@@ -2834,18 +2226,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 #screen-foto-directa .foto-preview-wrap img {
     width: 100%;
     display: block;
-}
-#screen-foto-directa .foto-reset-btn {
-    position: absolute;
-    top: 10px; right: 10px;
-    background: rgba(198,12,48,0.92);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 38px; height: 38px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
 }
 
 /* ============================================================
@@ -2908,9 +2288,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     #fab-foto-rapida::after { display: none; }
 }
 
-/* ============================================================
-   GALERIA DE FOTOS RÀPIDES
-   ============================================================ */
 /* ── Picker carretera (bottom sheet custom) ── */
 .carr-picker-backdrop {
     display: none;
@@ -3012,29 +2389,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-radius: 20px;
     border: 1px solid var(--border);
 }
-.galeria-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border: 1.5px solid var(--border-dark);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    white-space: nowrap;
-    min-height: 38px;
-}
-.galeria-btn:hover { background: var(--bg-alt); border-color: var(--text-muted); }
-.galeria-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
-.galeria-btn.danger { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
-.galeria-btn.danger:hover { background: #ffe4e6; }
-.galeria-btn.blue  { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
-.galeria-btn.blue:hover  { background: #1e40af; }
 
 /* Botó 3 punts */
 .galeria-menu-btn {
@@ -3158,12 +2512,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: var(--accent-blue);
     border-color: var(--accent-blue);
 }
-.galeria-filter-sep {
-    width: 1px; height: 20px;
-    background: var(--border);
-    flex-shrink: 0;
-}
-.galeria-filters-empty { display: none; }
 
 /* Selecció mode */
 .galeria-select-bar {
@@ -3463,38 +2811,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .visor-nav-arrow.prev { left: 10px; }
 .visor-nav-arrow.next { right: 10px; }
 .visor-nav-arrow[disabled] { opacity: 0.25; pointer-events: none; }
-.visor-bottombar {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 16px;
-    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
-}
-.visor-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 11px 20px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.12);
-    color: white;
-    font-family: var(--font);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    min-height: 44px;
-}
-.visor-btn:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.4); }
-.visor-btn.primary { background: var(--accent-blue); border-color: var(--accent-blue); }
-.visor-btn.primary:hover { background: #1e40af; }
 .visor-close, .visor-menu-btn {
     background: rgba(255,255,255,0.12);
     border: none;
@@ -3598,17 +2914,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .project-card.cat-inventari .project-card-title { color: var(--cat-inventari); }
 .project-card.cat-obra      .project-card-title { color: var(--cat-obra);      }
 
-/* ── Calendar event dots/bars by category ── */
-.cal-event-dot.cat-captura   { background: var(--cat-captura)   !important; }
-.cal-event-dot.cat-inventari { background: var(--cat-inventari) !important; }
-.cal-event-dot.cat-obra      { background: var(--cat-obra)      !important; }
-
-/* Obra spans look like a bar (border-radius 0) */
-.cal-event-dot.cat-obra { border-radius: 2px; font-weight: 700; }
-
-/* ============================================================
-   DOWNLOADS — table + search + responsive cards
-   ============================================================ */
 
 /* Top bar: search + count */
 .dl-topbar {
@@ -3792,16 +3097,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     word-break: break-word;
 }
 .dl-card-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
-.dl-card-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-}
-.dl-card-actions .dl-btn {
-    min-height: 42px;
-    font-size: 0.78rem;
-    justify-content: center;
-}
 
 /* Responsive switch */
 .dl-table-wrap { display: block; }  /* shown on desktop */
@@ -3980,15 +3275,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .dl-count { width: 100%; text-align: right; }
 }
 
-/* ── Legend items ── */
-.cal-legend-dot.cat-captura   { background: var(--cat-captura);   }
-.cal-legend-dot.cat-inventari { background: var(--cat-inventari); }
-.cal-legend-dot.cat-obra      { background: var(--cat-obra);      }
-
-/* Clickable legend filter */
-.cal-legend-item { cursor: pointer; opacity: 0.5; transition: opacity 0.2s; }
-.cal-legend-item.active { opacity: 1; }
-.cal-legend-item:hover  { opacity: 0.85; }
 
 /* ============================================================
    OBRA PROGRESS BAR
@@ -4113,58 +3399,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .detail-stat-val  { font-family: var(--font-cond); font-size: 1.5rem; font-weight: 900; color: var(--dark); }
 .detail-stat-label{ font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* ============================================================
-   HISTORIAL LEGEND FILTER ROW
-   ============================================================ */
-.legend-filter-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;           /* wrap to next line if needed */
-    margin-bottom: 14px;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-}
-.legend-filter-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-.legend-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 11px;
-    border-radius: 20px;
-    border: 1.5px solid transparent;
-    font-size: 0.76rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    background: var(--surface-2);
-    color: var(--text-muted);
-    white-space: nowrap;
-    flex-shrink: 0;            /* never squish the text */
-}
-.legend-pill .lpill-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-.legend-pill:hover    { opacity: 0.85; }
-.legend-pill.active.captura   { background: var(--cat-captura-lt);   color: var(--cat-captura);   border-color: var(--cat-captura); }
-.legend-pill.active.inventari { background: var(--cat-inventari-lt); color: var(--cat-inventari); border-color: var(--cat-inventari); }
-.legend-pill.active.obra      { background: var(--cat-obra-lt);      color: var(--cat-obra);      border-color: var(--cat-obra); }
-
-@media (max-width: 768px) {
-    .legend-filter-row { gap: 6px; }
-    .legend-filter-label { font-size: 0.65rem; width: 100%; margin-bottom: 2px; }
-    .legend-pill { font-size: 0.72rem; padding: 5px 10px; }
-    .legend-pill .lpill-dot { width: 7px; height: 7px; }
-}
 
 /* ============================================================
    MAP MODULE
@@ -4313,19 +3547,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .obra-closed-banner .banner-icon { font-size: 1.3rem; }
 
-.obra-closed { opacity: 0.8; }
-.obra-closed .project-card-title::after {
-    content: ' ✓ FINALITZADA';
-    font-size: 0.65rem;
-    vertical-align: middle;
-    background: var(--cat-obra);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 6px;
-    font-weight: 700;
-}
-
 /* Date edit inline */
 .obra-date-edit {
     display: flex;
@@ -4390,26 +3611,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     margin-top: 3px;
 }
 
-/* ============================================================
-   CALENDAR — obra span shading (visual bar across days)
-   ============================================================ */
-.cal-obra-shade {
-    position: absolute;
-    top: 0; bottom: 0;
-    background: rgba(22,163,74,0.10);
-    pointer-events: none;
-    z-index: 0;
-}
-/* Cell position context for the shade overlay */
-.cal-cell { position: relative; }
-
-/* Obra bar: left-open, right-open, closed for start/end day */
-.cal-cell.obra-span-mid  { background: rgba(22,163,74,0.07); }
-.cal-cell.obra-span-start{ background: rgba(22,163,74,0.12); }
-.cal-cell.obra-span-end  { background: rgba(22,163,74,0.12); }
-
-/* Closed obra: grey tint */
-.cal-cell.obra-closed-span { background: rgba(100,116,139,0.06); }
 
 /* ============================================================
    RECENTS SECTION — Home screen
@@ -4555,24 +3756,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .recent-continue{ padding: 6px 10px; font-size: 0.7rem; }
 }
 
-/* ============================================================
-   PK MAPA — CSS (patró fidel a PK-GEOLOC, paleta DATACAMP)
-   --pkm-accent:   #c60c30  (vermell DATACAMP)
-   --pkm-bg-0:     #111827
-   --pkm-bg-1:     #1f2937
-   --pkm-bg-2:     #1f2937
-   --pkm-bg-3:     #374151
-   --pkm-text-1:   #f9fafb
-   --pkm-text-2:   #d1d5db
-   --pkm-text-3:   #6b7280
-   --pkm-green:    #22d97a
-   --pkm-amber:    #f59e0b
-   --pkm-purple:   #c084fc
-   --pkm-red:      #f87171
-   --pkm-border:   rgba(255,255,255,.10)
-   --pkm-border-acc: rgba(198,12,48,.38)
-   --pkm-peek:     172px
-   ============================================================ */
 
 /* ── Quan pkMapaScreen és actiu, surt del flux del DATACAMP ── */
 #pkMapaScreen.active {
@@ -5081,7 +4264,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* ============================================================
    ANNEXOS — EDITOR I GESTOR
    ============================================================ */
-.screen-annex-editor, .screen-gestor-annexos {
+.screen-annex-editor {
     position: fixed; inset: 0; z-index: 500;
     background: var(--bg);
     display: flex !important; flex-direction: column; overflow: hidden;
@@ -5162,36 +4345,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .annex-table-add-row td { background: var(--bg); border: 1px dashed var(--border-dark) !important; text-align: center; padding: 4px; }
 .annex-add-btns { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
 
-/* Gestor ordre */
-.gestor-llista { display: flex; flex-direction: column; gap: 8px; padding: 16px; overflow-y: auto; flex: 1; }
-.gestor-item {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px 12px;
-}
-.gestor-item-annex { border-color: #e879f9; background: #fdf4ff; }
-.gestor-item-icon { font-size: 1.1rem; flex-shrink: 0; }
-.gestor-item-info { flex: 1; min-width: 0; }
-.gestor-item-titol { font-size: 0.85rem; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gestor-item-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-.gestor-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.gestor-btn { height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: 0.78rem; cursor: pointer; color: var(--text); transition: all 0.15s; }
-.gestor-btn:hover { background: var(--bg); }
-.gestor-btn-del { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
-.gestor-add-btn {
-    margin: 0 16px 16px; padding: 14px;
-    border: 2px dashed var(--primary); border-radius: var(--radius);
-    background: var(--primary-light); color: var(--primary);
-    font-weight: 700; font-size: 0.9rem; cursor: pointer; text-align: center;
-    transition: all 0.15s; font-family: var(--font);
-}
-.gestor-add-btn:hover { background: #f9e3e7; }
-.annex-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: #fdf4ff; color: #86198f; border: 1px solid #e879f9;
-    border-radius: 10px; padding: 2px 8px; font-size: 0.7rem; font-weight: 700;
-    margin-left: 6px;
-}
 
 /* ══════════════════════════════════════════════════════════════════
    DESKTOP DENSITY — a partir d'ordinador (≥1025px) reduïm mides
@@ -5255,7 +4408,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     /* ── Targetes i llistes, més denses ── */
     .card { padding: 12px 16px; margin-bottom: 8px; }
-    .download-card { padding: 12px 14px; }
 
     /* ── Modals amb proporcions d'escriptori (no una targeta de mòbil
        flotant enmig d'una pantalla enorme) ── */
@@ -5501,11 +4653,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 }
 
-
-/* ============================================================
-   FASE 1.5 · IDENTITAT DE CARRETERA
-   Detalls presos de la senyalització i la marca vial reals.
-   ============================================================ */
 
 /* Línia vermella sòlida sota la capçalera */
 .mobile-header,
@@ -5789,17 +4936,6 @@ body.pd-noscroll { overflow: hidden; }
 .pd-configura b { display: block; font-size: .95rem; font-weight: 700; }
 .pd-configura small { display: block; font-size: .8rem; color: var(--text); margin-top: 2px; line-height: 1.35; }
 .pd-configura:active { transform: scale(0.98); }
-.pd-configura-gran { margin-bottom: 14px; padding: 14px 16px; border-style: solid; }
-.pd-meves {
-    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer;
-    margin-bottom: 14px; padding: 10px 12px; border-radius: 12px;
-    background: var(--surface); border: 1px solid var(--border); font-family: var(--font);
-}
-.pd-meves:active { transform: scale(0.98); }
-.pd-meves-tit { font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); flex-shrink: 0; width: 92px; line-height: 1.2; letter-spacing: .6px !important; }
-.pd-meves-plaques { flex: 1; min-width: 0; display: flex; gap: 5px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
-.pd-meves-plaques .road-plate { flex-shrink: 0; }
-.pd-meves-ed { font-size: .85rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
 .pd-label-fila { display: flex; align-items: baseline; justify-content: space-between; }
 .pd-link-acc { color: var(--primary); padding: 4px 0; }
 .pd-accions .btn .ico { font-size: 1.15em; }
@@ -5881,11 +5017,6 @@ body.pd-noscroll { overflow: hidden; }
     flex-basis: 100%; margin-top: 10px;
     font-size: .72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
 }
-.pd-trams { display: grid; gap: 8px; margin-top: 14px; }
-.pd-trams:empty { display: none; }
-.pd-trams > label { margin-bottom: 0; }
-.pd-tram-row { display: flex; align-items: center; gap: 10px; }
-.pd-tram-row .road-plate { min-width: 64px; justify-content: center; }
 .pd-tram-ins { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
 .pd-tram-llista { flex-basis: 100%; margin-top: 6px; }
 .pd-tram-fl { color: var(--text-muted); flex-shrink: 0; }
@@ -5896,7 +5027,6 @@ body.pd-noscroll { overflow: hidden; }
     border: 1.5px solid var(--border-dark); border-radius: 8px; background: var(--surface); color: var(--dark);
 }
 .pd-pk-inp.err { border-color: var(--danger); background: var(--danger-lt); }
-.pd-trams .pd-nota { margin-top: 0; }
 .pd-li-acc button {
     width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
     border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 18px;
@@ -8518,9 +7648,6 @@ function renderRecents() {
     });
 }
 
-function navTo(screenId) {
-    if (screenId === 'list') historial(); else ir(screenId);
-}
 
 /* Mobile nav */
 function openMobileNav() {
@@ -8581,10 +7708,6 @@ function irConfigurador() {
     ir('config');
 }
 
-function addField(type, label = "") {
-    // Legacy shim — redirect to sheet
-    obrirFeSheet(-1, type, label);
-}
 
 /* ── feSheet state ──────────────────────────────────────── */
 let _feEditIdx = -1;      // -1 = nou camp, ≥0 = editar camp existent
@@ -9118,26 +8241,6 @@ function previewObrirFoto(i) {
     });
 }
 
-function obrirVisor(index) {
-    const fotoData = tmpFotos[index];
-    const titol = document.getElementById('titulo')?.value || "Projecte";
-    const carr  = document.querySelector('.dyn-input[data-idx="0"]')?.value || "SC";
-    const pk    = document.querySelector('.pk-km')?.value || "0";
-    const marge = document.querySelector('.dyn-marge')?.value || "Eix";
-    const nomFitxer = `${titol}_${carr}_PK${pk}_${marge}.jpg`.replace(/[^a-z0-9]/gi, '_');
-
-    const visor = document.createElement('div');
-    visor.className = 'full-img-modal';
-    visor.style.display = 'flex';
-    visor.innerHTML = `
-        <img src="${fotoData}" alt="Foto">
-        <div style="margin-top:20px; display:flex; gap:12px; width:90%; justify-content:center;">
-            <button class="btn btn-primary" id="btnBaixarAra" style="flex:1; margin:0;">💾 DESCARREGAR</button>
-            <button class="btn btn-ghost" onclick="this.parentElement.parentElement.remove()" style="flex:1; margin:0; background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.2);">TANCAR</button>
-        </div>`;
-    document.body.appendChild(visor);
-    document.getElementById('btnBaixarAra').onclick = () => descarregarFoto(fotoData, nomFitxer);
-}
 
 function descarregarFoto(data, nom) {
     try {
@@ -9224,22 +8327,9 @@ function actualizarDB(t) {
    HISTORIAL STATE — clean, no random palette
    ============================================================ */
 let allProjectsCache = [];
-let calYear  = new Date().getFullYear();
-let calMonth = new Date().getMonth();
 
 // Active category filters (tri-state: all 3 on by default)
-const activeCats = new Set(['captura','inventari','obra']);
-const activeCalCats = new Set(['captura','inventari','obra']);
 
-// Fixed colour lookup — eliminates all random palette logic
-function getCatColor(tipusEntrada) {
-    const map = {
-        captura:   'var(--cat-captura)',
-        inventari: 'var(--cat-inventari)',
-        obra:      'var(--cat-obra)'
-    };
-    return map[tipusEntrada] || map.inventari;
-}
 function getCatClass(tipusEntrada) {
     if (tipusEntrada === 'captura') return 'captura';
     if (tipusEntrada === 'obra')    return 'obra';
@@ -9249,40 +8339,6 @@ function getCatLabel(tipusEntrada) {
     if (tipusEntrada === 'captura') return '&#128248; Foto R&agrave;pida';
     if (tipusEntrada === 'obra')    return '&#128679; Obra';
     return '&#128203; Inventari';
-}
-
-/* ============================================================
-   LEGEND FILTER (List + Calendar shared)
-   ============================================================ */
-function toggleCatFilter(cat) {
-    if (activeCats.has(cat)) activeCats.delete(cat);
-    else activeCats.add(cat);
-    // Update pill appearance
-    document.querySelectorAll(`.legend-pill[data-cat="${cat}"]`).forEach(el => {
-        el.classList.toggle('active', activeCats.has(cat));
-    });
-    renderHistLlista();
-}
-
-function toggleCalCat(cat) {
-    if (activeCalCats.has(cat)) activeCalCats.delete(cat);
-    else activeCalCats.add(cat);
-    document.querySelectorAll(`.cal-legend-item[data-cat="${cat}"]`).forEach(el => {
-        el.classList.toggle('active', activeCalCats.has(cat));
-    });
-    renderCalendar();
-}
-
-/* ============================================================
-   TAB SWITCHING
-   ============================================================ */
-function switchHistTab(tab) {
-    document.querySelectorAll('.hist-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.hist-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('hist-panel-' + tab).classList.add('active');
-    if (tab === 'calendari') { populateCalFilterProjects(); renderCalendar(); }
-    if (tab === 'gantt')     { renderGantt(); }
 }
 
 /* ============================================================
@@ -9642,310 +8698,6 @@ function afegirHito(id) {
 }
 
 /* ============================================================
-   GANTT VIEW
-   ============================================================ */
-function renderGantt() {
-    const container = document.getElementById('ganttContainer');
-    if (!container) return;
-
-    const obres = allProjectsCache.filter(p =>
-        p.tipusEntrada === 'obra' && p.fecha_inicio && p.fecha_fin_estimada
-    );
-
-    if (obres.length === 0) {
-        container.innerHTML = "<div style='text-align:center;padding:30px;color:var(--text-muted);'>Cap obra amb dates definides.<br><small>Crea una Obra amb data inici i fi per veure-la aqui.</small></div>";
-        return;
-    }
-
-    // Date range
-    const allDates = obres.flatMap(p => [new Date(p.fecha_inicio), new Date(p.fecha_fin_estimada)]);
-    const minDate  = new Date(Math.min(...allDates));
-    const maxDate  = new Date(Math.max(...allDates));
-    const totalDays= Math.max(1, Math.ceil((maxDate - minDate) / 86400000)) + 2;
-    const today    = new Date();
-
-    const pct = (d) => ((new Date(d) - minDate) / 86400000 / totalDays * 100).toFixed(2);
-    const wPct = (s, e) => Math.max(1, ((new Date(e) - new Date(s)) / 86400000 / totalDays * 100)).toFixed(2);
-
-    const todayPct = ((today - minDate) / 86400000 / totalDays * 100).toFixed(2);
-
-    container.innerHTML = `
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <div style="min-width:320px;">
-            ${obres.map(p => {
-                const prog = p.porcentaje_progreso || 0;
-                const left = pct(p.fecha_inicio);
-                const w    = wPct(p.fecha_inicio, p.fecha_fin_estimada);
-                const fi   = new Date(p.fecha_fin_estimada);
-                const diff = Math.ceil((fi - today) / 86400000);
-                const barColor = diff < 0 ? 'var(--primary)' : 'var(--cat-obra)';
-                return `
-                <div style="margin-bottom:14px;">
-                    <div style="font-size:0.82rem;font-weight:700;color:var(--dark);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.titulo}</div>
-                    <div style="position:relative;height:28px;background:var(--bg-alt);border-radius:4px;overflow:hidden;">
-                        <div style="position:absolute;left:${left}%;width:${w}%;height:100%;background:${barColor};opacity:0.25;border-radius:4px;"></div>
-                        <div style="position:absolute;left:${left}%;width:${Math.min(parseFloat(w), parseFloat(w)*prog/100)}%;height:100%;background:${barColor};border-radius:4px;cursor:pointer;"
-                             onclick="obrirDetallProjecte('${p.id}','list')" title="${p.titulo} — ${prog}%"></div>
-                        <div style="position:absolute;left:${left}%;top:50%;transform:translateY(-50%);font-size:0.65rem;font-weight:700;color:white;padding:0 4px;pointer-events:none;">${prog}%</div>
-                    </div>
-                    <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">${p.fecha_inicio} &rarr; ${p.fecha_fin_estimada}${diff < 0 ? ' <span style="color:var(--primary);font-weight:700;">VENÇUDA</span>' : ''}</div>
-                </div>`;
-            }).join('')}
-            <!-- Today line -->
-            <div style="position:relative;height:20px;margin-top:8px;">
-                <div style="position:absolute;left:${todayPct}%;top:0;bottom:0;width:2px;background:var(--primary);"></div>
-                <div style="position:absolute;left:${todayPct}%;top:0;font-size:0.65rem;color:var(--primary);font-weight:700;white-space:nowrap;transform:translateX(-50%);">Avui</div>
-            </div>
-        </div>
-        </div>`;
-}
-
-/* ============================================================
-   CALENDAR — dot-only cells, detail panel below
-   ============================================================ */
-const MONTHS_CA   = ['Gener','Febrer','Marc','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'];
-const DOW_LONG    = ['Dl','Dm','Dc','Dj','Dv','Ds','Dg'];
-const DOW_SHORT   = ['L','M','X','J','V','S','D'];
-let selectedCalDay = null; // currently open day key
-
-function populateCalFilterProjects() {
-    const sel = document.getElementById('calFilterProject');
-    if (!sel) return;
-    const current = sel.value;
-    sel.innerHTML = '<option value="all">Tots els projectes</option>';
-    allProjectsCache.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.titulo;
-        sel.appendChild(opt);
-    });
-    if (current) sel.value = current;
-}
-
-function renderCalendar() {
-    const grid   = document.getElementById('calGrid');
-    const label  = document.getElementById('calMonthLabel');
-    const dowRow = document.getElementById('calDowRow');
-    if (!grid) return;
-
-    label.textContent = `${MONTHS_CA[calMonth]} ${calYear}`;
-
-    // Responsive day headers
-    const isNarrow = window.innerWidth < 380;
-    const labels   = isNarrow ? DOW_SHORT : DOW_LONG;
-    if (dowRow) dowRow.innerHTML = labels.map(l => `<div class="cal-dow">${l}</div>`).join('');
-
-    const filterProject = document.getElementById('calFilterProject')?.value || 'all';
-    let projects = [...allProjectsCache].filter(p => activeCalCats.has(p.tipusEntrada || 'inventari'));
-    if (filterProject !== 'all') projects = projects.filter(p => p.id === filterProject);
-
-    // Build date → events map
-    // Point events (captura, inventari): only their timestamp day
-    // Obra events: every day in fecha_inicio..fecha_fin_estimada that falls in this month
-    const eventMap = {}; // key "YYYY-MM-DD" → [{p, isSpan}]
-    const addEv = (key, p, isSpan) => {
-        if (!eventMap[key]) eventMap[key] = [];
-        if (!eventMap[key].find(e => e.p.id === p.id)) eventMap[key].push({ p, isSpan: !!isSpan });
-    };
-
-    projects.forEach(p => {
-        // Point: place on timestamp day
-        if (p.timestamp) {
-            const d   = new Date(p.timestamp);
-            const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-            addEv(key, p, false);
-        }
-        // Obra span: paint every day in range within current month
-        if (p.tipusEntrada === 'obra' && p.fecha_inicio && p.fecha_fin_estimada) {
-            const start = new Date(p.fecha_inicio);
-            const end   = new Date(p.fecha_fin_estimada);
-            for (let cur = new Date(start); cur <= end; cur.setDate(cur.getDate() + 1)) {
-                if (cur.getFullYear() === calYear && cur.getMonth() === calMonth) {
-                    const k = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-                    addEv(k, p, true);
-                }
-            }
-        }
-    });
-
-    const firstDay   = new Date(calYear, calMonth, 1);
-    let startDow     = firstDay.getDay();
-    startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
-    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-    const today = new Date();
-
-    // Build a set of "obra span" keys for shading — separate from eventMap
-    const obraSpanMap = {}; // key → {isStart, isEnd, isClosed}
-    projects.filter(p => p.tipusEntrada==='obra' && p.fecha_inicio && (p.fecha_fin_estimada||p.fecha_cierre_real)).forEach(p => {
-        const start   = new Date(p.fecha_inicio);
-        const endDate = p.fecha_cierre_real || p.fecha_fin_estimada;
-        const end     = new Date(endDate);
-        for (let cur = new Date(start); cur <= end; cur.setDate(cur.getDate()+1)) {
-            if (cur.getFullYear()===calYear && cur.getMonth()===calMonth) {
-                const k = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-                const isStart = cur.getTime() === start.getTime();
-                const isEnd   = cur.toDateString() === end.toDateString();
-                obraSpanMap[k] = { isStart, isEnd, isClosed: !!p.estat_obra_tancada };
-            }
-        }
-    });
-
-    let cells = '';
-    // leading blanks
-    for (let i = 0; i < startDow; i++) {
-        const prev = new Date(calYear, calMonth, -startDow + i + 1);
-        cells += `<div class="cal-cell other-month"><div class="cal-day-num">${prev.getDate()}</div></div>`;
-    }
-
-    for (let d = 1; d <= daysInMonth; d++) {
-        const key   = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const evs   = eventMap[key] || [];
-        const span  = obraSpanMap[key];
-        const isToday   = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
-        const hasEv     = evs.length > 0;
-        const isSelected= selectedCalDay === key;
-
-        // Obra span shading class
-        let spanCls = '';
-        if (span) {
-            if (span.isClosed)    spanCls = ' obra-closed-span';
-            else if (span.isStart) spanCls = ' obra-span-start';
-            else if (span.isEnd)   spanCls = ' obra-span-end';
-            else                   spanCls = ' obra-span-mid';
-        }
-
-        // Build dot strip — max 3 dots then "+N"
-        let dotsHTML = '';
-        const shown = evs.slice(0, 3);
-        shown.forEach(({ p }) => {
-            const cls = getCatClass(p.tipusEntrada || 'inventari');
-            dotsHTML += `<div class="cal-dot cat-${cls}" title="${p.titulo}"></div>`;
-        });
-        if (evs.length > 3) dotsHTML += `<div class="cal-more">+${evs.length-3}</div>`;
-
-        const clickAttr = hasEv ? `onclick="openCalDay('${key}')"` : '';
-        cells += `<div class="cal-cell${isToday?' today':''}${hasEv?' has-events':''}${isSelected?' selected':''}${spanCls}" ${clickAttr}>
-            <div class="cal-day-num">${d}</div>
-            <div class="cal-events">${dotsHTML}</div>
-        </div>`;
-    }
-
-    // trailing blanks
-    const total    = startDow + daysInMonth;
-    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
-    for (let i = 1; i <= trailing; i++) {
-        cells += `<div class="cal-cell other-month"><div class="cal-day-num">${i}</div></div>`;
-    }
-    grid.innerHTML = cells;
-
-    // Re-open selected day if it still exists
-    if (selectedCalDay && eventMap[selectedCalDay]) {
-        renderCalDayPanel(selectedCalDay, eventMap[selectedCalDay].map(e => e.p));
-    } else {
-        closeCalDayPanel();
-    }
-}
-
-function openCalDay(dateKey) {
-    const filterProject = document.getElementById('calFilterProject')?.value || 'all';
-
-    let projects = [...allProjectsCache].filter(p => {
-        if (!p.timestamp) return false;
-        const pd = new Date(p.timestamp);
-        const key = `${pd.getFullYear()}-${String(pd.getMonth()+1).padStart(2,'0')}-${String(pd.getDate()).padStart(2,'0')}`;
-        return key === dateKey;
-    });
-
-    // Also include obres whose span covers this date
-    const [y, m, d] = dateKey.split('-').map(Number);
-    const target = new Date(y, m-1, d);
-    allProjectsCache.forEach(p => {
-        if (p.tipusEntrada === 'obra' && p.fecha_inicio && p.fecha_fin_estimada) {
-            const s = new Date(p.fecha_inicio), e = new Date(p.fecha_fin_estimada);
-            if (target >= s && target <= e && !projects.find(x => x.id === p.id)) {
-                projects.push(p);
-            }
-        }
-    });
-
-    if (filterProject !== 'all') projects = projects.filter(p => p.id === filterProject);
-
-    // Toggle: close if same day tapped again
-    if (selectedCalDay === dateKey) {
-        selectedCalDay = null;
-        closeCalDayPanel();
-        renderCalendar();
-        return;
-    }
-
-    selectedCalDay = dateKey;
-    renderCalendar(); // re-render to apply .selected class
-    renderCalDayPanel(dateKey, projects);
-
-    // Scroll panel into view on mobile
-    setTimeout(() => {
-        document.getElementById('calDayPanel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
-}
-
-function renderCalDayPanel(dateKey, projects) {
-    const panel = document.getElementById('calDayPanel');
-    if (!panel) return;
-
-    const [y, m, d] = dateKey.split('-').map(Number);
-    const dateStr = `${d} de ${MONTHS_CA[m-1]} de ${y}`;
-
-    const entries = projects.map(p => {
-        const tipus = p.tipusEntrada || 'inventari';
-        const cls   = getCatClass(tipus);
-        const color = getCatColor(tipus);
-        const pts   = p.registros?.length || 0;
-        const hora  = p.hora || '';
-        const coord = p.coordenades ? `<div>&#127758; ${p.coordenades}</div>` : '';
-        const isCap = tipus === 'captura';
-        return `
-        <div class="cal-day-entry">
-            <div class="cal-day-entry-bar" style="background:${color}"></div>
-            <div class="cal-day-entry-info">
-                <div class="cal-day-entry-title">${p.titulo}</div>
-                <div class="cal-day-entry-meta">
-                    ${hora ? hora + ' &middot; ' : ''}<span class="cat-badge ${cls}">${getCatLabel(tipus)}</span> &middot; ${pts} punt${pts!==1?'s':''}
-                    ${coord}
-                </div>
-                <div class="cal-day-entry-actions">
-                    <button class="btn btn-primary btn-sm" style="width:auto;" onclick="obrirDetallProjecte('${p.id}','list')">Detall &#8594;</button>
-                    ${!isCap ? `<button class="btn btn-ghost btn-sm" style="width:auto;" onclick="openPFromDetail('${p.id}')">Obrir</button>` : ''}
-                </div>
-            </div>
-        </div>`;
-    }).join('') || '<p style="padding:12px 0;color:var(--text-muted);font-size:0.85rem;">Cap registre aquest dia</p>';
-
-    panel.style.display = 'block';
-    panel.innerHTML = `
-        <div class="cal-day-panel-header">
-            <div class="cal-day-panel-title">&#128197; ${dateStr} &middot; ${projects.length} entrada${projects.length!==1?'s':''}</div>
-            <button class="cal-day-panel-close" onclick="selectedCalDay=null;closeCalDayPanel();renderCalendar();">&#10005;</button>
-        </div>
-        <div class="cal-day-panel-list">${entries}</div>`;
-}
-
-function closeCalDayPanel() {
-    const panel = document.getElementById('calDayPanel');
-    if (panel) panel.style.display = 'none';
-}
-
-function calPrevMonth() {
-    calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
-    selectedCalDay = null;
-    renderCalendar();
-}
-function calNextMonth() {
-    calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
-    selectedCalDay = null;
-    renderCalendar();
-}
-
-/* ============================================================
    OBRA CREATION
    ============================================================ */
 function obrirModalObraDetall() {
@@ -10048,9 +8800,6 @@ function clonarP(id) {
     };
 }
 
-/* ============================================================
-   DOWNLOADS
-   ============================================================ */
 /* ============================================================
    DOWNLOADS — table (desktop) + cards (mobile)
    ============================================================ */
@@ -10470,8 +9219,6 @@ function _animalActionBtns() {
             <button class="dl-btn dl-btn-xls" title="Exportar a Excel" onclick="exportarFitxesAnimalsPDF('excel')">&#128202; Excel</button>`;
 }
 
-/* Logo oficial Generalitat de Catalunya — Departament de Territori (per a la fitxa corporativa d'animals) */
-const ANIMAL_LOGO_B64 = "data:image/png;base64,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";
 
 const ANIMAL_FIELDS_LABELS = [
     ['parc','PARC'], ['autor','Autor/a informe'], ['data','Data'], ['hora','Hora'], ['carretera','Carretera'],
@@ -10501,223 +9248,6 @@ function _buildProjecteVirtualAnimals(fitxes, titol) {
    (rèplica fidel del formulari "INCIDÈNCIES PROVOCADES PER
    ANIMALS MORTS" del Departament de Territori i Sostenibilitat)
    ============================================================ */
-function generarBlobPDFFitxaAnimal(fitxes) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
-    const ML = 12, MR = 198;            // marges
-    const ORANGE = [251, 213, 161];     // farciment barres de secció
-    const DARKRED = [165, 25, 25];      // títol principal
-    const BLACK = [20, 20, 20];
-    const GRAY = [90, 90, 90];
-
-    const val = (f, key) => {
-        const v = f[key];
-        if (typeof v === 'boolean') return v ? 'Sí' : '—';
-        return (v === undefined || v === null || v === '') ? '—' : String(v);
-    };
-
-    /* — Capçalera amb logo i adreça (es repeteix a cada pàgina) — */
-    const drawHeader = () => {
-        try {
-            const props = doc.getImageProperties(ANIMAL_LOGO_B64);
-            const hMax = 11, wMax = 58;
-            const r = Math.min(wMax / props.width, hMax / props.height);
-            doc.addImage(ANIMAL_LOGO_B64, 'PNG', ML, 10, props.width * r, props.height * r);
-        } catch (e) { console.error('Logo Generalitat:', e); }
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...BLACK);
-        doc.text('Serveis Territorials a Lleida', MR, 13, { align: 'right' });
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(...GRAY);
-        doc.text('Servei Territorial de Carreteres', MR, 17, { align: 'right' });
-        doc.text("Rbla. d'Aragó, 4", MR, 21, { align: 'right' });
-        doc.text('Lleida 25071', MR, 25, { align: 'right' });
-    };
-
-    /* — Barra de secció taronja — */
-    const sectionBar = (y, text) => {
-        doc.setFillColor(...ORANGE);
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.4);
-        doc.rect(ML, y, MR - ML, 7, 'FD');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(...BLACK);
-        doc.text(text, ML + 2, y + 5);
-    };
-
-    /* — Caixa etiqueta:valor (una fila) — */
-    const fieldBox = (x, y, w, h, label, value, opts = {}) => {
-        const labelW = opts.labelW || 30;
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.3);
-        doc.rect(x, y, w, h, 'S');
-        doc.line(x + labelW, y, x + labelW, y + h);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(7.5);
-        doc.setTextColor(...BLACK);
-        doc.text(label, x + 1.5, y + h / 2 + 1.2);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        const txt = doc.splitTextToSize(value, w - labelW - 3);
-        doc.text(txt[0] || '—', x + labelW + 2, y + h / 2 + 1.2);
-    };
-
-    /* — Caixa amb casella de verificació — */
-    const checkboxBox = (x, y, w, h, label, checked) => {
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.3);
-        doc.rect(x, y, w, h, 'S');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(7.5);
-        doc.setTextColor(...BLACK);
-        doc.text(label, x + 1.5, y + h / 2 + 1.2);
-        const bx = x + w - 11, by = y + h / 2 - 2.5;
-        doc.rect(bx, by, 5, 5, 'S');
-        if (checked) {
-            doc.setLineWidth(0.5);
-            doc.line(bx, by, bx + 5, by + 5);
-            doc.line(bx, by + 5, bx + 5, by);
-        }
-    };
-
-    const COLW = 91, COL2X = ML + COLW + 4, ROWH = 8;
-
-    fitxes.forEach((f, idx) => {
-        if (idx > 0) doc.addPage();
-        drawHeader();
-
-        // Títol principal
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.5);
-        doc.rect(ML, 29, MR - ML, 9, 'S');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(13);
-        doc.setTextColor(...DARKRED);
-        doc.text('INCIDÈNCIES PROVOCADES PER ANIMALS MORTS', (ML + MR) / 2, 35, { align: 'center' });
-
-        // PARC / Autor
-        let y = 44;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...BLACK);
-        doc.text('PARC', ML, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(val(f, 'parc'), ML + 18, y);
-        doc.setFont('helvetica', 'bold');
-        doc.text("Autor/a informe", 110, y);
-        doc.text(val(f, 'autor'), 152, y);
-
-        // 1. Localització
-        y = 50;
-        sectionBar(y, '1. Localització');
-        y += 10;
-        fieldBox(ML, y, COLW, ROWH, 'Data', val(f, 'data'));
-        fieldBox(COL2X, y, COLW, ROWH, 'PK', val(f, 'pk'));
-        y += ROWH;
-        fieldBox(ML, y, COLW, ROWH, 'Hora', val(f, 'hora'));
-        fieldBox(COL2X, y, COLW, ROWH, 'Sentit', val(f, 'sentit'));
-        y += ROWH;
-        fieldBox(ML, y, COLW, ROWH, 'Carretera', val(f, 'carretera'));
-        fieldBox(COL2X, y, COLW, ROWH, 'Ubicació', val(f, 'ubicacio'));
-        y += ROWH;
-        checkboxBox(ML, y, COLW, ROWH, 'Avís de CCCT', !!f.avisCcct);
-        fieldBox(COL2X, y, COLW, ROWH, 'Núm. incidència', val(f, 'numIncidencia'));
-
-        // 2. Tipologia, estat i entorn
-        y += ROWH + 6;
-        sectionBar(y, '2.Tipologia, estat i entorn');
-        y += 10;
-        fieldBox(ML, y, COLW, ROWH, 'Domèstic', val(f, 'domestic'));
-        fieldBox(COL2X, y, COLW, ROWH, 'Estat', val(f, 'estat'));
-        y += ROWH;
-        fieldBox(ML, y, COLW, ROWH, 'Llibertat', val(f, 'llibertat'));
-        fieldBox(COL2X, y, COLW, ROWH, 'Tamany', val(f, 'tamany'));
-        y += ROWH;
-        checkboxBox(ML, y, COLW, ROWH, 'Mesures correctores', !!f.mesuresCorrectores);
-        fieldBox(COL2X, y, COLW, ROWH, 'Tipologia', val(f, 'tipologia'));
-        y += ROWH;
-        const halfW = (COLW - 2) / 2;
-        checkboxBox(ML, y, COLW, ROWH, 'Senyalització', !!f.senyalitzacio);
-        fieldBox(COL2X, y, halfW, ROWH, 'PK inici', val(f, 'pkInici'), { labelW: 16 });
-        fieldBox(COL2X + halfW + 2, y, halfW, ROWH, 'PK fi', val(f, 'pkFi'), { labelW: 13 });
-
-        // 3. Altres consideracions
-        y += ROWH + 6;
-        sectionBar(y, '3.Altres consideracions');
-        y += 10;
-        fieldBox(ML, y, COLW, ROWH, 'Vehicle implicat', val(f, 'vehicleImplicat'));
-        fieldBox(COL2X, y, COLW, ROWH, 'Matrícula', val(f, 'matricula'));
-
-        // Observacions
-        y += ROWH + 6;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...BLACK);
-        doc.text('Observacions', ML, y);
-        y += 3;
-        const obsH = 30;
-        doc.setDrawColor(...BLACK);
-        doc.setLineWidth(0.3);
-        doc.rect(ML, y, MR - ML, obsH, 'S');
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        const obsTxt = doc.splitTextToSize(val(f, 'observacions'), MR - ML - 4);
-        doc.text(obsTxt, ML + 2, y + 5);
-
-        // Peu de pàgina
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.3);
-        doc.line(ML, 285, MR, 285);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(...GRAY);
-        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
-
-        // — Pàgina 2: Recull fotogràfic —
-        doc.addPage();
-        drawHeader();
-        sectionBar(29, '4.Recull fotogràfic');
-
-        const photos = f.fotos || [];
-        const boxW = 91, boxH = 58, gapX = 4, gapY = 4;
-        const startY = 40;
-        for (let r = 0; r < 3; r++) {
-            for (let c = 0; c < 2; c++) {
-                const i = r * 2 + c;
-                const bx = ML + c * (boxW + gapX);
-                const by = startY + r * (boxH + gapY);
-                doc.setDrawColor(...BLACK);
-                doc.setLineWidth(0.3);
-                doc.rect(bx, by, boxW, boxH, 'S');
-                const fotoSrc = photos[i];
-                if (fotoSrc) {
-                    try {
-                        const props = doc.getImageProperties(fotoSrc);
-                        const pad = 2;
-                        const cW = boxW - pad * 2, cH = boxH - pad * 2;
-                        const ratio = Math.min(cW / props.width, cH / props.height);
-                        const fw = props.width * ratio, fh = props.height * ratio;
-                        doc.addImage(fotoSrc, 'JPEG', bx + (boxW - fw) / 2, by + (boxH - fh) / 2, fw, fh);
-                    } catch (e) { console.error('Error foto fitxa animal:', e); }
-                }
-            }
-        }
-        doc.setDrawColor(220, 220, 220);
-        doc.line(ML, 285, MR, 285);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(...GRAY);
-        doc.text('DATACAMP — Eina de Recollida de Dades en Camp', 105, 290, { align: 'center' });
-    });
-
-    return doc.output('blob');
-}
 
 /* ══════════════════════════════════════════════════════════════════
    PDF OFICIAL "INCIDÈNCIES PROVOCADES PER ANIMALS MORTS"
@@ -10942,7 +9472,6 @@ let _itcEditId = null;
 let _itcFitxaOriginal = null;
 let _itcFotos = [];
 let _itcSignaturaDataURL = '';
-let _itcPadCtx = null, _itcPadDrawing = false, _itcPadHasInk = false;
 
 function obrirInformeITC(imgDataInicial, registreExistent) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -11026,92 +9555,6 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
     document.querySelector('.page-content').appendChild(screen);
 }
 
-function _itcRenderFotosGrid() {
-    const grid = document.getElementById('itcFotosGrid');
-    if (!grid) return;
-    grid.innerHTML = _itcFotos.map((f, i) => `
-        <div style="position:relative; border-radius:6px; overflow:hidden; border:1px solid var(--border); aspect-ratio:1;">
-            <img src="${f}" style="width:100%; height:100%; object-fit:cover; display:block; cursor:pointer;" onclick="_itcVeureFoto(${i})" alt="Foto ${i + 1}">
-            <span class="photo-edit-ind" aria-hidden="true">${PE_ICO.marca}</span>
-            <span onclick="_itcEliminarFoto(${i})" style="position:absolute; top:3px; right:3px; background:rgba(198,12,48,0.9); color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; cursor:pointer;">✕</span>
-        </div>`).join('');
-}
-
-function _itcAfegirFotos(files) {
-    const arr = Array.from(files);
-    Promise.all(arr.map(f => new Promise(res => {
-        const reader = new FileReader();
-        reader.onload = e => res(e.target.result);
-        reader.readAsDataURL(f);
-    }))).then(imgs => {
-        _itcFotos.push(...imgs);
-        _itcRenderFotosGrid();
-    });
-}
-
-function _itcVeureFoto(i) {
-    if (!_itcFotos[i]) return;
-    fpvObrir(_itcFotos[i], {
-        titol: 'Foto ' + (i + 1) + ' de ' + _itcFotos.length,
-        editar: nova => { _itcFotos[i] = nova; _itcRenderFotosGrid(); },
-        copia: nova => { _itcFotos.splice(i + 1, 0, nova); _itcRenderFotosGrid(); _itcVeureFoto(i + 1); showToast('Còpia desada: tens les dues fotos'); },
-        descarregar: src => descarregarFoto(src, 'foto_' + (i + 1) + '.jpg'),
-        eliminar: () => { _itcFotos.splice(i, 1); _itcRenderFotosGrid(); return true; }
-    });
-}
-function _itcEliminarFoto(idx) {
-    _itcFotos.splice(idx, 1);
-    _itcRenderFotosGrid();
-}
-
-/* — Pad de signatura tàctil/ratolí — */
-function _itcPadInit(existingDataURL) {
-    const canvas = document.getElementById('itcSignaturePad');
-    if (!canvas) return;
-    const ratio = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = (rect.width || 335) * ratio;
-    canvas.height = (rect.height || 150) * ratio;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(ratio, ratio);
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1a1a1a';
-    _itcPadCtx = ctx;
-    _itcPadHasInk = false;
-
-    const pos = e => {
-        const r = canvas.getBoundingClientRect();
-        const p = e.touches ? e.touches[0] : e;
-        return { x: p.clientX - r.left, y: p.clientY - r.top };
-    };
-    const start = e => { e.preventDefault(); _itcPadDrawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-    const move = e => { if (!_itcPadDrawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); _itcPadHasInk = true; };
-    const end = () => { _itcPadDrawing = false; };
-
-    canvas.onmousedown = start; canvas.onmousemove = move; canvas.onmouseup = end; canvas.onmouseleave = end;
-    canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = end;
-
-    if (existingDataURL) {
-        const img = new Image();
-        img.onload = () => ctx.drawImage(img, 0, 0, rect.width || 335, rect.height || 150);
-        img.src = existingDataURL;
-        _itcPadHasInk = true;
-    }
-}
-
-function _itcPadClear() {
-    const canvas = document.getElementById('itcSignaturePad');
-    if (!canvas || !_itcPadCtx) return;
-    _itcPadCtx.clearRect(0, 0, canvas.width, canvas.height);
-    _itcPadHasInk = false;
-}
-
-function _itcPadGetDataURL() {
-    const canvas = document.getElementById('itcSignaturePad');
-    if (!canvas || !_itcPadHasInk) return '';
-    try { return canvas.toDataURL('image/png'); } catch (e) { return ''; }
-}
 
 async function guardarInformeITC() {
     const v = id => document.getElementById(id)?.value || '';
@@ -11121,7 +9564,7 @@ async function guardarInformeITC() {
         id: _itcEditId || ('itc_' + Date.now() + '_' + Math.random().toString(36).slice(2,6)),
         ts: _itcEditId ? (_itcFitxaOriginal?.ts || Date.now()) : Date.now(),
         fotos: [..._itcFotos],
-        signatura: _itcPadGetDataURL() || _itcSignaturaDataURL || '',
+        signatura: _itcSignaturaDataURL || '',
         expedient: v('itc_expedient'), data: v('itc_data'), vigilant: v('itc_vigilant'),
         peticionari: v('itc_peticionari'), telefon: v('itc_telefon'),
         carretera: v('itc_carretera'), pkInici: v('itc_pkInici'), pkFinal: v('itc_pkFinal'),
@@ -11159,15 +9602,6 @@ async function guardarInformeITC() {
     }
 }
 
-function editarInformeITC(id) {
-    const tx = db.transaction('itcInformes').objectStore('itcInformes').get(id);
-    tx.onsuccess = e => {
-        const reg = e.target.result;
-        if (!reg) return;
-        _itcFitxaOriginal = reg;
-        obrirInformeITC(null, reg);
-    };
-}
 
 function eliminarInformeITC(id) {
     if (!confirm("Vols eliminar aquest informe ITC? Aquesta acció no es pot desfer.")) return;
@@ -11400,12 +9834,6 @@ async function exportarInformeITCIndividual(id) {
     };
 }
 
-function _incActionBtns(tipusFiltre) {
-    const arg = tipusFiltre ? `'${tipusFiltre.replace(/'/g, "\\'")}'` : `''`;
-    return `<button class="dl-btn dl-btn-pdf" title="PDF detallat amb fotos" onclick="exportarIncidenciesPDF(${arg},'Fitxa')">&#128196; Fitxa</button>
-            <button class="dl-btn dl-btn-pdf" style="background:#fdf2f8;color:#86198f;border-color:#e879f9;" title="PDF resum en taula" onclick="exportarIncidenciesPDF(${arg},'Taula')">&#128202; Taula</button>
-            <button class="dl-btn dl-btn-xls" title="Exportar a Excel" onclick="exportarIncidenciesPDF(${arg},'excel')">&#128202; Excel</button>`;
-}
 
 /* Construeix un "projecte virtual" compatible amb generarBlobPDF / generarBlobExcel */
 function _buildProjecteVirtualIncidencies(items, titol) {
@@ -11438,56 +9866,6 @@ function _buildProjecteVirtualIncidencies(items, titol) {
     return { titulo: titol, fields, registros };
 }
 
-async function exportarIncidenciesPDF(tipusFiltre, format) {
-    const cleanType = format === 'excel' ? 'EXCEL' : format.toUpperCase();
-    showSpinner(`GENERANT ${cleanType}...`);
-    galeriaLlegirFiltrades(ll => ll.filter(it => it.tipusIncidencia && (!tipusFiltre || it.tipusIncidencia === tipusFiltre)), async (items) => {
-        try {
-            let incidencies = (items || []).filter(it => it.tipusIncidencia);
-            if (tipusFiltre) incidencies = incidencies.filter(it => it.tipusIncidencia === tipusFiltre);
-
-            if (incidencies.length === 0) {
-                hideSpinner();
-                alert('No hi ha incidències per generar l\'informe.');
-                return;
-            }
-
-            const titol = tipusFiltre ? `Incidències — ${tipusFiltre}` : 'Incidències — Totes';
-            const p = _buildProjecteVirtualIncidencies(incidencies, titol);
-            const slug = titol.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
-            const date = new Date().toISOString().slice(0, 10);
-
-            if (format === 'excel') {
-                currentBlob = generarBlobExcel(p);
-                currentFileName = `Incidencies_${slug}_${date}.xlsx`;
-            } else {
-                currentBlob = await generarBlobPDF(p, format);
-                currentFileName = `${format}_Incidencies_${slug}_${date}.pdf`;
-            }
-
-            document.getElementById('exportTitle').innerText = cleanType;
-            document.getElementById('exportName').innerText = currentFileName;
-            document.getElementById('btnShare').onclick = () => {
-                const file = new File([currentBlob], currentFileName, { type: currentBlob.type });
-                if (navigator.share) navigator.share({ files: [file], title: currentFileName }).catch(console.error);
-                else alert('El teu navegador no permet compartir directament.');
-                closeExportModal();
-            };
-            document.getElementById('btnDownload').onclick = () => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(currentBlob);
-                a.download = currentFileName;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                closeExportModal();
-            };
-            hideSpinner();
-            document.getElementById('exportModal').style.display = 'flex';
-        } catch (err) {
-            hideSpinner();
-            alert('Error generant l\'informe: ' + err.message);
-        }
-    });
-}
 
 function _projMeta(p) {
     const carr   = (p.registros||[]).flatMap(r=>r.values||[])
@@ -11558,11 +9936,6 @@ function buildCard(p) {
     </div>`;
 }
 
-/* toggleOptions kept for backward compat (no longer used in new UI) */
-function toggleOptions(id) {
-    const el = document.getElementById(`opts-${id}`);
-    if (el) el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
-}
 
 async function descarregarTotesFotos(id) {
     showSpinner('GENERANT ZIP...');
@@ -12562,6 +10935,7 @@ function renderGaleria() {
         const el = document.getElementById('galeriaOptimitza');
         if (el) el.textContent = `Preparant les miniatures de la galeria… ${fets} de ${total} (només el primer cop)`;
     }).then(items => {
+        migraCaptures(items).catch(() => {});   // treu les còpies antigues de les fotos (un sol cop)
         if (n !== _galeriaRenderN) return;
         // Guardar tots per filtres
         galeriaItems = items;
@@ -13366,7 +11740,6 @@ document.addEventListener('keydown', e => {
    oficial de cada fitxa.
    ============================================================ */
 const NORMATIVA_LLEI_URL = 'https://portaljuridic.gencat.cat/ca/document-del-pjur/?documentId=480379';
-const NORMATIVA_REGLAMENT_URL = 'https://portaljuridic.gencat.cat/ca/document-del-pjur/?documentId=312160';
 
 const NORMATIVA_LLEI = [
 {t:'TÍTOL I', tn:'Disposicions generals', n:'1', nom:'Objecte', r:'Regula les carreteres de Catalunya no reservades a l\'Estat, establint els instruments per garantir-ne l\'ordenació, funcionalitat i protecció.'},
@@ -14375,7 +12748,6 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
     const horaStr  = `${ara.getHours().toString().padStart(2,'0')}:${ara.getMinutes().toString().padStart(2,'0')}`;
     const fechaFormat = `${fechaDD}_${fechaMM}_${fechaAny}`;
     const horaFormat  = `${ara.getHours().toString().padStart(2,'0')}_${ara.getMinutes().toString().padStart(2,'0')}`;
-    const fechaDisp   = `${fechaDD}/${fechaMM}/${fechaAny}`;
 
     let finalImg = imgData;
     if (wm) {
@@ -14464,56 +12836,19 @@ async function guardarFotoDirecta(imgData, compartirDesprés = false) {
         navegarAGaleria();
     }
 
-    // --- Save to Historial (non-blocking, with geolocation) ---
-    const saveToHistorial = (coordStr) => {
-        if (!db) return;
-        const projecteCaptura = {
-            id:           'cap_' + Date.now(),
-            titulo:       carr ? `${carr} PK ${pk} (${marge})` : `Captura ${horaStr}`,
-            fields:       [
-                { type: 'carretera', label: 'Carretera' },
-                { type: 'pk',        label: 'PK' },
-                { type: 'marge',     label: 'Marge' }
-            ],
-            registros:    [{
-                values: [
-                    { label: 'Carretera', val: carr },
-                    { label: 'PK',        val: pk },
-                    { label: 'Marge',     val: marge }
-                ],
-                fotos: [finalImg]
-            }],
-            fecha:        fechaDisp,
-            hora:         horaStr,
-            timestamp:    ara.getTime(),
-            coordenades:  coordStr || '',
-            tipusEntrada: 'captura'
-        };
-        db.transaction("projects","readwrite").objectStore("projects").put(projecteCaptura);
-        allProjectsCache.push(pjLleuger(projecteCaptura));
-    };
-
-    try {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                pos => saveToHistorial(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
-                ()  => saveToHistorial(''),
-                { timeout: 4000 }
-            );
-        } else {
-            saveToHistorial('');
-        }
-    } catch(e) {
-        saveToHistorial('');
+    // Si la foto no porta posició (el GPS de l'Auto-PK no havia respost), s'hi afegeix ara per al mapa.
+    // (Abans es desava una tercera còpia de la foto a «projects» només per a això.)
+    if (galeriaItem.lat == null || galeriaItem.lon == null) {
+        try {
+            navigator.geolocation?.getCurrentPosition(pos => {
+                idbGet('galeriaFotos', galeriaItem.id).then(f => {
+                    if (!f || f.lat != null || f.coordStr) return;
+                    f.coordStr = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                    db.transaction('galeriaFotos', 'readwrite').objectStore('galeriaFotos').put(f);
+                });
+            }, () => {}, { timeout: 4000 });
+        } catch (e) {}
     }
-}
-
-/* ============================================================
-   HELP TOGGLE
-   ============================================================ */
-function toggleHelp() {
-    const helpScreen = document.getElementById('helpScreen');
-    if (helpScreen.classList.contains('active')) ir('home'); else ir('helpScreen');
 }
 
 /* ============================================================
@@ -15050,7 +13385,6 @@ async function generarInformeObraPDF(id) {
         Y += 6;
 
 
-
         /* ════════════════════════════════════════════════════
            SECTION 5 — GPS
            ════════════════════════════════════════════════════ */
@@ -15149,8 +13483,6 @@ async function generarInformeObraPDF(id) {
         alert("Error generant l'informe PDF:\n" + err.message + "\n\nConsulta la consola per a m\u00e9s detalls.");
     }
 }
-
-
 
 
 /* ============================================================
@@ -15316,9 +13648,60 @@ function _transparentTile() {
     return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQAABjE+ibYAAAAASUVORK5CYII=';
 }
 
+/* Fotos ràpides antigues: cada foto tenia també una còpia a «projects» (tipus 'captura')
+   només per sortir al mapa. Ara el mapa llegeix la galeria directament, així que les
+   còpies que tenen la seva foto a la galeria s'esborren (i, si la foto no tenia posició,
+   abans s'hi passa la de la còpia). Les que ja no tenen foto a la galeria es conserven. */
+let _migraCapturesPromesa = null;
+function migraCaptures(fotos) { return _migraCapturesPromesa || (_migraCapturesPromesa = _migraCaptures(fotos)); }
+async function _migraCaptures(fotos) {
+    const caps = (await projectesLleugers()).filter(p => p.tipusEntrada === 'captura');
+    if (!caps.length) return;
+    const perTs = new Map(fotos.map(f => [f.ts, f]));
+    const esborra = [];
+    for (const c of caps) {
+        const f = perTs.get(c.timestamp);
+        if (!f) continue;
+        if ((f.lat == null || f.lon == null) && !f.coordStr && c.coordenades) {
+            const full = await idbGet('galeriaFotos', f.id);
+            if (full) { full.coordStr = c.coordenades; f.coordStr = c.coordenades;
+                await new Promise(r => { const t = db.transaction('galeriaFotos', 'readwrite'); t.objectStore('galeriaFotos').put(full); t.oncomplete = r; t.onerror = r; }); }
+        }
+        esborra.push(c.id);
+    }
+    if (!esborra.length) return;
+    await new Promise(r => { const t = db.transaction('projects', 'readwrite'); const st = t.objectStore('projects'); esborra.forEach(id => st.delete(id)); t.oncomplete = r; t.onerror = r; });
+    const fora = new Set(esborra);
+    allProjectsCache = allProjectsCache.filter(p => !fora.has(p.id));
+}
+function _galeriaPosicio(f) {
+    if (f.lat != null && f.lon != null && !isNaN(f.lat) && !isNaN(f.lon)) return [Number(f.lat), Number(f.lon)];
+    const p = String(f.coordStr || '').split(',').map(x => parseFloat(x.trim()));
+    return p.length >= 2 && !isNaN(p[0]) && !isNaN(p[1]) ? p : null;
+}
+/* Des del mapa: obre la foto al visor de la galeria */
+function mapaObreFoto(id) {
+    leafletMap?.closePopup();
+    ir('galeriaFotos');
+    const t0 = Date.now();
+    (function espera() {
+        if (galeriaItems.some(i => i.id === id) && document.querySelector(`.galeria-thumb[data-id="${id}"]`)) galeriaObrirVisor(id);
+        else if (Date.now() - t0 < 15000) setTimeout(espera, 100);
+    })();
+}
+
 /** Render/re-render all markers based on active category filters */
-function renderMapMarkers() {
+let _mapaRenderN = 0;
+async function renderMapMarkers() {
     if (!leafletMap || !markerCluster) return;
+    const n = ++_mapaRenderN;
+    let fotos = [];
+    try {
+        await migraCaptures(await galeriaLlegirLleugeres());
+        fotos = await galeriaLlegirLleugeres();
+        allProjectsCache = await projectesLleugers();
+    } catch (e) { console.warn('[mapa]', e); }
+    if (n !== _mapaRenderN || !leafletMap || !markerCluster) return;
 
     markerCluster.clearLayers();
     mapMarkers = [];
@@ -15363,13 +13746,40 @@ function renderMapMarkers() {
         mapMarkers.push(marker);
     });
 
+    // Fotos ràpides de la galeria (amb posició)
+    let nFotos = 0;
+    if (mapActiveCats.has('captura')) fotos.forEach(f => {
+        const pos = _galeriaPosicio(f);
+        if (!pos) return;
+        const [lat, lng] = pos;
+        const d = f.ts ? new Date(f.ts) : null;
+        const titol = f.carr ? `${f.carr} PK ${f.pk || '—'}${f.marge ? ' (' + f.marge + ')' : ''}` : 'Foto ràpida';
+        const marker = L.marker([lat, lng], { icon: makeMarkerIcon(MAP_COLORS.captura) });
+        marker.bindPopup(`
+        <div class="map-popup">
+            <div class="map-popup-title">${titol}</div>
+            <div class="map-popup-meta">
+                <span class="cat-badge ${getCatClass('captura')}" style="font-size:0.65rem;padding:2px 7px;">${getCatLabel('captura')}</span><br>
+                ${d ? `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : ''}${f.tipusIncidencia ? '<br>' + f.tipusIncidencia : ''}<br>
+                <small style="color:var(--text-light);">&#127758; ${lat.toFixed(5)}, ${lng.toFixed(5)}</small>
+            </div>
+            <button class="map-popup-btn" onclick="mapaObreFoto('${f.id}')">
+                &#128269; Veure foto
+            </button>
+        </div>`, { maxWidth: 220, closeButton: true });
+        marker._fotoId = f.id;
+        markerCluster.addLayer(marker);
+        mapMarkers.push(marker);
+        nFotos++;
+    });
+
     // Update stats row
     const statsEl = document.getElementById('mapStatsRow');
     if (statsEl) {
         const total   = mapMarkers.length;
         const nObres  = projects.filter(p => (p.tipusEntrada||'inventari')==='obra').length;
         const nInv    = projects.filter(p => (p.tipusEntrada||'inventari')==='inventari').length;
-        const nCap    = projects.filter(p => (p.tipusEntrada||'inventari')==='captura').length;
+        const nCap    = projects.filter(p => (p.tipusEntrada||'inventari')==='captura').length + nFotos;
         statsEl.innerHTML = [
             { icon:'📍', label:`${total} registre${total!==1?'s':''}` },
             { icon:'🟢', label:`${nObres} obres` },
@@ -15432,46 +13842,6 @@ function abrirMapa() {
     }, 150);
 }
 
-/* ============================================================
-   GEOLOCATION CAPTURE — called when saving any registro
-   ============================================================ */
-/**
- * Attempt to capture GPS coordinates for a project.
- * Stored as "lat, lng" string on the project object.
- * Non-blocking: if denied or slow, saves without coords.
- */
-function captureGeoForProject(projectId, callback) {
-    if (!navigator.geolocation) { callback(''); return; }
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            const coordStr = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
-            // Update the project in cache + DB
-            const idx = allProjectsCache.findIndex(p => p.id === projectId);
-            if (idx > -1 && !allProjectsCache[idx].coordenades) {
-                allProjectsCache[idx].coordenades = coordStr;
-                pjModifica(projectId, { coordenades: coordStr });
-            }
-            callback(coordStr);
-        },
-        () => callback(''),
-        { timeout: 5000, maximumAge: 30000 }
-    );
-}
-
-/** Enhanced saveReg: captures geolocation for the current project after saving */
-const _origActualizarDB = actualizarDB;
-// Patch actualizarDB to request geo when saving a new project for the first time
-const _savedActualizarDB = actualizarDB;
-function actualizarDBWithGeo(t) {
-    _savedActualizarDB(t);
-    // After first save, try to grab GPS if we don't have it yet
-    const cached = allProjectsCache.find(p => p.id === curId);
-    if (cached && !cached.coordenades) {
-        captureGeoForProject(curId, coordStr => {
-            if (coordStr) showToast(`📍 GPS: ${coordStr}`);
-        });
-    }
-}
 
 /* ============================================================
    LLISTA NEGRA DE CARRETERES
@@ -16300,10 +14670,6 @@ function eliminarFitxaAnimal(id) {
 }
 
 /* ============================================================
-   TRAMS P-24 (senyalització de fauna) — cerca de PK inici/fi
-   Carrega un fitxer .xlsx/.csv amb columnes Carretera, PK inici, PK fi
-   ============================================================ */
-/* ============================================================
    DADES DEL TÈCNIC (nom + PARC, recordats al dispositiu)
    ============================================================ */
 function _carregarDadesTecnic() {
@@ -16495,7 +14861,6 @@ function _animalBuscarTram() {
 document.addEventListener('DOMContentLoaded', () => setTimeout(_carregarP24Lazy, 2600));
 
 
-
 /** Carrega pk_seed.js en background (lazy, no bloqueja). */
 function _carregarPKSeedLazy() {
     if (typeof PK_SEED !== 'undefined') {
@@ -16665,10 +15030,6 @@ function autopkCarregarCache() {
         return raw ? JSON.parse(raw) : null;
     } catch { return null; }
 }
-function autopkDadesCache() {
-    const meta = autopkMeta();
-    return meta ? meta : null;
-}
 function autopkMeta() {
     try {
         const raw = localStorage.getItem(AUTOPK_CONFIG.LS_META_KEY);
@@ -16691,46 +15052,6 @@ function cercarEnCache(lat, lon, bufferGraus = 0.05) {
        o la sincro ArcGIS no s'ha fet mai). Buffer lleugerament més gran per compensar
        la menor resolució del seed (0.5 km). */
     return cercarEnSeed(lat, lon, Math.max(bufferGraus, 0.10));
-}
-
-/* ============================================================
-   ALGORISME PRINCIPAL DE CÀLCUL
-   Donada llista de punts, trobar el PK interpolat
-   ============================================================ */
-function calcularPKdePunts(userLat, userLon, punts) {
-    if (!punts || punts.length === 0) return null;
-
-    // Agrupar per carretera
-    const perCarretera = {};
-    punts.forEach(p => {
-        if (!perCarretera[p.carretera]) perCarretera[p.carretera] = [];
-        perCarretera[p.carretera].push(p);
-    });
-
-    let millor = null;
-
-    Object.entries(perCarretera).forEach(([carr, pks]) => {
-        // Ordenar per PK
-        pks.sort((a, b) => a.pk - b.pk);
-
-        // Provar tots els parells consecutius
-        for (let i = 0; i < pks.length - 1; i++) {
-            const res = interpolarPK(userLat, userLon, pks[i], pks[i+1]);
-            if (res && (!millor || res.dist < millor.dist)) {
-                millor = res;
-            }
-        }
-
-        // Si només hi ha un punt, usem distància directa
-        if (pks.length === 1) {
-            const d = haversineM(userLat, userLon, pks[0].lat, pks[0].lon);
-            if (!millor || d < millor.dist) {
-                millor = { km: Math.floor(pks[0].pk), m: Math.round((pks[0].pk % 1) * 1000), carretera: carr, dist: d };
-            }
-        }
-    });
-
-    return millor;
 }
 
 /* ============================================================
@@ -16854,13 +15175,6 @@ function pkWidgetSeleccionarMini(idx) {
         }).join('');
 }
 
-function pkWidgetSeleccionarChip(idx) {
-    _pkWidgetSelected = _pkWidgetResultats[idx];
-    // Actualitzar visual
-    document.querySelectorAll('#pkChipsRow .pk-chip').forEach((el, i) => {
-        el.classList.toggle('selected', i === idx);
-    });
-}
 
 function pkWidgetMostrarError(icon, text) {
     document.getElementById('pkWidgetIdle').style.display = 'none';
@@ -18149,89 +16463,9 @@ function _annexGetDB(id) {
         tx.onerror = e => rej(e.target.error);
     });
 }
-function _annexPutDB(p) {
-    return new Promise((res, rej) => {
-        const tx = db.transaction('projects','readwrite');
-        tx.objectStore('projects').put(p).onsuccess = () => res();
-        tx.onerror = e => rej(e.target.error);
-    });
-}
 
 /* ── Gestor d'ordre (punts + annexos) ────────────────────── */
-async function obrirGestorAnnexos(projectId) {
-    const p = await _annexGetDB(projectId);
-    document.getElementById('screen-gestor-annexos')?.remove();
-    const screen = document.createElement('div');
-    screen.id = 'screen-gestor-annexos';
-    screen.className = 'screen screen-gestor-annexos';
 
-    const regs = p.registros || [];
-    const hasAnexos = regs.some(r => r.tipus === 'annex');
-
-    const items = regs.map((r, i) => {
-        const isAnnex = r.tipus === 'annex';
-        const icon = isAnnex ? '📝' : '📍';
-        let titol, sub;
-        if (isAnnex) {
-            titol = `ANNEX: ${_annexEscHtml(r.titol || 'Sense títol')}`;
-            sub = `${(r.contingut||[]).length} bloc${(r.contingut||[]).length !== 1?'s':''}`;
-        } else {
-            const carr = (r.values||[]).find(v=>v.label?.toLowerCase().includes('carretera'))?.val || '—';
-            const pk   = (r.values||[]).find(v=>v.label?.toLowerCase().includes('pk'))?.val || '';
-            titol = `#${i+1} · ${_annexEscHtml(carr)}`;
-            sub   = pk ? `PK ${_annexEscHtml(pk)}` : '';
-        }
-        return `
-        <div class="gestor-item ${isAnnex ? 'gestor-item-annex' : ''}">
-            <span class="gestor-item-icon">${icon}</span>
-            <div class="gestor-item-info">
-                <div class="gestor-item-titol">${titol}</div>
-                ${sub ? `<div class="gestor-item-sub">${sub}</div>` : ''}
-            </div>
-            <div class="gestor-item-actions">
-                <button class="gestor-btn" onclick="moureItemGestor('${projectId}','${r.id}',-1)" title="Pujar">↑</button>
-                <button class="gestor-btn" onclick="moureItemGestor('${projectId}','${r.id}',1)" title="Baixar">↓</button>
-                ${isAnnex ? `
-                <button class="gestor-btn" onclick="obrirEditorAnnex('${projectId}','${r.id}')" title="Editar">✏️</button>
-                <button class="gestor-btn gestor-btn-del" onclick="eliminarAnnexConf('${projectId}','${r.id}')" title="Eliminar">🗑</button>` : ''}
-            </div>
-        </div>`;
-    }).join('');
-
-    screen.innerHTML = `
-        <div class="screen-header">
-            <button class="btn-back" onclick="document.getElementById('screen-gestor-annexos')?.remove()">←</button>
-            <h3>📋 Ordre del document</h3>
-        </div>
-        <div class="gestor-llista">
-            ${items || '<div style="text-align:center;padding:24px;color:var(--text-muted);">Cap punt encara</div>'}
-        </div>
-        <button class="gestor-add-btn" onclick="obrirEditorAnnex('${projectId}')">＋ Afegir annex</button>`;
-
-    document.body.appendChild(screen);
-}
-
-async function moureItemGestor(projectId, regId, dir) {
-    const p = await _annexGetDB(projectId);
-    const regs = p.registros || [];
-    const idx  = regs.findIndex(r => r.id === regId);
-    if (idx < 0) return;
-    const ni = idx + dir;
-    if (ni < 0 || ni >= regs.length) return;
-    [regs[idx], regs[ni]] = [regs[ni], regs[idx]];
-    p.registros = regs;
-    await _annexPutDB(p);
-    await obrirGestorAnnexos(projectId); // refrescar
-}
-
-async function eliminarAnnexConf(projectId, annexId) {
-    if (!confirm('Eliminar aquest annex? Aquesta acció no es pot desfer.')) return;
-    const p = await _annexGetDB(projectId);
-    p.registros = (p.registros||[]).filter(r => r.id !== annexId);
-    await _annexPutDB(p);
-    showToast('Annex eliminat', 'ok');
-    await obrirGestorAnnexos(projectId);
-}
 
 /* ── Editor d'annex ──────────────────────────────────────── */
 async function obrirEditorAnnex(projectId, annexId = null) {
@@ -18515,7 +16749,6 @@ async function desarEditorAnnex(projectId) {
     showToast('Annex desat ✓', 'ok');
     renderRegs();
 }
-
 
 
 function pkmToggleArea() {
@@ -19866,9 +18099,6 @@ function pdSetTipus(t) {
     document.getElementById('pdObsLabel').textContent = t === 'festa' ? 'Observacions (opcional)' : 'Anotacions incidències';
 }
 
-/* Compatibilitat: noms antics que encara poden cridar-se des d'altres llocs */
-function pdRenderChips() { if (pdEd.dia) pdRenderFiles('dia'); }
-function pdAfegirAlDia(txt) { pdAfegirFila('dia', txt); }
 
 /* Suggeriments: primer les pròpies, després el catàleg offline */
 function pdSuggerir(inputId, sugId, onTria) {
