@@ -5649,16 +5649,17 @@ html.sp-vist #splashScreen { display: none !important; }
 }
 .odo-d::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255,255,255,.14); z-index: 1; }
 .pk-inst {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 10px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1.25fr; gap: 1px; margin-top: 10px;
     background: rgba(255,255,255,.12); border-radius: 10px; overflow: hidden; position: relative; z-index: 1;
 }
 .pk-inst[hidden] { display: none; }
 .pk-inst-c { background: rgba(3,6,12,.82); padding: 7px 4px 6px; text-align: center; min-width: 0; }
 .pk-inst-c small { display: block; font-family: var(--font-cond); font-weight: 700; font-size: .6rem; letter-spacing: 1.8px; color: rgba(255,255,255,.5); }
-.pk-inst-c b { display: block; font-family: var(--font-cond); font-weight: 800; font-size: 1.08rem; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pk-inst-c b { display: block; font-family: var(--font-cond); font-weight: 800; font-size: clamp(.86rem, 4.1vw, 1.08rem); letter-spacing: 0; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pk-inst-c b[data-q="ok"] { color: #4ade80; } .pk-inst-c b[data-q="mig"] { color: #fbbf24; } .pk-inst-c b[data-q="mal"] { color: #f87171; }
 .pk-inst-coords { grid-column: 1 / -1; background: rgba(3,6,12,.82); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
     font-family: var(--font-cond); font-weight: 700; font-size: .92rem; color: #e2e8f0; letter-spacing: .5px; }
+.pk-viu:not(.on) { visibility: hidden; }   /* només es veu amb el mode en viu encès */
 .pk-viu { display: inline-flex; align-items: center; gap: 5px; font-size: .68rem; letter-spacing: 1.5px; color: rgba(255,255,255,.45); }
 .pk-viu i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
 .pk-viu.on { color: #4ade80; } .pk-viu.on i { background: #4ade80; animation: pkViu 1.4s ease-in-out infinite; }
