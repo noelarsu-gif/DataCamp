@@ -5568,6 +5568,7 @@ html[data-theme="sunlight"] .tema-btn { background: #ffd400; border-color: #000;
 .tele-gps[data-q="ok"]  .tele-dot { background: var(--tele-ok);  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tele-ok) 25%, transparent); }
 .tele-gps[data-q="mig"] .tele-dot { background: var(--tele-mig); }
 .tele-gps[data-q="mal"] .tele-dot { background: var(--tele-mal); }
+.tele-gps[data-viu="1"] .tele-dot { animation: pkViu 1.4s ease-in-out infinite; }
 .tele-disc[data-q="mal"] { color: var(--tele-mal); }
 .tele-disc[data-q="mig"] { color: var(--tele-mig); }
 .tele-strip { display: none; }
@@ -20119,7 +20120,7 @@ const NV_ITEMS = [
     { ico: 'i-pin',      to: 'tone-red',   nou: true, t: 'Nou Punt: fixa el PK d\'un toc',
       d: "El botó central de la barra de baix congela la carretera, el PK, les coordenades i l'hora amb una vibració, sense haver d'aturar-te. Després el completes des d'Inici amb una foto, o l'aprofites en un inventari." },
     { ico: 'i-road',     to: 'tone-blue',  nou: true, t: 'Barra inferior i GPS en viu',
-      d: "Inici, Nou Punt, PK Mapa i Gestió sempre a mà. A dalt veus la precisió del GPS i l'espai lliure, i el comptador de PK es posa al dia sol mentre et mous." },
+      d: "Inici, Nou Punt, PK Mapa i Gestió sempre a mà. A dalt veus la precisió de la darrera lectura del GPS i l'espai lliure. El GPS només s'encén quan demanes una posició; si toques «GPS» s'activa el mode en viu i el comptador de PK et segueix mentre circules (s'apaga sol als 10 minuts)." },
     { ico: 'i-sun',      to: 'tone-amber', nou: true, t: 'Mode sol i mode fosc',
       d: "El botó del sol canvia entre clar, fosc i alt contrast, per llegir la pantalla a ple sol. Els botons són més grans, pensats per fer-los servir amb guants." },
     { ico: 'i-mic',      to: 'tone-violet', nou: true, t: 'Dictat i esborranys',
@@ -20222,38 +20223,47 @@ window.dcTema = function () {
 };
 temaAplica(temaActual());
 
-/* ── TELEMETRIA · GPS en viu ───────────────────────────────────── */
+/* ── TELEMETRIA · GPS ────────────────────────────────────────────
+   El GPS NOMÉS s'encén quan es demana una posició (Detectar, Nou Punt,
+   Auto-PK, foto…) i s'apaga en tenir-la: no gasta bateria en repòs.
+   La franja mostra la precisió de la darrera lectura.
+   Tocant «GPS» s'activa a mà el mode en viu (l'odòmetre segueix el
+   vehicle); s'apaga sol als 10 minuts o en sortir de l'app. */
 const gps = window.dcGps = { fix: null, estat: 'off', watch: null };
+const GPS_VIU_MAX = 10 * 60000;
+let gpsViuT = null;
+function gpsDesa(c, ts) { gps.fix = { lat: c.latitude, lon: c.longitude, acc: c.accuracy, vel: c.speed, ts: ts || Date.now() }; }
 function gpsPinta() {
-    const f = gps.fix, fresc = f && Date.now() - f.ts < 60000;   // el GPS només avisa quan la posició canvia
+    const f = gps.fix, recent = f && Date.now() - f.ts < 120000, viu = gps.watch != null;
     let txt, q = '';
     if (gps.estat === 'no') txt = 'GPS no disponible';
     else if (gps.estat === 'denegat') { txt = 'GPS sense permís'; q = 'mal'; }
-    else if (gps.estat === 'off') txt = 'GPS · toca per activar';
-    else if (!fresc) txt = 'GPS cercant…';
-    else { txt = 'GPS ±' + Math.round(f.acc) + ' m'; q = qualitat(f.acc); }
-    document.querySelectorAll('.tele-gps').forEach(el => { el.dataset.q = q; el.lastElementChild.textContent = txt; });
+    else if (viu && !recent) txt = 'GPS cercant…';
+    else if (recent) { txt = 'GPS ±' + Math.round(f.acc) + ' m' + (viu ? ' · en viu' : ''); q = qualitat(f.acc); }
+    else txt = 'GPS en repòs';
+    document.querySelectorAll('.tele-gps').forEach(el => { el.dataset.q = q; el.dataset.viu = viu ? '1' : ''; el.lastElementChild.textContent = txt; });
 }
-function gpsInicia() {
+function gpsInicia() {          // mode en viu: només a petició
     if (!navigator.geolocation) { gps.estat = 'no'; return gpsPinta(); }
     if (gps.watch != null) return;
-    gps.estat = 'cerca'; gpsPinta();
+    gps.estat = 'on';
     gps.watch = navigator.geolocation.watchPosition(pos => {
-        const c = pos.coords;
-        gps.fix = { lat: c.latitude, lon: c.longitude, acc: c.accuracy, vel: c.speed, ts: Date.now() };
-        gps.estat = 'on'; gpsPinta(); odoViu(gps.fix);
+        gpsDesa(pos.coords); gps.estat = 'on'; gpsPinta(); odoViu(gps.fix);
     }, err => {
-        if (err.code === 1) { gps.estat = 'denegat'; gpsAtura(true); }
+        if (err.code === 1) { gps.estat = 'denegat'; gpsAtura(); }
         gpsPinta();
     }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
-}
-function gpsAtura(mantenEstat) {
-    if (gps.watch != null) { try { navigator.geolocation.clearWatch(gps.watch); } catch (e) {} gps.watch = null; }
-    if (!mantenEstat) gps.estat = 'off';
+    clearTimeout(gpsViuT);
+    gpsViuT = setTimeout(() => { if (gps.watch != null) { gpsAtura(); showToast('📡 GPS en viu aturat per estalviar bateria'); } }, GPS_VIU_MAX);
     gpsPinta();
 }
-/* Amb el GPS en viu en marxa, la resta de l'app (Auto-PK, foto ràpida, inventari…) rep la posició a l'instant:
-   el navegador no torna a donar un fix a qui el demana a part fins que la posició canvia. */
+function gpsAtura() {
+    clearTimeout(gpsViuT);
+    if (gps.watch != null) { try { navigator.geolocation.clearWatch(gps.watch); } catch (e) {} gps.watch = null; }
+    gpsPinta();
+}
+/* Cada petició puntual de posició (de qualsevol part de l'app) actualitza la franja.
+   Amb el mode en viu encès, es respon a l'instant amb la darrera lectura. */
 if (navigator.geolocation) {
     const geo = navigator.geolocation, demana0 = geo.getCurrentPosition.bind(geo);
     const posDe = f => ({ coords: { latitude: f.lat, longitude: f.lon, accuracy: f.acc, altitude: null, altitudeAccuracy: null, heading: null, speed: f.vel == null ? null : f.vel }, timestamp: f.ts });
@@ -20261,7 +20271,11 @@ if (navigator.geolocation) {
         geo.getCurrentPosition = function (ok, ko, opt) {
             const f = gps.fix;
             if (gps.watch != null && f && Date.now() - f.ts <= 15000) { setTimeout(() => ok(posDe(f)), 0); return; }
-            demana0(ok, err => {
+            demana0(pos => {
+                try { gpsDesa(pos.coords, Date.now()); if (gps.estat !== 'on') gps.estat = 'off'; gpsPinta(); } catch (e) {}
+                ok(pos);
+            }, err => {
+                if (err && err.code === 1) { gps.estat = 'denegat'; gpsPinta(); }
                 const g = gps.fix;
                 if (gps.watch != null && g && Date.now() - g.ts <= 120000 && err && err.code !== 1) ok(posDe(g));
                 else if (ko) ko(err);
@@ -20269,20 +20283,11 @@ if (navigator.geolocation) {
         };
     } catch (e) {}
 }
-async function gpsAuto() {      // només s'engega sol si el permís ja està donat (no demana res en obrir)
-    if (document.hidden || gps.watch != null || !navigator.geolocation) return;
-    try {
-        const p = await navigator.permissions.query({ name: 'geolocation' });
-        if (p.state === 'granted') gpsInicia();
-        else if (p.state === 'denied') { gps.estat = 'denegat'; gpsPinta(); }
-    } catch (e) {}
-}
 window.dcGpsToc = function () {
-    if (gps.watch == null) { gpsInicia(); return; }
-    const f = gps.fix;
-    showToast(f ? `📡 ${f.lat.toFixed(5)}, ${f.lon.toFixed(5)} · ±${Math.round(f.acc)} m` : '📡 Cercant senyal GPS…');
+    if (gps.watch == null) { gpsInicia(); vibra(15); showToast('📡 GPS en viu activat (s\'apaga sol als 10 minuts). Toca de nou per aturar-lo'); }
+    else { gpsAtura(); showToast('📡 GPS en viu aturat'); }
 };
-document.addEventListener('visibilitychange', () => { if (document.hidden) gpsAtura(gps.estat === 'denegat'); else { gpsAuto(); discPinta(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden) gpsAtura(); else discPinta(); });
 
 /* ── TELEMETRIA · espai lliure ─────────────────────────────────── */
 let disc = null;
@@ -20451,7 +20456,6 @@ window.dcFixaPK = async function () {
             f = await new Promise(res => navigator.geolocation.getCurrentPosition(
                 pos => res({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy, ts: Date.now() }),
                 () => res(null), { enableHighAccuracy: true, timeout: 9000, maximumAge: 3000 }));
-            if (f && gps.watch == null) gpsAuto();
             if (!f && gps.fix && t - gps.fix.ts < 120000) f = { ...gps.fix, ts: t };
         }
         if (!f) { vibra(200); showToast('📡 Sense senyal GPS: no s\'ha pogut fixar el punt'); return; }
@@ -20838,7 +20842,7 @@ window.dcGeo = { recull: geoRecull, geojson: geoAGeoJSON, kml: geoAKML, posDePK 
 
 /* ── ARRENCADA ─────────────────────────────────────────────────── */
 function arrenca() {
-    pinsPinta(); gpsPinta(); discPinta(); gpsAuto(); seccioPrepara(); veuPosaBotons();
+    pinsPinta(); gpsPinta(); discPinta(); seccioPrepara(); veuPosaBotons();
     const act = document.querySelector('.screen.active'); navSync(act ? act.id : 'home');
     const segur = fn => { try { fn(); } catch (e) { console.warn('[fase2]', fn.name, e); } };
     setInterval(() => { segur(esbTic); segur(veuPosaBotons); segur(pinsFormPinta); segur(instPinta); }, 500);
