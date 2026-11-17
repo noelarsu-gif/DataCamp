@@ -5547,7 +5547,9 @@ input[type="checkbox"], input[type="radio"] { min-width: 22px; min-height: 22px;
 html:not([data-theme]) .tema-btn .t-clar, html[data-theme="light"] .tema-btn .t-clar,
 html[data-theme="dark"] .tema-btn .t-fosc, html[data-theme="sunlight"] .tema-btn .t-sol { display: inline-block; }
 html[data-theme="sunlight"] .tema-btn { background: #ffd400; border-color: #000; color: #000; }
-.mobile-header-dreta { display: flex; align-items: center; gap: 8px; }
+.mobile-header-dreta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px; }
+.mobile-header .mobile-brand { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.mobile-header .mobile-brand-logo { flex: 0 1 auto; min-width: 0; max-width: 100%; object-fit: contain; object-position: left center; }
 
 /* ── TELEMETRIA (GPS en viu + espai lliure) ────────────────────── */
 .tele { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -5619,8 +5621,8 @@ html[data-theme="sunlight"] .tema-btn { background: #ffd400; border-color: #000;
 
 /* ── SPLASH ràpid ──────────────────────────────────────────────── */
 html.sp-vist #splashScreen { display: none !important; }
-/* Es fon sola als 0,38 s amb una animació CSS (no depèn que el JavaScript estigui lliure) i no bloqueja cap toc */
-#splashScreen { pointer-events: none; animation: spFora .12s linear .38s forwards; }
+/* Es fon sola als 1,6 s amb una animació CSS (no depèn que el JavaScript estigui lliure). Tocant-la es tanca abans. */
+#splashScreen { animation: spFora .3s ease 1.6s forwards; }
 @keyframes spFora { to { opacity: 0; } }
 
 /* ── INSTRUMENT PK (odòmetre de precisió) ──────────────────────── */
@@ -6041,11 +6043,11 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
         setTimeout(() => s.remove(), 120);
     }
     s.addEventListener('click', tancar);
-    /* Només el primer cop de cada sessió, i mig segon com a màxim */
+    /* Només el primer cop de cada sessió; dura prou per llegir la salutació */
     let vist = false;
     try { vist = !!sessionStorage.getItem('dc_splash'); sessionStorage.setItem('dc_splash', '1'); } catch (e) {}
     if (vist) { tancat = true; s.remove(); }
-    else setTimeout(tancar, 380);
+    else setTimeout(tancar, 1900);
 })();
 </script>
 
