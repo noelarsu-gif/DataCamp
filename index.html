@@ -6,6 +6,8 @@
     <title>DATACAMP — Gestió de Carreteres</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#c60c30">
+    <script>/* Tema i benvinguda abans de pintar res (evita el parpelleig) */
+    (function(){try{var t=localStorage.getItem('dc_tema');if(t==='dark'||t==='sunlight')document.documentElement.setAttribute('data-theme',t);if(sessionStorage.getItem('dc_splash'))document.documentElement.classList.add('sp-vist');}catch(e){}})();</script>
     <link rel="apple-touch-icon" href="icon-192.png">
     <!-- ── Fonts locals (sense CDN) ──────────────────────────── -->
     <link rel="stylesheet" href="./fonts/barlow.css">
@@ -35,6 +37,7 @@
     --accent-blue:    #1d4ed8;
     --accent-blue-lt: #eff6ff;
     --dark:           #111827;
+    --ink:            #111827;   /* superfície fosca fixa (menú, avisos); --dark és el color de títols */
     --text:           #374151;
     --text-muted:     #6b7280;
     --text-light:     #9ca3af;
@@ -90,7 +93,7 @@ html, body {
 /* SIDEBAR */
 .sidebar {
     width: var(--sidebar-w);
-    background: var(--dark);
+    background: var(--ink);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -269,7 +272,7 @@ html, body {
    HOME DASHBOARD — PK WIDGET
    ============================================================ */
 .pk-widget {
-    background: linear-gradient(135deg, var(--dark) 0%, #1a2332 100%);
+    background: linear-gradient(135deg, var(--ink) 0%, #1a2332 100%);
     border-radius: var(--radius-lg);
     padding: 20px 24px;
     margin-bottom: 24px;
@@ -1900,7 +1903,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     z-index: 99;
 }
 .btn-scroll {
-    background: var(--dark);
+    background: var(--ink);
     color: white;
     width: 38px; height: 38px;
     border-radius: 50%;
@@ -2009,7 +2012,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     top: 0; left: 0; bottom: 0;
     width: 80%;
     max-width: 300px;
-    background: var(--dark);
+    background: var(--ink);
     z-index: 301;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(.4,0,.2,1);
@@ -2266,7 +2269,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     right: calc(100% + 12px);
     top: 50%;
     transform: translateY(-50%);
-    background: var(--dark);
+    background: var(--ink);
     color: white;
     font-family: var(--font-cond);
     font-size: 0.78rem;
@@ -2866,7 +2869,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     position: fixed;
     bottom: 30px; left: 50%;
     transform: translateX(-50%) translateY(80px);
-    background: var(--dark);
+    background: var(--ink);
     color: white;
     padding: 12px 24px;
     border-radius: 40px;
@@ -2997,7 +3000,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     table-layout: fixed;
 }
 .dl-table thead tr {
-    background: var(--dark);
+    background: var(--ink);
 }
 .dl-table th {
     padding: 11px 14px;
@@ -3367,7 +3370,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .timeline-dot.cat-captura   { background: var(--cat-captura);   box-shadow: 0 0 0 2px var(--cat-captura); }
 .timeline-dot.cat-inventari { background: var(--cat-inventari); box-shadow: 0 0 0 2px var(--cat-inventari); }
 .timeline-dot.cat-obra      { background: var(--cat-obra);      box-shadow: 0 0 0 2px var(--cat-obra); }
-.timeline-dot.start         { background: var(--dark);          box-shadow: 0 0 0 2px var(--dark); }
+.timeline-dot.start         { background: var(--ink);          box-shadow: 0 0 0 2px var(--ink); }
 .timeline-dot.end           { background: var(--primary);       box-shadow: 0 0 0 2px var(--primary); }
 
 .timeline-content {
@@ -5063,7 +5066,7 @@ body.pd-noscroll { overflow: hidden; }
     font-family: var(--font); font-size: .78rem; font-weight: 600; color: var(--text); padding: 0 2px;
 }
 .pd-marge button:first-child { border-left: 0; }
-.pd-marge button.on { background: var(--dark); color: #fff; }
+.pd-marge button.on { background: var(--ink); color: #fff; }
 .pd-fila-x { width: 36px; height: 36px; flex-shrink: 0; display: grid; place-items: center; border: 0; background: none; color: var(--danger); cursor: pointer; font-size: 18px; border-radius: 8px; }
 .pd-fila-x:active { background: var(--danger-lt); }
 .pd-chip-n { min-width: 20px; height: 20px; border-radius: 10px; background: rgba(255,255,255,.9); color: var(--dark); font-size: .75rem; display: grid; place-items: center; padding: 0 5px; }
@@ -5079,7 +5082,7 @@ body.pd-noscroll { overflow: hidden; }
 .pd-ruta-chip .ico { font-size: 17px; color: var(--primary); }
 .pd-ruta-chip b { font-size: .92rem; font-weight: 700; white-space: nowrap; }
 .pd-ruta-chip small { font-size: .72rem; font-weight: 700; color: var(--text-muted); background: var(--surface-2, #f1f5f9); border-radius: 9px; padding: 1px 7px; }
-.pd-ruta-chip:active { transform: scale(0.96); background: var(--dark); color: #fff; }
+.pd-ruta-chip:active { transform: scale(0.96); background: var(--ink); color: #fff; }
 .pd-rutes-llista { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
 .pd-rutes-llista li { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
 .pd-rutes-llista li.pd-ajuda { border: 0; padding: 0; background: none; }
@@ -5211,7 +5214,7 @@ body.pe-obert { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .pe-desa-full, .pe-desa.open .pe-desa-full, .pe-desa-fons { transition: none; } }
 
 /* ══ Expedient ITC ═══════════════════════════════════════════ */
-.itc-cap { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; margin-bottom: 12px; border-radius: var(--radius-card); background: var(--dark); color: #fff; border-bottom: 3px solid var(--primary); }
+.itc-cap { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; margin-bottom: 12px; border-radius: var(--radius-card); background: var(--ink); color: #fff; border-bottom: 3px solid var(--primary); }
 .itc-cap-et { font-size: .7rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: .7; }
 .itc-cap b { font-family: var(--font-cond); font-size: 1.7rem; letter-spacing: .5px; line-height: 1.1; }
 .itc-cap small { font-size: .78rem; opacity: .75; word-break: break-all; }
@@ -5230,7 +5233,7 @@ body.pe-obert { overflow: hidden; }
 .itc-quins { display: grid; grid-template-columns: repeat(3, 1fr); border: 1.5px solid var(--border-dark); border-radius: 10px; overflow: hidden; }
 .itc-quins button { min-height: 42px; border: 0; border-left: 1px solid var(--border-dark); background: var(--surface); font: 600 .9rem var(--font); color: var(--text); cursor: pointer; }
 .itc-quins button:first-child { border-left: 0; }
-.itc-quins button.on { background: var(--dark); color: #fff; }
+.itc-quins button.on { background: var(--ink); color: #fff; }
 .itc-envia-fitxers { display: grid; gap: 2px; font-size: .74rem; color: var(--text-muted); word-break: break-all; font-family: var(--font-cond); letter-spacing: .2px; }
 .itc-envia-bots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .itc-envia-bots .btn { margin: 0 !important; width: 100%; }
@@ -5266,7 +5269,7 @@ body.pe-obert { overflow: hidden; }
 .itc-sel-filtres::-webkit-scrollbar { display: none; }
 .itc-xip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1.5px solid var(--border-dark); background: var(--surface); font: 600 .85rem var(--font); color: var(--text); cursor: pointer; }
 .itc-xip .ico { font-size: 15px; }
-.itc-xip.on { background: var(--dark); border-color: var(--dark); color: #fff; }
+.itc-xip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
 .itc-sel-graella { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: max-content; gap: 10px; padding: 2px 12px 16px; align-content: start; }
 @media (max-width: 768px) { .itc-sel-graella { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 2px 8px 14px; } }
 @media (max-width: 390px) { .itc-sel-graella { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -5358,6 +5361,362 @@ html.mou-anim .page-content { overflow: hidden; overflow: clip; }
 }
 .pd-check input { width: 22px; height: 22px; accent-color: var(--primary); }
 
+
+/* ══ FASE 2 · SISTEMA INDUSTRIAL DE CAMP ═══════════════════════════
+   Temes (clar / fosc / sol), controls tàctils de 48 px, xifres
+   tabulars, telemetria, barra inferior, instrument PK, punts fixats,
+   esborranys, dictat, progrés d'exportació i secció transversal.
+   Va al final del full: guanya per ordre i no toca cap regla anterior.
+   Les regles «html[data-theme="dark"] …» de colors fixos es generen
+   amb l'script tema.js a partir del CSS de sobre.
+   ═════════════════════════════════════════════════════════════════ */
+:root {
+    --bn-h: 0px;            /* alçada de la barra inferior (només mòbil) */
+    --tele-h: 0px;          /* alçada de la franja de telemetria (només mòbil) */
+    --touch: 48px;          /* mida mínima d'un control tàctil (ús amb guants) */
+    --on-primary: #ffffff;
+    --tele-ok: #16a34a; --tele-mig: #d97706; --tele-mal: #dc2626;
+}
+html { font-variant-numeric: tabular-nums lining-nums; color-scheme: light; }
+
+/* ── TEMA FOSC ─────────────────────────────────────────────────── */
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --primary: #e11d48; --primary-dark: #be123c; --primary-light: #3b0d18; --primary-glow: rgba(244,63,94,.28);
+    --accent-blue: #3b82f6; --accent-blue-lt: #14234a;
+    --dark: #f1f5f9; --ink: #060b16;
+    --text: #cbd5e1; --text-muted: #94a3b8; --text-light: #7b8aa3;
+    --bg: #0b1220; --bg-alt: #1e293b; --surface: #111a2c; --surface-2: #17223a;
+    --border: #263349; --border-dark: #3a4a66;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.5); --shadow: 0 4px 12px rgba(0,0,0,.5);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.55); --shadow-lg: 0 20px 40px rgba(0,0,0,.6);
+    --cat-captura: #fb923c; --cat-captura-lt: #3a1c08; --cat-captura-bd: #7c2d12;
+    --cat-inventari: #60a5fa; --cat-inventari-lt: #14234a; --cat-inventari-bd: #1e3a8a;
+    --cat-obra: #4ade80; --cat-obra-lt: #0d2b1a; --cat-obra-bd: #166534;
+    --success: #4ade80; --success-lt: #0d2b1a; --warning: #fbbf24; --warning-lt: #3a2606;
+    --danger: #f87171; --danger-lt: #3b1212;
+    --focus-ring: 0 0 0 3px rgba(96,165,250,.55);
+    --tele-ok: #4ade80; --tele-mig: #fbbf24; --tele-mal: #f87171;
+}
+html[data-theme="dark"] .tone-red    { --tone: #fb7185; --tone-lt: #3b0d18; }
+html[data-theme="dark"] .tone-blue   { --tone: #60a5fa; --tone-lt: #14234a; }
+html[data-theme="dark"] .tone-green  { --tone: #4ade80; --tone-lt: #0d2b1a; }
+html[data-theme="dark"] .tone-amber  { --tone: #fbbf24; --tone-lt: #3a2606; }
+html[data-theme="dark"] .tone-violet { --tone: #a78bfa; --tone-lt: #24163f; }
+html[data-theme="dark"] .tone-brown  { --tone: #fdba74; --tone-lt: #3a1c08; }
+html[data-theme="dark"] .tone-teal   { --tone: #2dd4bf; --tone-lt: #0b2b2a; }
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { background-color: var(--surface-2); color: var(--dark); border-color: var(--border-dark); }
+html[data-theme="dark"] ::placeholder { color: var(--text-light); }
+html[data-theme="dark"] #splashScreen { background: var(--bg); }
+html[data-theme="dark"] .mobile-brand-logo { background: #fff; border-radius: 4px; padding: 2px 5px; height: 26px; opacity: 1; }
+html[data-theme="dark"] .action-card:not([class*="tone-"]):not(.primary):not(.blue) .action-icon { background: var(--bg-alt); color: var(--dark); }
+html[data-theme="dark"] .dl-btn[style*="background"] { background: var(--surface-2) !important; border-color: var(--border-dark) !important; color: var(--dark) !important; }
+html[data-theme="dark"] code { background: var(--bg-alt) !important; color: var(--dark) !important; }
+html[data-theme="dark"] .pk-widget { box-shadow: inset 0 0 0 1px var(--border); }
+html[data-theme="dark"] .pin-carr { box-shadow: inset 0 0 0 1px var(--border-dark); }
+/* (generat amb tema.js) */
+html[data-theme="dark"] .blacklist-chip{background:#341114;border:1.5px solid #602930;color:#ee859e}
+html[data-theme="dark"] .blacklist-chip-del{color:#ee859e}
+html[data-theme="dark"] .btn-danger{background:#341114;color:#ee859e;border:1.5px solid #602930}
+html[data-theme="dark"] .btn-danger:hover{background:#381316}
+html[data-theme="dark"] .autopk-status{border:1.5px solid #294260}
+html[data-theme="dark"] .autopk-status.error{background:#341111;border-color:#602929}
+html[data-theme="dark"] .autopk-status.warning{background:#362f12}
+html[data-theme="dark"] .autopk-status.success{background:#12351d;color:#8fefb2}
+html[data-theme="dark"] .syncro-pk-badge.ok{background:#12351d;color:#8fefb2}
+html[data-theme="dark"] .syncro-pk-badge.pend{background:#362f12}
+html[data-theme="dark"] .syncro-pk-badge.error{background:#341111;border:1px solid #602929}
+html[data-theme="dark"] .watermark-row{border:1.5px solid #294260}
+html[data-theme="dark"] .watermark-row-text .wm-title{color:#89a0eb}
+html[data-theme="dark"] .annex-chip-btn{background:#2d1133}
+html[data-theme="dark"] .annex-chip-btn:hover{background:#191237}
+html[data-theme="dark"] .calc-result.forbid{border:1.5px solid #602933}
+html[data-theme="dark"] .calc-result.warn .calc-result-badge{color:#eeb787}
+html[data-theme="dark"] .calc-result-art-chip{background:#241237;border:1px solid #432960}
+html[data-theme="dark"] .calc-reg-chip{color:#9bdef1;background:#123436}
+html[data-theme="dark"] .calc-warning-box{color:#f0c198}
+html[data-theme="dark"] .tip-card.yellow{background:#362f12}
+html[data-theme="dark"] .tip-card.blue{background:#122135}
+html[data-theme="dark"] .tip-card.green{background:#12351d}
+html[data-theme="dark"] .tip-card.red{background:#341114}
+html[data-theme="dark"] .field-tag .btn.btn-danger.btn-sm{background:#391313 !important;border:1px solid #602929 !important}
+html[data-theme="dark"] .fe-label-row input:focus{background:#171d29}
+html[data-theme="dark"] .fe-options-row textarea:focus{background:#171d29}
+html[data-theme="dark"] .checkbox-toggle::after{background:#171d29}
+html[data-theme="dark"] .field-tag .btn-edit-field{background:#122135 !important;border:1px solid #294260 !important}
+html[data-theme="dark"] .galeria-dropdown-item.danger:hover{background:#341114}
+html[data-theme="dark"] .galeria-thumb-check{background:#171d29}
+html[data-theme="dark"] .dl-icon.pdf{background:#341114}
+html[data-theme="dark"] .dl-icon.xls{background:#12351d}
+html[data-theme="dark"] .dl-icon.zip{background:#433f16}
+html[data-theme="dark"] .dl-btn-pdf{background:#341114;color:#ee859e;border-color:#602930}
+html[data-theme="dark"] .dl-btn-pdf:hover{background:#381316}
+html[data-theme="dark"] .dl-btn-xls{background:#12351d;color:#a0efbe}
+html[data-theme="dark"] .dl-btn-xls:hover{background:#143c22}
+html[data-theme="dark"] .dl-btn-zip{background:#433f16;color:#f1bb9a}
+html[data-theme="dark"] .dl-btn-bak:hover{background:#14253b}
+html[data-theme="dark"] .dl-match-count{background:#12351d;color:#a0efbe}
+html[data-theme="dark"] .obra-days-pill.warning{background:#362f12;color:#efb78d}
+html[data-theme="dark"] #pkmBtnBackDesktop{color:#ed8498}
+html[data-theme="dark"] #pkmSearchBtn{color:#ed8498}
+html[data-theme="dark"] #pkmBtnBack{color:#ed8498}
+html[data-theme="dark"] #pkmBtnCentrar{color:#ed8498}
+html[data-theme="dark"] .atb-btn.atb-del:hover{background:#341111}
+html[data-theme="dark"] .annex-cell-btn-del{border-color:#602929;background:#341111}
+html[data-theme="dark"] .action-icon.sign-tri{color:#d3dbec}
+html[data-theme="dark"] .pd-dia.festa{background:#382c13}
+html[data-theme="dark"] .pd-tag-festa{background:#493818;color:#f2cea1}
+html[data-theme="dark"] .pd-fila{background:var(--surface-2, #142230)}
+html[data-theme="dark"] .pd-ruta-chip small{background:var(--surface-2, #162433)}
+html[data-theme="dark"] .pd-tag-festiu{background:#493818;color:#f2cea1}
+html[data-theme="dark"] .itc-estat{background:var(--warning-lt, #3a2c13);color:#efb78d}
+html[data-theme="dark"] .itc-estat.fet{background:var(--success-lt, #13381f);color:var(--success, #a0efbe)}
+html[data-theme="dark"] .itc-envia{background:var(--surface-2, #142230)}
+html[data-theme="dark"] #itcSelector{background:var(--bg, #1e222a)}
+html[data-theme="dark"] .itc-sel-foto{background:var(--bg-alt, #24282f)}
+html[data-theme="dark"] .nv-versio{color:var(--text-light, #99a6b8)}
+html[data-theme="dark"] .nv-item{border-bottom:1px solid var(--border, #3c424e)}
+html[data-theme="dark"] .nv-item .nv-d{color:var(--text-light, #99a6b8)}
+html[data-theme="dark"] .nv-help-btn{background:var(--primary-light, #361219)}
+
+/* ── MODE SOL · ALT CONTRAST ───────────────────────────────────── */
+html[data-theme="sunlight"] {
+    --primary: #a3001e; --primary-dark: #7a0016; --primary-light: #ffe1e6; --primary-glow: rgba(163,0,30,.25);
+    --accent-blue: #0032c8; --accent-blue-lt: #e3ebff;
+    --dark: #000000; --ink: #000000;
+    --text: #000000; --text-muted: #1c1c1c; --text-light: #3a3a3a;
+    --bg: #ffffff; --bg-alt: #dcdcdc; --surface: #ffffff; --surface-2: #f1f1f1;
+    --border: #000000; --border-dark: #000000;
+    --shadow-sm: none; --shadow: none; --shadow-md: 0 0 0 2px #000; --shadow-lg: 0 0 0 3px #000;
+    --cat-captura: #a33a00; --cat-inventari: #0032c8; --cat-obra: #006b2b;
+    --success: #006b2b; --warning: #8a4b00; --danger: #b00000;
+    --focus-ring: 0 0 0 4px #ffd400;
+    --tele-ok: #006b2b; --tele-mig: #8a4b00; --tele-mal: #b00000;
+}
+html[data-theme="sunlight"] body { font-weight: 600; font-size: 1.04rem; }
+html[data-theme="sunlight"] .action-card, html[data-theme="sunlight"] .card, html[data-theme="sunlight"] .modal-box,
+html[data-theme="sunlight"] .btn, html[data-theme="sunlight"] input, html[data-theme="sunlight"] select, html[data-theme="sunlight"] textarea,
+html[data-theme="sunlight"] .recent-item, html[data-theme="sunlight"] .dl-card, html[data-theme="sunlight"] .pins-card,
+html[data-theme="sunlight"] .mobile-header, html[data-theme="sunlight"] .bnav, html[data-theme="sunlight"] .tele-strip { border-width: 2px; border-style: solid; border-color: #000; }
+html[data-theme="sunlight"] .mobile-header { border-width: 0 0 2px; }
+html[data-theme="sunlight"] .bnav { border-width: 2px 0 0; }
+html[data-theme="sunlight"] .tele-strip { border-width: 0 0 2px; }
+html[data-theme="sunlight"] .btn-primary { background: #000; border-color: #000; color: #fff; }
+html[data-theme="sunlight"] .btn-ghost { background: #fff; color: #000; }
+html[data-theme="sunlight"] .action-desc, html[data-theme="sunlight"] label, html[data-theme="sunlight"] .calc-field-hint { color: #000; opacity: 1; }
+html[data-theme="sunlight"] :focus-visible { outline: 4px solid #ffd400; outline-offset: 2px; }
+html[data-theme="sunlight"] .bnav-it.on { background: #ffd400; color: #000; }
+html[data-theme="sunlight"] .tele-chip { color: #000; font-weight: 800; }
+html[data-theme="sunlight"] .slider { box-shadow: inset 0 0 0 2px #000; }
+
+/* ── CONTROLS TÀCTILS · mínim 48 px ────────────────────────────── */
+.btn, .btn-back, .hamburger, .dl-btn, .pk-widget-btn, .pk-widget-btn-sm, .btn-autopk, .btn-autopk-foto,
+.norm-doc-tab, .nav-item, .pk-chip, .pk-chip-mini, .btn-photo, .btn-scroll, .calc-pk-locate-btn { min-height: var(--touch); }
+.btn-back, .hamburger, .btn-icon, .calc-pk-locate-btn { min-width: var(--touch); }
+input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="search"], input[type="tel"], select { min-height: var(--touch); }
+input[type="checkbox"], input[type="radio"] { min-width: 22px; min-height: 22px; }
+.hamburger { width: var(--touch); height: var(--touch); }
+/* Botons petits sobre fotos: es veuen igual, però l'àrea que es pot tocar creix fins a 48 px */
+.btn-del-photo, .pk-widget-btn-sm, .blacklist-chip-del { position: relative; }
+.btn-del-photo::after, .blacklist-chip-del::after { content: ''; position: absolute; left: 50%; top: 50%; width: var(--touch); height: var(--touch); transform: translate(-50%, -50%); }
+.switch input { min-width: 0; min-height: 0; }
+.dl-pill, .dl-seg-btn, .itc-quins button, .pd-nav-btn, .pd-week-title, .project-card-actions .btn, .pts-count-btn { min-height: var(--touch); }
+.pd-nav-btn, .btn-scroll { min-width: var(--touch); }
+.actions button { min-height: var(--touch); min-width: var(--touch); }
+.obra-date-edit input[type="date"] { min-height: var(--touch); }
+#screen-foto-directa button[style*="border-radius:50%"] { width: var(--touch) !important; height: var(--touch) !important; }
+.leaflet-touch .leaflet-bar a, .leaflet-bar a { width: var(--touch); height: var(--touch); line-height: var(--touch); font-size: 24px; }
+/* Controls petits que no poden créixer sense trencar el disseny: es veuen igual, però l'àrea tàctil arriba a 48 px */
+:where(.switch, .galeria-filter-chip, .galeria-menu-btn, .map-filter-btn, .recent-continue, .recents-view-all, .annex-chip-btn,
+       .visor-close, .visor-menu-btn, .visor-nav-arrow, .pd-link, .tele-chip, .reg-edit-btn, .reg-del-btn, .fd-close) { position: relative; }
+:is(.switch, .galeria-filter-chip, .galeria-menu-btn, .map-filter-btn, .recent-continue, .recents-view-all, .annex-chip-btn,
+    .visor-close, .visor-menu-btn, .visor-nav-arrow, .pd-link, .tele-chip)::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, var(--touch)); height: max(100%, var(--touch)); transform: translate(-50%, -50%);
+}
+
+/* ── SELECTOR DE TEMA ──────────────────────────────────────────── */
+.tema-btn {
+    width: var(--touch); height: var(--touch); flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--surface-2); color: var(--dark);
+    border: 1.5px solid var(--border-dark); border-radius: var(--radius-btn);
+    cursor: pointer; font-size: 1.25rem; -webkit-tap-highlight-color: transparent;
+}
+.tema-btn:active { transform: scale(.94); }
+.tema-btn .ico { display: none; }
+html:not([data-theme]) .tema-btn .t-clar, html[data-theme="light"] .tema-btn .t-clar,
+html[data-theme="dark"] .tema-btn .t-fosc, html[data-theme="sunlight"] .tema-btn .t-sol { display: inline-block; }
+html[data-theme="sunlight"] .tema-btn { background: #ffd400; border-color: #000; color: #000; }
+.mobile-header-dreta { display: flex; align-items: center; gap: 8px; }
+
+/* ── TELEMETRIA (GPS en viu + espai lliure) ────────────────────── */
+.tele { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tele-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; padding: 0 10px;
+    font-family: var(--font-cond); font-weight: 700; font-size: .86rem; letter-spacing: .4px;
+    color: var(--text); background: none; border: 0; cursor: pointer; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+.tele-chip .ico { font-size: 1rem; opacity: .75; }
+.tele-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-light); flex-shrink: 0; }
+.tele-gps[data-q="ok"]  .tele-dot { background: var(--tele-ok);  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tele-ok) 25%, transparent); }
+.tele-gps[data-q="mig"] .tele-dot { background: var(--tele-mig); }
+.tele-gps[data-q="mal"] .tele-dot { background: var(--tele-mal); }
+.tele-disc[data-q="mal"] { color: var(--tele-mal); }
+.tele-disc[data-q="mig"] { color: var(--tele-mig); }
+.tele-strip { display: none; }
+.topbar .tele { margin-right: 4px; }
+.topbar .tele-chip { height: var(--touch); border: 1.5px solid var(--border); border-radius: var(--radius-btn); background: var(--surface-2); }
+
+/* ── BARRA INFERIOR (mòbil) ────────────────────────────────────── */
+.bnav { display: none; }
+@media (max-width: 768px) {
+    :root { --bn-h: calc(66px + env(safe-area-inset-bottom, 0px)); --tele-h: 30px; }
+    .main-content { margin-top: calc(60px + var(--tele-h)) !important; }
+    .tele-strip {
+        display: flex; justify-content: space-between; align-items: center;
+        position: fixed; top: 60px; left: 0; right: 0; height: var(--tele-h); z-index: 199;
+        padding: 0 8px; background: var(--surface-2); border-bottom: 1px solid var(--border);
+    }
+    .mobile-header { padding: 0 10px 0 14px; }
+    .mobile-brand { font-size: 1.3rem; gap: 8px; min-width: 0; }
+    .page-content { padding-bottom: calc(var(--bn-h) + 88px) !important; }
+    .bnav {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 250;
+        height: var(--bn-h); padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: var(--surface); border-top: 1px solid var(--border);
+        box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+    }
+    .bnav-it {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        min-height: var(--touch); background: none; border: 0; cursor: pointer;
+        font-family: var(--font-cond); font-weight: 700; font-size: .8rem; letter-spacing: .3px;
+        color: var(--text-muted); -webkit-tap-highlight-color: transparent; position: relative;
+    }
+    .bnav-it .ico { font-size: 1.5rem; }
+    .bnav-it.on { color: var(--primary); }
+    .bnav-it.on::before { content: ''; position: absolute; top: 0; left: 22%; right: 22%; height: 3px; border-radius: 0 0 3px 3px; background: var(--primary); }
+    .bnav-it:active { background: var(--bg-alt); }
+    .bnav-nou { color: var(--dark); }
+    .bnav-nou-ico {
+        width: 54px; height: 38px; border-radius: 19px; margin-top: -2px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--primary); color: var(--on-primary);
+        box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .bnav-nou-ico .ico { font-size: 1.45rem; stroke-width: 2.6; }
+    .bnav-nou.fixant .bnav-nou-ico { animation: bnPols .5s ease 2; }
+    body.teclat .bnav { display: none; }
+    body.pkm-on .bnav { z-index: 550; }
+    #pkMapaScreen.active { inset: 0 0 var(--bn-h) 0 !important; height: calc(100dvh - var(--bn-h)) !important; }
+    #fab-foto-rapida { bottom: calc(var(--bn-h) + 16px); }
+    .toast { bottom: calc(var(--bn-h) + 18px); max-width: calc(100vw - 24px); white-space: normal; text-align: center; }
+    .pk-fixa-btn { display: none !important; }    /* al mòbil, fixar PK és el botó central de la barra */
+}
+@keyframes bnPols { 50% { transform: scale(1.18); } }
+
+/* ── SPLASH ràpid ──────────────────────────────────────────────── */
+html.sp-vist #splashScreen { display: none !important; }
+/* Es fon sola als 0,38 s amb una animació CSS (no depèn que el JavaScript estigui lliure) i no bloqueja cap toc */
+#splashScreen { pointer-events: none; animation: spFora .12s linear .38s forwards; }
+@keyframes spFora { to { opacity: 0; } }
+
+/* ── INSTRUMENT PK (odòmetre de precisió) ──────────────────────── */
+.pk-widget-result, #pkMultiArea .pk-multi-main { position: relative; }
+.odo {
+    padding: 10px 10px 22px; border-radius: 12px; position: relative;
+    background: linear-gradient(180deg, #03050a, #0c121d);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 2px 10px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.08);
+}
+.odo::before {   /* escala graduada */
+    content: ''; position: absolute; left: 10px; right: 10px; bottom: 15px; height: 5px; pointer-events: none;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 1px, transparent 1px 8px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.odo-grp { display: flex; gap: clamp(3px, 1.1vw, 6px); min-width: 0; position: relative; }
+.odo-grp::after {
+    content: attr(data-cap); position: absolute; left: 0; right: 0; bottom: -17px; text-align: center;
+    font-family: var(--font-cond); font-weight: 700; font-size: .62rem; letter-spacing: 2.5px; color: rgba(255,255,255,.55);
+    background: #070b12; width: max-content; margin: 0 auto; padding: 0 6px;
+}
+.odo-d::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255,255,255,.14); z-index: 1; }
+.pk-inst {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 10px;
+    background: rgba(255,255,255,.12); border-radius: 10px; overflow: hidden; position: relative; z-index: 1;
+}
+.pk-inst[hidden] { display: none; }
+.pk-inst-c { background: rgba(3,6,12,.82); padding: 7px 4px 6px; text-align: center; min-width: 0; }
+.pk-inst-c small { display: block; font-family: var(--font-cond); font-weight: 700; font-size: .6rem; letter-spacing: 1.8px; color: rgba(255,255,255,.5); }
+.pk-inst-c b { display: block; font-family: var(--font-cond); font-weight: 800; font-size: 1.08rem; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pk-inst-c b[data-q="ok"] { color: #4ade80; } .pk-inst-c b[data-q="mig"] { color: #fbbf24; } .pk-inst-c b[data-q="mal"] { color: #f87171; }
+.pk-inst-coords { grid-column: 1 / -1; background: rgba(3,6,12,.82); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    font-family: var(--font-cond); font-weight: 700; font-size: .92rem; color: #e2e8f0; letter-spacing: .5px; }
+.pk-viu { display: inline-flex; align-items: center; gap: 5px; font-size: .68rem; letter-spacing: 1.5px; color: rgba(255,255,255,.45); }
+.pk-viu i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.pk-viu.on { color: #4ade80; } .pk-viu.on i { background: #4ade80; animation: pkViu 1.4s ease-in-out infinite; }
+@keyframes pkViu { 50% { opacity: .25; } }
+.pk-fixa-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px;
+    min-height: 52px; border-radius: 12px; border: 0; cursor: pointer; position: relative; z-index: 1;
+    background: #facc15; color: #111827; font-family: var(--font-cond); font-weight: 800; font-size: 1.05rem; letter-spacing: 1px; text-transform: uppercase;
+}
+.pk-fixa-btn:active { transform: scale(.98); }
+
+/* ── PUNTS FIXATS ──────────────────────────────────────────────── */
+.pins-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); margin: 0 0 18px; overflow: hidden; }
+.pins-card[hidden] { display: none; }
+.pins-cap { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border);
+    font-family: var(--font-cond); font-weight: 800; font-size: 1rem; letter-spacing: .5px; text-transform: uppercase; color: var(--dark); }
+.pins-cap small { font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--text-muted); font-size: .8rem; }
+.pin-row { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 14px; border-bottom: 1px solid var(--border); }
+.pin-row:last-child { border-bottom: 0; }
+.pin-carr { flex-shrink: 0; min-width: 58px; min-height: var(--touch); padding: 0 8px; border-radius: 8px; border: 0; cursor: pointer;
+    background: var(--ink); color: #fff; font-family: var(--font-cond); font-weight: 800; font-size: 1rem; }
+.pin-carr.pend { background: var(--warning-lt); color: var(--warning); }
+.pin-dades { flex: 1; min-width: 0; }
+.pin-pk { font-family: var(--font-cond); font-weight: 800; font-size: 1.3rem; color: var(--dark); line-height: 1.1; }
+.pin-meta { font-size: .78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pin-acc { display: flex; gap: 6px; flex-shrink: 0; }
+.pin-b { width: var(--touch); height: var(--touch); border-radius: 10px; border: 1.5px solid var(--border-dark); background: var(--surface-2); color: var(--dark);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
+.pin-b.prim { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+.pin-b:active { transform: scale(.94); }
+.pin-xips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 4px; }
+.pin-xip { min-height: var(--touch); padding: 0 14px; border-radius: 24px; border: 1.5px solid var(--border-dark); background: var(--surface-2); color: var(--dark);
+    font-family: var(--font-cond); font-weight: 700; font-size: .95rem; cursor: pointer; }
+
+/* ── ESBORRANYS ────────────────────────────────────────────────── */
+.esb-avis { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; padding: 10px 12px;
+    background: var(--warning-lt); border: 1.5px solid var(--warning); border-radius: var(--radius); color: var(--dark); font-size: .9rem; font-weight: 600; }
+.esb-avis span { flex: 1; min-width: 150px; }
+.esb-avis button { min-height: var(--touch); padding: 0 14px; border-radius: 10px; border: 1.5px solid var(--border-dark); background: var(--surface); color: var(--dark);
+    font-family: var(--font-cond); font-weight: 800; font-size: .92rem; letter-spacing: .4px; cursor: pointer; }
+.esb-avis button.prim { background: var(--warning); border-color: var(--warning); color: #111827; }
+
+/* ── DICTAT PER VEU ────────────────────────────────────────────── */
+.veu-btn { display: inline-flex; align-items: center; gap: 7px; min-height: var(--touch); margin: 6px 0 2px; padding: 0 14px;
+    border-radius: 24px; border: 1.5px solid var(--border-dark); background: var(--surface-2); color: var(--dark);
+    font-family: var(--font-cond); font-weight: 700; font-size: .92rem; letter-spacing: .4px; cursor: pointer; }
+.veu-btn .ico { font-size: 1.15rem; }
+.veu-btn.on { background: var(--danger); border-color: var(--danger); color: #fff; animation: pkViu 1.2s ease-in-out infinite; }
+
+/* ── PROGRÉS REAL D'EXPORTACIÓ ─────────────────────────────────── */
+.sp-prog { width: min(280px, 72vw); height: 10px; border-radius: 6px; background: rgba(255,255,255,.22); overflow: hidden; display: none; }
+.sp-prog i { display: block; height: 100%; width: 0; background: #fff; border-radius: 6px; transition: width .15s linear; }
+.sp-pct { color: #fff; font-family: var(--font-cond); font-weight: 800; font-size: 1.05rem; letter-spacing: 1px; display: none; }
+.spinner-overlay.amb-prog .sp-prog, .spinner-overlay.amb-prog .sp-pct { display: block; }
+.spinner-overlay.amb-prog .spinner { display: none; }
+
+/* ── SECCIÓ TRANSVERSAL (calculadora de normativa) ─────────────── */
+.norm-seccio { margin-top: 14px; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.norm-seccio svg { display: block; width: 100%; height: auto; }
+.norm-seccio text { font-family: var(--font-cond); font-weight: 700; }
+.norm-seccio-peu { font-size: .74rem; color: var(--text-muted); margin-top: 6px; }
+.geo-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.geo-btns .btn { flex: 1; min-width: 140px; margin: 0; }
+.geo-nota { font-size: .8rem; color: var(--text-muted); margin-top: 8px; line-height: 1.45; }
 </style>
     <!-- Preload del seed PKs offline (no bloqueja el render) -->
     <link rel="preload" href="/pk_seed.js" as="script">
@@ -5368,6 +5727,12 @@ html.mou-anim .page-content { overflow: hidden; overflow: clip; }
      ICONES (sprite SVG intern · Fase 1 sistema de disseny)
      ============================================================ -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 7l5 0M12 12l8 0M12 17l5 0"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></symbol>
+  <symbol id="i-disk" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15.5l-5-5L5 21"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.5h7.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></symbol>
@@ -5673,11 +6038,14 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
     function tancar() {
         if (tancat) return; tancat = true;
         s.classList.add('sp-out');
-        setTimeout(() => s.remove(), 480);
+        setTimeout(() => s.remove(), 120);
     }
     s.addEventListener('click', tancar);
-    const reduit = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(tancar, reduit ? 1600 : 2700);
+    /* Només el primer cop de cada sessió, i mig segon com a màxim */
+    let vist = false;
+    try { vist = !!sessionStorage.getItem('dc_splash'); sessionStorage.setItem('dc_splash', '1'); } catch (e) {}
+    if (vist) { tancat = true; s.remove(); }
+    else setTimeout(tancar, 380);
 })();
 </script>
 
@@ -5794,15 +6162,22 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                      class="mobile-brand-logo"
                      onerror="this.style.display='none'">
             </div>
-            <button class="hamburger" onclick="openMobileNav()">
-                <span></span><span></span><span></span>
-            </button>
+            <div class="mobile-header-dreta">
+                <button class="tema-btn" onclick="dcTema()" aria-label="Canviar el tema"><svg class="ico t-clar" aria-hidden="true"><use href="#i-sun"/></svg><svg class="ico t-fosc" aria-hidden="true"><use href="#i-moon"/></svg><svg class="ico t-sol" aria-hidden="true"><use href="#i-contrast"/></svg></button>
+                <button class="hamburger" onclick="openMobileNav()" aria-label="Obrir el menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </header>
+        <!-- TELEMETRIA (mòbil): precisió GPS en viu i espai lliure -->
+        <div class="tele-strip"><button class="tele-chip tele-gps" onclick="dcGpsToc()" aria-live="polite"><i class="tele-dot"></i><span>GPS —</span></button><button class="tele-chip tele-disc" onclick="dcDiscToc()"><svg class="ico" aria-hidden="true"><use href="#i-disk"/></svg><span>Espai —</span></button></div>
 
         <!-- TOPBAR (desktop) -->
         <div class="topbar">
             <div class="topbar-title" id="topbarTitle">Inici</div>
             <div class="topbar-actions">
+                <div class="tele"><button class="tele-chip tele-gps" onclick="dcGpsToc()" aria-live="polite"><i class="tele-dot"></i><span>GPS —</span></button><button class="tele-chip tele-disc" onclick="dcDiscToc()"><svg class="ico" aria-hidden="true"><use href="#i-disk"/></svg><span>Espai —</span></button></div>
+                <button class="tema-btn" onclick="dcTema()" aria-label="Canviar el tema"><svg class="ico t-clar" aria-hidden="true"><use href="#i-sun"/></svg><svg class="ico t-fosc" aria-hidden="true"><use href="#i-moon"/></svg><svg class="ico t-sol" aria-hidden="true"><use href="#i-contrast"/></svg></button>
                 <button class="btn btn-primary btn-sm" onclick="openProjectModal()">➕ Nou Projecte</button>
             </div>
         </div>
@@ -5879,6 +6254,16 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                         </div>
                     </div>
 
+                    <!-- Instrument: dades de la lectura -->
+                    <div class="pk-inst" id="pkInst" hidden>
+                        <div class="pk-inst-c"><small>GPS</small><b id="pkiGps">—</b></div>
+                        <div class="pk-inst-c"><small>A LA VIA</small><b id="pkiEix">—</b></div>
+                        <div class="pk-inst-c"><small>VELOCITAT</small><b id="pkiVel">—</b></div>
+                        <div class="pk-inst-c"><small>LECTURA</small><b id="pkiHora">—</b></div>
+                        <div class="pk-inst-coords"><span id="pkiCoords">—</span><span class="pk-viu" id="pkiViu"><i></i>EN VIU</span></div>
+                    </div>
+                    <button type="button" class="pk-fixa-btn" onclick="dcFixaPK()"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg> Fixar PK actual</button>
+
                     <!-- Missatge d'error / advertència -->
                     <div class="pk-widget-msg" id="pkWidgetMsg" style="display:none;">
                         <span id="pkWidgetMsgIcon">⚠️</span>
@@ -5887,6 +6272,12 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                     </div>
                 </div>
                 <!-- ── /WIDGET ─────────────────────────────────────── -->
+
+                <!-- Punts fixats amb «Nou Punt» / «Fixar PK actual», pendents de completar -->
+                <div class="pins-card" id="pinsCard" hidden>
+                    <div class="pins-cap"><span>Punts fixats</span><small class="pins-n"></small></div>
+                    <div class="pins-llista"></div>
+                </div>
 
                 <div class="action-grid">
                     <div class="action-card primary" onclick="openProjectModal()">
@@ -6402,6 +6793,12 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
                         <div class="action-desc">Informes tècnics de carreteres</div>
                     </div>
                 </div>
+
+                <div class="geo-btns">
+                    <button class="btn btn-secondary" onclick="dcGeoExporta('geojson')"><svg class="ico" aria-hidden="true"><use href="#i-map"/></svg> Exportar GeoJSON</button>
+                    <button class="btn btn-secondary" onclick="dcGeoExporta('kml')"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg> Exportar KML</button>
+                </div>
+                <div class="geo-nota">Tots els registres amb posició (fotos ràpides, punts fixats, projectes i punts d'inventari) en un sol fitxer per a QGIS, ArcGIS o Google Earth.</div>
 
                 <button class="btn btn-ghost" style="margin-top:20px;" onclick="ir('home')">TORNAR A L'INICI</button>
             </div>
@@ -7117,6 +7514,12 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
 <!-- ============================================================
      FAB — FOTO RÀPIDA (visible only on home dashboard)
      ============================================================ -->
+<nav class="bnav" id="bnav" aria-label="Navegació principal">
+    <button class="bnav-it on" data-bn="home" onclick="ir('home')"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span>Inici/PK</span></button>
+    <button class="bnav-it bnav-nou" onclick="dcFixaPK()" aria-label="Nou punt: fixar el PK actual"><span class="bnav-nou-ico"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></span><span>Nou Punt</span></button>
+    <button class="bnav-it" data-bn="pk" onclick="abrirPKMapa()"><svg class="ico" aria-hidden="true"><use href="#i-road"/></svg><span>PK Mapa</span></button>
+    <button class="bnav-it" data-bn="list" onclick="historial()"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg><span>Gestió</span></button>
+</nav>
 <button id="fab-foto-rapida" onclick="modeFotoDirecta()" title="Foto Ràpida" aria-label="Foto Ràpida">
     <svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg>
 </button>
@@ -7996,7 +8399,7 @@ async function saveReg() {
                     const finalImgData = await aplicarMarcaAigua(tmpFotos[idx], watermarkText);
                     zip.file(`${t}_PK${pk}_${idx+1}.jpg`.replace(/[^a-z0-9]/gi,'_'), finalImgData.split(',')[1], {base64:true});
                 }
-                currentBlob = await zip.generateAsync({ type: "blob" });
+                currentBlob = await zip.generateAsync({ type: "blob" }, m => window.dcProgres && dcProgres(m.percent, 100));
                 currentFileName = `Fotos_${t}.zip`.replace(/[^a-z0-9]/gi, '_');
             }
 
@@ -9098,7 +9501,7 @@ async function _dlIncDescarregarZip(incidencies, titolBase, date) {
         n++;
     });
     if (n === 0) return;
-    const blob = await zip.generateAsync({ type: 'blob' });
+    const blob = await zip.generateAsync({ type: 'blob' }, m => window.dcProgres && dcProgres(m.percent, 100));
     const slug = titolBase.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
     _dlDescarregarBlobDirecte(blob, `Fotos_${slug}_${date}.zip`);
 }
@@ -9385,7 +9788,9 @@ async function generarPDFOficialAnimals(fitxes) {
     const { PDFDocument } = PDFLib;
     const templateBytes = await (await fetch(ANIMAL_PDF_TEMPLATE_URL)).arrayBuffer();
     const combinat = await PDFDocument.create();
+    let fet = 0;
     for (const fitxa of fitxes) {
+        if (fitxes.length > 1 && window.dcProgresA) await dcProgresA(fet++, fitxes.length);
         const filled = await _omplirPlantillaOficialAnimal(fitxa, templateBytes);
         const pages = await combinat.copyPages(filled, filled.getPageIndices());
         pages.forEach(p => combinat.addPage(p));
@@ -9965,7 +10370,7 @@ async function descarregarTotesFotos(id) {
             return;
         }
 
-        currentBlob = await zip.generateAsync({ type: "blob" });
+        currentBlob = await zip.generateAsync({ type: "blob" }, m => window.dcProgres && dcProgres(m.percent, 100));
         const slug = p.titulo.replace(/[^a-z0-9]/gi,'_').slice(0,40);
         const date = new Date().toISOString().slice(0,10);
         currentFileName = `Fotos_${slug}_${date}.zip`;
@@ -10169,13 +10574,15 @@ async function generarBlobPDF(p, tipus) {
     }
 
     if (tipus === 'Fitxa') {
-        localRegs.forEach((r, i) => {
+        for (let i = 0; i < localRegs.length; i++) {
+            const r = localRegs[i];
+            if (window.dcProgresA) await dcProgresA(i, localRegs.length);   // progrés real, registre a registre
             if (i > 0) doc.addPage();
 
             // ── ANNEX ──────────────────────────────────────────────
             if (r.tipus === 'annex') {
                 renderAnnexPDF(r);
-                return;
+                continue;
             }
 
             // ── REGISTRE NORMAL ────────────────────────────────────
@@ -10259,7 +10666,8 @@ async function generarBlobPDF(p, tipus) {
             doc.setFontSize(7);
             doc.setTextColor(...GRAY);
             doc.text("DATACAMP — Eina de Recollida de Dades en Camp", 105, 290, { align: 'center' });
-        });
+        }
+        if (window.dcProgres) dcProgres(1, 1);
 
     } else {
         // PDF TAULA — separem registres normals dels annexos
@@ -10372,7 +10780,7 @@ async function exportarBackup() {
         const buida = () => { if (buf.length) { parts.push(new Blob(buf)); buf = []; mida = 0; } };
         const afegeix = t => { buf.push(t); mida += t.length; midaF += t.length; if (mida > 8e6) buida(); };
         const capcal = () => {
-            const c = JSON.stringify({ __datacampBackup: true, version: 3, exportedAt: ara, part: nFitxers + 1, partsDiaris: nFitxers === 0 ? diaris : undefined });
+            const c = JSON.stringify({ __datacampBackup: true, version: 3, exportedAt: ara, part: nFitxers + 1, partsDiaris: nFitxers === 0 ? diaris : undefined, puntsFixats: (nFitxers === 0 && window.dcPins && dcPins().length) ? dcPins() : undefined });
             afegeix(c.slice(0, -1) + ',"stores":{');
             storesAlFitxer = 0;
         };
@@ -10386,6 +10794,8 @@ async function exportarBackup() {
         };
         capcal();
         const compte = {};
+        let totalRegs = 0;
+        for (const st of stores) totalRegs += await new Promise(res => { const q = db.transaction(st).objectStore(st).count(); q.onsuccess = e => res(e.target.result || 0); q.onerror = () => res(0); });
         for (const st of stores) {
             obreStore(st);
             // D'un en un (cada registre en la seva lectura): així es pot fer pausa entre fitxers
@@ -10398,7 +10808,8 @@ async function exportarBackup() {
                 if (!primerItem && midaF + j.length > BK_MIDA_FITXER) { await tancaFitxer(); capcal(); obreStore(st); }
                 afegeix((primerItem ? '' : ',') + '\n' + j);
                 primerItem = false; k++; n++;
-                if (n % 25 === 0) { const sp = document.getElementById('spinnerText'); if (sp) sp.textContent = `PREPARANT CÒPIA... ${n}`; }
+                if (window.dcProgres) dcProgres(n, totalRegs);
+                if (n % 25 === 0) { const sp = document.getElementById('spinnerText'); if (sp) sp.textContent = `PREPARANT CÒPIA... ${n} de ${totalRegs}`; }
             }
             compte[st] = k;
         }
@@ -10445,12 +10856,14 @@ async function _importarBackupV3(file, etiqueta) {
         if (lot.length >= 20) await desa();
     };
     for (let pos = 0; pos < file.size; pos += TROS) {
+        if (window.dcProgres) dcProgres(pos, file.size);
         const txt = resta + dec.decode(await file.slice(pos, pos + TROS).arrayBuffer(), { stream: pos + TROS < file.size });
         const ls = txt.split('\n'); resta = ls.pop();
         for (const l of ls) await linia(l);
     }
     await linia(resta + dec.decode()); await desa();
     if (cap && cap.partsDiaris && typeof pdImportarBackup === 'function') await pdImportarBackup(cap.partsDiaris);
+    if (cap && cap.puntsFixats && window.dcPinsImporta) dcPinsImporta(cap.puntsFixats);
     return nFotos;
 }
 async function _importarBackupsV3(fitxers) {
@@ -10703,7 +11116,8 @@ function _pjIdb(d, st, mode, fn) {
     return new Promise((res, rej) => { const tx = d.transaction(st, mode); const r = fn(tx.objectStore(st)); tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error); });
 }
 function idbGet(store, id) {
-    return new Promise(res => { const q = db.transaction(store).objectStore(store).get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); });
+    return new Promise(res => { const q = db.transaction(store).objectStore(store).get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); })
+        .then(v => (store === 'galeriaFotos' && window.fotoHidrata) ? fotoHidrata(v) : v);   // les fotos de la galeria es desen en binari
 }
 function pjComplet(id) { return idbGet('projects', id); }
 const _pjClaus = new Map();   // clau de cua → [store, id]
@@ -10812,9 +11226,10 @@ function gmObre() {
 }
 function gmMeta(item) { const m = { ...item }; delete m.imgData; delete m.imgRaw; return m; }
 async function gmFesMini(src) {
-    const blob = await (await fetch(src)).blob();
+    const blob = src instanceof Blob ? src : await (await fetch(src)).blob();
     let bmp;
-    try { bmp = await createImageBitmap(blob); } catch (e) { const i = await peCarregaImatge(src); bmp = i; }
+    try { bmp = await createImageBitmap(blob); }
+    catch (e) { const u = src instanceof Blob ? URL.createObjectURL(src) : src; try { bmp = await peCarregaImatge(u); } finally { if (u !== src) setTimeout(() => URL.revokeObjectURL(u), 5000); } }
     const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight;
     const f = Math.min(1, 420 / Math.max(w0, h0));
     const cv = document.createElement('canvas');
@@ -10896,14 +11311,12 @@ function galeriaLlegirFiltrades(filtre, callback) {
 }
 function galeriaSrcMini(it) { return it._src || gmUrl(it); }
 /* La foto sencera (amb imgData / imgRaw) d'una foto de la galeria */
-function galeriaComplet(id) {
-    return new Promise(res => { const q = db.transaction('galeriaFotos').objectStore('galeriaFotos').get(id); q.onsuccess = e => res(e.target.result || null); q.onerror = () => res(null); });
-}
+function galeriaComplet(id) { return idbGet('galeriaFotos', id); }
 /* Intercepta les escriptures a «galeriaFotos» per mantenir les miniatures al dia */
 (function () {
     const P = IDBObjectStore.prototype, put0 = P.put, add0 = P.add, del0 = P.delete, clr0 = P.clear;
     const despres = (st, fn) => { try { st.transaction.addEventListener('complete', fn); } catch (e) {} };
-    P.put = function (v) { const r = put0.apply(this, arguments); if (this.name === 'galeriaFotos' && this.transaction.db.name === 'GencatDinaV5' && v && v.id != null) { const id = v.id; despres(this, () => gmAvisa(id)); } return r; };
+    P.put = function (v) { const r = put0.apply(this, arguments); if (this.name === 'galeriaFotos' && this.transaction.db.name === 'GencatDinaV5' && v && v.id != null && !window._dcSenseMini) { const id = v.id; despres(this, () => gmAvisa(id)); } return r; };
     P.add = function (v) { const r = add0.apply(this, arguments); if (this.name === 'galeriaFotos' && v && v.id != null) { const id = v.id; despres(this, () => gmAvisa(id)); } return r; };
     P.delete = function (k) { const r = del0.apply(this, arguments); if (this.name === 'galeriaFotos' && (typeof k === 'string' || typeof k === 'number')) { despres(this, () => gmAvisa(k)); } return r; };
     P.clear = function () { const r = clr0.apply(this, arguments); if (this.name === 'galeriaFotos') { despres(this, async () => { const d = await gmObre(); if (d) await _gmIdb(d, 'readwrite', st => st.clear()); _gmUrls.forEach(u => URL.revokeObjectURL(u.url)); _gmUrls.clear(); }); } return r; };
@@ -10913,7 +11326,11 @@ function galeriaComplet(id) {
 function galeriaLlegirTotes(callback) {
     if (!db.objectStoreNames.contains("galeriaFotos")) { callback([]); return; }
     const store = db.transaction("galeriaFotos","readonly").objectStore("galeriaFotos");
-    store.getAll().onsuccess = e => callback(e.target.result || []);
+    store.getAll().onsuccess = async e => {
+        const tots = e.target.result || [];
+        if (window.fotoHidrata) for (const f of tots) await fotoHidrata(f);
+        callback(tots);
+    };
 }
 
 /* Renderitza el grid */
@@ -12273,6 +12690,7 @@ function normCalcAnalitzar() {
    FOTO DIRECTA
    ============================================================ */
 function modeFotoDirecta() {
+    if (window.dcPinNet) dcPinNet();
     isFotoDirecta = true;
     tmpFotos = [];
     document.getElementById('fCam').click();
@@ -12460,6 +12878,7 @@ function obrirEditorFotoDirecta(imgData) {
     `;
 
     document.querySelector('.page-content').appendChild(screen);
+    if (!_fdEditId && window.dcPinAFoto) setTimeout(dcPinAFoto, 0);   // si ve d'un punt fixat, n'agafa carretera, PK i posició
 
     // ── Mode edició: precarregar dades de l'ítem existent ──────────
     if (_fdEditId && _fdEditOriginal) {
@@ -13570,7 +13989,7 @@ function initLeafletMap() {
         iconCreateFunction: function(cluster) {
             const count = cluster.getChildCount();
             return L.divIcon({
-                html: `<div style="background:var(--dark);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${count}</div>`,
+                html: `<div style="background:var(--ink);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${count}</div>`,
                 className: '',
                 iconSize: [36,36],
                 iconAnchor: [18,18]
@@ -15230,6 +15649,7 @@ async function executarAutoPKWidget() {
     navigator.geolocation.getCurrentPosition(
         async (pos) => {
             const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+            if (window.dcOdoFix) dcOdoFix(lat, lon, accuracy, true);
             try {
                 let punts = [];
                 const bufferGraus = 0.04;
@@ -17031,13 +17451,26 @@ function pkmBack() {
 
     function pinta(odo, text) {
         const m = /(\d+)\s*\+\s*(\d+)/.exec(text || '');
-        if (!m) { odo.innerHTML = ''; odo.hidden = true; return; }
+        if (!m) { odo.innerHTML = ''; odo.hidden = true; odo.dataset.n = ''; return; }
         odo.hidden = false;
         const km = m[1], metres = m[2].padStart(3, '0').slice(-3);
+        const digits = (km + metres).split(''), forma = String(km.length);
+        const tires = odo.querySelectorAll('.odo-strip');
+        if (odo.dataset.n === forma && tires.length === digits.length) {
+            // Lectura en viu: només giren els tambors que canvien
+            tires.forEach((st, i) => {
+                if (st.dataset.v === digits[i]) return;
+                st.dataset.v = digits[i];
+                st.style.transition = reduit ? 'none' : 'transform .45s cubic-bezier(.2,.8,.2,1)';
+                st.style.transform = 'translateY(calc(var(--h) * -' + (20 + Number(digits[i])) + '))';
+            });
+            return;
+        }
+        odo.dataset.n = forma;
         odo.innerHTML = '<span class="odo-lbl">PK</span>'
-            + km.split('').map(d => tambor(d, '')).join('')
+            + '<span class="odo-grp" data-cap="KM" style="flex:' + km.length + ' 1 0">' + km.split('').map(d => tambor(d, '')).join('') + '</span>'
             + '<span class="odo-sep">+</span>'
-            + metres.split('').map(d => tambor(d, ' m')).join('');
+            + '<span class="odo-grp" data-cap="METRES" style="flex:3 1 0">' + metres.split('').map(d => tambor(d, ' m')).join('') + '</span>';
         void odo.offsetHeight;   // força el reflow perquè la transició arrenqui des de 0
         odo.querySelectorAll('.odo-strip').forEach((st, i) => {
             const passos = 20 + Number(st.dataset.v);       // dues voltes completes i s'atura
@@ -18199,7 +18632,7 @@ async function pdEntregaPdfs(regs, mode, nomZip) {
         if (fitxers.length > 1 && typeof JSZip !== 'undefined') {
             const zip = new JSZip();
             fitxers.forEach(f => zip.file(f.name, f));
-            pdBaixa(await zip.generateAsync({ type: 'blob' }), nomZip || 'comunicats.zip');
+            pdBaixa(await zip.generateAsync({ type: 'blob' }, m => window.dcProgres && dcProgres(m.percent, 100)), nomZip || 'comunicats.zip');
             showToast(fitxers.length + ' comunicats descarregats (' + (nomZip || 'comunicats.zip') + ')');
         } else {
             fitxers.forEach((f, i) => setTimeout(() => pdBaixa(f, f.name), i * 500));
@@ -19652,19 +20085,29 @@ function tancarVisorAnimat() {
 
 <script>
 /* Per a la propera actualització: canvia NV_VERSIO i la llista NV_ITEMS. */
-const NV_VERSIO = '2026.11.2';
-const NV_DATA   = '16-11-2026';
+const NV_VERSIO = '2026.11.3';
+const NV_DATA   = '17-11-2026';
 const NV_KEY    = 'dc_novetats_vistes';
 const NV_ITEMS = [
-    { ico: 'i-file',     to: 'tone-red',   nou: true, t: 'Comunicat oficial en PDF',
+    { ico: 'i-pin',      to: 'tone-red',   nou: true, t: 'Nou Punt: fixa el PK d\'un toc',
+      d: "El botó central de la barra de baix congela la carretera, el PK, les coordenades i l'hora amb una vibració, sense haver d'aturar-te. Després el completes des d'Inici amb una foto, o l'aprofites en un inventari." },
+    { ico: 'i-road',     to: 'tone-blue',  nou: true, t: 'Barra inferior i GPS en viu',
+      d: "Inici, Nou Punt, PK Mapa i Gestió sempre a mà. A dalt veus la precisió del GPS i l'espai lliure, i el comptador de PK es posa al dia sol mentre et mous." },
+    { ico: 'i-sun',      to: 'tone-amber', nou: true, t: 'Mode sol i mode fosc',
+      d: "El botó del sol canvia entre clar, fosc i alt contrast, per llegir la pantalla a ple sol. Els botons són més grans, pensats per fer-los servir amb guants." },
+    { ico: 'i-mic',      to: 'tone-violet', nou: true, t: 'Dictat i esborranys',
+      d: "Dicta les observacions amb el micròfon. I si l'app es tanca a mig formulari, en tornar-hi et proposa recuperar el que havies escrit." },
+    { ico: 'i-map',      to: 'tone-teal',  nou: true, t: 'GeoJSON, KML i secció transversal',
+      d: "A Descàrregues pots exportar tots els punts amb posició per a QGIS o Google Earth. La calculadora de normativa dibuixa la secció amb les zones de protecció, i les exportacions mostren el progrés real." },
+    { ico: 'i-file',     to: 'tone-red',   t: 'Comunicat oficial en PDF',
       d: "El comunicat diari de vigilància amb el mateix format, logo i nom de fitxer que l'oficial. Es comparteix o es descarrega d'un toc, d'un dia o de tota la setmana." },
-    { ico: 'i-folder',   to: 'tone-violet', nou: true, t: 'Expedients ITC amb annex',
+    { ico: 'i-folder',   to: 'tone-violet', t: 'Expedients ITC amb annex',
       d: "Poses el codi de l'expedient un cop i hi tens l'informe i l'annex fotogràfic junts. Les fotos s'agafen de la galeria de l'app amb el seu PK, i s'envien amb el nom oficial." },
-    { ico: 'i-edit',     to: 'tone-amber', nou: true, t: 'Editor de fotos',
+    { ico: 'i-edit',     to: 'tone-amber', t: 'Editor de fotos',
       d: "Retalla, gira, redreça i marca les fotos amb cercles, fletxes, requadres i text. Toca qualsevol miniatura (galeria, inventari, annex, ITC o fitxa d'animal) i prem «Editar». En acabar tries: substituir l'original o desar-la com a còpia i conservar les dues." },
-    { ico: 'i-map',      to: 'tone-blue',  nou: true, t: 'Rutes favorites',
+    { ico: 'i-map',      to: 'tone-blue',  t: 'Rutes favorites',
       d: 'Desa les teves rutes amb el nom que vulguis i, cada dia, carrega tots els trams de cop.' },
-    { ico: 'i-road',     to: 'tone-teal',  nou: true, t: 'Comunicats de treball',
+    { ico: 'i-road',     to: 'tone-teal',  t: 'Comunicats de treball',
       d: "Apunta cada dia els trams fets (carretera, marge i PK), els dies de festa i exporta-ho al calendari." },
     { ico: 'i-shield',   to: 'tone-green', t: 'Sense seguiment GPS',
       d: "Els comunicats només guarden el que escrius tu. La teva ubicació no es registra mai." },
@@ -19707,6 +20150,678 @@ function nvTancar() {
         if (ocupat && intents++ < 60) return setTimeout(espera, 300);
         setTimeout(nvObrir, 250);
     })();
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   FASE 2 · EINES DE CAMP
+   Tema, telemetria (GPS en viu + espai lliure), barra inferior,
+   instrument PK en viu, punts fixats, fotos en binari, esborranys,
+   dictat per veu, progrés real, secció transversal i GeoJSON / KML.
+   Tot s'afegeix per sobre: no canvia l'estructura de GencatDinaV5.
+   ══════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const LS = {
+    get(k, d = null) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const vibra = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const p2 = n => String(n).padStart(2, '0');
+const fmtData = t => { const d = new Date(t); return `${p2(d.getDate())}-${p2(d.getMonth() + 1)}-${d.getFullYear()}`; };
+const fmtHora = (t, seg) => { const d = new Date(t); return `${p2(d.getHours())}:${p2(d.getMinutes())}` + (seg ? `:${p2(d.getSeconds())}` : ''); };
+const fmtPK = (km, m) => `${km}+${String(m).padStart(3, '0')}`;
+const qualitat = acc => acc <= 10 ? 'ok' : acc <= 30 ? 'mig' : 'mal';
+const fmtMida = b => b >= 1e9 ? (b / 1e9).toFixed(1).replace('.', ',') + ' GB' : Math.max(0, Math.round(b / 1e6)) + ' MB';
+
+/* ── TEMA: clar → fosc → sol ───────────────────────────────────── */
+const TEMES = ['light', 'dark', 'sunlight'];
+const TEMA_NOM = { light: '☀️ Mode clar', dark: '🌙 Mode fosc', sunlight: '🔆 Mode sol · alt contrast' };
+const TEMA_BARRA = { light: '#c60c30', dark: '#0b1220', sunlight: '#000000' };
+function temaActual() { const t = document.documentElement.getAttribute('data-theme'); return TEMES.includes(t) ? t : 'light'; }
+function temaAplica(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', TEMA_BARRA[t]);
+    document.querySelectorAll('.tema-btn').forEach(b => b.setAttribute('aria-label', 'Canviar el tema. Ara: ' + TEMA_NOM[t].replace(/^\S+\s/, '')));
+}
+window.dcTema = function () {
+    const t = TEMES[(TEMES.indexOf(temaActual()) + 1) % TEMES.length];
+    LS.set('dc_tema', t); temaAplica(t); vibra(12);
+    if (typeof showToast === 'function') showToast(TEMA_NOM[t]);
+};
+temaAplica(temaActual());
+
+/* ── TELEMETRIA · GPS en viu ───────────────────────────────────── */
+const gps = window.dcGps = { fix: null, estat: 'off', watch: null };
+function gpsPinta() {
+    const f = gps.fix, fresc = f && Date.now() - f.ts < 60000;   // el GPS només avisa quan la posició canvia
+    let txt, q = '';
+    if (gps.estat === 'no') txt = 'GPS no disponible';
+    else if (gps.estat === 'denegat') { txt = 'GPS sense permís'; q = 'mal'; }
+    else if (gps.estat === 'off') txt = 'GPS · toca per activar';
+    else if (!fresc) txt = 'GPS cercant…';
+    else { txt = 'GPS ±' + Math.round(f.acc) + ' m'; q = qualitat(f.acc); }
+    document.querySelectorAll('.tele-gps').forEach(el => { el.dataset.q = q; el.lastElementChild.textContent = txt; });
+}
+function gpsInicia() {
+    if (!navigator.geolocation) { gps.estat = 'no'; return gpsPinta(); }
+    if (gps.watch != null) return;
+    gps.estat = 'cerca'; gpsPinta();
+    gps.watch = navigator.geolocation.watchPosition(pos => {
+        const c = pos.coords;
+        gps.fix = { lat: c.latitude, lon: c.longitude, acc: c.accuracy, vel: c.speed, ts: Date.now() };
+        gps.estat = 'on'; gpsPinta(); odoViu(gps.fix);
+    }, err => {
+        if (err.code === 1) { gps.estat = 'denegat'; gpsAtura(true); }
+        gpsPinta();
+    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+}
+function gpsAtura(mantenEstat) {
+    if (gps.watch != null) { try { navigator.geolocation.clearWatch(gps.watch); } catch (e) {} gps.watch = null; }
+    if (!mantenEstat) gps.estat = 'off';
+    gpsPinta();
+}
+/* Amb el GPS en viu en marxa, la resta de l'app (Auto-PK, foto ràpida, inventari…) rep la posició a l'instant:
+   el navegador no torna a donar un fix a qui el demana a part fins que la posició canvia. */
+if (navigator.geolocation) {
+    const geo = navigator.geolocation, demana0 = geo.getCurrentPosition.bind(geo);
+    const posDe = f => ({ coords: { latitude: f.lat, longitude: f.lon, accuracy: f.acc, altitude: null, altitudeAccuracy: null, heading: null, speed: f.vel == null ? null : f.vel }, timestamp: f.ts });
+    try {
+        geo.getCurrentPosition = function (ok, ko, opt) {
+            const f = gps.fix;
+            if (gps.watch != null && f && Date.now() - f.ts <= 15000) { setTimeout(() => ok(posDe(f)), 0); return; }
+            demana0(ok, err => {
+                const g = gps.fix;
+                if (gps.watch != null && g && Date.now() - g.ts <= 120000 && err && err.code !== 1) ok(posDe(g));
+                else if (ko) ko(err);
+            }, opt);
+        };
+    } catch (e) {}
+}
+async function gpsAuto() {      // només s'engega sol si el permís ja està donat (no demana res en obrir)
+    if (document.hidden || gps.watch != null || !navigator.geolocation) return;
+    try {
+        const p = await navigator.permissions.query({ name: 'geolocation' });
+        if (p.state === 'granted') gpsInicia();
+        else if (p.state === 'denied') { gps.estat = 'denegat'; gpsPinta(); }
+    } catch (e) {}
+}
+window.dcGpsToc = function () {
+    if (gps.watch == null) { gpsInicia(); return; }
+    const f = gps.fix;
+    showToast(f ? `📡 ${f.lat.toFixed(5)}, ${f.lon.toFixed(5)} · ±${Math.round(f.acc)} m` : '📡 Cercant senyal GPS…');
+};
+document.addEventListener('visibilitychange', () => { if (document.hidden) gpsAtura(gps.estat === 'denegat'); else { gpsAuto(); discPinta(); } });
+
+/* ── TELEMETRIA · espai lliure ─────────────────────────────────── */
+let disc = null;
+async function discPinta() {
+    let txt = 'Espai —', q = '';
+    try {
+        if (navigator.storage && navigator.storage.estimate) {
+            const e = await navigator.storage.estimate();
+            disc = { quota: e.quota || 0, us: e.usage || 0 };
+            const lliure = Math.max(0, disc.quota - disc.us);
+            txt = 'Lliure ' + fmtMida(lliure); q = lliure < 3e8 ? 'mal' : lliure < 1.5e9 ? 'mig' : '';
+        }
+    } catch (e) {}
+    document.querySelectorAll('.tele-disc').forEach(el => { el.dataset.q = q; el.lastElementChild.textContent = txt; });
+}
+window.dcDiscToc = async function () {
+    await discPinta();
+    if (!disc) return showToast('Aquest navegador no informa de l\'espai');
+    let prot = ''; try { prot = (await navigator.storage.persisted()) ? ' · dades protegides' : ''; } catch (e) {}
+    showToast(`💾 DataCamp ocupa ${fmtMida(disc.us)} · lliure ${fmtMida(disc.quota - disc.us)}${prot}`);
+};
+
+/* ── BARRA INFERIOR ────────────────────────────────────────────── */
+const BN = { home: 'home', pkMapaScreen: 'pk', list: 'list', gestioLlista: 'list', projectDetail: 'list', puntsLlistat: 'list' };
+function navSync(id) {
+    document.querySelectorAll('.bnav-it[data-bn]').forEach(b => b.classList.toggle('on', b.dataset.bn === BN[id]));
+    document.body.classList.toggle('pkm-on', id === 'pkMapaScreen');
+    if (id === 'home') pinsPinta();
+}
+if (typeof window.ir === 'function') {
+    const ir0 = window.ir;
+    window.ir = function (id) { const r = ir0.apply(this, arguments); try { navSync(id); } catch (e) {} return r; };
+}
+if (window.visualViewport) {
+    const vv = window.visualViewport;
+    vv.addEventListener('resize', () => document.body.classList.toggle('teclat', vv.height < window.innerHeight - 140));
+}
+
+/* ── PK des de dades locals (memòria, sense tornar a llegir el disc) ── */
+let _pkLoc = null, _pkLocT = 0, _pkPerCarr = null;
+function pkLocals() {
+    if (_pkLoc && Date.now() - _pkLocT < 3e5) return _pkLoc;
+    let c = null; try { c = autopkCarregarCache(); } catch (e) {}
+    if (!(Array.isArray(c) && c.length)) { try { cercarEnSeed(0, 0, 0); c = _pkSeedMemoria || []; } catch (e) { c = []; } }
+    if (!c.length) return c;      // les dades encara no s'han carregat: no es recorda el buit
+    _pkLoc = c; _pkLocT = Date.now(); _pkPerCarr = null;
+    return c;
+}
+function pkAProp(lat, lon, buf) { return pkLocals().filter(p => p.lat >= lat - buf && p.lat <= lat + buf && p.lon >= lon - buf && p.lon <= lon + buf); }
+function pkCalcula(lat, lon, punts) { return calcularPKperCarreteraWidget(lat, lon, blacklistFiltrarPunts(punts)); }
+async function pkDe(lat, lon) {
+    let r = pkCalcula(lat, lon, pkAProp(lat, lon, 0.06));
+    if (!r.length && navigator.onLine) {
+        try { let pts = await consultarArcGIS(lat, lon, 0.04); if (!pts.length) pts = await consultarArcGIS(lat, lon, 0.10); r = pkCalcula(lat, lon, pts); } catch (e) {}
+    }
+    if (!r.length) r = pkCalcula(lat, lon, pkAProp(lat, lon, 0.12));
+    return r;
+}
+/* Posició aproximada d'un PK (interpolant les fites que hi ha al mòbil) */
+function posDePK(carr, pkTxt) {
+    const m = /(\d+)\s*\+\s*(\d+)/.exec(String(pkTxt || '')); if (!m || !carr) return null;
+    const pk = Number(m[1]) + Number(m[2]) / 1000, nom = String(carr).trim().toUpperCase();
+    const pts = pkLocals();      // (pot refrescar les dades i buidar l'índex: s'ha de cridar abans)
+    if (!_pkPerCarr) { _pkPerCarr = new Map(); for (const p of pts) { const k = String(p.carretera).toUpperCase(); if (!_pkPerCarr.has(k)) _pkPerCarr.set(k, []); _pkPerCarr.get(k).push(p); } _pkPerCarr.forEach(a => a.sort((x, y) => x.pk - y.pk)); }
+    const a = _pkPerCarr.get(nom); if (!a || !a.length) return null;
+    for (let i = 0; i < a.length - 1; i++) if (a[i].pk <= pk && a[i + 1].pk >= pk) {
+        if (a[i + 1].pk - a[i].pk > 3) break;            // fites massa separades: no és fiable
+        const t = (pk - a[i].pk) / ((a[i + 1].pk - a[i].pk) || 1);
+        return [a[i].lat + t * (a[i + 1].lat - a[i].lat), a[i].lon + t * (a[i + 1].lon - a[i].lon)];
+    }
+    const prop = a.reduce((x, y) => Math.abs(y.pk - pk) < Math.abs(x.pk - pk) ? y : x);
+    return Math.abs(prop.pk - pk) <= 0.6 ? [prop.lat, prop.lon] : null;
+}
+
+/* ── INSTRUMENT PK: dades del fix i lectura en viu ─────────────── */
+let instFix = null, viuDarrer = null, viuT = 0;
+window.dcOdoFix = function (lat, lon, acc, manual) {
+    instFix = { lat, lon, acc, vel: gps.fix && Date.now() - gps.fix.ts < 5000 ? gps.fix.vel : null, ts: Date.now() };
+    if (manual) { document.querySelectorAll('.odo').forEach(o => { o.dataset.n = ''; }); viuDarrer = { lat, lon }; viuT = Date.now(); }
+    instPinta();
+};
+function widgetAmbResultat() {
+    const a = $('pkWidgetResult'), b = $('pkMultiArea');
+    return (a && a.style.display !== 'none') || (b && b.style.display !== 'none');
+}
+function instPinta() {
+    const el = $('pkInst'); if (!el) return;
+    const mostra = widgetAmbResultat() && instFix;
+    el.hidden = !mostra; if (!mostra) return;
+    const sel = (typeof _pkWidgetSelected !== 'undefined') ? _pkWidgetSelected : null;
+    const g = $('pkiGps'); g.textContent = '±' + Math.round(instFix.acc) + ' m'; g.dataset.q = qualitat(instFix.acc);
+    $('pkiEix').textContent = sel ? Math.round(sel.dist) + ' m' : '—';
+    $('pkiVel').textContent = instFix.vel != null && instFix.vel >= 0.5 ? Math.round(instFix.vel * 3.6) + ' km/h' : '—';
+    $('pkiHora').textContent = fmtHora(instFix.ts, true);
+    $('pkiCoords').textContent = instFix.lat.toFixed(5) + ', ' + instFix.lon.toFixed(5);
+    $('pkiViu').classList.toggle('on', gps.watch != null && !!gps.fix && Date.now() - gps.fix.ts < 60000);
+}
+function odoViu(f) {      // el GPS es mou → l'odòmetre es posa al dia sol (només amb dades del mòbil)
+    try {
+        if (!widgetAmbResultat() || !$('home').classList.contains('active') || document.hidden) return;
+        if (typeof _pkWidgetRunning !== 'undefined' && _pkWidgetRunning) return;
+        if (Date.now() - viuT < 1500) return;
+        if (viuDarrer && haversineM(f.lat, f.lon, viuDarrer.lat, viuDarrer.lon) < 4) { instFix = { ...f }; return instPinta(); }
+        const r = pkCalcula(f.lat, f.lon, pkAProp(f.lat, f.lon, 0.06));
+        viuT = Date.now(); viuDarrer = { lat: f.lat, lon: f.lon };
+        if (!r.length) return;
+        const abans = (typeof _pkWidgetSelected !== 'undefined' && _pkWidgetSelected) ? _pkWidgetSelected.carretera : null;
+        _pkWidgetResultats = r;
+        if (r.length === 1) pkWidgetMostrarResultat(r[0]);
+        else { pkWidgetMostrarChips(r); const i = _pkWidgetResultats.findIndex(x => x.carretera === abans); if (i > 0) pkWidgetSeleccionarMini(i); }
+        instFix = { ...f }; instPinta();
+    } catch (e) { console.warn('[odo viu]', e); }
+}
+
+/* ── PUNTS FIXATS (pin drop) ───────────────────────────────────── */
+const PINS_KEY = 'dc_punts_fixats';
+function pinsLlegeix() { try { const a = JSON.parse(LS.get(PINS_KEY, '[]')); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function pinsDesa(a) { LS.set(PINS_KEY, JSON.stringify(a)); pinsPinta(); }
+window.dcPins = pinsLlegeix;
+window.dcPinsImporta = function (llista) {
+    if (!Array.isArray(llista)) return;
+    const a = pinsLlegeix(), ids = new Set(a.map(p => p.id));
+    llista.forEach(p => { if (p && p.id && !ids.has(p.id)) a.push(p); });
+    pinsDesa(a);
+};
+function pinTxt(p) { return p.carr ? `${p.carr} PK ${fmtPK(p.km, p.m)}` : 'PK pendent'; }
+function pinsPinta() {
+    const c = $('pinsCard'); if (!c) return;
+    const a = pinsLlegeix().sort((x, y) => y.ts - x.ts);
+    c.hidden = !a.length; if (!a.length) { c.querySelector('.pins-llista').innerHTML = ''; return; }
+    c.querySelector('.pins-n').textContent = a.length + (a.length === 1 ? ' pendent de completar' : ' pendents de completar');
+    c.querySelector('.pins-llista').innerHTML = a.map(p => `
+        <div class="pin-row">
+            <button class="pin-carr${p.carr ? '' : ' pend'}" onclick="dcPinCarr('${p.id}')" aria-label="${p.carr ? 'Carretera ' + esc(p.carr) + (p.alt && p.alt.length ? '. Toca per canviar-la' : '') : 'Tornar a calcular el PK'}">${p.carr ? esc(p.carr) + (p.alt && p.alt.length ? ' ⇄' : '') : '↻'}</button>
+            <div class="pin-dades">
+                <div class="pin-pk">${p.carr ? 'PK ' + fmtPK(p.km, p.m) : 'PK pendent'}</div>
+                <div class="pin-meta">${fmtHora(p.ts, true)}${fmtData(p.ts) !== fmtData(Date.now()) ? ' · ' + fmtData(p.ts) : ''} · ±${Math.round(p.acc)} m</div>
+            </div>
+            <div class="pin-acc">
+                <button class="pin-b prim" onclick="dcPinFoto('${p.id}')" aria-label="Completar amb una foto ràpida"><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg></button>
+                <button class="pin-b" onclick="dcPinCopia('${p.id}')" aria-label="Copiar les dades del punt"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg></button>
+                <button class="pin-b" onclick="dcPinEsborra('${p.id}')" aria-label="Esborrar el punt"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+            </div>
+        </div>`).join('');
+}
+async function pinResol(id) {
+    const a = pinsLlegeix(), p = a.find(x => x.id === id); if (!p) return null;
+    const r = await pkDe(p.lat, p.lon);
+    if (!r.length) return p;
+    const b = pinsLlegeix(), q = b.find(x => x.id === id); if (!q) return null;
+    q.carr = r[0].carretera; q.km = r[0].km; q.m = r[0].m; q.dist = Math.round(r[0].dist);
+    q.alt = r.slice(1, 4).map(x => ({ carr: x.carretera, km: x.km, m: x.m, dist: Math.round(x.dist) }));
+    pinsDesa(b); return q;
+}
+let fixant = false;
+window.dcFixaPK = async function () {
+    if (fixant) return; fixant = true;
+    const t = Date.now();
+    vibra([35, 45, 35]);
+    document.querySelectorAll('.bnav-nou').forEach(b => { b.classList.remove('fixant'); void b.offsetWidth; b.classList.add('fixant'); });
+    try {
+        // Es congela el fix del moment del toc. Si el GPS en viu no està en marxa, es demana un fix nou.
+        // (Amb el GPS en viu, si no arriba cap fix nou és que no t'has mogut: el darrer és bo.)
+        let f = gps.fix && gps.watch != null && t - gps.fix.ts < 30000 ? { ...gps.fix, ts: t } : null;
+        if (!f && navigator.geolocation) {
+            f = await new Promise(res => navigator.geolocation.getCurrentPosition(
+                pos => res({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy, ts: Date.now() }),
+                () => res(null), { enableHighAccuracy: true, timeout: 9000, maximumAge: 3000 }));
+            if (f && gps.watch == null) gpsAuto();
+            if (!f && gps.fix && t - gps.fix.ts < 120000) f = { ...gps.fix, ts: t };
+        }
+        if (!f) { vibra(200); showToast('📡 Sense senyal GPS: no s\'ha pogut fixar el punt'); return; }
+        const pin = { id: 'pin_' + t + '_' + Math.random().toString(36).slice(2, 5), ts: t, lat: +f.lat.toFixed(6), lon: +f.lon.toFixed(6), acc: Math.round(f.acc), retard: Math.max(0, Math.round((f.ts - t) / 1000)), carr: '', km: null, m: null, alt: [] };
+        const a = pinsLlegeix(); a.push(pin);
+        if (!LS.set(PINS_KEY, JSON.stringify(a))) { showToast('⚠️ No s\'ha pogut desar el punt (memòria plena)'); return; }
+        pinsPinta();
+        showToast('📍 Punt fixat · ' + fmtHora(t, true));
+        // El PK es calcula a part: així es pot fixar un altre punt de seguida
+        pinResol(pin.id).then(q => {
+            if (q && q.carr) { vibra(20); showToast(`📍 ${pinTxt(q)} fixat · ${fmtHora(t, true)}`); }
+            else { showToast('📍 Punt fixat. El PK es calcularà quan hi hagi dades de la zona'); [6000, 30000].forEach(ms => setTimeout(() => { const p = pinsLlegeix().find(x => x.id === pin.id); if (p && !p.carr) pinResol(pin.id); }, ms)); }
+        }).catch(() => {});
+    } finally { fixant = false; }
+};
+window.dcPinCarr = async function (id) {
+    const a = pinsLlegeix(), p = a.find(x => x.id === id); if (!p) return;
+    if (!p.carr) { showToast('🔎 Calculant el PK…'); const q = await pinResol(id); showToast(q && q.carr ? `📍 ${pinTxt(q)}` : 'Encara no hi ha dades d\'aquesta zona'); return; }
+    if (!p.alt || !p.alt.length) return;
+    const nou = p.alt.shift(); p.alt.push({ carr: p.carr, km: p.km, m: p.m, dist: p.dist });
+    p.carr = nou.carr; p.km = nou.km; p.m = nou.m; p.dist = nou.dist;
+    pinsDesa(a); showToast(`📍 ${pinTxt(p)}`);
+};
+window.dcPinCopia = async function (id) {
+    const p = pinsLlegeix().find(x => x.id === id); if (!p) return;
+    const txt = `${pinTxt(p)} · ${p.lat.toFixed(5)}, ${p.lon.toFixed(5)} · ${fmtData(p.ts)} ${fmtHora(p.ts)}`;
+    try { await navigator.clipboard.writeText(txt); showToast('📋 Copiat: ' + txt); } catch (e) { showToast(txt); }
+};
+window.dcPinEsborra = function (id) {
+    const p = pinsLlegeix().find(x => x.id === id); if (!p) return;
+    if (!confirm(`Esborrar el punt fixat ${pinTxt(p)} (${fmtHora(p.ts)})?`)) return;
+    pinsDesa(pinsLlegeix().filter(x => x.id !== id));
+};
+function pinTreu(id) { pinsDesa(pinsLlegeix().filter(x => x.id !== id)); }
+/* Completar amb foto ràpida: la foto s'obre amb la carretera, el PK i la posició del punt */
+let pinFoto = null;
+window.dcPinFoto = function (id) {
+    const p = pinsLlegeix().find(x => x.id === id); if (!p) return;
+    modeFotoDirecta();
+    pinFoto = { id, t: Date.now() };
+};
+window.dcPinNet = function () { pinFoto = null; };
+window.dcPinAFoto = function () {      // cridat quan s'obre la pantalla de la foto ràpida nova
+    const pf = pinFoto; pinFoto = null;
+    if (!pf || Date.now() - pf.t > 3e5) return;
+    const p = pinsLlegeix().find(x => x.id === pf.id), sc = $('screen-foto-directa'); if (!p || !sc) return;
+    sc.dataset.pin = p.id;
+    if (p.carr) { const c = $('fd_carretera'), k = $('fd_pk'); if (c) c.value = p.carr; if (k) k.value = fmtPK(p.km, p.m); }
+    try { _fdLastLat = p.lat; _fdLastLon = p.lon; } catch (e) {}
+    showToast(`📍 Dades del punt fixat: ${pinTxt(p)}`);
+};
+/* Al formulari d'inventari: xips per omplir carretera i PK amb un punt fixat */
+let pinForm = null;
+function pinsFormPinta() {
+    const f = $('form'); if (!f) return;
+    let cont = $('pinsForm');
+    const a = f.classList.contains('active') && typeof fields !== 'undefined' && fields.some(x => x.type === 'carretera' || x.type === 'pk') ? pinsLlegeix().filter(p => p.carr) : [];
+    if (!a.length) { if (cont) cont.remove(); return; }
+    const sig = a.map(p => p.id + p.carr + p.km + p.m).join('|') + '#' + (pinForm || '');
+    if (cont && cont.dataset.sig === sig) return;
+    if (!cont) { cont = document.createElement('div'); cont.id = 'pinsForm'; const ref = $('autopkChipsArea'); if (!ref) return; ref.parentNode.insertBefore(cont, ref); }
+    cont.dataset.sig = sig;
+    cont.innerHTML = '<label style="margin-top:6px;">Punts fixats</label><div class="pin-xips">' + a.sort((x, y) => y.ts - x.ts).map(p =>
+        `<button type="button" class="pin-xip" onclick="dcPinAForm('${p.id}')">📍 ${esc(pinTxt(p))} · ${fmtHora(p.ts)}${pinForm === p.id ? ' ✓' : ''}</button>`).join('') + '</div>';
+}
+window.dcPinAForm = function (id) {
+    const p = pinsLlegeix().find(x => x.id === id); if (!p || !p.carr) return;
+    autopkOmplirCamps(p.carr, p.km, p.m);
+    pinForm = id; pinsFormPinta(); esbMarca($('form'));
+    showToast(`📍 ${pinTxt(p)} aplicat`);
+};
+
+/* ── FOTOS EN BINARI (Blob) A LA GALERIA ───────────────────────────
+   Les fotos de «galeriaFotos» es guarden com a Blob i no com a text
+   base64: ocupen un 25 % menys i no carreguen la memòria amb textos
+   gegants. La resta de l'app continua rebent la foto com sempre:
+   la conversió es fa en llegir (idbGet / galeriaComplet). */
+const esFotoTxt = v => typeof v === 'string' && v.startsWith('data:image/') && v.indexOf(';base64,') > 0;
+function fotoABlob(s) {
+    const i = s.indexOf(','), mime = (/^data:([^;,]+)/.exec(s) || [])[1] || 'image/jpeg';
+    const bin = atob(s.slice(i + 1)), n = bin.length, u = new Uint8Array(n);
+    for (let k = 0; k < n; k++) u[k] = bin.charCodeAt(k);
+    return new Blob([u], { type: mime });
+}
+function blobAText(b) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); }); }
+window.fotoHidrata = async function (rec) {
+    if (rec && typeof rec === 'object') for (const k of ['imgData', 'imgRaw']) if (rec[k] instanceof Blob) rec[k] = await blobAText(rec[k]);
+    return rec;
+};
+const STORES_APP = { projects: 1, galeriaFotos: 1, animalsIncidencies: 1, itcInformes: 1 };
+(function () {
+    const P = IDBObjectStore.prototype, put1 = P.put, add1 = P.add;
+    const prepara = (st, v) => {
+        let db0 = ''; try { db0 = st.transaction.db.name; } catch (e) {}
+        if (db0 === 'GencatDinaV5' && STORES_APP[st.name]) { const nom = st.name; try { st.transaction.addEventListener('complete', () => esbDesat(nom)); } catch (e) {} }
+        else if (db0 === 'DataCampPartsDiaris') { try { st.transaction.addEventListener('complete', () => esbDesat('partsDiaris')); } catch (e) {} }
+        if (db0 === 'GencatDinaV5' && st.name === 'galeriaFotos' && v && (esFotoTxt(v.imgData) || esFotoTxt(v.imgRaw))) {
+            try {
+                const c = { ...v };
+                if (esFotoTxt(c.imgData)) c.imgData = fotoABlob(c.imgData);
+                if (esFotoTxt(c.imgRaw)) c.imgRaw = (v.imgRaw === v.imgData) ? c.imgData : fotoABlob(c.imgRaw);
+                return c;
+            } catch (e) { console.warn('[foto blob]', e); }
+        }
+        return v;
+    };
+    P.put = function (v) { const a = Array.prototype.slice.call(arguments); a[0] = prepara(this, v); return put1.apply(this, a); };
+    P.add = function (v) { const a = Array.prototype.slice.call(arguments); a[0] = prepara(this, v); return add1.apply(this, a); };
+})();
+/* Passa a binari, de mica en mica i en segon pla, les fotos que ja hi havia */
+async function fotosMigra() {
+    if (LS.get('dc_fotos_blob') === '1' || typeof db === 'undefined' || !db || !db.objectStoreNames.contains('galeriaFotos')) return;
+    const tx = m => db.transaction('galeriaFotos', m).objectStore('galeriaFotos');
+    const req = q => new Promise((res, rej) => { q.onsuccess = e => res(e.target.result); q.onerror = e => rej(e.target.error); });
+    try {
+        const claus = await req(tx('readonly').getAllKeys());
+        for (const k of claus) {
+            while (document.hidden) await new Promise(r => setTimeout(r, 3000));
+            const v = await req(tx('readonly').get(k));
+            if (v && (esFotoTxt(v.imgData) || esFotoTxt(v.imgRaw))) {
+                await new Promise((res, rej) => {
+                    const t = db.transaction('galeriaFotos', 'readwrite');
+                    // Es torna a llegir dins la mateixa transacció: si entremig s'ha editat la foto, no es trepitja
+                    const st = t.objectStore('galeriaFotos');
+                    st.get(k).onsuccess = e => { const ara = e.target.result; if (!ara) return; window._dcSenseMini = true; try { st.put(ara); } finally { window._dcSenseMini = false; } };
+                    t.oncomplete = res; t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+                });
+            }
+            await new Promise(r => setTimeout(r, 25));
+        }
+        LS.set('dc_fotos_blob', '1');
+    } catch (e) { console.warn('[fotos→blob] es reprendrà més tard', e); }
+}
+window.dcFotosMigra = fotosMigra;
+
+/* ── ESBORRANYS (autodesat cada 500 ms) ────────────────────────────
+   Només el text i les opcions dels formularis (les fotos no hi caben).
+   Si l'app es tanca a mig omplir, en tornar-hi s'ofereix recuperar-lo. */
+const ESB = [
+    { clau: 'form', sel: '#form', store: 'projects', ctx: () => (typeof curId !== 'undefined' ? curId : '') + ':' + (typeof editIdx !== 'undefined' ? editIdx : '') },
+    { clau: 'foto', sel: '#screen-foto-directa', store: 'galeriaFotos', ctx: () => (typeof _fdEditId !== 'undefined' && _fdEditId) || 'nova' },
+    { clau: 'animal', sel: '#screen-fitxa-animal', store: 'animalsIncidencies', ctx: () => (typeof _animalEditId !== 'undefined' && _animalEditId) || 'nova' },
+    { clau: 'itc', sel: '#screen-informe-itc', store: 'itcInformes', ctx: () => (typeof _itcEditId !== 'undefined' && _itcEditId) || 'nou' },
+    { clau: 'obra', sel: '#obraModal', store: 'projects', ctx: () => '' },
+    { clau: 'pd', sel: '#pdDiaSheet', store: 'partsDiaris', ctx: () => (typeof pdEdicio !== 'undefined' && pdEdicio && pdEdicio.original) || 'nou' }
+];
+const esbEstat = new Map();     // clau → { el, vist, brut, avis }
+const esbCamps = el => Array.from(el.querySelectorAll('input, textarea, select')).filter(c => !/^(file|hidden|button|submit|password|range)$/.test(c.type) && !c.closest('.esb-avis'));
+const esbClau = (c, i) => c.id || c.name || ((c.dataset.idx != null ? 'i' + c.dataset.idx : 'n' + i) + '.' + (c.className || '').split(' ')[0]);
+function esbFoto(el) { const o = {}; esbCamps(el).forEach((c, i) => { o[esbClau(c, i)] = (c.type === 'checkbox' || c.type === 'radio') ? !!c.checked : c.value; }); return o; }
+function esbVisible(el, def) {
+    if (!el || !el.isConnected) return false;
+    if (el.classList.contains('screen')) return el.classList.contains('active');
+    if (el.classList.contains('fe-sheet-overlay')) return el.classList.contains('open');
+    return el.offsetParent !== null || el.getClientRects().length > 0;
+}
+function esbMarca(node) {
+    if (!node) return;
+    for (const d of ESB) { const el = document.querySelector(d.sel); if (el && el.contains(node)) { const e = esbEstat.get(d.clau); if (e) { e.brut = true; if (e.avis) { e.avis.remove(); e.avis = null; } } } }
+}
+window.dcEsbMarca = esbMarca;
+['input', 'change'].forEach(ev => document.addEventListener(ev, e => { if (e.isTrusted && e.target && e.target.matches && e.target.matches('input, textarea, select')) esbMarca(e.target); }, true));
+function esbDesat(store) {      // s'ha desat a la base de dades → l'esborrany ja no cal
+    for (const d of ESB) if (d.store === store) { const e = esbEstat.get(d.clau); if (e && (e.vist || e.brut)) { LS.del('dc_esb_' + d.clau); e.brut = false; if (e.avis) { e.avis.remove(); e.avis = null; } } }
+    if (store === 'projects' && pinForm && $('form') && $('form').classList.contains('active')) { const id = pinForm; pinForm = null; pinTreu(id); }
+    if (store === 'galeriaFotos') { const sc = $('screen-foto-directa'); if (sc && sc.dataset.pin) { const id = sc.dataset.pin; delete sc.dataset.pin; pinTreu(id); } }
+}
+function esbOfereix(d, e) {
+    let g = null; try { g = JSON.parse(LS.get('dc_esb_' + d.clau, 'null')); } catch (x) {}
+    if (!g || !g.camps || g.ctx !== d.ctx() || Date.now() - g.t > 7 * 864e5) return;
+    const ara = esbFoto(e.el);
+    const dif = Object.keys(g.camps).some(k => k in ara && g.camps[k] !== ara[k] && g.camps[k] !== '' && g.camps[k] !== false);
+    if (!dif) return;
+    const av = document.createElement('div'); av.className = 'esb-avis'; av.setAttribute('role', 'status');
+    av.innerHTML = `<span>📝 Hi ha un esborrany sense desar del ${fmtData(g.t)} a les ${fmtHora(g.t)}.</span><button type="button" class="prim">Recuperar</button><button type="button">Descartar</button>`;
+    const [bR, bD] = av.querySelectorAll('button');
+    bR.onclick = () => {
+        esbCamps(e.el).forEach((c, i) => {
+            const k = esbClau(c, i); if (!(k in g.camps)) return;
+            if (c.type === 'checkbox' || c.type === 'radio') { if (c.checked !== g.camps[k]) { c.checked = g.camps[k]; c.dispatchEvent(new Event('change', { bubbles: true })); } }
+            else if (c.value !== g.camps[k]) { c.value = g.camps[k]; c.dispatchEvent(new Event('input', { bubbles: true })); c.dispatchEvent(new Event('change', { bubbles: true })); }
+        });
+        av.remove(); e.avis = null; e.brut = true; showToast('📝 Esborrany recuperat');
+    };
+    bD.onclick = () => { LS.del('dc_esb_' + d.clau); av.remove(); e.avis = null; };
+    const cap = e.el.querySelector('.screen-header, .fe-sheet-handle, .modal-title');
+    if (cap && cap.parentNode) cap.parentNode.insertBefore(av, cap.nextSibling); else e.el.insertBefore(av, e.el.firstChild);
+    e.avis = av;
+}
+function esbTic() {
+    for (const d of ESB) {
+        const el = document.querySelector(d.sel);
+        let e = esbEstat.get(d.clau); if (!e) { e = { el: null, vist: false, brut: false, avis: null }; esbEstat.set(d.clau, e); }
+        const vis = esbVisible(el, d);
+        if (!vis) { if (e.vist) { e.vist = false; e.brut = false; if (e.avis) { e.avis.remove(); e.avis = null; } } continue; }
+        if (!e.vist || e.el !== el) { e.vist = true; e.el = el; e.brut = false; setTimeout(() => { if (e.vist && e.el === el && !e.brut) try { esbOfereix(d, e); } catch (x) {} }, 350); continue; }
+        if (e.brut) { e.brut = false; LS.set('dc_esb_' + d.clau, JSON.stringify({ t: Date.now(), ctx: d.ctx(), camps: esbFoto(el) })); }
+    }
+}
+
+/* ── DICTAT PER VEU (ca-ES) ────────────────────────────────────── */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+function veuPosaBotons() {
+    if (!SR) return;
+    document.querySelectorAll('textarea:not([data-veu])').forEach(ta => {
+        ta.dataset.veu = '1';
+        if (ta.id === 'feOptions' || ta.readOnly) return;
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'veu-btn';
+        b.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-mic"/></svg><span>Dictar</span>';
+        b.onclick = ev => { ev.preventDefault(); ev.stopPropagation(); veuToc(b, ta); };
+        ta.insertAdjacentElement('afterend', b);
+    });
+}
+function veuToc(btn, ta) {
+    if (rec) { try { rec.stop(); } catch (e) {} return; }
+    let r; try { r = new SR(); } catch (e) { return showToast('El dictat no està disponible en aquest navegador'); }
+    r.lang = 'ca-ES'; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
+    const base = ta.value ? ta.value.replace(/\s*$/, ' ') : '';
+    let ferm = '';
+    r.onresult = e => {
+        let prov = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) { const x = e.results[i]; if (x.isFinal) ferm += x[0].transcript.trim() + ' '; else prov += x[0].transcript; }
+        let t = (ferm + prov).trim(); if (!base && t) t = t.charAt(0).toUpperCase() + t.slice(1);
+        ta.value = base + t; ta.dispatchEvent(new Event('input', { bubbles: true })); esbMarca(ta);
+    };
+    r.onerror = e => {
+        const m = { 'not-allowed': 'Cal donar permís al micròfon', 'service-not-allowed': 'Cal donar permís al micròfon', network: 'El dictat necessita connexió a Internet en aquest mòbil', 'no-speech': 'No s\'ha sentit res', 'audio-capture': 'No s\'ha trobat cap micròfon', 'language-not-supported': 'Aquest mòbil no té el català instal·lat per al dictat' }[e.error];
+        if (m) showToast('🎤 ' + m);
+    };
+    r.onend = () => { rec = null; btn.classList.remove('on'); btn.lastElementChild.textContent = 'Dictar'; ta.dispatchEvent(new Event('change', { bubbles: true })); };
+    try { r.start(); } catch (e) { return showToast('🎤 No s\'ha pogut iniciar el dictat'); }
+    rec = r; btn.classList.add('on'); btn.lastElementChild.textContent = 'Escoltant… toca per acabar'; vibra(20);
+}
+
+/* ── PROGRÉS REAL ──────────────────────────────────────────────── */
+(function () {
+    const ov = $('spinnerOverlay'); if (!ov) return;
+    const bar = document.createElement('div'); bar.className = 'sp-prog'; bar.innerHTML = '<i></i>'; bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100');
+    const pct = document.createElement('div'); pct.className = 'sp-pct';
+    ov.insertBefore(bar, $('spinnerText')); ov.appendChild(pct);
+    let darrer = 0;
+    window.dcProgres = function (fet, total) {
+        const p = total > 0 ? Math.max(0, Math.min(100, fet / total * 100)) : 0;
+        ov.classList.add('amb-prog'); bar.firstChild.style.width = p + '%'; bar.setAttribute('aria-valuenow', Math.round(p)); pct.textContent = Math.round(p) + ' %';
+    };
+    /* Igual que dcProgres però cedint el torn perquè la barra es repinti dins de bucles llargs */
+    window.dcProgresA = async function (fet, total) {
+        window.dcProgres(fet, total);
+        if (performance.now() - darrer > 60) { await new Promise(r => setTimeout(r, 0)); darrer = performance.now(); }
+    };
+    const net = () => { ov.classList.remove('amb-prog'); bar.firstChild.style.width = '0'; pct.textContent = ''; };
+    const s0 = window.showSpinner, h0 = window.hideSpinner;
+    window.showSpinner = function () { net(); return s0.apply(this, arguments); };
+    window.hideSpinner = function () { net(); return h0.apply(this, arguments); };
+})();
+
+/* ── SECCIÓ TRANSVERSAL DINÀMICA (calculadora de normativa) ────── */
+function seccioPinta(estat) {
+    const cont = $('normSeccio'); if (!cont || typeof NORM_LLINDARS === 'undefined') return;
+    const ll = NORM_LLINDARS[($('calcTipusVia') || {}).value || 'resta'];
+    const ref = ($('calcReferencia') || {}).value || 'explanacio';
+    const d = parseFloat(($('calcDistancia') || {}).value);
+    const W = 420, H = 236, x0 = 104, x1 = W - 8, terra = 150;
+    const maxD = ll.af * 1.25;
+    const sx = v => x0 + (x1 - x0) * Math.sqrt(Math.max(0, Math.min(v, maxD)) / maxD);      // escala comprimida: es veuen totes les zones
+    const zones = [
+        { a: 0, b: ll.dp, nom: 'Domini públic', c: '#dc2626' },
+        { a: ll.dp, b: ll.sv, nom: 'Servitud', c: '#ea580c' },
+        { a: ll.sv, b: ll.af, nom: 'Afectació', c: '#ca8a04' },
+        { a: ll.af, b: maxD, nom: 'Fora', c: '#16a34a' }
+    ];
+    const bandes = zones.map(z => {
+        const xa = sx(z.a), xb = sx(z.b), mig = (xa + xb) / 2, ample = xb - xa;
+        return `<rect x="${xa.toFixed(1)}" y="${terra}" width="${ample.toFixed(1)}" height="34" fill="${z.c}" fill-opacity=".85"/>` +
+            (ample > 34 ? `<text x="${mig.toFixed(1)}" y="${terra + 22}" text-anchor="middle" font-size="14" fill="#fff">${ample > 96 ? z.nom : z.nom.split(' ')[0]}</text>` : '') +
+            (z.b < maxD ? `<line x1="${xb.toFixed(1)}" y1="${terra - 8}" x2="${xb.toFixed(1)}" y2="${terra + 40}" stroke="currentColor" stroke-width="1.5"/><text x="${xb.toFixed(1)}" y="${terra + 60}" text-anchor="middle" font-size="15" fill="currentColor">${z.b} m</text>` : '');
+    }).join('');
+    // Línia d'edificació (des de la calçada): es dibuixa a títol orientatiu
+    const xe = sx(ll.edif);
+    const edif = `<line x1="${xe.toFixed(1)}" y1="33" x2="${xe.toFixed(1)}" y2="${terra}" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="7 5"/><text x="${xe.toFixed(1)}" y="26" text-anchor="${xe > W - 80 ? 'end' : 'middle'}" font-size="14" fill="#7c3aed">Edificació · ${ll.edif} m</text>`;
+    let marca = '';
+    if (!isNaN(d) && d >= 0) {
+        const xm = sx(d), col = { ok: '#16a34a', forbid: '#dc2626', warn: '#d97706', info: '#2563eb' }[estat] || 'currentColor';
+        const ancora = xm > W - 50 ? 'end' : xm < x0 + 30 ? 'start' : 'middle';
+        marca = `<line x1="${xm.toFixed(1)}" y1="62" x2="${xm.toFixed(1)}" y2="${terra + 34}" stroke="${col}" stroke-width="3"/>` +
+            `<path d="M${(xm - 9).toFixed(1)} 62h18l-9 13z" fill="${col}"/>` +
+            `<text x="${xm.toFixed(1)}" y="55" text-anchor="${ancora}" font-size="19" fill="${col}">${String(d).replace('.', ',')} m${d > maxD ? ' →' : ''}</text>`;
+    }
+    cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Secció transversal de la carretera amb les zones de protecció">
+        <g style="color:var(--dark)">
+        <path d="M0 ${terra - 26}H80L${x0} ${terra}H${W}V${terra + 34}H0Z" fill="var(--bg-alt)"/>
+        <path d="M0 ${terra - 26}H80L${x0} ${terra}" fill="none" stroke="currentColor" stroke-width="2"/>
+        <rect x="0" y="${terra - 34}" width="62" height="8" fill="#1f2937"/>
+        <rect x="54" y="${terra - 34}" width="8" height="8" fill="#f8fafc" stroke="#1f2937" stroke-width="1"/>
+        <text x="28" y="${terra - 42}" text-anchor="middle" font-size="13" fill="currentColor">Calçada</text>
+        <line x1="62" y1="${terra - 60}" x2="62" y2="${terra - 26}" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <text x="62" y="${terra - 66}" text-anchor="middle" font-size="13" fill="currentColor">AEC</text>
+        <line x1="${x0}" y1="${terra - 60}" x2="${x0}" y2="${terra + 40}" stroke="currentColor" stroke-width="2"/>
+        <text x="${x0}" y="${terra - 66}" text-anchor="middle" font-size="13" fill="currentColor">AEE</text>
+        <text x="${x0}" y="${terra + 60}" text-anchor="middle" font-size="15" fill="currentColor">0</text>
+        ${bandes}${edif}${marca}
+        </g></svg>
+        <div class="norm-seccio-peu">Esquema orientatiu, no a escala. ${ref === 'calcada' ? 'La distància s\'ha mesurat des de la calçada (AEC): la zona real pot ser més restrictiva.' : 'Zones mesurades des de l\'aresta exterior de l\'explanació (AEE).'} ${ll.nom}.</div>`;
+}
+window.dcSeccio = seccioPinta;
+function seccioPrepara() {
+    const panell = $('normativaCalcPanell'), res = $('normCalcResultat'); if (!panell || !res || $('normSeccio')) return;
+    const c = document.createElement('div'); c.id = 'normSeccio'; c.className = 'norm-seccio';
+    res.parentNode.insertBefore(c, res);
+    ['calcTipusVia', 'calcReferencia', 'calcDistancia'].forEach(id => { const el = $(id); if (el) { el.addEventListener('input', () => seccioPinta()); el.addEventListener('change', () => seccioPinta()); } });
+    new MutationObserver(() => { const r = res.querySelector('.calc-result'); seccioPinta(r ? (['ok', 'forbid', 'warn', 'info'].find(k => r.classList.contains(k)) || '') : ''); }).observe(res, { childList: true });
+    seccioPinta();
+}
+
+/* ── EXPORTACIÓ GEOGRÀFICA: GeoJSON i KML ──────────────────────── */
+async function geoRecull() {
+    const fs = [];
+    const afegeix = (pos, props) => { if (pos && isFinite(pos[0]) && isFinite(pos[1])) fs.push({ lat: +(+pos[0]).toFixed(6), lon: +(+pos[1]).toFixed(6), props }); };
+    const val = (reg, clau) => { const v = (reg.values || []).find(x => String(x.label || '').toLowerCase().includes(clau)); return v ? v.val : ''; };
+    let fet = 0; const pas = async () => { if (++fet % 200 === 0) await new Promise(r => setTimeout(r, 0)); };
+    // Fotos ràpides
+    const fotos = await galeriaLlegirLleugeres();
+    for (const f of fotos) { afegeix(_galeriaPosicio(f), { tipus: 'Foto ràpida', carretera: f.carr || '', pk: f.pk || '', marge: f.marge || '', data: f.ts ? fmtData(f.ts) + ' ' + fmtHora(f.ts) : '', incidencia: f.tipusIncidencia || '', reparada: f.reparada ? 'Sí' : 'No', posicio: 'GPS' }); await pas(); }
+    // Punts fixats
+    for (const p of pinsLlegeix()) afegeix([p.lat, p.lon], { tipus: 'Punt fixat', carretera: p.carr || '', pk: p.carr ? fmtPK(p.km, p.m) : '', data: fmtData(p.ts) + ' ' + fmtHora(p.ts, true), precisio_m: p.acc, posicio: 'GPS' });
+    // Projectes i els seus punts
+    const projs = await projectesLleugers();
+    for (const p of projs) {
+        if (String(p.id || '').startsWith('cap_')) continue;
+        if (p.coordenades) { const c = String(p.coordenades).split(',').map(x => parseFloat(x)); afegeix(c, { tipus: 'Projecte', titol: p.titulo || '', data: p.fecha || '', posicio: 'GPS' }); }
+        for (const [i, r] of (p.registros || []).entries()) {
+            if (!r || r.tipus === 'annex') continue;
+            const carr = val(r, 'carretera'), pk = val(r, 'pk');
+            const props = { tipus: 'Punt de projecte', projecte: p.titulo || '', punt: i + 1, carretera: carr, pk, marge: val(r, 'marge'), posicio: 'calculada a partir del PK' };
+            (r.values || []).forEach(v => { const k = String(v.label || '').trim(); if (k && !(k.toLowerCase() in { carretera: 1, pk: 1, marge: 1 }) && v.val !== '' && v.val != null) props[k] = v.val; });
+            afegeix(posDePK(carr, pk), props); await pas();
+        }
+    }
+    // Fitxes d'animals
+    try { for (const a of await indexLleuger('animalsIncidencies')) { afegeix(posDePK(a.carretera, a.pk), { tipus: 'Fitxa d\'animal', carretera: a.carretera || '', pk: a.pk || '', data: a.data || '', hora: a.hora || '', especie: a.especie || a.animal || '', posicio: 'calculada a partir del PK' }); await pas(); } } catch (e) {}
+    return fs;
+}
+function geoAGeoJSON(fs) {
+    return JSON.stringify({ type: 'FeatureCollection', name: 'DataCamp', crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:OGC:1.3:CRS84' } },
+        features: fs.map(f => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [f.lon, f.lat] }, properties: f.props })) }, null, 1);
+}
+function geoAKML(fs) {
+    const x = s => String(s == null ? '' : s).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+    const grups = {}; fs.forEach(f => { (grups[f.props.tipus] = grups[f.props.tipus] || []).push(f); });
+    const nom = p => p.titol || [p.carretera, p.pk ? 'PK ' + p.pk : ''].filter(Boolean).join(' ') || p.tipus;
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>DataCamp ' + fmtData(Date.now()) + '</name>\n' +
+        Object.keys(grups).map(g => '<Folder><name>' + x(g) + '</name>\n' + grups[g].map(f =>
+            '<Placemark><name>' + x(nom(f.props)) + '</name><ExtendedData>' + Object.keys(f.props).map(k => '<Data name="' + x(k) + '"><value>' + x(f.props[k]) + '</value></Data>').join('') +
+            '</ExtendedData><Point><coordinates>' + f.lon + ',' + f.lat + ',0</coordinates></Point></Placemark>').join('\n') + '\n</Folder>').join('\n') + '\n</Document></kml>\n';
+}
+window.dcGeoExporta = async function (format) {
+    showSpinner('PREPARANT ' + (format === 'kml' ? 'KML' : 'GEOJSON') + '...');
+    try {
+        const fs = await geoRecull();
+        if (!fs.length) { hideSpinner(); return alert('Encara no hi ha cap registre amb posició per exportar.'); }
+        const esKml = format === 'kml';
+        const blob = new Blob([esKml ? geoAKML(fs) : geoAGeoJSON(fs)], { type: esKml ? 'application/vnd.google-earth.kml+xml' : 'application/geo+json' });
+        const d = new Date(), nom = `DataCamp_${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.${esKml ? 'kml' : 'geojson'}`;
+        hideSpinner();
+        currentBlob = blob; currentFileName = nom;
+        $('exportTitle').innerText = `${esKml ? 'KML' : 'GEOJSON'} (${fs.length} punt${fs.length !== 1 ? 's' : ''})`;
+        $('exportName').innerText = nom;
+        $('btnShare').onclick = () => {
+            const file = new File([blob], nom, { type: blob.type });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: nom }).catch(() => {});
+            else alert('Aquest navegador no pot compartir aquest tipus de fitxer. Fes servir «Descarregar».');
+            closeExportModal();
+        };
+        $('btnDownload').onclick = () => {
+            const a = document.createElement('a'), url = URL.createObjectURL(blob); a.href = url; a.download = nom;
+            document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+            closeExportModal();
+        };
+        $('exportModal').style.display = 'flex';
+    } catch (e) { hideSpinner(); alert('Error preparant el fitxer: ' + e.message); }
+};
+window.dcGeo = { recull: geoRecull, geojson: geoAGeoJSON, kml: geoAKML, posDePK };
+
+/* ── ARRENCADA ─────────────────────────────────────────────────── */
+function arrenca() {
+    pinsPinta(); gpsPinta(); discPinta(); gpsAuto(); seccioPrepara(); veuPosaBotons();
+    const act = document.querySelector('.screen.active'); navSync(act ? act.id : 'home');
+    const segur = fn => { try { fn(); } catch (e) { console.warn('[fase2]', fn.name, e); } };
+    setInterval(() => { segur(esbTic); segur(veuPosaBotons); segur(pinsFormPinta); segur(instPinta); }, 500);
+    setInterval(() => { gpsPinta(); }, 4000);
+    setInterval(discPinta, 30000);
+    // PK pendents de punts fixats sense dades: es tornen a provar en obrir
+    setTimeout(() => { pinsLlegeix().filter(p => !p.carr).slice(0, 5).forEach(p => pinResol(p.id)); }, 4000);
+    (function esperaDb(n) { if (typeof db !== 'undefined' && db) setTimeout(fotosMigra, 9000); else if (n < 80) setTimeout(() => esperaDb(n + 1), 500); })(0);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrenca); else arrenca();
 })();
 </script>
 
