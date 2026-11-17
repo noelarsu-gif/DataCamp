@@ -5407,7 +5407,10 @@ html[data-theme="dark"] .tone-brown  { --tone: #fdba74; --tone-lt: #3a1c08; }
 html[data-theme="dark"] .tone-teal   { --tone: #2dd4bf; --tone-lt: #0b2b2a; }
 html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { background-color: var(--surface-2); color: var(--dark); border-color: var(--border-dark); }
 html[data-theme="dark"] ::placeholder { color: var(--text-light); }
-html[data-theme="dark"] #splashScreen { background: var(--bg); }
+html[data-theme="dark"] #splashScreen { background: var(--bg); animation: spDeBlanc .45s ease .2s backwards, spFora .3s ease 2s forwards; }
+@keyframes spDeBlanc { from { background: #ffffff; } }
+html[data-theme="dark"] .sp-hello { color: var(--dark); }
+html[data-theme="dark"] .sp-msg { color: var(--text-muted); }
 html[data-theme="dark"] .mobile-brand-logo { background: #fff; border-radius: 4px; padding: 2px 5px; height: 26px; opacity: 1; }
 html[data-theme="dark"] .action-card:not([class*="tone-"]):not(.primary):not(.blue) .action-icon { background: var(--bg-alt); color: var(--dark); }
 html[data-theme="dark"] .dl-btn[style*="background"] { background: var(--surface-2) !important; border-color: var(--border-dark) !important; color: var(--dark) !important; }
@@ -5621,8 +5624,8 @@ html[data-theme="sunlight"] .tema-btn { background: #ffd400; border-color: #000;
 
 /* ── SPLASH ràpid ──────────────────────────────────────────────── */
 html.sp-vist #splashScreen { display: none !important; }
-/* Es fon sola als 1,6 s amb una animació CSS (no depèn que el JavaScript estigui lliure). Tocant-la es tanca abans. */
-#splashScreen { animation: spFora .3s ease 1.6s forwards; }
+/* Es fon sola als 2 s amb una animació CSS (no depèn que el JavaScript estigui lliure). Tocant-la es tanca abans. */
+#splashScreen { animation: spFora .3s ease 2s forwards; }
 @keyframes spFora { to { opacity: 0; } }
 
 /* ── INSTRUMENT PK (odòmetre de precisió) ──────────────────────── */
@@ -5844,9 +5847,28 @@ html.sp-vist #splashScreen { display: none !important; }
     .sp-van { animation: none; left: calc(50% - 80px); }
     .sp-asphalt::after, .sp-van * { animation: none !important; }
 }
+/* ── Enllaç amb la pantalla d'Android ────────────────────────────
+   En obrir l'app instal·lada, Android mostra el seu icon sobre blanc.
+   La benvinguda comença amb el mateix icon al mateix lloc i aquest es
+   fon cap amunt mentre apareix el saludo: sembla una sola animació. */
+.sp-icona {
+    position: absolute; left: 50%; top: 50%;
+    width: 132px; height: 132px; margin: -66px 0 0 -66px;
+    pointer-events: none;
+    animation: spIcona .5s cubic-bezier(.4,0,.2,1) .15s forwards;
+}
+@keyframes spIcona { to { opacity: 0; transform: translateY(-120px) scale(.45); } }
+.sp-word { animation-delay: .35s; }
+.sp-asphalt { animation-delay: .45s; }
+.sp-asphalt::after, .sp-van, .sp-van .body, .sp-van .spin, .sp-van .speed { animation-delay: .5s; }
+.sp-hello { animation-delay: .8s; }
+.sp-msg { animation-delay: 1s; }
+.sp-foot { animation-delay: 1.15s; }
+@media (prefers-reduced-motion: reduce) { .sp-icona { display: none; } }
 </style>
 
 <div id="splashScreen" role="status" aria-live="polite" aria-label="Benvinguda a DataCamp">
+    <img class="sp-icona" src="icon-512.png" alt="" aria-hidden="true">
     <div class="sp-center">
         <div class="sp-word">DATACAMP</div>
         <div class="sp-scene" aria-hidden="true">
@@ -6047,7 +6069,7 @@ window.DC_INSTAL_NOVA = (function () { try { return localStorage.length === 0; }
     let vist = false;
     try { vist = !!sessionStorage.getItem('dc_splash'); sessionStorage.setItem('dc_splash', '1'); } catch (e) {}
     if (vist) { tancat = true; s.remove(); }
-    else setTimeout(tancar, 1900);
+    else setTimeout(tancar, 2300);
 })();
 </script>
 
