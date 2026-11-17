@@ -9934,7 +9934,7 @@ function obrirInformeITC(imgDataInicial, registreExistent) {
 
         <div style="background:var(--primary); color:#fff; font-weight:700; padding:7px 12px; border-radius:var(--radius-sm); margin-bottom:10px; font-size:0.85rem;">Dades de l'expedient</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div class="form-group" style="margin:0"><label>Expedient</label><input type="text" id="itc_expedient" value="${r.expedient || ''}" placeholder="Ex: CAL2018XXXX"></div>
+            <div class="form-group" style="margin:0"><label>Expedient</label><input type="text" id="itc_expedient" value="${r.expedient || ''}" placeholder="2026_20595"></div>
             <div class="form-group" style="margin:0"><label>Data</label><input type="text" id="itc_data" value="${dataDefault}" placeholder="DD-MM-AAAA"></div>
         </div>
         <div class="form-group"><label>Vigilant</label><input type="text" id="itc_vigilant" value="${vigilantDefault}"></div>
@@ -17614,9 +17614,9 @@ function pkmBack() {
     <div class="fe-sheet pd-sheet" role="dialog" aria-modal="true" aria-labelledby="itcExpTitol">
         <div class="fe-sheet-handle"></div>
         <h4 id="itcExpTitol">Nou expedient ITC</h4>
-        <label for="itcExpCodi">Codi de l'expedient</label>
-        <input type="text" id="itcExpCodi" class="itc-exp-inp" autocomplete="off" autocapitalize="characters" spellcheck="false"
-               placeholder="MB00147_2026_AUTO_20085_2_1" oninput="itcPreviaCodi()" onkeydown="if(event.key==='Enter'){event.preventDefault();itcCrearExpedient();}">
+        <label for="itcExpCodi">Número d'expedient</label>
+        <input type="text" id="itcExpCodi" class="itc-exp-inp" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="2026_20595" oninput="itcPreviaCodi()" onkeydown="if(event.key==='Enter'){event.preventDefault();itcCrearExpedient();}">
         <p class="itc-exp-previa" id="itcExpPrevia"></p>
         <button class="btn btn-primary btn-block" onclick="itcCrearExpedient()">Continuar</button>
         <div id="itcExpRecents"></div>
@@ -19380,10 +19380,10 @@ async function fotoRedueix(src, max, q) {
 
 /* ══════════════════════════════════════════════════════════════════
    EXPEDIENT ITC = Informe tècnic de camp + Annex fotogràfic
-   · Primer es demana el codi de l'expedient (p. ex. MB00147_2026_AUTO_20085_2_1).
-     A l'informe hi surt la forma curta (2026_20085); el codi complet dona
-     nom als fitxers, com es lliuren ara:
-       <codi>_Informe_tecnic_camp.pdf · <codi>_Informe_tecnic_camp_annex.pdf
+   · Primer es demana només el número de l'expedient (p. ex. 2026_20595).
+     Surt a la capçalera dels PDF (EXP. 2026_20595) i dona nom als fitxers:
+       2026_20595_Informe_tecnic_camp.pdf · 2026_20595_Informe_tecnic_camp_annex.pdf
+     Si s'enganxa el codi llarg antic (MB00147_2026_AUTO_20085_2_1) se'n treu el número.
    · Tot es desa al mateix registre d'«itcInformes» (camps codi i annex),
      que ja entra a la còpia de seguretat.
    ══════════════════════════════════════════════════════════════════ */
@@ -19393,14 +19393,19 @@ let _itcDesarT = null;
 
 function itcEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function itcNetejaCodi(t) { return String(t || '').trim().replace(/[\s\/\\]+/g, '_').replace(/[^A-Za-z0-9_.\-]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, ''); }
-/** «MB00147_2026_AUTO_20085_2_1» → «2026_20085»; si ja és curt, es manté */
+/** «MB00147_2026_AUTO_20085_2_1» → «2026_20085»; «2026/20085», «2026-20085» o «2026 20085» → «2026_20085»;
+    només «20085» → «<any actual>_20085»; si no s'hi reconeix cap número, es manté */
 function itcExpCurt(codi) {
-    const c = itcNetejaCodi(codi);
+    const c = itcNetejaCodi(String(codi || '').replace(/^\s*exp(?:edient)?\.?\s*/i, '').replace(/[\s\-]+/g, '_'));
+    if (/^\d{3,}$/.test(c)) return new Date().getFullYear() + '_' + c;
     let m = /(?:^|_)((?:19|20)\d{2})_[A-Za-z]+_(\d{3,})/.exec(c); if (m) return m[1] + '_' + m[2];
     m = /^((?:19|20)\d{2})[_\-](\d+)$/.exec(c); if (m) return m[1] + '_' + m[2];
     return c;
 }
-function itcCodiDe(r) { return itcNetejaCodi(r.codi || r.expedient || 'ITC') || 'ITC'; }
+function itcCodiDe(r) {      // els fitxers i la capçalera porten només el número (2026_20595)
+    const a = itcExpCurt(r.expedient || ''), b = itcExpCurt(r.codi || ''), ok = x => /^(19|20)\d{2}_\d+$/.test(x);
+    return (ok(a) ? a : ok(b) ? b : a || b) || 'ITC';
+}
 function itcNomITC(r) { return itcCodiDe(r) + '_Informe_tecnic_camp.pdf'; }
 function itcNomAnnex(r) { return itcCodiDe(r) + '_Informe_tecnic_camp_annex.pdf'; }
 function itcAnnexDe(r) { return Array.isArray(r.annex) ? r.annex : []; }
@@ -19426,23 +19431,22 @@ async function itcNouExpedient() {
     const tots = (await itcTots()).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 4);
     document.getElementById('itcExpRecents').innerHTML = tots.length
         ? '<span class="itc-recents-tit">Obrir un de recent</span>' + tots.map(r =>
-            `<button type="button" class="itc-recent" onclick="itcTancaFullExp(); itcObrirExpedient('${itcEsc(r.id)}')"><b>${itcEsc(r.expedient || itcExpCurt(itcCodiDe(r)))}</b><small>${itcEsc(r.carretera || '')} ${itcEsc(r.titolObra || '')}</small></button>`).join('')
+            `<button type="button" class="itc-recent" onclick="itcTancaFullExp(); itcObrirExpedient('${itcEsc(r.id)}')"><b>${itcEsc(itcCodiDe(r))}</b><small>${itcEsc(r.carretera || '')} ${itcEsc(r.titolObra || '')}</small></button>`).join('')
         : '';
     pdObreSheet('itcExpSheet');
     setTimeout(() => inp.focus(), 250);
 }
 function itcTancaFullExp() { pdTancaSheet('itcExpSheet'); }
 function itcPreviaCodi() {
-    const c = itcNetejaCodi(document.getElementById('itcExpCodi').value);
+    const v = document.getElementById('itcExpCodi').value, c = itcExpCurt(v);
     document.getElementById('itcExpPrevia').innerHTML = c
-        ? `A l'informe: <b>${itcEsc(itcExpCurt(c))}</b><br>Fitxers: <b>${itcEsc(c)}_Informe_tecnic_camp.pdf</b> i <b>…_annex.pdf</b>`
-        : 'Enganxa el codi complet (p. ex. MB00147_2026_AUTO_20085_2_1): dona nom als fitxers.';
+        ? `Capçalera: <b>EXP. ${itcEsc(c)}</b> · Fitxers: <b>${itcEsc(c)}_Informe_tecnic_camp.pdf</b> i <b>…_annex.pdf</b>`
+        : 'Escriu només el número de l’expedient.';
 }
 async function itcCrearExpedient() {
-    const codi = itcNetejaCodi(document.getElementById('itcExpCodi').value);
-    if (!codi) { showToast('Escriu el codi de l’expedient'); document.getElementById('itcExpCodi').focus(); return; }
-    const curt = itcExpCurt(codi);
-    const ja = (await itcTots()).find(r => itcCodiDe(r).toLowerCase() === codi.toLowerCase());
+    const curt = itcExpCurt(document.getElementById('itcExpCodi').value), codi = curt;
+    if (!curt) { showToast('Escriu el número de l’expedient'); document.getElementById('itcExpCodi').focus(); return; }
+    const ja = (await itcTots()).find(r => itcCodiDe(r).toLowerCase() === curt.toLowerCase());
     if (ja) { itcTancaFullExp(); showToast('Aquest expedient ja existia: l’obrim'); itcObrirExpedient(ja.id); return; }
     const tecnic = (typeof _carregarDadesTecnic === 'function' ? _carregarDadesTecnic() : {}) || {};
     const ara = new Date();
@@ -19477,8 +19481,7 @@ function itcRenderHub() {
     document.getElementById('itcExpCos').innerHTML = `
         <div class="itc-cap">
             <span class="itc-cap-et">Expedient</span>
-            <b>${itcEsc(r.expedient || itcExpCurt(itcCodiDe(r)))}</b>
-            <small>${itcEsc(itcCodiDe(r))}</small>
+            <b>${itcEsc(itcCodiDe(r))}</b>
         </div>
         <button type="button" class="itc-targeta" onclick="itcObrirFormulari()">
             <span class="action-icon tone-violet"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></span>
@@ -19529,7 +19532,7 @@ async function itcTornarDelFormulari(id) {
 }
 async function itcEliminarExpedient() {
     const r = itcActual; if (!r) return;
-    if (!confirm('Vols eliminar l’expedient ' + (r.expedient || itcCodiDe(r)) + ' amb l’informe i l’annex? No es pot desfer.')) return;
+    if (!confirm('Vols eliminar l’expedient ' + itcCodiDe(r) + ' amb l’informe i l’annex? No es pot desfer.')) return;
     await new Promise(res => { const tx = db.transaction('itcInformes', 'readwrite'); tx.objectStore('itcInformes').delete(r.id); tx.oncomplete = res; tx.onerror = res; });
     itcActual = null;
     showToast('Expedient eliminat');
@@ -19547,7 +19550,7 @@ function itcObrirAnnex() {
 }
 function itcRenderAnnex() {
     const r = itcActual, punts = itcAnnexDe(r);
-    document.getElementById('itcAnnexTit').textContent = 'Annex · ' + (r.expedient || itcExpCurt(itcCodiDe(r)));
+    document.getElementById('itcAnnexTit').textContent = 'Annex · ' + itcCodiDe(r);
     document.getElementById('itcAnnexCos').innerHTML = punts.map((p, i) => `
         <section class="itc-punt" data-i="${i}">
             <div class="itc-punt-cap"><b>Registre ${i + 1}${punts.length > 1 ? ' de ' + punts.length : ''}</b>
@@ -19728,7 +19731,7 @@ async function itcBlobAnnex(r) {
     const punts = itcAnnexDe(r).filter(p => (p.fotos || []).length || p.carretera || p.obs);
     if (!punts.length || !itcNFotos(r)) throw new Error('L’annex encara no té fotos');
     const p = {   // mateix format que el PDF «Fitxa» que ja es lliura
-        titulo: 'EXP. ' + (r.expedient || itcExpCurt(itcCodiDe(r))),
+        titulo: 'EXP. ' + itcCodiDe(r),
         fields: [{ label: 'Carretera' }, { label: 'PK' }, { label: 'Marge' }, { label: 'Observacions' }],
         registros: punts.map(pt => ({
             values: [{ label: 'Carretera', val: pt.carretera }, { label: 'PK', val: pt.pk }, { label: 'Marge', val: pt.marge }, { label: 'Observacions', val: pt.obs }],
